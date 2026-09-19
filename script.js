@@ -1,122 +1,178 @@
 // ===== SALINLAHI Mini-Level: game logic (database not connected yet) =====
+// NOTE: The Filipino vocabulary below should be checked by your Filipino validator.
 
-// ----- Game content: 3 levels based on the storyboard -----
-const LEVELS = [
+// ----- Vocabulary: meaning, emoji, and the character action for each word -----
+const WORDS = {
+  // Home
+  bukas: { en: "Open",        emoji: "🚪", action: "act" },
+  sara:  { en: "Close",       emoji: "🔒", action: "act" },
+  kuha:  { en: "Get / Take",  emoji: "🤲", action: "collect" },
+  upo:   { en: "Sit",         emoji: "🪑", action: "duck" },
+  tayo:  { en: "Stand up",    emoji: "🧍", action: "act" },
+  // School
+  sulat: { en: "Write",       emoji: "✏️", action: "act" },
+  basa:  { en: "Read",        emoji: "📖", action: "act" },
+  punta: { en: "Go to",       emoji: "📍", action: "walk" },
+  // Park
+  lakad: { en: "Walk",        emoji: "🚶", action: "walk" },
+  takbo: { en: "Run",         emoji: "🏃", action: "dash" },
+  talon: { en: "Jump",        emoji: "🦘", action: "jump" },
+  hinto: { en: "Stop",        emoji: "✋", action: "halt" },
+  yuko:  { en: "Bend down",   emoji: "🙇", action: "duck" },
+  // Store
+  bili:  { en: "Buy",         emoji: "🛒", action: "collect" },
+  bayad: { en: "Pay",         emoji: "💵", action: "act" },
+  pili:  { en: "Choose",      emoji: "👆", action: "act" },
+  bigay: { en: "Give",        emoji: "🎁", action: "act" }
+};
+
+// ----- Environments, each with 3 levels -----
+// A question with a single word as its answer = "single" challenge.
+// A question with an array as its answer = "sequence" challenge (say the words in order).
+const ENVIRONMENTS = [
   {
-    name: "Basic Words",
-    intro: "Learn these action words!",
-    words: [
-      { word: "talon", en: "Jump", emoji: "🦘" },
-      { word: "lakad", en: "Walk", emoji: "🚶" },
-      { word: "tigil", en: "Stop",  emoji: "✋" }
-    ],
-    questions: [
-      { emoji: "🪨", text: "A rock is in the way! Which Filipino word means JUMP?", answer: "talon", action: "jump" },
-      { emoji: "🛤️", text: "The path is clear. Which Filipino word means WALK?", answer: "lakad", action: "walk" },
-      { emoji: "🛑", text: "A stop sign! Which Filipino word means STOP?", answer: "tigil", action: "halt" }
+    id: "home", name: "Home", emoji: "🏠", theme: "Everyday actions", decor: "🖼️ 🛋️ 🪟",
+    levels: [
+      {
+        name: "Living Room", intro: "Learn these words for things you do at home!",
+        words: ["bukas", "sara", "kuha"],
+        questions: [
+          { emoji: "🚪", text: "The door is closed. Which Filipino word means OPEN?", answer: "bukas" },
+          { emoji: "🪟", text: "It is raining! Which Filipino word means CLOSE?", answer: "sara" },
+          { emoji: "🧸", text: "Your toy is on the table. Which Filipino word means GET / TAKE?", answer: "kuha" }
+        ]
+      },
+      {
+        name: "Bedroom", intro: "Two new words for your day at home!",
+        words: ["upo", "tayo"],
+        questions: [
+          { emoji: "🪑", text: "Time to eat! Which Filipino word means SIT?", answer: "upo" },
+          { emoji: "🛏️", text: "Good morning! Which Filipino word means STAND UP?", answer: "tayo" },
+          { emoji: "🧸", text: "Pick up your toy. Which Filipino word means GET / TAKE?", answer: "kuha" }
+        ]
+      },
+      {
+        name: "Kitchen", intro: "Combine the words you learned!",
+        words: ["bukas", "sara", "kuha", "upo", "tayo"],
+        questions: [
+          { emoji: "🚪", text: "Keep the cold out! Which Filipino word means CLOSE?", answer: "sara" },
+          { emoji: "🍎", text: "Stand up, get the apple, then sit down. Choose the words in order!", answer: ["tayo", "kuha", "upo"] },
+          { emoji: "🧸", text: "Open the door, get the toy, then close the door. Choose the words in order!", answer: ["bukas", "kuha", "sara"] }
+        ]
+      }
     ]
   },
   {
-    name: "More Actions",
-    intro: "New action words to overcome obstacles!",
-    words: [
-      { word: "yuko", en: "Bend down", emoji: "🙇" },
-      { word: "takbo", en: "Run", emoji: "🏃" },
-      { word: "hinto", en: "Halt", emoji: "🚧" }
-    ],
-    questions: [
-      { emoji: "🪵", text: "A low log is ahead! Which Filipino word means BEND DOWN?", answer: "yuko", action: "duck" },
-      { emoji: "🐕", text: "A dog is chasing you! Which Filipino word means RUN?", answer: "takbo", action: "dash" },
-      { emoji: "🚧", text: "Construction ahead! Which Filipino word means HALT?", answer: "hinto", action: "halt" }
+    id: "school", name: "School", emoji: "🏫", theme: "Classroom actions", decor: "🔔 📚 🖍️",
+    levels: [
+      {
+        name: "Classroom", intro: "Learn these words for your classroom!",
+        words: ["sulat", "basa", "punta"],
+        questions: [
+          { emoji: "✏️", text: "Copy the lesson. Which Filipino word means WRITE?", answer: "sulat" },
+          { emoji: "📖", text: "Open your book. Which Filipino word means READ?", answer: "basa" },
+          { emoji: "🧑‍🏫", text: "The teacher calls you. Which Filipino word means GO TO?", answer: "punta" }
+        ]
+      },
+      {
+        name: "Hallway", intro: "Two new words for the school day!",
+        words: ["tayo", "upo"],
+        questions: [
+          { emoji: "🔔", text: "Class starts! Which Filipino word means STAND UP?", answer: "tayo" },
+          { emoji: "🪑", text: "Time to listen. Which Filipino word means SIT?", answer: "upo" },
+          { emoji: "🪧", text: "Look at the sign. Which Filipino word means READ?", answer: "basa" }
+        ]
+      },
+      {
+        name: "School Yard", intro: "Combine the words you learned!",
+        words: ["sulat", "basa", "punta", "tayo", "upo"],
+        questions: [
+          { emoji: "🧑‍🏫", text: "Walk to the teacher's desk. Which Filipino word means GO TO?", answer: "punta" },
+          { emoji: "📋", text: "Stand up, go to the board, then write. Choose the words in order!", answer: ["tayo", "punta", "sulat"] },
+          { emoji: "📚", text: "Go to your seat, sit down, then read. Choose the words in order!", answer: ["punta", "upo", "basa"] }
+        ]
+      }
     ]
   },
   {
-    name: "Objects",
-    intro: "Learn the Filipino names of these objects!",
-    words: [
-      { word: "aklat", en: "Book", emoji: "📕" },
-      { word: "bag", en: "Bag", emoji: "🎒" },
-      { word: "lapis", en: "Pencil", emoji: "✏️" },
-      { word: "upuan", en: "Chair", emoji: "🪑" }
-    ],
-    questions: [
-      { emoji: "📕", text: "Ano ang tawag dito? (What is this called?)", answer: "aklat", action: "collect" },
-      { emoji: "🎒", text: "Ano ang tawag dito? (What is this called?)", answer: "bag", action: "collect" },
-      { emoji: "✏️", text: "Ano ang tawag dito? (What is this called?)", answer: "lapis", action: "collect" },
-      { emoji: "🪑", text: "Ano ang tawag dito? (What is this called?)", answer: "upuan", action: "collect" }
+    id: "park", name: "Park", emoji: "🌳", theme: "Movement", decor: "",
+    levels: [
+      {
+        name: "Playground", intro: "Learn these movement words!",
+        words: ["lakad", "takbo", "talon"],
+        questions: [
+          { emoji: "🛤️", text: "The path is clear. Which Filipino word means WALK?", answer: "lakad" },
+          { emoji: "🐕", text: "A dog is chasing you! Which Filipino word means RUN?", answer: "takbo" },
+          { emoji: "🪨", text: "A rock is in the way! Which Filipino word means JUMP?", answer: "talon" }
+        ]
+      },
+      {
+        name: "Garden Path", intro: "Two new words for the park!",
+        words: ["hinto", "yuko"],
+        questions: [
+          { emoji: "🛑", text: "A stop sign! Which Filipino word means STOP?", answer: "hinto" },
+          { emoji: "🪵", text: "A low branch! Which Filipino word means BEND DOWN?", answer: "yuko" },
+          { emoji: "🌷", text: "Enjoy the flowers. Which Filipino word means WALK?", answer: "lakad" }
+        ]
+      },
+      {
+        name: "Pond Trail", intro: "Combine the words you learned!",
+        words: ["lakad", "takbo", "talon", "hinto", "yuko"],
+        questions: [
+          { emoji: "🦆", text: "A duck is crossing the path! Which Filipino word means STOP?", answer: "hinto" },
+          { emoji: "🪨", text: "Walk, stop, then jump over the rock. Choose the words in order!", answer: ["lakad", "hinto", "talon"] },
+          { emoji: "🌳", text: "Run, bend down under the branch, then jump the puddle. Choose the words in order!", answer: ["takbo", "yuko", "talon"] }
+        ]
+      }
+    ]
+  },
+  {
+    id: "store", name: "Community Store", emoji: "🛍️", theme: "Everyday words", decor: "🏷️ 🛒 🧺",
+    levels: [
+      {
+        name: "Fruit Stand", intro: "Learn these words for shopping!",
+        words: ["pili", "bili", "bayad"],
+        questions: [
+          { emoji: "🍎", text: "So many fruits! Which Filipino word means CHOOSE?", answer: "pili" },
+          { emoji: "🛒", text: "You want the apples. Which Filipino word means BUY?", answer: "bili" },
+          { emoji: "💵", text: "Time to pay the cashier. Which Filipino word means PAY?", answer: "bayad" }
+        ]
+      },
+      {
+        name: "Market", intro: "Two new words for the market!",
+        words: ["bigay", "kuha"],
+        questions: [
+          { emoji: "🎁", text: "A gift for your friend! Which Filipino word means GIVE?", answer: "bigay" },
+          { emoji: "🧺", text: "Grab the basket. Which Filipino word means GET / TAKE?", answer: "kuha" },
+          { emoji: "🧸", text: "You like this toy. Which Filipino word means BUY?", answer: "bili" }
+        ]
+      },
+      {
+        name: "Shopping Street", intro: "Combine the words you learned!",
+        words: ["pili", "bili", "bayad", "bigay", "kuha"],
+        questions: [
+          { emoji: "🧾", text: "The cashier is waiting. Which Filipino word means PAY?", answer: "bayad" },
+          { emoji: "🍎", text: "Choose the fruit, buy it, then pay. Choose the words in order!", answer: ["pili", "bili", "bayad"] },
+          { emoji: "🛍️", text: "Get the bag, pay for it, then give it to your mom. Choose the words in order!", answer: ["kuha", "bayad", "bigay"] }
+        ]
+      }
     ]
   }
 ];
 
 const POINTS_PER_CORRECT = 10;
-const PASS_RATIO = 0.6; // need 60% correct to unlock the next level
+const PASS_RATIO = 0.6;     // need 60% correct to unlock the next level
+const STEP_MS = 950;        // time for one character action
 
-let state = {};
-let bgX = 0;
-
-// ----- Elements -----
+// ----- Helpers -----
 const $ = id => document.getElementById(id);
-const SCREENS = ["profileScreen", "learnScreen", "playScreen", "levelResultScreen", "finalScreen"];
+const SCREENS = ["profileScreen", "envScreen", "levelsScreen", "learnScreen", "playScreen", "resultScreen"];
 
 function showScreen(id) {
   SCREENS.forEach(s => $(s).classList.add("hidden"));
   $(id).classList.remove("hidden");
 }
 
-// ===== 1. Start / Player Profile =====
-$("startBtn").addEventListener("click", () => {
-  const name = $("playerName").value.trim();
-  const age = parseInt($("playerAge").value, 10);
-  const learningLevel = $("learningLevel").value;
-
-  if (name === "") { $("startError").textContent = "Please enter your name."; return; }
-  if (isNaN(age) || age < 4 || age > 12) { $("startError").textContent = "Please enter an age from 4 to 12."; return; }
-  $("startError").textContent = "";
-
-  state = {
-    name: name,
-    age: age,
-    learningLevel: learningLevel,
-    levelIndex: 0,
-    qIndex: 0,
-    score: 0,
-    levelCorrect: 0,
-    levelsPassed: 0,
-    levelReached: 1,
-    wordsLearned: new Set(),
-    locked: false
-  };
-  showLearn();
-});
-
-// ===== 2. Learn the words =====
-function showLearn() {
-  const level = LEVELS[state.levelIndex];
-  $("learnTitle").textContent = "LEVEL " + (state.levelIndex + 1) + ": " + level.name.toUpperCase();
-  $("learnSub").textContent = level.intro;
-
-  const box = $("wordCards");
-  box.innerHTML = "";
-  level.words.forEach(w => {
-    const card = document.createElement("div");
-    card.className = "word-card";
-    card.innerHTML =
-      '<span class="emoji">' + w.emoji + '</span>' +
-      '<strong>' + w.word.toUpperCase() + '</strong>' +
-      '<span>' + w.en + '</span>';
-    box.appendChild(card);
-  });
-  showScreen("learnScreen");
-}
-
-$("playLevelBtn").addEventListener("click", () => {
-  state.qIndex = 0;
-  state.levelCorrect = 0;
-  showScreen("playScreen");
-  showQuestion();
-});
-
-// ===== 3. Play =====
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -126,63 +182,218 @@ function shuffle(arr) {
   return a;
 }
 
+// Restart a CSS animation class on an element
+function setClass(el, base, extra) {
+  el.className = base;
+  void el.offsetWidth; // force reflow so the animation restarts
+  if (extra) el.className = base + " " + extra;
+}
+
+// ----- Game state -----
+let state = { name: "", envId: null, levelIndex: 0, qIndex: 0, score: 0, correct: 0, seq: [], locked: false, progress: {} };
+let bgX = 0;
+
+function currentEnv() { return ENVIRONMENTS.find(e => e.id === state.envId); }
+function currentLevel() { return currentEnv().levels[state.levelIndex]; }
+function currentQuestion() { return currentLevel().questions[state.qIndex]; }
+
+// ===== 1. Enter nickname =====
+$("startBtn").addEventListener("click", () => {
+  const name = $("playerName").value.trim();
+  if (name === "") { $("startError").textContent = "Please enter a nickname."; return; }
+  $("startError").textContent = "";
+
+  state.name = name;
+  state.progress = {};
+  ENVIRONMENTS.forEach(e => state.progress[e.id] = 0); // levels passed per environment
+  showEnvs();
+});
+
+// ===== 2. Choose an environment =====
+function showEnvs() {
+  $("envGreeting").textContent = "Hi, " + state.name + "! Where do you want to learn?";
+  const grid = $("envGrid");
+  grid.innerHTML = "";
+  ENVIRONMENTS.forEach(env => {
+    const card = document.createElement("button");
+    card.className = "env-card";
+    card.innerHTML =
+      '<span class="env-emoji">' + env.emoji + '</span>' +
+      '<strong>' + env.name + '</strong>' +
+      '<span class="env-theme">' + env.theme + '</span>' +
+      '<span class="env-progress">Levels passed: ' + state.progress[env.id] + '/' + env.levels.length + '</span>';
+    card.addEventListener("click", () => { state.envId = env.id; showLevels(); });
+    grid.appendChild(card);
+  });
+  showScreen("envScreen");
+}
+
+$("changeNameBtn").addEventListener("click", () => showScreen("profileScreen"));
+
+// ===== 3. Level list =====
+function showLevels() {
+  const env = currentEnv();
+  $("levelsTitle").textContent = env.emoji + " " + env.name.toUpperCase();
+  $("levelsSub").textContent = "Pass a level to unlock the next one.";
+
+  const list = $("levelList");
+  list.innerHTML = "";
+  env.levels.forEach((lvl, i) => {
+    const passed = i < state.progress[env.id];
+    const locked = i > state.progress[env.id];
+    const btn = document.createElement("button");
+    btn.className = "level-btn";
+    btn.disabled = locked;
+    btn.innerHTML =
+      '<span>Level ' + (i + 1) + ': ' + lvl.name + '</span>' +
+      '<span>' + (locked ? "🔒" : passed ? "✅" : "▶️") + '</span>';
+    btn.addEventListener("click", () => { state.levelIndex = i; showLearn(); });
+    list.appendChild(btn);
+  });
+  showScreen("levelsScreen");
+}
+
+$("backToEnvBtn").addEventListener("click", showEnvs);
+
+// ===== 4. Learn the words =====
+function showLearn() {
+  const env = currentEnv();
+  const level = currentLevel();
+  $("learnTitle").textContent = env.name.toUpperCase() + " • LEVEL " + (state.levelIndex + 1) + ": " + level.name.toUpperCase();
+  $("learnSub").textContent = level.intro;
+
+  const box = $("wordCards");
+  box.innerHTML = "";
+  level.words.forEach(w => {
+    const card = document.createElement("div");
+    card.className = "word-card";
+    card.innerHTML =
+      '<span class="emoji">' + WORDS[w].emoji + '</span>' +
+      '<strong>' + w.toUpperCase() + '</strong>' +
+      '<span>' + WORDS[w].en + '</span>';
+    box.appendChild(card);
+  });
+  showScreen("learnScreen");
+}
+
+$("playLevelBtn").addEventListener("click", () => {
+  state.qIndex = 0;
+  state.score = 0;
+  state.correct = 0;
+  applyScene();
+  showScreen("playScreen");
+  showQuestion();
+});
+
+// ===== 5. Play =====
+function applyScene() {
+  const env = currentEnv();
+  const indoor = env.id !== "park";
+  $("scene").className = "scene " + (indoor ? "indoor " : "") + "scene-" + env.id;
+  $("decor").textContent = env.decor;
+}
+
+// Words the player can choose from: everything learned so far in this environment
+function getPool() {
+  const env = currentEnv();
+  const set = new Set();
+  env.levels.slice(0, state.levelIndex + 1).forEach(l => l.words.forEach(w => set.add(w)));
+  currentLevel().questions.forEach(q => [].concat(q.answer).forEach(w => set.add(w)));
+  return Array.from(set);
+}
+
 function showQuestion() {
-  const level = LEVELS[state.levelIndex];
-  const q = level.questions[state.qIndex];
+  const env = currentEnv();
+  const level = currentLevel();
+  const q = currentQuestion();
+  const isSequence = Array.isArray(q.answer);
 
   $("hudPlayer").textContent = "Player: " + state.name;
-  $("hudLevel").textContent = "Level " + (state.levelIndex + 1) + " • " + (state.qIndex + 1) + "/" + level.questions.length;
+  $("hudLevel").textContent = env.name + " • Level " + (state.levelIndex + 1) + " • " + (state.qIndex + 1) + "/" + level.questions.length;
   $("hudScore").textContent = "Score: " + state.score;
 
   $("obstacle").textContent = q.emoji;
-  $("obstacle").className = "obstacle enter";
-  $("character").className = "character";
+  setClass($("obstacle"), "obstacle", "enter");
+  setClass($("character"), "character");
   $("bubble").classList.add("hidden");
 
   $("questionText").textContent = q.text;
   $("feedback").textContent = "";
   $("feedback").className = "feedback";
 
-  const optionsBox = $("options");
-  optionsBox.innerHTML = "";
-  shuffle(level.words.map(w => w.word)).forEach(word => {
+  state.seq = [];
+  const box = $("options");
+  box.innerHTML = "";
+  shuffle(getPool()).forEach(word => {
     const btn = document.createElement("button");
     btn.textContent = word;
-    btn.addEventListener("click", () => checkAnswer(word));
-    optionsBox.appendChild(btn);
+    btn.addEventListener("click", () => isSequence ? addToSequence(word) : resolveQuestion([word]));
+    box.appendChild(btn);
   });
+
+  if (isSequence) {
+    const clear = document.createElement("button");
+    clear.className = "clear-btn";
+    clear.textContent = "↩ Clear";
+    clear.addEventListener("click", () => {
+      if (state.locked) return;
+      state.seq = [];
+      $("bubble").classList.add("hidden");
+    });
+    box.appendChild(clear);
+  }
   state.locked = false;
 }
 
-function checkAnswer(chosen) {
+function showBubble(words) {
+  $("bubble").textContent = "🎤 " + words.map(w => w.toUpperCase()).join(" → ") + "!";
+  $("bubble").classList.remove("hidden");
+}
+
+function addToSequence(word) {
+  if (state.locked) return;
+  const q = currentQuestion();
+  state.seq.push(word);
+  showBubble(state.seq);
+  if (state.seq.length === q.answer.length) resolveQuestion(state.seq.slice());
+}
+
+function resolveQuestion(spoken) {
   if (state.locked) return;
   state.locked = true;
 
-  const q = LEVELS[state.levelIndex].questions[state.qIndex];
+  const q = currentQuestion();
+  const answers = [].concat(q.answer);
+  const isCorrect = spoken.length === answers.length && spoken.every((w, i) => w === answers[i]);
+
   document.querySelectorAll("#options button").forEach(b => b.disabled = true);
+  showBubble(spoken);
 
-  // Show what the player "said" in a speech bubble
-  $("bubble").textContent = "🎤 " + chosen.toUpperCase() + "!";
-  $("bubble").classList.remove("hidden");
-
-  if (chosen === q.answer) {
+  let delay;
+  if (isCorrect) {
     state.score += POINTS_PER_CORRECT;
-    state.levelCorrect += 1;
-    state.wordsLearned.add(q.answer);
-    $("character").className = "character " + q.action;
-    $("obstacle").className = "obstacle cleared";
+    state.correct += 1;
     $("feedback").textContent = "Tama! Magaling!";
     $("feedback").className = "feedback correct";
-    scrollBackground();
+
+    // The character performs each spoken command one after another
+    answers.forEach((w, i) => {
+      setTimeout(() => {
+        setClass($("character"), "character", WORDS[w].action);
+        scrollBackground();
+      }, i * STEP_MS);
+    });
+    setTimeout(() => setClass($("obstacle"), "obstacle", "cleared"), (answers.length - 1) * STEP_MS + 400);
+    delay = answers.length * STEP_MS + 600;
   } else {
-    $("character").className = "character bump";
-    $("obstacle").className = "obstacle shake";
-    $("feedback").textContent = "Mali. The correct word is '" + q.answer.toUpperCase() + "'.";
+    setClass($("character"), "character", "bump");
+    setClass($("obstacle"), "obstacle", "shake");
+    $("feedback").textContent = "Mali. The correct answer is: " + answers.map(w => w.toUpperCase()).join(" → ");
     $("feedback").className = "feedback wrong";
+    delay = 2200;
   }
   $("hudScore").textContent = "Score: " + state.score;
-
-  setTimeout(nextQuestion, 1500);
+  setTimeout(nextQuestion, delay);
 }
 
 function scrollBackground() {
@@ -193,77 +404,65 @@ function scrollBackground() {
 
 function nextQuestion() {
   state.qIndex += 1;
-  if (state.qIndex < LEVELS[state.levelIndex].questions.length) {
+  if (state.qIndex < currentLevel().questions.length) {
     showQuestion();
   } else {
     endLevel();
   }
 }
 
-// ===== 4. Level result =====
+// ===== 6. Level result / reward =====
 function endLevel() {
-  const level = LEVELS[state.levelIndex];
+  const env = currentEnv();
+  const level = currentLevel();
   const total = level.questions.length;
   const needed = Math.ceil(total * PASS_RATIO);
-  const passed = state.levelCorrect >= needed;
+  const passed = state.correct >= needed;
+  const levelNumber = state.levelIndex + 1;
 
-  state.levelReached = state.levelIndex + 1;
-  if (passed) state.levelsPassed += 1;
+  // Unlock the next level if this one was newly passed
+  if (passed && levelNumber > state.progress[env.id]) state.progress[env.id] = levelNumber;
 
-  $("levelResultTitle").textContent = passed
-    ? "Level " + (state.levelIndex + 1) + " Complete!"
-    : "Level " + (state.levelIndex + 1) + " not passed";
-  $("levelResultText").textContent =
-    "You got " + state.levelCorrect + " out of " + total + " correct." +
-    (passed ? " Magaling!" : " You need " + needed + " correct to move on.");
+  $("resBanner").textContent = passed ? "MISSION COMPLETE!" : "KEEP GOING!";
+  $("resTitle").textContent = passed ? "Magaling!" : "Subukan muli!";
+  $("resEnv").textContent = env.emoji + " " + env.name + " • Level " + levelNumber + ": " + level.name;
+  $("statCorrect").textContent = state.correct + " / " + total;
+  $("statScore").textContent = state.score;
+  $("medal").textContent = passed ? "🏅" : "💪";
 
-  const btn = $("nextBtn");
-  if (passed && state.levelIndex < LEVELS.length - 1) {
-    btn.textContent = "NEXT LEVEL";
-    btn.onclick = () => { state.levelIndex += 1; showLearn(); };
+  // Buttons
+  const nextBtn = $("nextBtn");
+  nextBtn.classList.remove("hidden");
+  if (passed && state.levelIndex < env.levels.length - 1) {
+    nextBtn.textContent = "NEXT LEVEL";
+    nextBtn.onclick = () => { state.levelIndex += 1; showLearn(); };
+  } else if (!passed) {
+    nextBtn.textContent = "TRY AGAIN";
+    nextBtn.onclick = () => showLearn();
   } else {
-    btn.textContent = "SEE RESULTS";
-    btn.onclick = finishGame;
+    nextBtn.classList.add("hidden"); // last level passed
   }
-  showScreen("levelResultScreen");
-}
 
-// ===== 5. Completion / Reward =====
-function finishGame() {
-  const allPassed = state.levelsPassed === LEVELS.length;
-  const remarks = allPassed ? "Completed" : "Failed";
-
-  // This record will be saved to the database in a later step
+  // The record that will be saved to the database in a later step
   const record = {
     player_name: state.name,
-    age: state.age,
-    learning_level: state.learningLevel,
+    environment: env.name,
+    level: levelNumber,
     score: state.score,
-    level: state.levelReached,
-    words_learned: state.wordsLearned.size,
-    remarks: remarks
+    correct_answers: state.correct,
+    total_questions: total,
+    remarks: passed ? "Passed" : "Failed"
   };
 
-  $("finalBanner").textContent = allPassed ? "MISSION COMPLETE!" : "KEEP GOING!";
-  $("finalTitle").textContent = allPassed ? "Magaling!" : "Subukan muli!";
-  $("statWords").textContent = record.words_learned;
-  $("statLevels").textContent = state.levelsPassed + " / " + LEVELS.length;
-  $("statScore").textContent = record.score;
-
-  showScreen("finalScreen");
+  showScreen("resultScreen");
   saveRecord(record);
 }
+
+$("resLevelsBtn").addEventListener("click", showLevels);
+$("resEnvBtn").addEventListener("click", showEnvs);
 
 // ===== PLACEHOLDER: database save (replaced when Firestore is connected) =====
 function saveRecord(record) {
   console.log("Record ready to save:", record);
   $("saveStatus").textContent = "(Database not connected yet. Record shown in the browser console.)";
 }
-
-// ----- Play again -----
-$("playAgainBtn").addEventListener("click", () => {
-  bgX = 0;
-  $("hills").style.backgroundPositionX = "0px";
-  $("ground").style.backgroundPositionX = "0px";
-  showScreen("profileScreen");
-});
