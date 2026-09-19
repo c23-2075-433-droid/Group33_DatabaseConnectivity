@@ -1,0 +1,101 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #dbe8ff;
+  color: #1d2b53;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.game {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+h1 { margin: 0; color: #2b4c9b; letter-spacing: 3px; }
+.subtitle { margin-top: 4px; color: #555; }
+
+.hidden { display: none; }
+
+label { display: block; margin-bottom: 8px; font-weight: bold; }
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: 2px solid #9bb5ea;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+button {
+  font-size: 1.1rem;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #2b6fd6;
+  color: #fff;
+  cursor: pointer;
+}
+button:hover { background: #1e57b0; }
+button:disabled { background: #a8b4c8; cursor: not-allowed; }
+
+.error { color: #c0392b; min-height: 1.2em; }
+
+.status {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.track {
+  position: relative;
+  height: 60px;
+  background: #e9f5e1;
+  border-bottom: 6px solid #6aa84f;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+#character {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 2.2rem;
+  transition: left 0.5s ease;
+}
+
+.finish {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  font-size: 2rem;
+}
+
+.obstacle-emoji { font-size: 3.5rem; }
+#obstaclePrompt { font-size: 1.1rem; }
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.options button { min-width: 100px; }
+
+.feedback { min-height: 1.4em; font-weight: bold; }
+.feedback.correct { color: #2e8b3d; }
+.feedback.wrong { color: #c0392b; }
+
+.save-status { color: #777; font-style: italic; }
