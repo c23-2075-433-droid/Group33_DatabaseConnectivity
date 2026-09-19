@@ -15,24 +15,14 @@
       <p>A Voice-Interactive Filipino Language Learning Game</p>
     </header>
 
-    <!-- Screen 1: Start / Player Profile -->
+    <!-- Screen 1: Enter Nickname -->
     <section id="profileScreen" class="screen">
       <div class="panel">
         <div class="ribbon">CREATE PLAYER</div>
         <div class="profile-body">
           <div class="profile-form">
-            <label for="playerName">Name:</label>
-            <input type="text" id="playerName" maxlength="15" placeholder="e.g. Ana" />
-
-            <label for="playerAge">Age:</label>
-            <input type="number" id="playerAge" min="4" max="12" placeholder="4 - 12" />
-
-            <label for="learningLevel">Learning Level:</label>
-            <select id="learningLevel">
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-            </select>
-
+            <label for="playerName">What should we call you?</label>
+            <input type="text" id="playerName" maxlength="15" placeholder="Nickname, e.g. Alex" />
             <button id="startBtn" class="btn">START GAME</button>
             <p id="startError" class="error"></p>
           </div>
@@ -42,7 +32,27 @@
       </div>
     </section>
 
-    <!-- Screen 2: Learn the words -->
+    <!-- Screen 2: Choose an Environment -->
+    <section id="envScreen" class="screen hidden">
+      <div class="panel">
+        <div class="ribbon">CHOOSE AN ENVIRONMENT</div>
+        <p id="envGreeting" class="sub"></p>
+        <div id="envGrid" class="env-grid"></div>
+        <button id="changeNameBtn" class="btn btn-secondary">CHANGE NICKNAME</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Level list of the chosen environment -->
+    <section id="levelsScreen" class="screen hidden">
+      <div class="panel">
+        <div class="ribbon" id="levelsTitle"></div>
+        <p id="levelsSub" class="sub"></p>
+        <div id="levelList" class="level-list"></div>
+        <button id="backToEnvBtn" class="btn btn-secondary">BACK TO ENVIRONMENTS</button>
+      </div>
+    </section>
+
+    <!-- Screen 4: Learn the words -->
     <section id="learnScreen" class="screen hidden">
       <div class="panel">
         <div class="ribbon" id="learnTitle"></div>
@@ -52,7 +62,7 @@
       </div>
     </section>
 
-    <!-- Screen 3: Play -->
+    <!-- Screen 5: Play -->
     <section id="playScreen" class="screen hidden">
       <div class="hud">
         <span id="hudPlayer"></span>
@@ -64,6 +74,7 @@
         <div class="sun">☀️</div>
         <div class="cloud c1">☁️</div>
         <div class="cloud c2">☁️</div>
+        <div class="decor" id="decor"></div>
         <div class="hills" id="hills"></div>
         <div class="ground" id="ground"></div>
         <div id="bubble" class="bubble hidden"></div>
@@ -76,30 +87,25 @@
       <p id="feedback" class="feedback"></p>
     </section>
 
-    <!-- Screen 4: Level result -->
-    <section id="levelResultScreen" class="screen hidden">
+    <!-- Screen 6: Level result / reward -->
+    <section id="resultScreen" class="screen hidden">
       <div class="panel">
-        <h2 id="levelResultTitle"></h2>
-        <p id="levelResultText" class="sub"></p>
-        <button id="nextBtn" class="btn"></button>
-      </div>
-    </section>
-
-    <!-- Screen 5: Completion / Reward -->
-    <section id="finalScreen" class="screen hidden">
-      <div class="panel">
-        <div class="mission-banner" id="finalBanner"></div>
-        <h2 id="finalTitle"></h2>
+        <div class="mission-banner" id="resBanner"></div>
+        <h2 id="resTitle"></h2>
+        <p id="resEnv" class="sub"></p>
         <div class="final-card">
           <ul class="stats">
-            <li>Words Learned: <strong id="statWords"></strong></li>
-            <li>Levels Completed: <strong id="statLevels"></strong></li>
+            <li>Correct Answers: <strong id="statCorrect"></strong></li>
             <li>Score: <strong id="statScore"></strong></li>
           </ul>
-          <div class="medal">🏅</div>
+          <div class="medal" id="medal">🏅</div>
         </div>
         <p id="saveStatus" class="save-status"></p>
-        <button id="playAgainBtn" class="btn">PLAY AGAIN</button>
+        <div class="btn-row">
+          <button id="nextBtn" class="btn"></button>
+          <button id="resLevelsBtn" class="btn btn-secondary">LEVEL LIST</button>
+          <button id="resEnvBtn" class="btn btn-secondary">ENVIRONMENTS</button>
+        </div>
       </div>
     </section>
 
