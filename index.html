@@ -4,50 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SALINLAHI Mini-Level</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="game">
-    <h1>SALINLAHI</h1>
-    <p class="subtitle">Mini-Level: Piliin ang tamang utos!</p>
 
-    <!-- Screen 1: Start -->
-    <section id="startScreen" class="screen">
-      <label for="playerName">Enter your nickname:</label>
-      <input type="text" id="playerName" maxlength="15" placeholder="e.g. Mika" />
-      <button id="startBtn">Start Game</button>
-      <p id="startError" class="error"></p>
+    <header class="title-bar">
+      <h1>SALINLAHI</h1>
+      <p>A Voice-Interactive Filipino Language Learning Game</p>
+    </header>
+
+    <!-- Screen 1: Start / Player Profile -->
+    <section id="profileScreen" class="screen">
+      <div class="panel">
+        <div class="ribbon">CREATE PLAYER</div>
+        <div class="profile-body">
+          <div class="profile-form">
+            <label for="playerName">Name:</label>
+            <input type="text" id="playerName" maxlength="15" placeholder="e.g. Ana" />
+
+            <label for="playerAge">Age:</label>
+            <input type="number" id="playerAge" min="4" max="12" placeholder="4 - 12" />
+
+            <label for="learningLevel">Learning Level:</label>
+            <select id="learningLevel">
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+            </select>
+
+            <button id="startBtn" class="btn">START GAME</button>
+            <p id="startError" class="error"></p>
+          </div>
+          <div class="profile-art">👧</div>
+        </div>
+        <p class="quote">Handa ka na bang matuto at maglaro?</p>
+      </div>
     </section>
 
-    <!-- Screen 2: Game -->
-    <section id="gameScreen" class="screen hidden">
-      <div class="status">
-        <span id="playerLabel"></span>
-        <span id="progressLabel"></span>
-        <span id="scoreLabel"></span>
+    <!-- Screen 2: Learn the words -->
+    <section id="learnScreen" class="screen hidden">
+      <div class="panel">
+        <div class="ribbon" id="learnTitle"></div>
+        <p id="learnSub" class="sub"></p>
+        <div id="wordCards" class="word-cards"></div>
+        <button id="playLevelBtn" class="btn">LET'S PLAY!</button>
+      </div>
+    </section>
+
+    <!-- Screen 3: Play -->
+    <section id="playScreen" class="screen hidden">
+      <div class="hud">
+        <span id="hudPlayer"></span>
+        <span id="hudLevel"></span>
+        <span id="hudScore"></span>
       </div>
 
-      <div class="track">
-        <div id="character">🧒</div>
-        <div class="finish">🏁</div>
+      <div class="scene" id="scene">
+        <div class="sun">☀️</div>
+        <div class="cloud c1">☁️</div>
+        <div class="cloud c2">☁️</div>
+        <div class="hills" id="hills"></div>
+        <div class="ground" id="ground"></div>
+        <div id="bubble" class="bubble hidden"></div>
+        <div id="character" class="character">🧒</div>
+        <div id="obstacle" class="obstacle"></div>
       </div>
 
-      <div class="obstacle">
-        <div id="obstacleEmoji" class="obstacle-emoji"></div>
-        <p id="obstaclePrompt"></p>
-      </div>
-
+      <p id="questionText" class="question"></p>
       <div id="options" class="options"></div>
       <p id="feedback" class="feedback"></p>
     </section>
 
-    <!-- Screen 3: Result -->
-    <section id="resultScreen" class="screen hidden">
-      <h2 id="resultTitle"></h2>
-      <p id="resultText"></p>
-      <p id="saveStatus" class="save-status"></p>
-      <button id="playAgainBtn">Play Again</button>
+    <!-- Screen 4: Level result -->
+    <section id="levelResultScreen" class="screen hidden">
+      <div class="panel">
+        <h2 id="levelResultTitle"></h2>
+        <p id="levelResultText" class="sub"></p>
+        <button id="nextBtn" class="btn"></button>
+      </div>
     </section>
+
+    <!-- Screen 5: Completion / Reward -->
+    <section id="finalScreen" class="screen hidden">
+      <div class="panel">
+        <div class="mission-banner" id="finalBanner"></div>
+        <h2 id="finalTitle"></h2>
+        <div class="final-card">
+          <ul class="stats">
+            <li>Words Learned: <strong id="statWords"></strong></li>
+            <li>Levels Completed: <strong id="statLevels"></strong></li>
+            <li>Score: <strong id="statScore"></strong></li>
+          </ul>
+          <div class="medal">🏅</div>
+        </div>
+        <p id="saveStatus" class="save-status"></p>
+        <button id="playAgainBtn" class="btn">PLAY AGAIN</button>
+      </div>
+    </section>
+
   </main>
 
   <script src="script.js"></script>
