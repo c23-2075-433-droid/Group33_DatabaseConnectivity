@@ -4,26 +4,26 @@
 // ----- Vocabulary: meaning, emoji, and the character action for each word -----
 const WORDS = {
   // Home
-  bukas: { en: "Open",        emoji: "🚪", action: "act" },
-  sara:  { en: "Close",       emoji: "🔒", action: "act" },
-  kuha:  { en: "Get / Take",  emoji: "🤲", action: "collect" },
-  upo:   { en: "Sit",         emoji: "🪑", action: "duck" },
-  tayo:  { en: "Stand up",    emoji: "🧍", action: "act" },
+  bukas: { en: "Open",        icon: "door-open",  action: "act" },
+  sara:  { en: "Close",       icon: "door",       action: "act" },
+  kuha:  { en: "Get / Take",  icon: "hand",       action: "collect" },
+  upo:   { en: "Sit",         icon: "chair",      action: "duck" },
+  tayo:  { en: "Stand up",    icon: "jump",       action: "act" },
   // School
-  sulat: { en: "Write",       emoji: "✏️", action: "act" },
-  basa:  { en: "Read",        emoji: "📖", action: "act" },
-  punta: { en: "Go to",       emoji: "📍", action: "walk" },
+  sulat: { en: "Write",       icon: "pencil",     action: "act" },
+  basa:  { en: "Read",        icon: "book",       action: "act" },
+  punta: { en: "Go to",       icon: "pin",        action: "walk" },
   // Park
-  lakad: { en: "Walk",        emoji: "🚶", action: "walk" },
-  takbo: { en: "Run",         emoji: "🏃", action: "dash" },
-  talon: { en: "Jump",        emoji: "🦘", action: "jump" },
-  hinto: { en: "Stop",        emoji: "✋", action: "halt" },
-  yuko:  { en: "Bend down",   emoji: "🙇", action: "duck" },
+  lakad: { en: "Walk",        icon: "footprints", action: "walk" },
+  takbo: { en: "Run",         icon: "shoe",       action: "dash" },
+  talon: { en: "Jump",        icon: "jump",       action: "jump" },
+  hinto: { en: "Stop",        icon: "stop",       action: "halt" },
+  yuko:  { en: "Bend down",   icon: "bend",       action: "duck" },
   // Store
-  bili:  { en: "Buy",         emoji: "🛒", action: "collect" },
-  bayad: { en: "Pay",         emoji: "💵", action: "act" },
-  pili:  { en: "Choose",      emoji: "👆", action: "act" },
-  bigay: { en: "Give",        emoji: "🎁", action: "act" }
+  bili:  { en: "Buy",         icon: "cart",       action: "collect" },
+  bayad: { en: "Pay",         icon: "money",      action: "act" },
+  pili:  { en: "Choose",      icon: "check",      action: "act" },
+  bigay: { en: "Give",        icon: "gift",       action: "act" }
 };
 
 // ----- Environments, each with 3 levels -----
@@ -31,129 +31,129 @@ const WORDS = {
 // A question with an array as its answer = "sequence" challenge (say the words in order).
 const ENVIRONMENTS = [
   {
-    id: "home", name: "Home", emoji: "🏠", theme: "Everyday actions", decor: "🖼️ 🛋️ 🪟",
+    id: "home", name: "Home", icon: "home", theme: "Everyday actions", decor: ["frame", "sofa", "window"],
     levels: [
       {
         name: "Living Room", intro: "Learn these words for things you do at home!",
         words: ["bukas", "sara", "kuha"],
         questions: [
-          { emoji: "🚪", text: "The door is closed. Which Filipino word means OPEN?", answer: "bukas" },
-          { emoji: "🪟", text: "It is raining! Which Filipino word means CLOSE?", answer: "sara" },
-          { emoji: "🧸", text: "Your toy is on the table. Which Filipino word means GET / TAKE?", answer: "kuha" }
+          { icon: "door", text: "The door is closed. Which Filipino word means OPEN?", answer: "bukas" },
+          { icon: "window", text: "It is raining! Which Filipino word means CLOSE?", answer: "sara" },
+          { icon: "teddy", text: "Your toy is on the table. Which Filipino word means GET / TAKE?", answer: "kuha" }
         ]
       },
       {
         name: "Bedroom", intro: "Two new words for your day at home!",
         words: ["upo", "tayo"],
         questions: [
-          { emoji: "🪑", text: "Time to eat! Which Filipino word means SIT?", answer: "upo" },
-          { emoji: "🛏️", text: "Good morning! Which Filipino word means STAND UP?", answer: "tayo" },
-          { emoji: "🧸", text: "Pick up your toy. Which Filipino word means GET / TAKE?", answer: "kuha" }
+          { icon: "chair", text: "Time to eat! Which Filipino word means SIT?", answer: "upo" },
+          { icon: "bed", text: "Good morning! Which Filipino word means STAND UP?", answer: "tayo" },
+          { icon: "teddy", text: "Pick up your toy. Which Filipino word means GET / TAKE?", answer: "kuha" }
         ]
       },
       {
         name: "Kitchen", intro: "Combine the words you learned!",
         words: ["bukas", "sara", "kuha", "upo", "tayo"],
         questions: [
-          { emoji: "🚪", text: "Keep the cold out! Which Filipino word means CLOSE?", answer: "sara" },
-          { emoji: "🍎", text: "Stand up, get the apple, then sit down. Choose the words in order!", answer: ["tayo", "kuha", "upo"] },
-          { emoji: "🧸", text: "Open the door, get the toy, then close the door. Choose the words in order!", answer: ["bukas", "kuha", "sara"] }
+          { icon: "door", text: "Keep the cold out! Which Filipino word means CLOSE?", answer: "sara" },
+          { icon: "apple", text: "Stand up, get the apple, then sit down. Choose the words in order!", answer: ["tayo", "kuha", "upo"] },
+          { icon: "teddy", text: "Open the door, get the toy, then close the door. Choose the words in order!", answer: ["bukas", "kuha", "sara"] }
         ]
       }
     ]
   },
   {
-    id: "school", name: "School", emoji: "🏫", theme: "Classroom actions", decor: "🔔 📚 🖍️",
+    id: "school", name: "School", icon: "school", theme: "Classroom actions", decor: ["bell", "books", "pencil"],
     levels: [
       {
         name: "Classroom", intro: "Learn these words for your classroom!",
         words: ["sulat", "basa", "punta"],
         questions: [
-          { emoji: "✏️", text: "Copy the lesson. Which Filipino word means WRITE?", answer: "sulat" },
-          { emoji: "📖", text: "Open your book. Which Filipino word means READ?", answer: "basa" },
-          { emoji: "🧑‍🏫", text: "The teacher calls you. Which Filipino word means GO TO?", answer: "punta" }
+          { icon: "pencil", text: "Copy the lesson. Which Filipino word means WRITE?", answer: "sulat" },
+          { icon: "book", text: "Open your book. Which Filipino word means READ?", answer: "basa" },
+          { icon: "teacher", text: "The teacher calls you. Which Filipino word means GO TO?", answer: "punta" }
         ]
       },
       {
         name: "Hallway", intro: "Two new words for the school day!",
         words: ["tayo", "upo"],
         questions: [
-          { emoji: "🔔", text: "Class starts! Which Filipino word means STAND UP?", answer: "tayo" },
-          { emoji: "🪑", text: "Time to listen. Which Filipino word means SIT?", answer: "upo" },
-          { emoji: "🪧", text: "Look at the sign. Which Filipino word means READ?", answer: "basa" }
+          { icon: "bell", text: "Class starts! Which Filipino word means STAND UP?", answer: "tayo" },
+          { icon: "chair", text: "Time to listen. Which Filipino word means SIT?", answer: "upo" },
+          { icon: "sign", text: "Look at the sign. Which Filipino word means READ?", answer: "basa" }
         ]
       },
       {
         name: "School Yard", intro: "Combine the words you learned!",
         words: ["sulat", "basa", "punta", "tayo", "upo"],
         questions: [
-          { emoji: "🧑‍🏫", text: "Walk to the teacher's desk. Which Filipino word means GO TO?", answer: "punta" },
-          { emoji: "📋", text: "Stand up, go to the board, then write. Choose the words in order!", answer: ["tayo", "punta", "sulat"] },
-          { emoji: "📚", text: "Go to your seat, sit down, then read. Choose the words in order!", answer: ["punta", "upo", "basa"] }
+          { icon: "teacher", text: "Walk to the teacher's desk. Which Filipino word means GO TO?", answer: "punta" },
+          { icon: "clipboard", text: "Stand up, go to the board, then write. Choose the words in order!", answer: ["tayo", "punta", "sulat"] },
+          { icon: "books", text: "Go to your seat, sit down, then read. Choose the words in order!", answer: ["punta", "upo", "basa"] }
         ]
       }
     ]
   },
   {
-    id: "park", name: "Park", emoji: "🌳", theme: "Movement", decor: "",
+    id: "park", name: "Park", icon: "tree", theme: "Movement", decor: [],
     levels: [
       {
         name: "Playground", intro: "Learn these movement words!",
         words: ["lakad", "takbo", "talon"],
         questions: [
-          { emoji: "🛤️", text: "The path is clear. Which Filipino word means WALK?", answer: "lakad" },
-          { emoji: "🐕", text: "A dog is chasing you! Which Filipino word means RUN?", answer: "takbo" },
-          { emoji: "🪨", text: "A rock is in the way! Which Filipino word means JUMP?", answer: "talon" }
+          { icon: "path", text: "The path is clear. Which Filipino word means WALK?", answer: "lakad" },
+          { icon: "dog", text: "A dog is chasing you! Which Filipino word means RUN?", answer: "takbo" },
+          { icon: "rock", text: "A rock is in the way! Which Filipino word means JUMP?", answer: "talon" }
         ]
       },
       {
         name: "Garden Path", intro: "Two new words for the park!",
         words: ["hinto", "yuko"],
         questions: [
-          { emoji: "🛑", text: "A stop sign! Which Filipino word means STOP?", answer: "hinto" },
-          { emoji: "🪵", text: "A low branch! Which Filipino word means BEND DOWN?", answer: "yuko" },
-          { emoji: "🌷", text: "Enjoy the flowers. Which Filipino word means WALK?", answer: "lakad" }
+          { icon: "stop", text: "A stop sign! Which Filipino word means STOP?", answer: "hinto" },
+          { icon: "log", text: "A low branch! Which Filipino word means BEND DOWN?", answer: "yuko" },
+          { icon: "tulip", text: "Enjoy the flowers. Which Filipino word means WALK?", answer: "lakad" }
         ]
       },
       {
         name: "Pond Trail", intro: "Combine the words you learned!",
         words: ["lakad", "takbo", "talon", "hinto", "yuko"],
         questions: [
-          { emoji: "🦆", text: "A duck is crossing the path! Which Filipino word means STOP?", answer: "hinto" },
-          { emoji: "🪨", text: "Walk, stop, then jump over the rock. Choose the words in order!", answer: ["lakad", "hinto", "talon"] },
-          { emoji: "🌳", text: "Run, bend down under the branch, then jump the puddle. Choose the words in order!", answer: ["takbo", "yuko", "talon"] }
+          { icon: "duck", text: "A duck is crossing the path! Which Filipino word means STOP?", answer: "hinto" },
+          { icon: "rock", text: "Walk, stop, then jump over the rock. Choose the words in order!", answer: ["lakad", "hinto", "talon"] },
+          { icon: "tree", text: "Run, bend down under the branch, then jump the puddle. Choose the words in order!", answer: ["takbo", "yuko", "talon"] }
         ]
       }
     ]
   },
   {
-    id: "store", name: "Community Store", emoji: "🛍️", theme: "Everyday words", decor: "🏷️ 🛒 🧺",
+    id: "store", name: "Community Store", icon: "store", theme: "Everyday words", decor: ["tag", "cart", "basket"],
     levels: [
       {
         name: "Fruit Stand", intro: "Learn these words for shopping!",
         words: ["pili", "bili", "bayad"],
         questions: [
-          { emoji: "🍎", text: "So many fruits! Which Filipino word means CHOOSE?", answer: "pili" },
-          { emoji: "🛒", text: "You want the apples. Which Filipino word means BUY?", answer: "bili" },
-          { emoji: "💵", text: "Time to pay the cashier. Which Filipino word means PAY?", answer: "bayad" }
+          { icon: "apple", text: "So many fruits! Which Filipino word means CHOOSE?", answer: "pili" },
+          { icon: "cart", text: "You want the apples. Which Filipino word means BUY?", answer: "bili" },
+          { icon: "money", text: "Time to pay the cashier. Which Filipino word means PAY?", answer: "bayad" }
         ]
       },
       {
         name: "Market", intro: "Two new words for the market!",
         words: ["bigay", "kuha"],
         questions: [
-          { emoji: "🎁", text: "A gift for your friend! Which Filipino word means GIVE?", answer: "bigay" },
-          { emoji: "🧺", text: "Grab the basket. Which Filipino word means GET / TAKE?", answer: "kuha" },
-          { emoji: "🧸", text: "You like this toy. Which Filipino word means BUY?", answer: "bili" }
+          { icon: "gift", text: "A gift for your friend! Which Filipino word means GIVE?", answer: "bigay" },
+          { icon: "basket", text: "Grab the basket. Which Filipino word means GET / TAKE?", answer: "kuha" },
+          { icon: "teddy", text: "You like this toy. Which Filipino word means BUY?", answer: "bili" }
         ]
       },
       {
         name: "Shopping Street", intro: "Combine the words you learned!",
         words: ["pili", "bili", "bayad", "bigay", "kuha"],
         questions: [
-          { emoji: "🧾", text: "The cashier is waiting. Which Filipino word means PAY?", answer: "bayad" },
-          { emoji: "🍎", text: "Choose the fruit, buy it, then pay. Choose the words in order!", answer: ["pili", "bili", "bayad"] },
-          { emoji: "🛍️", text: "Get the bag, pay for it, then give it to your mom. Choose the words in order!", answer: ["kuha", "bayad", "bigay"] }
+          { icon: "receipt", text: "The cashier is waiting. Which Filipino word means PAY?", answer: "bayad" },
+          { icon: "apple", text: "Choose the fruit, buy it, then pay. Choose the words in order!", answer: ["pili", "bili", "bayad"] },
+          { icon: "bag", text: "Get the bag, pay for it, then give it to your mom. Choose the words in order!", answer: ["kuha", "bayad", "bigay"] }
         ]
       }
     ]
@@ -166,6 +166,10 @@ const STEP_MS = 950;        // time for one character action
 
 // ----- Helpers -----
 const $ = id => document.getElementById(id);
+// Returns an <img> tag for an icon file in the images folder
+function icon(name, cls) {
+  return '<img class="icon ' + (cls || "") + '" src="images/' + name + '.svg" alt="">';
+}
 const SCREENS = ["profileScreen", "envScreen", "levelsScreen", "learnScreen", "playScreen", "resultScreen"];
 
 function showScreen(id) {
@@ -218,7 +222,7 @@ function showEnvs() {
     const card = document.createElement("button");
     card.className = "env-card";
     card.innerHTML =
-      '<span class="env-emoji">' + env.emoji + '</span>' +
+      '<span class="env-emoji">' + icon(env.icon, "big") + '</span>' +
       '<strong>' + env.name + '</strong>' +
       '<span class="env-theme">' + env.theme + '</span>' +
       '<span class="env-progress">Levels passed: ' + state.progress[env.id] + '/' + env.levels.length + '</span>';
@@ -233,7 +237,7 @@ $("changeNameBtn").addEventListener("click", () => showScreen("profileScreen"));
 // ===== 3. Level list =====
 function showLevels() {
   const env = currentEnv();
-  $("levelsTitle").textContent = env.emoji + " " + env.name.toUpperCase();
+  $("levelsTitle").innerHTML = icon(env.icon, "inline") + " " + env.name.toUpperCase();
   $("levelsSub").textContent = "Pass a level to unlock the next one.";
 
   const list = $("levelList");
@@ -246,7 +250,7 @@ function showLevels() {
     btn.disabled = locked;
     btn.innerHTML =
       '<span>Level ' + (i + 1) + ': ' + lvl.name + '</span>' +
-      '<span>' + (locked ? "🔒" : passed ? "✅" : "▶️") + '</span>';
+      '<span>' + icon(locked ? "lock" : passed ? "check" : "play", "inline") + '</span>';
     btn.addEventListener("click", () => { state.levelIndex = i; showLearn(); });
     list.appendChild(btn);
   });
@@ -268,7 +272,7 @@ function showLearn() {
     const card = document.createElement("div");
     card.className = "word-card";
     card.innerHTML =
-      '<span class="emoji">' + WORDS[w].emoji + '</span>' +
+      '<span class="emoji">' + icon(WORDS[w].icon, "big") + '</span>' +
       '<strong>' + w.toUpperCase() + '</strong>' +
       '<span>' + WORDS[w].en + '</span>';
     box.appendChild(card);
@@ -290,7 +294,7 @@ function applyScene() {
   const env = currentEnv();
   const indoor = env.id !== "park";
   $("scene").className = "scene " + (indoor ? "indoor " : "") + "scene-" + env.id;
-  $("decor").textContent = env.decor;
+  $("decor").innerHTML = env.decor.map(n => icon(n, "decor-img")).join("");
 }
 
 // Words the player can choose from: everything learned so far in this environment
@@ -312,7 +316,7 @@ function showQuestion() {
   $("hudLevel").textContent = env.name + " • Level " + (state.levelIndex + 1) + " • " + (state.qIndex + 1) + "/" + level.questions.length;
   $("hudScore").textContent = "Score: " + state.score;
 
-  $("obstacle").textContent = q.emoji;
+  $("obstacle").innerHTML = icon(q.icon, "obstacle-img");
   setClass($("obstacle"), "obstacle", "enter");
   setClass($("character"), "character");
   $("bubble").classList.add("hidden");
@@ -334,7 +338,7 @@ function showQuestion() {
   if (isSequence) {
     const clear = document.createElement("button");
     clear.className = "clear-btn";
-    clear.textContent = "↩ Clear";
+    clear.textContent = "Clear";
     clear.addEventListener("click", () => {
       if (state.locked) return;
       state.seq = [];
@@ -346,7 +350,7 @@ function showQuestion() {
 }
 
 function showBubble(words) {
-  $("bubble").textContent = "🎤 " + words.map(w => w.toUpperCase()).join(" → ") + "!";
+  $("bubble").innerHTML = icon("mic", "inline") + " " + words.map(w => w.toUpperCase()).join(" → ") + "!";
   $("bubble").classList.remove("hidden");
 }
 
@@ -425,10 +429,10 @@ function endLevel() {
 
   $("resBanner").textContent = passed ? "MISSION COMPLETE!" : "KEEP GOING!";
   $("resTitle").textContent = passed ? "Magaling!" : "Subukan muli!";
-  $("resEnv").textContent = env.emoji + " " + env.name + " • Level " + levelNumber + ": " + level.name;
+  $("resEnv").innerHTML = icon(env.icon, "inline") + " " + env.name + " • Level " + levelNumber + ": " + level.name;
   $("statCorrect").textContent = state.correct + " / " + total;
   $("statScore").textContent = state.score;
-  $("medal").textContent = passed ? "🏅" : "💪";
+  $("medal").innerHTML = icon(passed ? "medal" : "star", "medal-img");
 
   // Buttons
   const nextBtn = $("nextBtn");
