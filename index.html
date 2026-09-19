@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SALINLAHI Mini-Level</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game">
+    <h1>SALINLAHI</h1>
+    <p class="subtitle">Mini-Level: Piliin ang tamang utos!</p>
+
+    <!-- Screen 1: Start -->
+    <section id="startScreen" class="screen">
+      <label for="playerName">Enter your nickname:</label>
+      <input type="text" id="playerName" maxlength="15" placeholder="e.g. Mika" />
+      <button id="startBtn">Start Game</button>
+      <p id="startError" class="error"></p>
+    </section>
+
+    <!-- Screen 2: Game -->
+    <section id="gameScreen" class="screen hidden">
+      <div class="status">
+        <span id="playerLabel"></span>
+        <span id="progressLabel"></span>
+        <span id="scoreLabel"></span>
+      </div>
+
+      <div class="track">
+        <div id="character">🧒</div>
+        <div class="finish">🏁</div>
+      </div>
+
+      <div class="obstacle">
+        <div id="obstacleEmoji" class="obstacle-emoji"></div>
+        <p id="obstaclePrompt"></p>
+      </div>
+
+      <div id="options" class="options"></div>
+      <p id="feedback" class="feedback"></p>
+    </section>
+
+    <!-- Screen 3: Result -->
+    <section id="resultScreen" class="screen hidden">
+      <h2 id="resultTitle"></h2>
+      <p id="resultText"></p>
+      <p id="saveStatus" class="save-status"></p>
+      <button id="playAgainBtn">Play Again</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
