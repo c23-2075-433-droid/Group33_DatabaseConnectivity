@@ -170,7 +170,7 @@ const $ = id => document.getElementById(id);
 function icon(name, cls) {
   return '<img class="icon ' + (cls || "") + '" src="images/' + name + '.svg" alt="">';
 }
-const SCREENS = ["profileScreen", "envScreen", "levelsScreen", "learnScreen", "playScreen", "resultScreen"];
+const SCREENS = ["profileScreen", "envScreen", "levelsScreen", "learnScreen", "playScreen", "resultScreen", "recordsScreen"];
 
 function showScreen(id) {
   SCREENS.forEach(s => $(s).classList.add("hidden"));
@@ -184,6 +184,15 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// Stop waiting for the database after a number of milliseconds
+function withTimeout(promise, ms) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error("Timed out")), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 // Restart a CSS animation class on an element
@@ -202,7 +211,7 @@ function currentLevel() { return currentEnv().levels[state.levelIndex]; }
 function currentQuestion() { return currentLevel().questions[state.qIndex]; }
 
 // ===== 1. Enter nickname =====
-$("startBtn").addEventListener("click", () => {
+$("startBtn").addEventListener("click", async () => {
   const name = $("playerName").value.trim();
   if (name === "") { $("startError").textContent = "Please enter a nickname."; return; }
   $("startError").textContent = "";
@@ -210,8 +219,35 @@ $("startBtn").addEventListener("click", () => {
   state.name = name;
   state.progress = {};
   ENVIRONMENTS.forEach(e => state.progress[e.id] = 0); // levels passed per environment
+
+  // RETRIEVE: load this player's saved records so unlocked levels are restored
+  const btn = $("startBtn");
+  btn.disabled = true;
+  btn.textContent = "LOADING...";
+  try {
+    const records = await withTimeout(window.SalinlahiDB.getPlayerRecords(name), 15000);
+    state.progress = progressFromRecords(records);
+  } catch (err) {
+    console.warn("Could not load saved progress:", err);
+  }
+  btn.disabled = false;
+  btn.textContent = "START GAME";
   showEnvs();
 });
+
+// A level counts as unlocked when it and all earlier levels were passed
+function progressFromRecords(records) {
+  const progress = {};
+  ENVIRONMENTS.forEach(env => {
+    const passed = new Set(
+      records.filter(r => r.environment === env.name && r.remarks === "Passed").map(r => r.level)
+    );
+    let n = 0;
+    while (passed.has(n + 1)) n++;
+    progress[env.id] = n;
+  });
+  return progress;
+}
 
 // ===== 2. Choose an environment =====
 function showEnvs() {
@@ -465,8 +501,57 @@ function endLevel() {
 $("resLevelsBtn").addEventListener("click", showLevels);
 $("resEnvBtn").addEventListener("click", showEnvs);
 
-// ===== PLACEHOLDER: database save (replaced when Firestore is connected) =====
-function saveRecord(record) {
-  console.log("Record ready to save:", record);
-  $("saveStatus").textContent = "(Database not connected yet. Record shown in the browser console.)";
+// ===== SAVE: send the level record to Firebase Firestore =====
+async function saveRecord(record) {
+  $("saveStatus").textContent = "Saving your progress...";
+  try {
+    const id = await withTimeout(window.SalinlahiDB.saveRecordToDB(record), 15000);
+    $("saveStatus").textContent = "Progress saved! (Record ID: " + id + ")";
+  } catch (err) {
+    console.error("Save failed:", err);
+    $("saveStatus").textContent = "Could not save to the database. Check your internet and Firebase setup.";
+  }
 }
+
+// ===== RETRIEVE + DISPLAY: My Progress and Top Scores =====
+function fillTable(boxId, headers, rows) {
+  const box = $(boxId);
+  box.innerHTML = "";
+  if (rows.length === 0) { box.textContent = "No records yet."; return; }
+  const table = document.createElement("table");
+  const head = document.createElement("tr");
+  headers.forEach(h => { const th = document.createElement("th"); th.textContent = h; head.appendChild(th); });
+  table.appendChild(head);
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    r.forEach(cell => { const td = document.createElement("td"); td.textContent = cell; tr.appendChild(td); });
+    table.appendChild(tr);
+  });
+  box.appendChild(table);
+}
+
+async function showRecords() {
+  showScreen("recordsScreen");
+  $("myRecords").textContent = "Loading...";
+  $("topScores").textContent = "Loading...";
+  try {
+    const mine = await withTimeout(window.SalinlahiDB.getPlayerRecords(state.name), 15000);
+    fillTable("myRecords", ["Environment", "Level", "Score", "Result", "Date"],
+      mine.slice(0, 10).map(r => [r.environment, r.level, r.score, r.remarks, new Date(r.created_ms).toLocaleString()]));
+  } catch (err) {
+    console.error(err);
+    $("myRecords").textContent = "Could not load your records.";
+  }
+  try {
+    const top = await withTimeout(window.SalinlahiDB.getTopScores(10), 15000);
+    fillTable("topScores", ["Player", "Environment", "Level", "Score"],
+      top.map(r => [r.player_name, r.environment, r.level, r.score]));
+  } catch (err) {
+    console.error(err);
+    $("topScores").textContent = "Could not load top scores.";
+  }
+}
+
+$("progressBtn").addEventListener("click", showRecords);
+$("resProgressBtn").addEventListener("click", showRecords);
+$("recordsBackBtn").addEventListener("click", showEnvs);
