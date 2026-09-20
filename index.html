@@ -38,7 +38,10 @@
         <div class="ribbon">CHOOSE AN ENVIRONMENT</div>
         <p id="envGreeting" class="sub"></p>
         <div id="envGrid" class="env-grid"></div>
-        <button id="changeNameBtn" class="btn btn-secondary">CHANGE NICKNAME</button>
+        <div class="btn-row">
+          <button id="progressBtn" class="btn">MY PROGRESS</button>
+          <button id="changeNameBtn" class="btn btn-secondary">CHANGE NICKNAME</button>
+        </div>
       </div>
     </section>
 
@@ -104,13 +107,26 @@
         <div class="btn-row">
           <button id="nextBtn" class="btn"></button>
           <button id="resLevelsBtn" class="btn btn-secondary">LEVEL LIST</button>
+          <button id="resProgressBtn" class="btn btn-secondary">MY PROGRESS</button>
           <button id="resEnvBtn" class="btn btn-secondary">ENVIRONMENTS</button>
         </div>
       </div>
     </section>
 
+    <!-- Screen 7: My progress and top scores (retrieved from Firestore) -->
+    <section id="recordsScreen" class="screen hidden">
+      <div class="panel">
+        <div class="ribbon">MY PROGRESS</div>
+        <div id="myRecords" class="table-box"></div>
+        <div class="ribbon">TOP SCORES</div>
+        <div id="topScores" class="table-box"></div>
+        <button id="recordsBackBtn" class="btn">BACK</button>
+      </div>
+    </section>
+
   </main>
 
+  <script type="module" src="firebase-db.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -380,3 +380,12 @@ body {
 /* ===== Icons (SVG images) ===== */
 .icon { display: inline-block; vertical-align: middle; }
 .icon.inline { width: 1.3em; height: 1.3em; }
+<<<<<<< HEAD
+
+/* ===== Records tables ===== */
+.table-box { overflow-x: auto; margin-bottom: 14px; }
+.table-box table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.table-box th, .table-box td { padding: 6px 8px; border-bottom: 2px solid #eadfc9; text-align: left; }
+.table-box th { background: #f3e6c8; }
+=======
+>>>>>>> 16dd350f15478b3a1cb771ee51a5ea3052488df3
