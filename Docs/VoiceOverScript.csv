@@ -1,0 +1,94 @@
+File Name,Category,Level,Scene,Speaker,Script / Word,English Gloss,Notes
+rachel_l1_s1_intro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Good morning! Kylo needs to get ready for school. Help her get out of bed and start her morning!",-,Scene intro
+rachel_l1_s1_outro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Great job! Now help Kylo get to the bathroom.",-,Scene transition
+rachel_l1_s2_intro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo needs to get ready before school. Help her find the bathroom and get ready for her morning bath!",-,Scene intro
+rachel_l1_s2_outro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Nice! Kylo is ready for her bath.",-,Scene transition
+rachel_l1_s3_intro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"Kylo needs to get clean before going to school. Help her finish her morning routine!",-,Scene intro
+rachel_l1_s3_outro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"Wonderful! Kylo is all clean and ready to get dressed.",-,Scene transition
+rachel_l1_s4_intro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"It's almost time for school! Help Kylo put on her uniform and prepare her things.",-,Scene intro
+rachel_l1_s4_outro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Perfect! Kylo is dressed and ready. But first, she needs breakfast!",-,Scene transition
+rachel_l1_s5_intro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Before going to school, Kylo needs a good breakfast. Help her eat and drink!",-,Scene intro
+rachel_l1_s5_bonus.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Can you find the kanin and itlog?",-,Bonus tap-vocabulary prompt
+rachel_l1_s5_outro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Yummy! Kylo has finished her breakfast.",-,Scene transition
+rachel_l1_s6_intro.wav,Rachel Line,Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,"It's time for school! Help Kylo get to the door and say goodbye to Nanay.",-,Scene intro
+rachel_l1_s6_outro.wav,Rachel Line,Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,"Great job! Kylo is ready for school. Let's go!",-,Scene transition
+rachel_l1_complete_summary.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,"You helped Kylo finish her morning routine!",-,Level complete
+rachel_l1_complete_badge.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,"Bahay Badge Unlocked!",-,Badge unlock stinger
+rachel_l2_s1_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"Kylo has arrived at school! Help her enter the school and get to class before the bell rings.",-,Scene intro
+rachel_l2_s1_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"You made it! Now let's go to the classroom.",-,Scene transition
+rachel_l2_s2_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Class is about to begin. Help Kylo get ready for her lesson.",-,Scene intro
+rachel_l2_s2_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Everyone is ready. It's time to learn!",-,Scene transition
+rachel_l2_s3_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Now it's Kylo's turn to learn some new Filipino words. Help her participate in class!",-,Scene intro
+rachel_l2_s3_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Excellent! Kylo is learning new words.",-,Scene transition
+rachel_l2_s4_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"It's recess! Help Kylo enjoy her break and make some friends.",-,Scene intro
+rachel_l2_s4_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"That was fun! But recess is over. Let's go back to class.",-,Scene transition
+rachel_l2_s5_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"The school day is almost over. Help Kylo clean up and prepare to go home.",-,Scene intro
+rachel_l2_complete_summary.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,"Great job! Kylo finished her school day!",-,Level complete
+rachel_l2_complete_badge.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,"Paaralan Badge Unlocked!",-,Badge unlock stinger
+rachel_l3_s1_intro.wav,Rachel Line,Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"Kylo wants to relax at the park after school. Help her get there safely!",-,Scene intro
+rachel_l3_s2_intro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"The playground is waiting! Help Kylo enjoy the different activities.",-,Scene intro
+rachel_l3_s2_outro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"Wow! Kylo is having so much fun!",-,Scene transition
+rachel_l3_s3_intro.wav,Rachel Line,Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"Look! Kylo met some new friends. Help her introduce herself and play with them.",-,Scene intro
+rachel_l3_s4_intro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"After playing, Kylo and her new friends are hungry. Help them enjoy their snack together.",-,Scene intro
+rachel_l3_s4_outro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"Sharing makes snack time even better!",-,Scene transition
+rachel_l3_s5_intro.wav,Rachel Line,Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"The day is almost over. Help Kylo say goodbye to her friends and head home.",-,Scene intro
+rachel_l3_complete_summary.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,"Amazing! Kylo had a wonderful day!",-,Level complete
+rachel_l3_complete_badge.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,"Parke Badge Unlocked!",-,Badge unlock stinger
+rachel_feedback_correct_1.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Tama!",Correct!,"Not in original script - needed so every one of the 53 words gets a right-answer cue without recording one per word. Reused everywhere."
+rachel_feedback_correct_2.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Magaling!",Well done!,Reused everywhere - rotate between the 3 correct variants for variety
+rachel_feedback_correct_3.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Ang galing!",Great job!,Reused everywhere
+rachel_feedback_incorrect_1.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Mali, subukan muli.","Wrong, try again.","Matches the ""mali mali mali"" wrong-answer cue referenced in VoiceCommand.cs. Reused everywhere."
+rachel_feedback_incorrect_2.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Hindi pa tama, subukan ulit.","Not quite, try again.",Reused everywhere
+word_bangon.wav,Word,Level 1 - Bahay,Scene 1,-,Bangon,Get up,First taught here
+word_tayo.wav,Word,Level 1 - Bahay,Scene 1,-,Tayo,Stand up,First taught here
+word_lakad.wav,Word,Level 1 - Bahay,Scene 1,-,Lakad,Walk,"First taught here. Reused: L1 S2 & S6, L2 S1, L3 S1 & S5"
+word_kaliwa.wav,Word,Level 1 - Bahay,Scene 2,-,Kaliwa,Left,First taught here
+word_kanan.wav,Word,Level 1 - Bahay,Scene 2,-,Kanan,Right,First taught here
+word_bukas.wav,Word,Level 1 - Bahay,Scene 2,-,Bukas,Open,"First taught here. Reused: L1 S6, L2 S1 & S2"
+word_ilaw.wav,Word,Level 1 - Bahay,Scene 2,-,Ilaw,Light (turn on),First taught here
+word_maligo.wav,Word,Level 1 - Bahay,Scene 3,-,Maligo,Take a bath,First taught here
+word_sabon.wav,Word,Level 1 - Bahay,Scene 3,-,Sabon,Soap,First taught here
+word_suklay.wav,Word,Level 1 - Bahay,Scene 3,-,Suklay,Comb,First taught here
+word_sipilyo.wav,Word,Level 1 - Bahay,Scene 3,-,Sipilyo,Toothbrush,First taught here
+word_tuwalya.wav,Word,Level 1 - Bahay,Scene 3,-,Tuwalya,Towel,First taught here
+word_damit.wav,Word,Level 1 - Bahay,Scene 4,-,Damit,Clothes / uniform,First taught here
+word_medyas.wav,Word,Level 1 - Bahay,Scene 4,-,Medyas,Socks,First taught here
+word_sapatos.wav,Word,Level 1 - Bahay,Scene 4,-,Sapatos,Shoes,First taught here
+word_salamin.wav,Word,Level 1 - Bahay,Scene 4,-,Salamin,Mirror,First taught here
+word_bag.wav,Word,Level 1 - Bahay,Scene 4,-,Bag,Bag,"First taught here. Reused: L2 S5"
+word_upo.wav,Word,Level 1 - Bahay,Scene 5,-,Upo,Sit down,"First taught here. Reused: L2 S2 & S5, L3 S4"
+word_kain.wav,Word,Level 1 - Bahay,Scene 5,-,Kain,Eat,"First taught here. Reused: L2 S4, L3 S4"
+word_inom.wav,Word,Level 1 - Bahay,Scene 5,-,Inom,Drink,"First taught here. Reused: L3 S4"
+word_kanin.wav,Word (tap target),Level 1 - Bahay,Scene 5 (bonus),-,Kanin,Rice,"Tap-to-select bonus vocabulary, not a spoken command"
+word_itlog.wav,Word (tap target),Level 1 - Bahay,Scene 5 (bonus),-,Itlog,Egg,"Tap-to-select bonus vocabulary, not a spoken command"
+word_alis.wav,Word,Level 1 - Bahay,Scene 6,-,Alis,Leave / go,"First taught here. Reused: L2 S5"
+word_paalam.wav,Word,Level 1 - Bahay,Scene 6,-,Paalam,Goodbye,"First taught here. Reused: L3 S5"
+word_tara.wav,Word,Level 1 - Bahay,Scene 6,-,Tara,Let's go,First taught here
+word_kumusta.wav,Word,Level 2 - Paaralan,Scene 1,-,Kumusta,Hello / how are you,"First taught here. Reused: L2 S2, L3 S3"
+word_pasok.wav,Word,Level 2 - Paaralan,Scene 1,-,Pasok,Enter,"First taught here. Reused: L2 S5, L3 S1"
+word_takbo.wav,Word,Level 2 - Paaralan,Scene 1,-,Takbo,Run,"First taught here. Reused: L3 S1"
+word_kuha.wav,Word,Level 2 - Paaralan,Scene 2,-,Kuha,Get / take,First taught here
+word_lapis.wav,Word,Level 2 - Paaralan,Scene 2,-,Lapis,Pencil,First taught here
+word_aklat.wav,Word,Level 2 - Paaralan,Scene 3,-,Aklat,Book,First taught here
+word_basa.wav,Word,Level 2 - Paaralan,Scene 3,-,Basa,Read,First taught here
+word_sulat.wav,Word,Level 2 - Paaralan,Scene 3,-,Sulat,Write,First taught here
+word_tanong.wav,Word,Level 2 - Paaralan,Scene 3,-,Tanong,Ask / question,"First taught here. Reused: L3 S3"
+word_sagot.wav,Word,Level 2 - Paaralan,Scene 3,-,Sagot,Answer,First taught here
+word_labas.wav,Word,Level 2 - Paaralan,Scene 4,-,Labas,Go outside,First taught here
+word_laro.wav,Word,Level 2 - Paaralan,Scene 4,-,Laro,Play,"First taught here. Reused: L3 S3"
+word_tawa.wav,Word,Level 2 - Paaralan,Scene 4,-,Tawa,Laugh,First taught here
+word_tulong.wav,Word,Level 2 - Paaralan,Scene 4,-,Tulong,Help,First taught here
+word_linis.wav,Word,Level 2 - Paaralan,Scene 5,-,Linis,Clean up,First taught here
+word_tingin.wav,Word,Level 3 - Parke,Scene 1,-,Tingin,Look,"First taught here. Reused: L3 S5"
+word_tuwa.wav,Word,Level 3 - Parke,Scene 1,-,Tuwa,Joy / delight,First taught here
+word_akyat.wav,Word,Level 3 - Parke,Scene 2,-,Akyat,Climb,First taught here
+word_dausdos.wav,Word,Level 3 - Parke,Scene 2,-,Dausdos,Slide,First taught here
+word_sakay.wav,Word,Level 3 - Parke,Scene 2,-,Sakay,Ride,First taught here
+word_tulak.wav,Word,Level 3 - Parke,Scene 2,-,Tulak,Push,First taught here
+word_talon.wav,Word,Level 3 - Parke,Scene 2,-,Talon,Jump,First taught here
+word_ngiti.wav,Word,Level 3 - Parke,Scene 3,-,Ngiti,Smile,First taught here
+word_bati.wav,Word,Level 3 - Parke,Scene 3,-,Bati,Greet,First taught here
+word_ibahagi.wav,Word,Level 3 - Parke,Scene 4,-,Ibahagi,Share,First taught here
+word_salamat.wav,Word,Level 3 - Parke,Scene 4,-,Salamat,Thank you,First taught here
+word_pagod.wav,Word,Level 3 - Parke,Scene 5,-,Pagod,Tired,First taught here
+word_uwi.wav,Word,Level 3 - Parke,Scene 5,-,Uwi,Go home,First taught here
