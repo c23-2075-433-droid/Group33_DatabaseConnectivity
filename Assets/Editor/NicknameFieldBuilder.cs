@@ -27,29 +27,42 @@ public static class NicknameFieldBuilder
     /// returns the InputField. Any existing copies are removed first, so this
     /// is safe to re-run.
     /// </summary>
+    // The plank art is 1874x455 (~4.12:1); the field below keeps that ratio so
+    // the wood isn't stretched. Leaves occupy the left ~11.8% of the sprite, so
+    // the text is inset past them - otherwise typing would run over the leaves.
+    private const float PlateAspect = 1874f / 455f;
+    private const float FieldWidth = 620f;
+    private const float LeafInset = 0.118f;
+
     public static InputField Build(Transform canvas)
     {
         foreach (GameObject stale in FindAllInScene(FieldName)) Object.DestroyImmediate(stale);
+        // Older versions added a separate white label above the box; the
+        // wooden plank plus its placeholder says the same thing with less
+        // clutter (and nothing to collide with the menu art), so remove it.
         foreach (GameObject stale in FindAllInScene(LabelName)) Object.DestroyImmediate(stale);
 
-        // Sits just above the Play button. If it overlaps anything on your
-        // screen, move the RectTransform in the Scene view - no code change.
-        CreateLabel(canvas, LabelName, "Ano ang pangalan mo?", new Vector2(81, 210), new Vector2(560, 60));
+        float fieldHeight = FieldWidth / PlateAspect;
 
         GameObject fieldGO = new GameObject(FieldName, typeof(RectTransform));
         fieldGO.transform.SetParent(canvas, false);
         RectTransform fieldRect = fieldGO.GetComponent<RectTransform>();
-        fieldRect.anchoredPosition = new Vector2(81, 140);
-        fieldRect.sizeDelta = new Vector2(560, 84);
+        // Sits just above the Play button. If it clashes with the menu art,
+        // move the RectTransform in the Scene view - no code change needed.
+        fieldRect.anchoredPosition = new Vector2(81, 150);
+        fieldRect.sizeDelta = new Vector2(FieldWidth, fieldHeight);
 
         Image background = fieldGO.AddComponent<Image>();
-        background.color = new Color(1f, 0.98f, 0.92f, 0.97f); // warm cream, readable on the menu art
+        background.sprite = LoadSprite("ui_name_plate");
+        background.color = Color.white; // white = show the sprite's own colours untinted
 
-        // Child text objects the InputField drives.
-        Text placeholder = CreateFieldText(fieldGO.transform, "Placeholder", "Type your name...",
-            new Color(0.45f, 0.38f, 0.30f), FontStyle.Italic);
+        // Cream text, because the plank is mid-brown - dark text would not read
+        // against it (the menu title uses the same cream-on-wood pairing).
+        float leftPad = FieldWidth * LeafInset + 16f;
+        Text placeholder = CreateFieldText(fieldGO.transform, "Placeholder", "Pangalan mo?",
+            new Color(0.99f, 0.96f, 0.89f, 0.55f), FontStyle.Italic, leftPad);
         Text text = CreateFieldText(fieldGO.transform, "Text", "",
-            new Color(0.20f, 0.13f, 0.07f), FontStyle.Bold);
+            new Color(0.99f, 0.96f, 0.89f, 1f), FontStyle.Bold, leftPad);
 
         InputField input = fieldGO.AddComponent<InputField>();
         input.targetGraphic = background;
@@ -61,14 +74,15 @@ public static class NicknameFieldBuilder
         return input;
     }
 
-    private static Text CreateFieldText(Transform parent, string name, string content, Color color, FontStyle style)
+    private static Text CreateFieldText(Transform parent, string name, string content,
+        Color color, FontStyle style, float leftPadding)
     {
         GameObject go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
         Text text = go.AddComponent<Text>();
         text.text = content;
         text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = 34;
+        text.fontSize = 38;
         text.fontStyle = style;
         text.alignment = TextAnchor.MiddleLeft;
         text.color = color;
@@ -76,26 +90,18 @@ public static class NicknameFieldBuilder
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
-        rect.offsetMin = new Vector2(20, 8);
-        rect.offsetMax = new Vector2(-20, -8);
+        rect.offsetMin = new Vector2(leftPadding, 26); // clear the leaves and the plank's outline
+        rect.offsetMax = new Vector2(-30, -26);
         return text;
     }
 
-    private static void CreateLabel(Transform parent, string name, string content, Vector2 pos, Vector2 size)
+    private static Sprite LoadSprite(string spriteFile)
     {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        Text text = go.AddComponent<Text>();
-        text.text = content;
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = 36;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = Color.white;
-        text.raycastTarget = false;
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchoredPosition = pos;
-        rect.sizeDelta = size;
+        string path = "Assets/Sprites/" + spriteFile + ".png";
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        if (sprite == null)
+            Debug.LogWarning("[SALINLAHI] Could not load sprite at '" + path + "'. Make sure it's imported as Sprite (2D and UI).");
+        return sprite;
     }
 
     /// <summary>Finds GameObjects by name in the open scene, including inactive ones (unlike GameObject.Find).</summary>
