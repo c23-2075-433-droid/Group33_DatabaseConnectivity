@@ -53,6 +53,9 @@ crashlytics-build.properties
 # Editor scratch
 .utmp/
 
+# Leftovers from cloud/network-synced filesystems (deleted-but-still-open files)
+.fuse_hidden*
+
 # OS files
 .DS_Store
 .DS_Store?
