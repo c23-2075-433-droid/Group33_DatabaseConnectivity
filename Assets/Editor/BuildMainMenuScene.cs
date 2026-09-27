@@ -211,7 +211,7 @@ public class BuildMainMenuScene
         go.transform.SetParent(parent, false);
         Text text = go.AddComponent<Text>();
         text.text = content;
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.font = UIFont.Get();
         text.fontSize = fontSize;
         text.fontStyle = style;
         text.alignment = TextAnchor.MiddleCenter;

@@ -249,7 +249,7 @@ public class BuildLevel1Scene
         textGO.transform.SetParent(badgeGO.transform, false);
         UnityEngine.UI.Text text = textGO.AddComponent<UnityEngine.UI.Text>();
         text.text = word;
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.font = UIFont.Get();
         text.fontSize = 36;
         text.fontStyle = FontStyle.Bold;
         text.alignment = TextAnchor.MiddleCenter;
