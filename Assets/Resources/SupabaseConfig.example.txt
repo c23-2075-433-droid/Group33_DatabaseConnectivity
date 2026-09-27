@@ -1,0 +1,35 @@
+SupabaseConfig — example / placeholder values
+=============================================
+
+The real config asset (SupabaseConfig.asset, in this same folder) is
+git-ignored on purpose so that database credentials are never committed to
+the repository. This file is the committed stand-in that documents what the
+asset should contain.
+
+To create your own local copy:
+
+  1. In Unity: Tools > SALINLAHI > Create Supabase Config
+  2. Select Assets/Resources/SupabaseConfig.asset
+  3. Fill in the Inspector fields using the values below as a template,
+     taking the real values from your Supabase dashboard
+     (Project Settings > API).
+
+Fields
+------
+
+  Project Url : https://YOUR-PROJECT-REF.supabase.co
+  Anon Key    : eyJhbGciOi...            (the "anon public" key, not the service_role key)
+  Table Name  : player_scores
+
+IMPORTANT
+---------
+
+  * Use the "anon public" key. NEVER put the "service_role" key in the game -
+    it bypasses Row Level Security entirely.
+  * The anon key is public by design; it ships inside the built app. The Row
+    Level Security policies (see Docs/SupabaseSetup.md) are what actually
+    restrict what it can do - insert and read player_scores, nothing else.
+  * Do not commit SupabaseConfig.asset. It is already listed in .gitignore.
+
+Full setup instructions, including the SQL to create the table and policies:
+Docs/SupabaseSetup.md
