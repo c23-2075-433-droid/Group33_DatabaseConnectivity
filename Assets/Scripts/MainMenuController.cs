@@ -8,8 +8,14 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
-    [Header("Nickname")]
+    [Header("Nickname Dialog")]
+    [Tooltip("The 'Enter Nickname' popup shown when Play is pressed.")]
+    public GameObject nicknamePanel;
     public InputField nicknameInput;
+    [Tooltip("Confirms the name and starts the game.")]
+    public Button nicknameOkayButton;
+    [Tooltip("Closes the popup without starting the game.")]
+    public Button nicknameCancelButton;
 
     [Header("Buttons")]
     public Button playButton;
@@ -53,6 +59,12 @@ public class MainMenuController : MonoBehaviour
         if (settingsCloseButton != null) settingsCloseButton.onClick.AddListener(() => settingsPanel.SetActive(false));
         if (aboutCloseButton != null) aboutCloseButton.onClick.AddListener(() => aboutPanel.SetActive(false));
 
+        if (nicknameOkayButton != null) nicknameOkayButton.onClick.AddListener(OnNicknameConfirmed);
+        if (nicknameCancelButton != null) nicknameCancelButton.onClick.AddListener(CloseNicknameDialog);
+        // Enter also confirms. onEndEdit fires on focus loss too, so only treat
+        // it as a submit when Enter was actually pressed.
+        if (nicknameInput != null) nicknameInput.onEndEdit.AddListener(OnNicknameEndEdit);
+
         if (volumeSlider != null)
         {
             volumeSlider.value = PlayerPrefs.GetFloat(VolumePrefsKey, 1f);
@@ -62,6 +74,7 @@ public class MainMenuController : MonoBehaviour
 
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
+        if (nicknamePanel != null) nicknamePanel.SetActive(false);
 
         isMuted = PlayerPrefs.GetInt(MutedPrefsKey, 0) == 1;
         volumeBeforeMute = AudioListener.volume > 0f ? AudioListener.volume : 1f;
@@ -85,8 +98,53 @@ public class MainMenuController : MonoBehaviour
         PlayerPrefs.SetInt(MutedPrefsKey, isMuted ? 1 : 0);
     }
 
+    /// <summary>
+    /// Play no longer starts the game directly - it opens the nickname dialog
+    /// first, so each play session is saved under a real player name instead
+    /// of NicknameManager's fallback. OKAY starts the game; CANCEL backs out.
+    /// </summary>
     private void OnPlayPressed()
     {
+        if (nicknamePanel == null)
+        {
+            // No dialog wired up (e.g. an older scene) - keep the original
+            // behaviour rather than trapping the player on the menu.
+            StartGame();
+            return;
+        }
+
+        nicknamePanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (aboutPanel != null) aboutPanel.SetActive(false);
+
+        if (nicknameInput != null)
+        {
+            nicknameInput.Select();
+            nicknameInput.ActivateInputField();
+        }
+    }
+
+    private void OnNicknameEndEdit(string value)
+    {
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            OnNicknameConfirmed();
+        }
+    }
+
+    private void OnNicknameConfirmed()
+    {
+        StartGame();
+    }
+
+    private void CloseNicknameDialog()
+    {
+        if (nicknamePanel != null) nicknamePanel.SetActive(false);
+    }
+
+    private void StartGame()
+    {
+        // Blank input is fine - NicknameManager falls back to a default name.
         string nickname = nicknameInput != null ? nicknameInput.text : "";
         NicknameManager.SetNickname(nickname);
         SceneManager.LoadScene(levelSelectSceneName);
