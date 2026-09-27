@@ -60,8 +60,7 @@ public class AddExitTrigger
         // LoadNextScene() just no-ops instead of trying to load something
         // that doesn't exist. Swap this out once Scene 2 exists.
         trigger.nextSceneName = "";
-        trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel(
-            "Great job! You helped Kylo wake up!\n(More of Level 1 coming soon...)");
+        trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("Magaling!");
 
         SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
         if (controller != null) trigger.objectiveController = controller;

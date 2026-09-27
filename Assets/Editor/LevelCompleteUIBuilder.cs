@@ -102,21 +102,25 @@ public static class LevelCompleteUIBuilder
         // not read against it (same pairing as the menu title).
         Color cream = new Color(0.99f, 0.96f, 0.89f);
 
-        // Headline message.
+        // Headline message. Kept short by callers so it stays on one line -
+        // a wrapped title steals room the leaderboard needs.
         CreateText(panel.transform, "TitleText", message,
-            new Vector2(0, interiorTop - 62), new Vector2(interiorWidth, 120),
-            44, FontStyle.Bold, TextAnchor.MiddleCenter, cream);
+            new Vector2(0, interiorTop - 48), new Vector2(interiorWidth, 96),
+            46, FontStyle.Bold, TextAnchor.MiddleCenter, cream);
 
         // This session's result - filled in at runtime by SessionScoreTracker.
         CreateText(panel.transform, "ScoreText", "",
-            new Vector2(0, interiorTop - 160), new Vector2(interiorWidth, 80),
+            new Vector2(0, interiorTop - 128), new Vector2(interiorWidth, 76),
             34, FontStyle.Bold, TextAnchor.MiddleCenter, cream);
 
         // Records read back OUT of the database - the "display retrieved data"
-        // half of the Activity 5 requirement.
-        CreateText(panel.transform, "RecordsText", "",
-            new Vector2(0, interiorTop - 340), new Vector2(interiorWidth, 280),
-            26, FontStyle.Normal, TextAnchor.UpperCenter, cream);
+        // half of the Activity 5 requirement. Sized close to the score line
+        // rather than half of it, with extra line spacing, so six stacked rows
+        // stay legible over the wood grain.
+        Text records = CreateText(panel.transform, "RecordsText", "",
+            new Vector2(0, interiorTop - 340), new Vector2(interiorWidth, 330),
+            32, FontStyle.Bold, TextAnchor.UpperCenter, cream);
+        records.lineSpacing = 1.15f;
 
         // OKAY returns to the journey map, so the player isn't stranded on a
         // dead-end panel (and the demo can loop straight into another run).
@@ -155,6 +159,14 @@ public static class LevelCompleteUIBuilder
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Overflow;
         text.raycastTarget = false;
+
+        // Dark edge around every glyph. Cream on mid-brown woodgrain has weak
+        // contrast on its own - the grain runs right through the letters at
+        // small sizes - and this is what makes the leaderboard rows legible.
+        Outline outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.16f, 0.09f, 0.04f, 0.95f);
+        outline.effectDistance = new Vector2(2.2f, -2.2f);
+
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchoredPosition = anchoredPos;
         rect.sizeDelta = size;

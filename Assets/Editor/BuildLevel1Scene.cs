@@ -119,8 +119,7 @@ public class BuildLevel1Scene
         // just no-ops instead of trying to load something that doesn't exist.
         // Swap this out once Scene 2 exists.
         exitTrigger.nextSceneName = "";
-        exitTrigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel(
-            "Great job! You helped Kylo wake up!\n(More of Level 1 coming soon...)");
+        exitTrigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("Magaling!");
 
         // --- UI: word-prompt canvas, World Space so each prompt can just sit
         //     at a world position above its matching object (bed, door, etc.)

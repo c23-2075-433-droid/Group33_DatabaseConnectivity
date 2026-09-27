@@ -57,7 +57,7 @@ public class AddDatabaseDemoToLevel1
 
         // Rebuild the completion panel so it definitely has the score/records
         // text fields this demo writes into.
-        GameObject panel = LevelCompleteUIBuilder.BuildPanel("Great job! You helped Kylo wake up!");
+        GameObject panel = LevelCompleteUIBuilder.BuildPanel("Magaling!");
         Transform panelRoot = panel.transform.Find("Panel");
         Text scoreText = FindText(panelRoot, "ScoreText");
         Text recordsText = FindText(panelRoot, "RecordsText");
