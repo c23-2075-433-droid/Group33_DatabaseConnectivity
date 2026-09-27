@@ -8,7 +8,8 @@
 // and scaled to the 1920x1080 canvas used here. To tweak anything, move the
 // object's RectTransform in the Scene view - no code changes needed.
 //
-// No nickname field for now (NicknameManager just uses its default name).
+// Includes the nickname entry box (see NicknameFieldBuilder.cs), which feeds
+// NicknameManager and therefore the player_name on saved database records.
 //
 // Also puts MainMenu first in Build Settings so the game boots into it,
 // followed by the LevelSelect journey map and then Chapter 1 Level 1.
@@ -121,8 +122,13 @@ public class BuildMainMenuScene
         settingsPanel.SetActive(false);
         aboutPanel.SetActive(false);
 
-        // --- Wire controller (no nickname field, no mute icon in this design) ---
+        // --- Nickname entry, so saved records carry a real player name
+        //     instead of NicknameManager's "Bata" fallback. ---
+        InputField nicknameInput = NicknameFieldBuilder.Build(canvasT);
+
+        // --- Wire controller (no mute icon in this design) ---
         MainMenuController controller = canvasGO.AddComponent<MainMenuController>();
+        controller.nicknameInput = nicknameInput;
         controller.playButton = playBtn.GetComponent<Button>();
         controller.settingsButton = settingsBtn.GetComponent<Button>();
         controller.aboutButton = aboutBtn.GetComponent<Button>();
