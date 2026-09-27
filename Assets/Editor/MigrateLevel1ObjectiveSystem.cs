@@ -32,6 +32,12 @@ public class MigrateLevel1ObjectiveSystem
     [MenuItem("Tools/SALINLAHI/Migrate Level 1 To Objective System")]
     public static void Migrate()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogError("[SALINLAHI] Stop Play mode first - this edits the scene, which Unity doesn't allow while the game is running.");
+            return;
+        }
+
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
         Debug.Log("[SALINLAHI] Opened scene '" + scene.name + "' at " + scene.path +
                    " (isLoaded=" + scene.isLoaded + ", rootCount=" + scene.rootCount + ")");

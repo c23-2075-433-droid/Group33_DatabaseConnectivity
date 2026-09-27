@@ -27,6 +27,12 @@ public class AddExitTrigger
     [MenuItem("Tools/SALINLAHI/Add Exit Trigger To Level 1")]
     public static void AddTrigger()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogError("[SALINLAHI] Stop Play mode first - this edits the scene, which Unity doesn't allow while the game is running.");
+            return;
+        }
+
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
         ExitDoorTrigger trigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);

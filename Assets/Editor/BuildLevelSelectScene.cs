@@ -36,6 +36,12 @@ public class BuildLevelSelectScene
     [MenuItem("Tools/SALINLAHI/Build Level Select Scene")]
     public static void BuildScene()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogError("[SALINLAHI] Stop Play mode first - this rebuilds the scene, which Unity doesn't allow while the game is running.");
+            return;
+        }
+
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
         // --- Camera ---

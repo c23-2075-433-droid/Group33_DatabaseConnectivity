@@ -35,6 +35,12 @@ public class AddDatabaseDemoToLevel1
     [MenuItem("Tools/SALINLAHI/Add Database Demo To Level 1")]
     public static void AddDemo()
     {
+        if (EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            Debug.LogError("[SALINLAHI] Stop Play mode first - this edits the scene, which Unity doesn't allow while the game is running.");
+            return;
+        }
+
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
         VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
