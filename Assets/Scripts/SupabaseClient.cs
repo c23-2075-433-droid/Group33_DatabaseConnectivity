@@ -123,7 +123,17 @@ public class SupabaseClient : MonoBehaviour
     private void ApplyHeaders(UnityWebRequest request)
     {
         request.SetRequestHeader("apikey", config.anonKey);
-        request.SetRequestHeader("Authorization", "Bearer " + config.anonKey);
+
+        // Legacy "anon" keys are JWTs (they start with "eyJ"), and PostgREST
+        // accepts them as the bearer token too. The newer sb_publishable_...
+        // keys are NOT JWTs - sending one as a bearer token makes PostgREST
+        // try to parse it as a JWT and reject the request with a 401. So only
+        // set Authorization for the JWT style; the apikey header above is
+        // what authenticates either kind.
+        if (config.anonKey.StartsWith("eyJ"))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + config.anonKey);
+        }
     }
 
     /// <summary>
