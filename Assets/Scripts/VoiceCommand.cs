@@ -73,6 +73,30 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     private bool isInitialized = false;
 
+    // The speech plugin holds on to this script as its listener, and results can
+    // still arrive after the object is gone (stopping Play, or loading another
+    // scene, mid-recognition). Touching anything on a destroyed MonoBehaviour
+    // then throws MissingReferenceException, so every callback checks this first.
+    private bool isShuttingDown = false;
+
+    void OnDestroy()
+    {
+        isShuttingDown = true;
+        CancelInvoke();                      // drop any queued StartListening()
+        SetListening(false);
+
+        // Tell the recognizer to stop, so it doesn't keep delivering results
+        // to a listener that no longer exists.
+        try
+        {
+            if (isInitialized && SpeechToText.IsBusy()) SpeechToText.Cancel();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("VoiceCommand: couldn't cancel speech recognition on destroy: " + e.Message);
+        }
+    }
+
 #if UNITY_EDITOR
     [Header("Editor Testing Only")]
     [Tooltip("Editor-only keyboard shortcuts that simulate voice commands, since the speech plugin doesn't run in the Editor (Android/iOS only). Stripped out of real builds.")]
@@ -135,6 +159,10 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         SpeechToText.RequestPermissionAsync((permission) =>
         {
+            // The permission dialog is async too, so the same "destroyed while
+            // we were waiting" case applies here.
+            if (isShuttingDown || this == null) return;
+
             if (permission == SpeechToText.Permission.Granted)
             {
                 StartListening();
@@ -149,6 +177,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     private void StartListening()
     {
+        if (isShuttingDown || this == null) return;
         if (!isInitialized) return;
 
         // Don't try to start a new session if one's already running.
@@ -162,7 +191,11 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     // The recognizer is now actively listening for speech - this is the
     // moment the microphone button should start its "listening" pulse.
-    void ISpeechToTextListener.OnReadyForSpeech() => SetListening(true);
+    void ISpeechToTextListener.OnReadyForSpeech()
+    {
+        if (isShuttingDown || this == null) return;
+        SetListening(true);
+    }
 
     void ISpeechToTextListener.OnBeginningOfSpeech() { }
 
@@ -170,12 +203,19 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     void ISpeechToTextListener.OnPartialResultReceived(string spokenText)
     {
+        if (isShuttingDown || this == null) return;
+
         // Live partial results, shown as they come in (before the final result).
         SetStatusText("Recognized (partial):\n\"" + spokenText + "\"");
     }
 
     void ISpeechToTextListener.OnResultReceived(string spokenText, int? errorCode)
     {
+        // A result can land after this object was destroyed (Play stopped or
+        // scene changed while the recognizer was still working) - bail out
+        // rather than touching a dead object.
+        if (isShuttingDown || this == null) return;
+
         // A result just came in, so the recognizer has stopped actively
         // listening for this cycle - stop the mic button's pulse. If
         // listenContinuously is on, OnReadyForSpeech() will turn it back on

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 13b62031a75a46b1a0e0663a142c8ca6
+guid: 4127a39e5b0429b3e946f2aacb19b002
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5690296430090677349
-    second: walk_frame_4_0
+      213: 294796877656554756
+    second: marker_player_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,11 +51,11 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 120
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
-  alphaIsTransparency: 0
+  alphaIsTransparency: 1
   spriteTessellationMethod: 0
   spriteTessellationDetail: -1
   spriteGeometrySubdivision: -1
@@ -128,43 +128,43 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: walk_frame_4_0
+      name: marker_player_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 242
-        height: 745
+        width: 512
+        height: 515
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
+      customData:
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 26c6a36647ef7fe4080000000000040
-      internalID: 5690296430090677349
+      spriteID: 216fa8ae10244c7b0800000000000000
+      internalID: 294796877656554756
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     outline: []
-    customData: 
+    customData:
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 2de32d288bb3afd50800000000000000
     internalID: 0
     vertices: []
-    indices: 
+    indices:
     edges: []
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
     nameFileIdTable: {}
-  mipmapLimitGroupName: 
+  mipmapLimitGroupName:
   pSDRemoveMatte: 0
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:

@@ -72,11 +72,22 @@ public class PlayerMovement : MonoBehaviour
         {
             spriteRenderer.sprite = lyingDownSprite;
 
-            // The lyingDownSprite art has the head on the right side, but the
-            // bed's pillow is positioned at the left (headboard) end. Mirror
-            // it so the head actually rests on the pillow. Bangon()/TayoUp()
-            // reset flipX back to false once the character sits/stands up.
-            spriteRenderer.flipX = true;
+            // The current lyingDownSprite art already has the head on the LEFT,
+            // which is the pillow/headboard end of the bed, so no mirroring is
+            // needed. (The older art faced the other way and was flipped here -
+            // if the sleeping art is ever replaced with a head-right version,
+            // set this back to true.)
+            spriteRenderer.flipX = false;
+        }
+
+        // While the character is still in bed, gravity would drag him off the
+        // mattress down to the floor collider the moment Play starts (the bed
+        // is painted into the background and has no collider of its own). Hold
+        // him still until he actually stands up - TayoUp() turns physics back on.
+        if (rb != null && currentWakeStage != WakeStage.Standing)
+        {
+            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.linearVelocity = Vector2.zero;
         }
     }
 
@@ -218,6 +229,11 @@ public class PlayerMovement : MonoBehaviour
             if (standingSprite != null) spriteRenderer.sprite = standingSprite;
             spriteRenderer.flipX = false; // face right by default once standing
         }
+
+        // He's out of bed now, so hand him back to physics: gravity settles him
+        // onto the floor and walking/jumping work from here on.
+        if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
+
         Debug.Log("PlayerMovement: Tayo triggered - now standing, movement unlocked.");
     }
 

@@ -98,30 +98,11 @@ public class BuildMainMenuScene
         GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(-88, -319), new Vector2(356, 199));
         GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(274, -312), new Vector2(350, 192));
 
-        // --- Settings popup (volume) ---
-        GameObject settingsPanel = CreatePanel(canvasT, "SettingsPanel", new Vector2(700, 500));
-        CreateText(settingsPanel.transform, "SettingsTitle", "Settings",
-            new Vector2(0, 170), new Vector2(500, 70), 48, FontStyle.Bold, Color.white);
-        CreateText(settingsPanel.transform, "VolumeLabel", "Volume",
-            new Vector2(0, 40), new Vector2(300, 50), 30, FontStyle.Normal, Color.white);
-        GameObject sliderGO = CreateSlider(settingsPanel.transform, "VolumeSlider", new Vector2(0, -30), new Vector2(500, 60));
-        GameObject settingsCloseGO = CreateTextButton(settingsPanel.transform, "CloseButton", "Close",
-            new Vector2(0, -170), new Vector2(260, 80));
-
-        // --- About popup (credits) ---
-        GameObject aboutPanel = CreatePanel(canvasT, "AboutPanel", new Vector2(760, 560));
-        CreateText(aboutPanel.transform, "AboutTitle", "About SALINLAHI",
-            new Vector2(0, 200), new Vector2(600, 70), 44, FontStyle.Bold, Color.white);
-        CreateText(aboutPanel.transform, "AboutBody",
-            "A voice-interactive Filipino vocabulary learning game.\n\n" +
-            "BSIT Capstone Project\nUniversity of Perpetual Help System Laguna\n\n" +
-            "Daquis, Jhesza Mhei G.\nLacida, Kylo Bryan\nManzanero, Kyla Samantha",
-            new Vector2(0, 10), new Vector2(660, 320), 28, FontStyle.Normal, Color.white);
-        GameObject aboutCloseGO = CreateTextButton(aboutPanel.transform, "CloseButton", "Close",
-            new Vector2(0, -220), new Vector2(260, 80));
-
-        settingsPanel.SetActive(false);
-        aboutPanel.SetActive(false);
+        // --- Settings and About popups, in the same bamboo style as the
+        //     nickname dialog (see SettingsAboutDialogBuilder). Both start
+        //     inactive; MainMenuController shows them on button press. ---
+        SettingsAboutDialogBuilder.Dialog settingsDialog = SettingsAboutDialogBuilder.BuildSettings(canvasT);
+        SettingsAboutDialogBuilder.Dialog aboutDialog = SettingsAboutDialogBuilder.BuildAbout(canvasT);
 
         // --- "Enter Nickname" popup, opened by Play, so saved records carry a
         //     real player name instead of NicknameManager's "Bata" fallback. ---
@@ -136,11 +117,11 @@ public class BuildMainMenuScene
         controller.playButton = playBtn.GetComponent<Button>();
         controller.settingsButton = settingsBtn.GetComponent<Button>();
         controller.aboutButton = aboutBtn.GetComponent<Button>();
-        controller.settingsPanel = settingsPanel;
-        controller.aboutPanel = aboutPanel;
-        controller.settingsCloseButton = settingsCloseGO.GetComponent<Button>();
-        controller.aboutCloseButton = aboutCloseGO.GetComponent<Button>();
-        controller.volumeSlider = sliderGO.GetComponent<Slider>();
+        controller.settingsPanel = settingsDialog.root;
+        controller.aboutPanel = aboutDialog.root;
+        controller.settingsCloseButton = settingsDialog.close;
+        controller.aboutCloseButton = aboutDialog.close;
+        controller.volumeSlider = settingsDialog.slider;
         controller.levelSelectSceneName = "LevelSelect";
 
         // --- Save + put MainMenu first in Build Settings ---
