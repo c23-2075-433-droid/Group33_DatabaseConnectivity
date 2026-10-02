@@ -103,11 +103,16 @@ Credentials are **not** in this repository.
 See [`Assets/Resources/SupabaseConfig.example.txt`](Assets/Resources/SupabaseConfig.example.txt)
 for the expected values.
 
-### 4. Wire the demo into the scene
+### 4. Build and wire the scenes
 In Unity, run in order:
 
 1. **Tools → SALINLAHI → Add Exit Trigger To Level 1**
-2. **Tools → SALINLAHI → Add Database Demo To Level 1**
+2. **Tools → SALINLAHI → Build Bahay Scene 2**
+3. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
+
+Step 3 joins the two scenes with a fade and puts the score and
+recent-scores panel at the end of Scene 2, which is where the playable
+content currently stops.
 
 ### 5. Play
 Open `Assets/Scenes/MainMenu.unity` and press Play.
