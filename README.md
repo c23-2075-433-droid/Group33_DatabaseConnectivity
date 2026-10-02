@@ -10,12 +10,10 @@ from, and displayed back from an online database.
 
 | Name | Role |
 |---|---|
-| Daquis, Jhesza Mhei G. | *(assign role)* |
-| Lacida, Kylo Bryan | *(assign role)* |
-| Manzanero, Kyla Samantha | *(assign role)* |
+| Daquis, Jhesza Mhei G. | Game Logic Developer |
+| Lacida, Kylo Bryan | UI and Testing Lead |
+| Manzanero, Kyla Samantha | Documentation Lead |
 
-> Suggested roles to fill in: Game Logic Developer, Database/Storage Developer,
-> UI and Testing Lead, Documentation Lead, Repository Manager.
 
 BSIT Capstone Project — University of Perpetual Help System Laguna
 
