@@ -33,6 +33,7 @@ public class BuildBahayScene2
     private const float BgScale = 10.8f / 8.64f;      // 1.25
     private const float ScreenWidth = 19.2f;          // 15.36 * 1.25
     private const float FloorY = -2.98f;              // top of the floor planks
+    private const float PlayerScale = 0.40f;          // 745px art -> ~3 units, child height
 
     [MenuItem("Tools/SALINLAHI/Build Bahay Scene 2")]
     public static void BuildScene()
@@ -95,7 +96,11 @@ public class BuildBahayScene2
         // --- Player ---
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-6.5f, FloorY + 0.75f, 0f);
+        playerGO.transform.position = new Vector3(-6.5f, FloorY + 1.6f, 0f);
+        // The character art is 745px (7.45 world units) tall, which is nearly
+        // floor-to-ceiling in a 10.8-unit view. Scale him down to roughly a
+        // child's height against the wall.
+        playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
         playerSr.sortingLayerName = "Player";
@@ -105,8 +110,10 @@ public class BuildBahayScene2
         playerRb.gravityScale = 3f;
         playerRb.freezeRotation = true;
 
+        // Collider is in LOCAL units, so it gets scaled with the transform -
+        // these numbers are sized against the sprite, not the world.
         BoxCollider2D playerCol = playerGO.AddComponent<BoxCollider2D>();
-        playerCol.size = new Vector2(0.6f, 1.4f);
+        playerCol.size = new Vector2(1.4f, 7.0f);
 
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
         player.lyingDownSprite = LoadSprite("lying_down");
@@ -124,8 +131,18 @@ public class BuildBahayScene2
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
+        // Each room is exactly one screen wide and one screen tall, so an
+        // unconstrained follow camera immediately shows past the artwork.
+        // Clamping to the two room centres means the camera sits still inside
+        // a room and pans across only when the player changes rooms.
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
+        follow.offset = new Vector3(0f, 0f, -10f);
+        follow.clampHorizontally = true;
+        follow.minX = 0f;                 // hallway centre
+        follow.maxX = ScreenWidth;        // bathroom centre
+        follow.lockVertically = true;
+        follow.fixedY = 0f;
 
         // --- Floor, spanning both rooms ---
         GameObject groundGO = new GameObject("Ground");
