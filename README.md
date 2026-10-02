@@ -122,14 +122,19 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 
 | Key | Simulates |
 |---|---|
-| `B` | "Bangon" |
-| `T` | "Tayo" |
-| `L` | "Lakad" |
+| `Enter` | **whatever word the scene is currently asking for** |
+| `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
+| `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
 
-Press **B → T → L** to finish the session; the completion panel then shows your
-score and the recent records read back from Supabase.
+**Enter is the one to use** — it reads the current objective and says that
+word, so it works in any scene without needing a key per word. Press it
+repeatedly to walk through a whole scene.
+
+Scene 1 ends by walking out of the bedroom, which fades into Scene 2. After
+Scene 2's five words, the completion panel shows your score and the recent
+records read back from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
 

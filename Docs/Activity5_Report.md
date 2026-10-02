@@ -350,8 +350,8 @@ The nickname is stored and becomes the `player_name` on the saved record.
 game shows one Filipino word at a time, and the player says it into the
 microphone: **Bangon**, then **Tayo**, then **Lakad**. Each correct word makes
 the character perform the action. On a computer, where the speech plugin does
-not run, the keys B, T, and L simulate the same spoken words through exactly
-the same code.
+not run, pressing Enter simulates saying the word the game is currently
+asking for, through exactly the same code.
 *See Figure 3 (player action that generates game data).*
 
 **Step 4. Saving data.** When the last word is said correctly, the game

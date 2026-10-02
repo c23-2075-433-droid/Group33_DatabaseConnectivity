@@ -109,15 +109,27 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // These go through SimulateSpeech, NOT straight to PlayerMovement, so
         // the Editor exercises the real pipeline: objective matching,
         // OnAnswerChecked, and score tracking all behave as they do on device.
-        if (Input.GetKeyDown(KeyCode.B)) SimulateSpeech("bangon");
+
+        // ENTER says whatever word the scene is currently asking for. This is
+        // the one to use: it works in every scene, including ones built later,
+        // without needing a new key per word.
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (!string.IsNullOrEmpty(currentTargetWord)) SimulateSpeech(currentTargetWord);
+            else Debug.Log("VoiceCommand (Editor fallback): no objective is active right now.");
+        }
+        // Individual words, for answering out of order or checking one action.
+        else if (Input.GetKeyDown(KeyCode.B)) SimulateSpeech("bangon");
         else if (Input.GetKeyDown(KeyCode.T)) SimulateSpeech("tayo");
         else if (Input.GetKeyDown(KeyCode.L)) SimulateSpeech("lakad");
+        else if (Input.GetKeyDown(KeyCode.K)) SimulateSpeech("kaliwa");
+        else if (Input.GetKeyDown(KeyCode.N)) SimulateSpeech("kanan");
+        else if (Input.GetKeyDown(KeyCode.O)) SimulateSpeech("bukas");
+        else if (Input.GetKeyDown(KeyCode.I)) SimulateSpeech("ilaw");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see
         // attempts counted without the objective advancing.
         else if (Input.GetKeyDown(KeyCode.X)) SimulateSpeech("mali");
-        // Raw movement check, bypassing the word system on purpose.
-        else if (Input.GetKeyDown(KeyCode.K)) player.WalkLeft();
     }
 #endif
 
