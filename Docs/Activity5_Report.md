@@ -2,35 +2,30 @@
 
 **DRAFT — fill in the blanks marked `[ ... ]`, add the screenshots, then export as PDF.**
 
-Every place you need a screenshot is marked like this:
+Screenshot spots are marked like this:
 
-> **SCREENSHOT:** what to capture
+> **FIGURE n:** what to capture
 
-Everything else is already written. Read it once and change any wording you
-do not agree with, because you must be able to explain it in the demo.
+Read it once and change anything you disagree with, because you must be able
+to explain all of it during the demo.
 
 ---
 
 ## Cover Page
 
-**Activity 5 — Database Connectivity**
+**COLLEGE OF COMPUTER STUDIES**
 
-**Game Title:** SALINLAHI — A Journey Through Language
+**Game Database Connectivity Prototype**
 
-**Group Number:** 33
+**Group 33 — BSIT-J4T**
 
-**Members:**
-- Daquis, Jhesza Mhei G. — `[role]`
-- Lacida, Kylo Bryan — `[role]`
-- Manzanero, Kyla Samantha — `[role]`
+- Daquis, Jhesza Mhei G.
+- Lacida, Kylo Bryan
+- Manzanero, Kyla Samantha
 
-**Course / Section:** `[fill in]`
 **Instructor:** `[fill in]`
 **Date Submitted:** `[fill in]`
 **Repository Link:** `[paste GitHub link]`
-
-> Roles to pick from: Game Logic Developer, Database/Storage Developer,
-> UI and Testing Lead, Documentation Lead, Repository Manager.
 
 ---
 
@@ -38,41 +33,51 @@ do not agree with, because you must be able to explain it in the demo.
 
 | Item | Answer |
 |---|---|
-| Group Number | 33 |
+| Group Number | Group 33 |
 | Group Members | Daquis, Jhesza Mhei G.; Lacida, Kylo Bryan; Manzanero, Kyla Samantha |
 | Prototype Direction | Capstone-Based |
-| Game Title | SALINLAHI — A Journey Through Language |
-| Game Type or Genre | Educational voice-controlled 2D game |
-| Target Users | Filipino children learning basic Tagalog words |
+| Game Title | SALINLAHI: A Voice-Interactive Filipino Language Learning Game |
+| Game Type or Genre | 2D educational voice-controlled game |
+| Target Users | Primary: Children who mainly use English in daily communication. Secondary: Young learners from Kindergarten to Grade 3. |
 | Platform Used | Android (also runs on desktop for testing) |
-| Development Tool Used | Unity 6 (6000.6.2f1), C#, Visual Studio Code |
+| Development Tool Used | Unity 6 (6000.6.2f1), C#, Visual Studio Code, GitHub |
 | Database or Storage Used | Supabase (PostgreSQL) through its REST API |
 
 **What is the main purpose of your game?**
 
-SALINLAHI teaches Filipino words to children. The player must say the word
-out loud to make the character move. This helps the child learn the word by
-speaking it, not only by reading it.
+SALINLAHI helps young learners who mostly speak English build their Filipino
+vocabulary and confidence. The player must say the Filipino word out loud to
+make the character move, so the word is learned by speaking it and not only
+by reading it. Words are taught inside everyday places so they have context.
+This prototype is a working part of the full capstone, and it shows how the
+game saves, retrieves, and displays learner progress using a database.
 
 **What does the player do in the game?**
 
-The player helps a child character named Kylo finish her morning routine. The
-game shows a Filipino word on screen. The player says that word into the
-microphone. If the word is correct, Kylo does the action. Level 1 has three
-words: *Bangon* (get up), *Tayo* (stand), and *Lakad* (walk).
+The player enters a nickname, then chooses a location on the journey map:
+Bahay (Home), Paaralan (School), Palaruan (Park), or Palengke (Community
+Store). In Bahay, the player helps a child character named Kylo wake up and
+get ready. The game shows one Filipino word at a time, and the player says
+that word into the microphone. If the word is said correctly, the character
+performs the action. Level 1 teaches three words: **Bangon** (get up),
+**Tayo** (stand), and **Lakad** (walk). At the end, the player sees their
+score and their recent results.
 
 **What data will the game save?**
 
-After the player finishes the level, the game saves one record: the player
-name, the score, the number of tries, the level played, a short remark, and
-the date and time.
+Each time a level is finished, the game saves one record containing the
+player's nickname, the level played, the score, the number of attempts, a
+short remark, and the date and time of play.
 
 **Why did your group choose this prototype direction?**
 
-We chose the capstone-based direction because our game already makes useful
-data. Every time the player says a word, the game already knows if it was
-right or wrong. We only needed to save that result instead of throwing it
-away. Building a separate game would have wasted that.
+We chose the capstone-based direction because this prototype is a working
+part of our actual project. SALINLAHI already needs score and progress
+tracking as a system feature, so saving and retrieving learner data is
+something we would have to build anyway. The game also already produces this
+data: every time the player speaks, the game already decides whether the word
+was correct, and before this activity that result was simply thrown away.
+Building the database now lets us test our data design early.
 
 ---
 
@@ -80,139 +85,193 @@ away. Building a separate game would have wasted that.
 
 | Data Item | Purpose | Example Value |
 |---|---|---|
-| Player Name | Shows whose score it is | Kyla |
-| Score | Number of words said correctly | 3 |
-| Attempts | Number of tries the player made | 4 |
+| Player Name | Identifies whose attempt the record belongs to, using a nickname instead of a full name | Kyla |
+| Score | Shows how many Filipino words the player said correctly | 3 |
+| Attempts | Shows how many tries the player needed, so accuracy can be measured | 4 |
 | Level or Stage | Shows which part of the game was played | Bahay - Scene 1: Umaga na! |
-| Result or Remarks | Short readable result | 3/4 correct |
-| Date or Time | Shows when the player played | 2026-09-27 13:46 |
-| Player ID | Gives each record its own unique number | (made by the database) |
+| Result or Remarks | Shows the outcome of the attempt in a readable form | 3/4 correct |
+| Date or Time | Records when the attempt was played, so progress can be tracked over time | September 27, 2026 – 1:46 PM |
+| Player ID | Gives every record its own unique identifier | (generated by the database) |
 
 **Why does your game need to store this data?**
 
-The game needs to remember how well each player did. Without saving, the
-score disappears when the game closes. Saving lets the player see their old
-scores, and lets a teacher see which words are hard for the children.
+SALINLAHI is a learning game, so it needs to keep track of how learners
+perform. Without stored data, the score and result disappear as soon as the
+level ends, and there would be no way to see whether the player is improving.
+The stored records also let the game show recent scores when the level
+finishes.
 
 **How will the stored data improve the game or user experience?**
 
-After each level, the game shows a list of recent scores. The player can see
-their own result and compare it with their classmates. This makes the child
-want to try again and get a better score.
+Players can see their own result next to the results of other players, which
+motivates them to play again and get a better score. The saved records also
+give teachers or parents a way to check how a child is doing with Filipino
+vocabulary. Because we save both the score and the number of attempts, the
+records show not only whether the child got the word right, but how many
+tries it took. This supports the capstone's goal of tracking learner progress.
 
 **What data should not be stored? Explain why.**
 
-We do not store the child's real full name, address, age, school, or any
-voice recording. These are children, so we only keep a short nickname they
-type themselves. We also do not store the Supabase secret key inside the
-game. Keeping only what we need protects the children's privacy.
+The game should not store sensitive personal information such as the child's
+full real name, home address, birthdate, contact number, or school ID, since
+the target users are young children. It should also not store passwords or
+voice recordings. The microphone audio is processed by the device and only
+the recognised text is used; the audio itself is never saved or uploaded.
+Only a nickname and gameplay data are needed. Collecting less protects the
+children's privacy and reduces risk if the database is ever accessed by
+someone else.
 
 ---
 
 ## Part III. Database Design
 
-**Table name:** `player_scores`
+**Table name:** `player_scores` (PostgreSQL table in Supabase)
 
 | Field Name | Data Type | Description |
 |---|---|---|
-| player_id | uuid (auto) | Unique identifier of the record |
-| player_name | text | Nickname typed by the player |
-| score | integer | Number of words said correctly |
-| attempts | integer | Total number of tries |
+| player_id | uuid | Unique identifier of each game record |
+| player_name | text | Nickname of the player |
+| score | integer | Number of Filipino words said correctly |
+| attempts | integer | Total number of tries the player made |
 | level | text | Level or scene that was played |
-| remarks | text | Short result, such as "3/4 correct" |
-| created_at | timestamp (auto) | Date and time the record was saved |
+| remarks | text | Result of the attempt, such as "3/4 correct" |
+| created_at | timestamptz | Date and time when the record was saved |
 
-> **SCREENSHOT:** Supabase → Table Editor → the `player_scores` table showing
-> the column names.
+> **FIGURE 1:** Supabase → Table Editor → the `player_scores` table showing
+> the saved records and the column names.
 
 **What is the purpose of your table or collection?**
 
-It stores one row for every finished play session, so the game can show past
-results later.
+The `player_scores` table stores one record for every level a player finishes
+in SALINLAHI. Each record keeps the player's nickname, the level played, the
+score, the number of attempts, the result, and the date and time. The game
+uses these records to show the player's own result and the recent scores of
+other players on the level-complete screen. This lets learners see how they
+are doing and supports the capstone's goal of tracking learner progress.
 
 **Which field is used as the unique identifier?**
 
-`player_id`. The database makes this value by itself using
-`gen_random_uuid()`, so two records can never have the same ID.
+The `player_id` field is the unique identifier. The database generates it
+automatically using `gen_random_uuid()` when a record is inserted, so no two
+records are ever the same, even when the same player plays the same level
+again. It identifies the record, not the person; players are identified by
+their nickname, which is why one nickname can have many records.
 
 **Which fields are required before saving a record?**
 
-`player_name` and `level` are required. The rest have default values:
-`player_id` and `created_at` are filled by the database, and `score` and
-`attempts` start at 0.
+Two fields must have a value before a record can be saved: `player_name` and
+`level`. Both are marked `not null` in the table. The other fields have
+default values: `score` and `attempts` start at 0, `player_id` is generated
+by the database, and `created_at` is set to the server's current time.
+
+**Access rules**
+
+Row Level Security is turned on for the table. The game's public key is only
+allowed to `insert` new records and `select` existing ones. There is
+deliberately no `update` or `delete` policy, so the game can add and read
+records but can never change or erase them.
 
 ---
 
 ## Part IV. Database Connectivity Implementation
 
-**How the connection works (short explanation)**
+**Brief explanation of how the connection works**
 
-The game talks to Supabase using its REST API. We did not install any extra
-SDK. Unity's built-in `UnityWebRequest` sends normal web requests:
+Our game is built in Unity with C#, and it connects to Supabase, a cloud
+PostgreSQL database. We did not install any extra SDK. The connection uses
+Supabase's REST API through Unity's built-in `UnityWebRequest`, which sends
+ordinary web requests over HTTPS.
 
-- To **save**, the game sends a `POST` request with the record as JSON.
-- To **retrieve**, the game sends a `GET` request and reads back the rows.
+The connection settings are stored in a `SupabaseConfig` asset that holds the
+project URL and the public API key. That asset stays on our own computers and
+is not uploaded to GitHub. The repository includes a sample file,
+`SupabaseConfig.example.txt`, instead, and each group member creates their own
+copy through a menu command in Unity.
 
-Both requests carry the Supabase API key in the `apikey` header so the
-server knows the request is allowed.
+When the player finishes all the words in a level, `SessionScoreTracker`
+builds the record and passes it to `SupabaseClient`. The save function sends a
+`POST` request with the record as JSON, and the database fills in the unique
+ID and the timestamp. Right after a successful save, the retrieve function
+sends a `GET` request for the five newest records, sorted from newest to
+oldest, and `SessionScoreTracker` writes them onto the level-complete panel.
 
 **Where the code is**
 
 | Function | File |
 |---|---|
-| Save (POST) | `Assets/Scripts/SupabaseClient.cs` → `SaveScore()` |
-| Retrieve (GET) | `Assets/Scripts/SupabaseClient.cs` → `FetchRecentScores()` |
-| Decides when to save and what to show | `Assets/Scripts/SessionScoreTracker.cs` |
+| Save (HTTP POST) | `Assets/Scripts/SupabaseClient.cs` → `SaveScore()` |
+| Retrieve (HTTP GET) | `Assets/Scripts/SupabaseClient.cs` → `FetchRecentScores()` |
+| Decides when to save and what to display | `Assets/Scripts/SessionScoreTracker.cs` |
 | Shape of one record | `Assets/Scripts/ScoreRecord.cs` |
-| URL and API key settings | `Assets/Scripts/SupabaseConfig.cs` |
+| Connection settings | `Assets/Scripts/SupabaseConfig.cs` |
 
-**What action triggers the saving of data?**
+> **FIGURE 2:** Game interface before saving data (the main menu).
 
-Saving happens when the player finishes all the words in the level. When the
-last word (*Lakad*) is said correctly, `SceneObjectiveController` reports
-that the level is complete, and `SessionScoreTracker` sends the record.
+> **FIGURE 3:** Player action that generates game data (the level being
+> played, with the word prompt and microphone button visible).
 
-**How does the game retrieve stored data?**
+> **FIGURE 4:** Successful save action (the level-complete panel showing the
+> score and the RECENT SCORES list).
 
-Right after a successful save, the game sends a `GET` request for the five
-newest rows, sorted by `created_at` from newest to oldest.
+> **FIGURE 5:** Database connection setup (`SupabaseConfig.cs`, or the
+> Supabase settings in the Unity Inspector with the key blurred out).
 
-**Where is the retrieved data displayed?**
+> **FIGURE 6:** Save and retrieve functions (`SupabaseClient.cs` showing
+> `SaveScore()` and `FetchRecentScores()`).
 
-On the level-complete panel, under the heading **RECENT SCORES**. It shows
-the player name, the score, and the date and time of each record.
+**1. What action triggers the saving of data?**
 
-**What problem did your group encounter during database connection?**
+Finishing a level triggers the save. When the player says the last word of
+the level correctly, `SceneObjectiveController` reports that all objectives
+are complete, and `SessionScoreTracker` builds the record and sends it to
+Supabase automatically. The player does not need to press a save button. The
+level-complete panel then confirms the save by showing the score and the
+retrieved list of recent scores.
 
-We had three real problems:
+**2. How does the game retrieve stored data?**
 
-1. The game could not connect at first. The error said the project URL and
-   API key were missing, because we had not filled them in yet.
-2. Our Supabase key was a new-style `sb_publishable_` key, which is not a
-   JWT. Our code was sending it in the `Authorization: Bearer` header, and
-   the server rejected it.
-3. The saved record always used the name "Bata", because the game had no
-   place for the player to type a name.
+The game sends a `GET` request to the `player_scores` table asking for the
+five newest records, ordered by `created_at` from newest to oldest. This
+happens immediately after a successful save, so the player always sees an
+up-to-date list that already includes their own run.
 
-**How did your group solve the problem?**
+**3. Where is the retrieved data displayed?**
 
-1. We created the config file in Unity and pasted the project URL and the
-   anon/publishable key into it.
-2. We changed the code to send the key only in the `apikey` header when it
-   is not a JWT. Now both old and new key types work.
-3. We added an "Enter Nickname" popup on the main menu, so the name the
-   player types is the name that gets saved.
+It is displayed inside the game on the level-complete panel, under the
+heading **RECENT SCORES**. Each row shows the player name, the score out of
+the number of attempts, and the date and time the record was saved. The
+player's own result for the current session is shown above the list.
 
-> **SCREENSHOT:** the game before saving (the level running, prompt showing).
+**4. What problem did your group encounter during database connection?**
 
-> **SCREENSHOT:** the level-complete panel right after saving, showing the
-> score and the RECENT SCORES list.
+We had three problems.
 
-> **SCREENSHOT:** Supabase → Table Editor → rows of saved data.
+First, the game could not connect at all. The level-complete panel showed the
+message "SupabaseConfig is missing its project URL or anon key", because we
+had created the settings file but had not pasted the values into it yet.
 
-> **SCREENSHOT:** `SupabaseClient.cs` open in VS Code, showing `SaveScore()`
-> and `FetchRecentScores()`.
+Second, after filling in the key, the server still refused the requests. Our
+Supabase project gave us a new-style publishable key (`sb_publishable_...`),
+which is not a JWT. Our code was sending that key in the
+`Authorization: Bearer` header, and the server tried to read it as a JWT and
+rejected it.
+
+Third, every saved record used the name "Bata". The game had no place for the
+player to type a name, so it always fell back to its default nickname, and
+the recent-scores list showed the same name on every row.
+
+**5. How did your group solve the problem?**
+
+For the first problem, we created the settings asset through the Unity menu
+and pasted in the project URL and the public key from the Supabase dashboard.
+
+For the second, we changed the code so the key is always sent in the `apikey`
+header, and the `Authorization: Bearer` header is only used when the key is a
+JWT. Both the old and new Supabase key types now work.
+
+For the third, we added an "Enter Nickname" popup that opens when Play is
+pressed, so the name the player types becomes the `player_name` on the saved
+record.
 
 ---
 
@@ -225,64 +284,94 @@ We had three real problems:
 | Repository Link | `[paste link]` |
 | Repository Visibility | `[Public or Private]` |
 | Instructor Access Confirmed | `[Yes or No]` |
-| Number of Meaningful Commits | 16 |
+| Number of Meaningful Commits | `[check current count]` |
 
 **What files are included in the repository?**
 
-The whole Unity project: the `Assets` folder (scripts, sprites, scenes,
-fonts), the `ProjectSettings` folder, the `Packages` folder, the `Docs`
-folder, the `README.md`, and a `.gitignore`. The `Library` folder is not
-included because Unity rebuilds it, and it is about 2.6 GB.
+The repository contains the complete Unity project. `Assets/Scripts` holds the
+game logic and the database code, `Assets/Editor` holds the tools that build
+the game screens, `Assets/Sprites` holds the artwork, `Assets/Scenes` holds
+the game scenes, and `Assets/Fonts` holds the UI font. `ProjectSettings` and
+`Packages` hold the Unity configuration so the project opens correctly on
+another computer. `Docs` holds this report and the database setup guide, and
+`README.md` explains the project and how to run it. The `.gitignore` file
+keeps our real Supabase settings out of the repository, and also excludes
+Unity's `Library` folder, which is about 2.6 GB and is rebuilt automatically.
 
 **Where can the database save and retrieve functions be found in the code?**
 
-In `Assets/Scripts/SupabaseClient.cs`. `SaveScore()` does the saving and
-`FetchRecentScores()` does the retrieving.
+They are in `Assets/Scripts/SupabaseClient.cs`. The save function is
+`SaveScore()` and the retrieve function is `FetchRecentScores()`. In
+`Assets/Scripts/SessionScoreTracker.cs`, the `HandleSessionComplete()` method
+calls the save function when a level ends, and `FetchAndDisplayRecords()`
+calls the retrieve function and writes the results to the screen.
 
 **What does the README file explain?**
 
-It explains the game, the group members, the tools we used, the database we
-used, how to run the project, what data is saved and retrieved, where the
-code is, the security notes, and the parts that are not finished yet.
+The README gives the project title, the group number and members, a short
+description of the game, the tools and technologies used, the database used
+(Supabase), what data is saved and retrieved, where the save and retrieve
+functions are, step-by-step instructions on how to run the prototype
+including how to create the local settings file, the security notes, and the
+known limitations.
 
 **How did your group use the repository to organize or track progress?**
 
-We made one commit for each finished part, such as the main menu, the voice
-commands, the database connection, and the UI fixes. The commit messages
-explain what changed, so we can see the order we built things in.
+We used GitHub to keep all the project files in one place and to keep a
+commit history of each stage of development. The commits follow the order we
+built things in: the main menu and journey map, the Level 1 scene and voice
+recognition, the microphone and replay buttons, the objective system, the
+Supabase connection, and finally the user interface artwork and
+documentation. Each commit message describes what changed, so we can see our
+progress and go back if something breaks. We also used `.gitignore` and a
+sample settings file to keep our Supabase credentials out of the repository.
 
-> **SCREENSHOT:** the GitHub repository main page.
+> **FIGURE 7:** Repository page on GitHub.
 
-> **SCREENSHOT:** the commit history list.
+> **FIGURE 8:** Commit history.
 
-> **SCREENSHOT:** the README file shown on GitHub.
+> **FIGURE 9:** README file shown on GitHub.
 
 ---
 
 ## Part VI. Application Output Demonstration
 
-**Steps of the demonstration**
+**Step 1. Opening or running the game.** The project is opened in Unity and
+run with the Play button, or installed on an Android phone. The main menu
+appears with the Play, Settings, and About buttons.
+*See Figure 2 (game interface before saving data).*
 
-1. Open the game. The main menu appears.
-2. Press **Play**. The "Enter Nickname" popup opens.
-3. Type a nickname and press **OKAY**.
-4. The journey map appears. Tap the **Bahay** (house) location.
-5. Level 1 starts. The character is asleep in bed.
-6. Say **Bangon**, then **Tayo**, then **Lakad** into the microphone.
-   (On a computer, press the B, T and L keys instead, because the speech
-   plugin only runs on Android.)
-7. The level-complete panel appears. It shows the player name, the score,
-   and the RECENT SCORES list read back from the database.
-8. Open Supabase and show the new row in the `player_scores` table.
-9. Press **OKAY** to go back to the journey map.
+**Step 2. Entering a nickname.** The player presses **Play**, and the "Enter
+Nickname" popup appears. The player types a nickname and presses **OKAY**.
+The nickname is stored and becomes the `player_name` on the saved record.
 
-> **SCREENSHOT:** the main menu.
+**Step 3. Playing the level.** The journey map appears. The player taps the
+**Bahay** location and Level 1 starts, with the character asleep in bed. The
+game shows one Filipino word at a time, and the player says it into the
+microphone: **Bangon**, then **Tayo**, then **Lakad**. Each correct word makes
+the character perform the action. On a computer, where the speech plugin does
+not run, the keys B, T, and L simulate the same spoken words through exactly
+the same code.
+*See Figure 3 (player action that generates game data).*
 
-> **SCREENSHOT:** the "Enter Nickname" popup with a name typed in.
+**Step 4. Saving data.** When the last word is said correctly, the game
+calculates the score and the number of attempts, builds one record, and sends
+it to the `player_scores` table in Supabase. The level-complete panel appears
+and shows the player name and the score.
+*See Figure 4 (successful save action).*
 
-> **SCREENSHOT:** the level being played (word prompt and microphone visible).
+**Step 5. Viewing the saved data.** In the Supabase dashboard, under Table
+Editor, the `player_scores` table contains the new record with the fields
+`player_id`, `player_name`, `score`, `attempts`, `level`, `remarks`, and
+`created_at`.
+*See Figure 1 (saved record in Supabase).*
 
-> **SCREENSHOT:** the final panel with the RECENT SCORES list.
+**Step 6. Retrieving and displaying the saved data.** Immediately after
+saving, the game reads the five newest records back from the table and
+displays them on the same panel under **RECENT SCORES**, showing each
+player's name, score, and the date and time they played. Pressing **OKAY**
+returns the player to the journey map.
+*See Figure 4 (retrieved data displayed in the game).*
 
 ---
 
@@ -290,85 +379,125 @@ explain what changed, so we can see the order we built things in.
 
 | Component | Role in the Prototype |
 |---|---|
-| User or Player | The child who types a nickname and says the Filipino words |
-| Game Application | The Unity game that shows the words and checks the answers |
-| Input | The nickname typed on the menu, and the spoken words from the microphone |
-| Process | `PronunciationChecker` compares the spoken word with the target word and decides right or wrong; `SessionScoreTracker` counts the score and attempts |
-| Database or Storage | Supabase `player_scores` table, which keeps every finished session |
-| Output | The level-complete panel showing the score and the recent scores list |
-| Network or API | Supabase REST API, called with `UnityWebRequest` over HTTPS |
-| Repository | GitHub, which stores the source code and the history of our changes |
-| Development Tool | Unity 6 and Visual Studio Code, used to build and edit the game |
+| User or Player | A young learner who types a nickname and says the Filipino words out loud |
+| Game Application | The Unity game that shows the words, listens to the microphone, and calculates the score |
+| Input | The nickname typed on the menu, and the spoken Filipino words captured by the microphone |
+| Process | `PronunciationChecker` compares the recognised speech with the target word and decides right or wrong; `SessionScoreTracker` counts the score and the attempts and builds the record |
+| Database or Storage | Supabase, a cloud PostgreSQL database, where each finished level is stored as one row in the `player_scores` table |
+| Output | The character's actions, the word prompts, the level-complete panel, and the RECENT SCORES list |
+| Network or API | The internet connection and the Supabase REST API, called with `UnityWebRequest` over HTTPS, which carries records between the game and the database |
+| Repository | GitHub, which stores the source code, artwork, README, and commit history, while keeping the real Supabase settings private |
+| Development Tool | Unity 6 and Visual Studio Code for writing and running the game, GitHub Desktop and Git for version control, and the Supabase dashboard for viewing the saved data |
 
 **How does this activity show that a game application is also a system
 composed of connected parts?** *(minimum 100 words)*
 
-This activity shows that a game is not only pictures and buttons. It is a
-system where many parts work together, and each part depends on the others.
-The player gives input by typing a nickname and saying a word. The game
-processes that input and decides if the answer is correct. The result then
-becomes data, and that data travels over the internet to the database using
-an API. The database stores the record safely and gives it back when the
-game asks for it. The game then turns that data back into something the
-player can read on screen. If one part fails, the whole chain stops. When
-our API key was wrong, the game still ran, but nothing was saved and nothing
-could be displayed. This proved that the interface, the logic, the network,
-and the storage are all one connected system, not separate pieces.
+This activity showed us that our game is not only a screen with pictures and
+buttons. It is a system in which every part depends on the others. The player
+gives input by typing a nickname and speaking a Filipino word. The game
+application processes that input by comparing the speech with the target word,
+deciding whether it is correct, and counting the score. That result becomes
+data, and the data travels over the network through an API to the database,
+which stores it safely and gives it back when the game asks. The game then
+turns that data back into something the player can read on screen. If one part
+fails, the whole chain stops. When our API key was being sent in the wrong
+header, the game still ran and the player could still play, but nothing was
+saved and nothing could be displayed. That one small mistake in the network
+layer broke the storage and the output even though the input and the process
+were working. This proved to us that the interface, the game logic, the
+network, and the storage are one connected system, not separate pieces.
 
 ---
 
 ## Part VIII. Group Reflection and Technical Learning
 
-> **Please edit this in your own words before submitting.** It must sound
-> like your group. Keep the real problems, but say them the way you would.
+> **Edit this in your own words before submitting.** It must sound like your
+> group. Keep the real problems, but say them the way you would.
 
 *(minimum 150 words)*
 
-Our group learned that connecting a game to a database is not as hard as we
-thought, but it must be done carefully. We learned that saving data is only
-half of the work. Retrieving the data and showing it on screen is what makes
-the data useful to the player. Database connectivity is helpful in games
-because it lets the game remember the player. Without it, every score is
-lost when the game closes, and the player cannot see if they are improving.
+**What did your group learn about database connectivity?**
 
-The hardest part was the connection itself. Our API key was a new type of
-Supabase key, and our code was sending it in the wrong header, so the server
-kept refusing it. We also spent time confused when the game showed an error
-saying the settings were empty, because we had not pasted the project URL
-and key yet. Fixing these taught us to read the error message carefully
-instead of guessing.
+We learned that connecting a game to a database means more than saving a
+score. The game needs settings that identify the project, code that sends and
+reads the data, and rules on the database side that allow it. We also learned
+the difference between saving data and retrieving it, and that both must work
+before the connection is actually useful. Saving alone is invisible to the
+player.
 
-The repository helped us a lot. Each commit described one finished part, so
-we could see our progress and go back if something broke. It also kept our
-API key out of the project, because we listed the settings file in
-`.gitignore`.
+**Why is database connectivity useful in game applications?**
 
-If we had more time, we would show only the best score of each player, add
-the recorded Filipino voice-over, and finish the other scenes of Level 1.
-This activity will help our capstone because our game already needs to track
-which words each child finds difficult, and now we know how to store and
-read that data.
+It lets a game remember what the player did. Without a database, the score
+disappears the moment the game closes, and the player cannot see whether they
+are improving. With one, SALINLAHI can show a player their result next to
+other players' results, and it gives teachers and parents a way to track how
+a child is improving in Filipino vocabulary.
+
+**What was the most difficult part of the activity?**
+
+Troubleshooting the connection. The hardest one to find was the API key
+problem, because the game showed no obvious error at first and simply refused
+to save. Our Supabase project used a newer type of key that is not a JWT, and
+our code was putting it in a header meant for JWTs. We had to read the error
+response carefully instead of guessing. We also had to fix the game so the
+player could type their own nickname, because every record was being saved
+under the same default name.
+
+**How did the repository help your group manage the project?**
+
+It kept all the files in one place and recorded each stage of our progress
+through commits. Because each commit described one finished part, we could
+see the order we built things in and go back if something broke. It also
+taught us to keep private settings out of the repository using `.gitignore`
+and a sample settings file.
+
+**What would your group improve if you had more time?**
+
+We would record the Filipino voice-over so the replay button can play the
+word out loud, finish the other scenes of the Bahay level, and show only the
+best score of each player instead of every attempt. We would also use a login
+or a unique player code so that two players with the same nickname do not get
+mixed together.
+
+**How can this activity help your future capstone project?**
+
+This prototype is already a working part of SALINLAHI. The table design, the
+save and retrieve functions, and the progress tracking can be reused and
+extended in the full capstone, for example to store which words each child
+finds difficult and to keep pre-test and post-test results.
 
 ---
 
-## Required Screenshots Checklist
+## References
 
-Tick each one before exporting the PDF.
+- Supabase. (n.d.). *REST API (PostgREST) documentation.* https://supabase.com/docs/guides/api
+- Supabase. (n.d.). *Row Level Security.* https://supabase.com/docs/guides/database/postgres/row-level-security
+- Unity Technologies. (n.d.). *UnityWebRequest.* https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest.html
+- yasirkula. (n.d.). *UnitySpeechToText.* https://github.com/yasirkula/UnitySpeechToText
+- GitHub. (n.d.). *GitHub Docs.* https://docs.github.com
+- Anthropic. (2026). *Claude* [AI assistant]. Used as a learning reference for guidance on Supabase, Unity, Git and GitHub, debugging, and for drafting code, artwork, and documentation, which our group reviewed, tested, modified, and can explain. https://claude.ai
 
-- [ ] Game interface (main menu)
-- [ ] Player input or action that makes data (nickname popup / level being played)
-- [ ] Successful data saving (level-complete panel after saving)
-- [ ] Database table with saved records (Supabase Table Editor)
-- [ ] Retrieved data displayed in the game (RECENT SCORES list)
-- [ ] Code or connection setup (`SupabaseClient.cs`)
-- [ ] Repository page (GitHub)
-- [ ] Commit history
-- [ ] README file
+---
 
-**Tip before taking screenshots:** delete the test rows first, then have all
-three members play once using their real names. A list showing three
-different names looks much better than one showing "Bata" and "test".
+## Screenshot Checklist
+
+- [ ] Figure 1 — Supabase table with saved records
+- [ ] Figure 2 — Game interface (main menu)
+- [ ] Figure 3 — Level being played (word prompt + microphone)
+- [ ] Figure 4 — Level-complete panel (score + RECENT SCORES)
+- [ ] Figure 5 — Connection setup (`SupabaseConfig.cs` / Inspector, key blurred)
+- [ ] Figure 6 — Save and retrieve functions (`SupabaseClient.cs`)
+- [ ] Figure 7 — GitHub repository page
+- [ ] Figure 8 — Commit history
+- [ ] Figure 9 — README on GitHub
+
+**Before taking screenshots:** delete the test rows, then have all three
+members play once using their real names, so the RECENT SCORES list and the
+Supabase table both show three different players.
 
 ```sql
 delete from player_scores where player_name in ('Bata', 'Sugar', 'test');
 ```
+
+**Blur the API key** in any screenshot that shows it. It is a public key, but
+a graded document should not display credentials.
