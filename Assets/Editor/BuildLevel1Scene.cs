@@ -114,12 +114,11 @@ public class BuildLevel1Scene
         doorCol.isTrigger = true;
         doorCol.size = new Vector2(1f, 2f);
         ExitDoorTrigger exitTrigger = exitTriggerGO.AddComponent<ExitDoorTrigger>();
-        // No further scenes exist yet (Bahay's bathroom/bath/dressing/breakfast
-        // scenes aren't built) - leave nextSceneName empty so LoadNextScene()
-        // just no-ops instead of trying to load something that doesn't exist.
-        // Swap this out once Scene 2 exists.
-        exitTrigger.nextSceneName = "";
-        exitTrigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("Magaling!");
+        // Walking out of the bedroom now continues into Scene 2 rather than
+        // ending the game, so there is no complete panel here - the score and
+        // recent-scores list live at the end of Scene 2 instead.
+        exitTrigger.nextSceneName = "Chapter1_Level2_Banyo";
+        exitTrigger.delayBeforeLoad = 0.2f;
 
         // --- UI: word-prompt canvas, World Space so each prompt can just sit
         //     at a world position above its matching object (bed, door, etc.)
@@ -196,6 +195,9 @@ public class BuildLevel1Scene
         // --- Voice UI: mic (listening indicator) + replay/speaker buttons.
         //     See Assets/Editor/VoiceUIBuilder.cs and VoiceInteractionUI.cs. ---
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
+
+        // --- Fade out when leaving for Scene 2 ---
+        SceneFaderBuilder.Build();
 
         // --- Save scene ---
         string scenePath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";

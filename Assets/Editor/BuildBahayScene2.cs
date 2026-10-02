@@ -202,6 +202,14 @@ public class BuildBahayScene2
         // --- Voice UI (mic + replay buttons) ---
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
 
+        // --- Fade in on arrival from Scene 1 ---
+        SceneFaderBuilder.Build();
+
+        // --- This is currently the last playable scene, so the session is
+        //     saved and the recent scores shown here. When Scene 3 is built,
+        //     move this on with Link Scene 1 To Scene 2's approach. ---
+        DatabaseDemoBuilder.Build("Bahay - Scene 2: Punta sa Banyo", "LevelSelect");
+
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
         AddToBuildSettings();

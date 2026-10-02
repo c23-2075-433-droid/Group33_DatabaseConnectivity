@@ -78,6 +78,16 @@ public class ExitDoorTrigger : MonoBehaviour
             Debug.LogWarning("ExitDoorTrigger: nextSceneName is empty - not loading anything.");
             return;
         }
+
+        // Fade out if the scene has a fader, otherwise cut straight across so
+        // scenes without one still work.
+        SceneFader fader = Object.FindFirstObjectByType<SceneFader>();
+        if (fader != null)
+        {
+            fader.FadeOutAndLoad(nextSceneName);
+            return;
+        }
+
         SceneManager.LoadScene(nextSceneName);
     }
 
