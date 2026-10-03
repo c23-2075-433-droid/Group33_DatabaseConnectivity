@@ -13,11 +13,12 @@ Writes Assets/Sprites/<name>.png
 from PIL import Image
 import numpy as np
 from scipy import ndimage
-import os
+import io, os
 
 SPRITES = 'Assets/Sprites'   # where finished sprites go
 ART = 'Art'                  # source illustrations, outside Unity's import path
-NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step']
+NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
+         'prop_medyas', 'prop_sapatos', 'prop_bag']
 WHITE = 238          # at or above this in every channel counts as background
 FEATHER = 1.0        # softens the cut edge
 
@@ -46,7 +47,11 @@ def key(path_in, path_out):
         if sel.sum() < 200:
             continue
         patch = rgb[sel]
-        if patch.mean() >= 252 and patch.std() < 2.0:
+        # The flatness allowance has to cover JPEG noise: the same hole in a
+        # PNG measures a standard deviation near 0, but around 2.8 once the
+        # image has been through JPEG. Shaded white that belongs to the
+        # drawing - the socks, the plumeria - varies far more than this.
+        if patch.mean() >= 250 and patch.std() < 4.0:
             bg |= sel
 
     alpha = np.where(bg, 0.0, 255.0)
@@ -62,6 +67,17 @@ def key(path_in, path_out):
     Image.fromarray(out[y0:y1, x0:x1].astype(np.uint8)).save(path_out)
     return (x1-x0, y1-y0), float((out[..., 3] > 128).mean())
 
+def write_meta(name, model='item_tabo'):
+    """Copy a working sprite's import settings so Unity imports this as a Sprite."""
+    import re, uuid
+    out = os.path.join(SPRITES, name + '.png.meta')
+    if os.path.exists(out):
+        return
+    base = io.open(os.path.join(SPRITES, model + '.png.meta'), encoding='utf-8').read()
+    t = re.sub(r'^guid: [0-9a-f]{32}$', 'guid: ' + uuid.uuid4().hex, base, count=1, flags=re.M)
+    t = t.replace(model + '_0', name + '_0')
+    io.open(out, 'w', encoding='utf-8').write(t)
+
 if __name__ == '__main__':
     done = 0
     for n in NAMES:
@@ -69,6 +85,7 @@ if __name__ == '__main__':
         if not os.path.exists(src):
             print('  skip %-16s (no %s_raw.png yet)' % (n, n)); continue
         size, solid = key(src, os.path.join(SPRITES, n + '.png'))
+        write_meta(n)
         print('  %-16s -> %dx%d, %.0f%% opaque' % (n + '.png', size[0], size[1], solid*100))
         done += 1
     if not done:
