@@ -14,7 +14,12 @@ dresser_v3.png itself is left untouched, because Scene 1's bedroom uses it.
 This writes two new sprites instead:
 
   prop_damit.png        the shirt on its hanger
+  prop_salamin.png      the framed mirror, to hang over the painted dresser
   dresser_v3_bare.png   the same dresser with the rack empty
+
+The bedroom's own furniture is painted into bedroom_background.png, so the
+mirror has to be lifted out and placed as a prop: the room has no mirror of
+its own for "Salamin" to point at.
 
 Run from the repository root:  python3 Tools/cut_bedroom_props.py
 """
@@ -26,6 +31,7 @@ import io, os, re, uuid
 SPRITES = 'Assets/Sprites'
 SRC = 'dresser_v3'
 SHIRT_BOX = (345, 150, 503, 375)      # x0, y0, x1, y1 around the hanging shirt
+MIRROR_BOX = (50, 0, 290, 234)        # the framed mirror, stopping above the dresser top
 
 def disk(r):
     y, x = np.ogrid[-r:r+1, -r:r+1]
@@ -74,6 +80,23 @@ def main():
     out[..., 3] = np.where(shirt[cy0:cy1+1, cx0:cx1+1], 255, 0)
     Image.fromarray(out).save(os.path.join(SPRITES, 'prop_damit.png'))
     meta_for('prop_damit')
+
+    # --- the mirror, for "Salamin" ---
+    mbox = np.zeros((H, W), bool)
+    mbox[MIRROR_BOX[1]:MIRROR_BOX[3], MIRROR_BOX[0]:MIRROR_BOX[2]] = True
+    mirror = mbox & (al > 128)
+    mlab, mn = ndimage.label(mirror)
+    msizes = ndimage.sum(mirror, mlab, range(1, mn + 1))
+    mirror = mlab == (int(np.argmax(msizes)) + 1)
+    mys, mxs = np.where(mirror)
+    mx0, my0 = max(0, mxs.min() - 3), max(0, mys.min() - 3)
+    mx1, my1 = min(W - 1, mxs.max() + 3), min(H - 1, mys.max() + 3)
+    mout = np.zeros((my1 - my0 + 1, mx1 - mx0 + 1, 4), np.uint8)
+    mout[..., :3] = rgb[my0:my1+1, mx0:mx1+1]
+    mout[..., 3] = np.where(mirror[my0:my1+1, mx0:mx1+1], 255, 0)
+    Image.fromarray(mout).save(os.path.join(SPRITES, 'prop_salamin.png'))
+    meta_for('prop_salamin')
+    print('  prop_salamin.png     %dx%d, %d px' % (mout.shape[1], mout.shape[0], mirror.sum()))
 
     bare = a.copy()
     bare[shirt, 3] = 0
