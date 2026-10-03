@@ -26,7 +26,10 @@ from scipy import ndimage
 import io, os, re, uuid
 
 SPRITES = 'Assets/Sprites'
-POSES = ['standing', 'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4']
+# 'talking' is the front-facing pose. Scene 4 uses it instead of the side-on
+# 'standing', because the child is dressing him and should see him face on.
+POSES = ['standing', 'talking',
+         'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4']
 
 # where the white shirt's brightness lands: deep fold -> lit highlight
 SHADOW, HIGHLIGHT = 168.0, 250.0
