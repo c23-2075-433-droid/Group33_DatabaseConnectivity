@@ -93,6 +93,13 @@ session's score plus the recent score list.
 ### 1. Open the project
 Open the folder in Unity **6000.6.2f1** via Unity Hub.
 
+The first open takes several minutes and **needs an internet connection**: Unity
+rebuilds `Library/` from scratch, and the speech plugin is not committed — it is
+pulled from GitHub by `Packages/manifest.json`
+(`com.yasirkula.speechtotext`). Until it finishes downloading, every script that
+touches `SpeechToText` will show compile errors. That is expected; let it finish
+before judging anything.
+
 ### 2. Set up the database
 Follow [`Docs/SupabaseSetup.md`](Docs/SupabaseSetup.md) — it contains the SQL to
 create the `player_scores` table and its Row Level Security policies.
@@ -111,17 +118,26 @@ for the expected values.
 ### 4. Build and wire the scenes
 In Unity, run in order:
 
+Only Scene 1, Scene 2, the main menu and the map are committed as `.unity`
+files. Scenes 3 and 4 are **built from their scripts**, so a fresh clone has to
+run these once, in order:
+
 1. **Tools → SALINLAHI → Add Exit Trigger To Level 1**
 2. **Tools → SALINLAHI → Add Run Score Counter To Level 1**
-3. **Tools → SALINLAHI → Build Bahay Scene 2**
+3. **Tools → SALINLAHI → Build Bahay Scene 4**
 4. **Tools → SALINLAHI → Build Bahay Scene 3**
-5. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
+5. **Tools → SALINLAHI → Build Bahay Scene 2**
+6. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
+7. **Tools → SALINLAHI → Build Level Select Scene**
 
-Step 2 makes the bedroom's words count towards the final result. Step 5 joins
-Scene 1 to Scene 2 with a fade and makes sure neither of them tries to end the
-level: Level 1 runs Scene 1 → Scene 2 → Scene 3, and the score and
-recent-scores panel sit at the end of Scene 3, where the playable content
-currently stops.
+Build the scenes back to front (4, then 3, then 2). Each one registers itself in
+Build Settings, and the scene before it fades into it by name — build them the
+other way round and the earlier scene has nowhere to go.
+
+Level 1 runs Scene 1 → 2 → 3 → 4. The scene that **ends** a level owns the
+database demo and shows the result; every other scene carries its own
+`RunScoreCounter`. Keep that rule when adding Scene 5, or its words will vanish
+from the score with nothing in the log to say so.
 
 ### 5. Play
 Open `Assets/Scenes/MainMenu.unity` and press Play.
@@ -136,7 +152,8 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
 | `A` / `S` / `P` / `W` | "Tabo" / "Sabon" / "Sipilyo" / "Tuwalya" (Scene 2) |
 | `M` / `C` | "Maligo" / "Suklay" (Scene 3) |
-| `U` | "Kunin" (take — picks the school bag up, Scene 4 onward) |
+| `D` / `Z` / `F` / `R` / `V` | "Damit" / "Medyas" / "Sapatos" / "Salamin" / "Bag" (Scene 4) |
+| `U` | "Kunin" (take — picks the school bag up, Scene 4) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
 
@@ -147,8 +164,9 @@ repeatedly to walk through a whole scene.
 Scene 1 ends by walking out of the bedroom, which fades into Scene 2. In Scene
 2, saying **Bukas** opens the bathroom door, walks Kylo through it and fades
 across into the bathroom, which stays dark until **Ilaw**. Scene 2's last word
-fades on into Scene 3, the bath. After Scene 3, the completion panel shows your
-score for the whole level and the recent records read back from Supabase.
+fades on into Scene 3, the bath, and Scene 3 fades on into Scene 4, getting
+dressed. After Scene 4, the completion panel shows your score for the whole
+level and the recent records read back from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
 
@@ -221,6 +239,11 @@ belongs with getting dressed in Scene 4.
   Palengke are locked on the map.
 - Scene 3's **Maligo** is a water-and-suds overlay rather than an animation;
   the character art has only standing and walking poses.
+- **Scene 4 is missing three props.** `prop_medyas`, `prop_sapatos` and
+  `prop_bag` are generated but not yet imported, so the socks, shoes and bag
+  build as invisible objects with a warning in the Console. The scene still
+  plays — the words still count — but there is nothing on the floor to see.
+  Drop the three PNGs into `Assets/Sprites/` and re-run Build Bahay Scene 4.
 - The result is saved once, at the end of the last scene, and covers the
   whole level: [`RunScoreCounter`](Assets/Scripts/RunScoreCounter.cs) adds
   each scene's attempts to [`RunScore`](Assets/Scripts/RunScore.cs), and
