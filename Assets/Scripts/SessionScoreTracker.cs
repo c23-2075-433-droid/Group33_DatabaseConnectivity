@@ -8,8 +8,10 @@ using UnityEngine.UI;
 /// the player. This is the piece Activity 5 grades: SAVE, RETRIEVE, DISPLAY.
 ///
 /// Flow:
-///   1. Every voice attempt raises VoiceCommand.OnAnswerChecked, so this
-///      counts attempts and correct answers as the player goes.
+///   1. RunScoreCounter adds every voice attempt, in every scene of the
+///      level, to RunScore. This reads that total rather than counting for
+///      itself, so the saved result covers the whole level instead of just
+///      the scene it happens to sit in.
 ///   2. When SceneObjectiveController finishes its last objective, the
 ///      session result is POSTed to Supabase (SAVE).
 ///   3. Immediately after a successful save, recent records are fetched back
@@ -23,7 +25,6 @@ using UnityEngine.UI;
 public class SessionScoreTracker : MonoBehaviour
 {
     [Header("References")]
-    public VoiceCommand voiceCommand;
     public SceneObjectiveController objectiveController;
     public SupabaseClient supabaseClient;
 
@@ -41,32 +42,19 @@ public class SessionScoreTracker : MonoBehaviour
     [Tooltip("How many past records to pull back and list.")]
     public int recentRecordsToShow = 5;
 
-    private int correctAnswers = 0;
-    private int totalAttempts = 0;
     private bool alreadySaved = false;
 
     void OnEnable()
     {
-        if (voiceCommand != null) voiceCommand.OnAnswerChecked += HandleAnswerChecked;
         if (objectiveController != null) objectiveController.onAllObjectivesComplete.AddListener(HandleSessionComplete);
     }
 
     void OnDisable()
     {
-        if (voiceCommand != null) voiceCommand.OnAnswerChecked -= HandleAnswerChecked;
         if (objectiveController != null) objectiveController.onAllObjectivesComplete.RemoveListener(HandleSessionComplete);
     }
 
-    // ---- 1. Collect the data the session generates ----
-
-    private void HandleAnswerChecked(string spokenText, bool isCorrect)
-    {
-        totalAttempts++;
-        if (isCorrect) correctAnswers++;
-        Debug.Log("SessionScoreTracker: " + correctAnswers + " correct / " + totalAttempts + " attempts.");
-    }
-
-    // ---- 2. SAVE ----
+    // ---- 1. SAVE ----
 
     private void HandleSessionComplete()
     {
@@ -74,6 +62,11 @@ public class SessionScoreTracker : MonoBehaviour
         // sequence; only ever save one record per playthrough.
         if (alreadySaved) return;
         alreadySaved = true;
+
+        // The whole level's total, gathered by RunScoreCounter across every
+        // scene, not just the words said in this one.
+        int correctAnswers = RunScore.Correct;
+        int totalAttempts = RunScore.Attempts;
 
         ScoreInsert record = new ScoreInsert
         {
@@ -83,6 +76,9 @@ public class SessionScoreTracker : MonoBehaviour
             level = levelName,
             remarks = correctAnswers + "/" + totalAttempts + " correct",
         };
+
+        // Playing again starts from zero rather than adding to this run.
+        RunScore.Reset();
 
         ShowPanel();
         SetText(scoreText, "Player: " + record.player_name +
@@ -106,7 +102,7 @@ public class SessionScoreTracker : MonoBehaviour
         });
     }
 
-    // ---- 3. RETRIEVE + DISPLAY ----
+    // ---- 2. RETRIEVE + DISPLAY ----
 
     private void FetchAndDisplayRecords()
     {

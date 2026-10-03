@@ -63,13 +63,20 @@ public static class DatabaseDemoBuilder
 
         SessionScoreTracker tracker = host.GetComponent<SessionScoreTracker>();
         if (tracker == null) tracker = host.AddComponent<SessionScoreTracker>();
-        tracker.voiceCommand = voiceCommand;
         tracker.objectiveController = controller;
         tracker.supabaseClient = client;
         tracker.levelCompletePanel = panel;
         tracker.scoreText = scoreText;
         tracker.recordsText = recordsText;
         tracker.levelName = levelName;
+
+        // Counting lives here, not on the tracker, so every scene of a level
+        // adds to the same running total (RunScore). This is a later scene of
+        // the level, so it must not reset it - the first scene does that.
+        RunScoreCounter counter = host.GetComponent<RunScoreCounter>();
+        if (counter == null) counter = host.AddComponent<RunScoreCounter>();
+        counter.voiceCommand = voiceCommand;
+        counter.resetOnStart = false;
 
         if (client.config == null)
         {
