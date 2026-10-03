@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1_Level4_Damit.unity
     guid: 387c31d066c1046daafd70b696e2c8d7
+  - enabled: 1
+    path: Assets/Scenes/Chapter1_Level3_Maligo.unity
+    guid: d9947e9b5b6354ec88ae4b11357fa302
   m_configObjects: {}
