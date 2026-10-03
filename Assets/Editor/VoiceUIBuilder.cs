@@ -5,7 +5,7 @@
 // VoiceInteractionUI. Used by both:
 //   - AddVoiceUIToLevel1.cs (patches the already-built Level 1 scene in
 //     place, without touching anything else)
-//   - BuildLevel1Scene.cs (so a fresh full rebuild includes it too)
+//   - BuildBahayScene2.cs (so a scene built from scratch includes it too)
 //
 // Positioned bottom-center of the screen so it stays in the same comfortable,
 // thumb-reachable spot regardless of which word prompt is currently showing.

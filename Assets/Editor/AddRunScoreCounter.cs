@@ -6,9 +6,9 @@
 // words and the bedroom's three were quietly dropped.
 //
 // Scene 2 gets its counter from DatabaseDemoBuilder when it is built, so this
-// only has to patch Scene 1. It is written as an additive patch rather than
-// being folded into BuildLevel1Scene because that builder is out of date and
-// re-running it would overwrite the hand-tuned bedroom.
+// only has to patch Scene 1. Level 1 has no builder of its own: the bedroom is
+// hand-tuned and Chapter1_Level1_UmagaNa.unity is the only copy of it, so
+// everything that scene needs is added by a patch like this one.
 //
 // Safe to run more than once: an existing counter is reconfigured rather than
 // duplicated.

@@ -12,8 +12,8 @@
 // exists, swap this out for a real transition - ExitDoorTrigger doesn't care
 // what levelCompleteUI looks like, only that it exists.
 //
-// Used by both AddExitTrigger.cs (patches the already-built Level 1 scene)
-// and BuildLevel1Scene.cs (fresh full rebuild).
+// Used by AddExitTrigger.cs (patches the already-built Level 1 scene) and by
+// DatabaseDemoBuilder.cs (the scene that ends a level).
 
 using System.Collections.Generic;
 using UnityEditor;
