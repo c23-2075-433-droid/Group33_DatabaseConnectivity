@@ -138,6 +138,27 @@ records read back from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
 
+## Character Art: Two Sets
+
+Kylo is drawn twice, because the school bag is painted into the character art
+rather than being a separate layer:
+
+| Files | Used in |
+|---|---|
+| `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | Scenes 1–3, before the bag is collected |
+| the same names with `_with_bag` | Scene 4 onward, after "Kunin" |
+
+The plain set was produced from the original drawings by
+[`Tools/strip_backpack.py`](Tools/strip_backpack.py); the `_with_bag` files are
+the untouched originals. Before this split, Kylo wore his school bag in bed —
+the bag appeared the moment the player said "Tayo", while the same bag was also
+sitting on the chair prop beside him.
+
+Saying **Kunin** in Scene 4 switches the prop off and swaps one set for the
+other, through [`PickUpItem`](Assets/Scripts/PickUpItem.cs) and
+`PlayerMovement.SetAppearance()`. Scene 4 is not built yet, so the word has no
+scene to live in; the pieces are in place for when it is.
+
 ## Security Notes
 
 - `Assets/Resources/SupabaseConfig.asset` is **git-ignored**; no keys are
