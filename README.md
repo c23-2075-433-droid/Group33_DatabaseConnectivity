@@ -32,11 +32,15 @@ The player guides a child character, Kylo, through her morning routine by
 microphone, checks the pronunciation, and advances the story when the word is
 said correctly.
 
-Level 1 ("Bahay — Umaga na!") asks the player to say:
+Level 1 ("Bahay — Umaga na!") asks the player to say, across two scenes:
 
 1. **Bangon** — get up
 2. **Tayo** — stand up
 3. **Lakad** — walk
+4. **Kaliwa** / **Kanan** — left / right
+5. **Bukas** — open (the bathroom door)
+6. **Ilaw** — turn the light on
+7. **Tabo**, **Sabon**, **Sipilyo**, **Tuwalya** — dipper, soap, toothbrush, towel
 
 When the sequence is finished, the session result is saved to the database, and
 the most recent scores are retrieved and displayed on the completion panel.
@@ -107,12 +111,13 @@ for the expected values.
 In Unity, run in order:
 
 1. **Tools → SALINLAHI → Add Exit Trigger To Level 1**
-2. **Tools → SALINLAHI → Build Bahay Scene 2**
-3. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
+2. **Tools → SALINLAHI → Add Run Score Counter To Level 1**
+3. **Tools → SALINLAHI → Build Bahay Scene 2**
+4. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
 
-Step 3 joins the two scenes with a fade and puts the score and
-recent-scores panel at the end of Scene 2, which is where the playable
-content currently stops.
+Step 2 makes the bedroom's words count towards the final result. Step 4 joins
+the two scenes with a fade and puts the score and recent-scores panel at the
+end of Scene 2, which is where the playable content currently stops.
 
 ### 5. Play
 Open `Assets/Scenes/MainMenu.unity` and press Play.
@@ -125,6 +130,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `Enter` | **whatever word the scene is currently asking for** |
 | `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
+| `A` / `S` / `P` / `W` | "Tabo" / "Sabon" / "Sipilyo" / "Tuwalya" (Scene 2) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4 onward) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
@@ -162,6 +168,34 @@ other, through [`PickUpItem`](Assets/Scripts/PickUpItem.cs) and
 `PlayerMovement.SetAppearance()`. Scene 4 is not built yet, so the word has no
 scene to live in; the pieces are in place for when it is.
 
+## Bathroom Objects
+
+The objects in the bathroom are separate sprites rather than part of the
+background painting, so a spoken word can take one away:
+
+| Sprite | Word it serves |
+|---|---|
+| `item_tabo.png` | **Tabo** (dipper) |
+| `item_sabon.png` | **Sabon** (soap) |
+| `item_sipilyo.png` | **Sipilyo** (toothbrush) |
+| `item_tuwalya.png` | **Tuwalya** (towel) |
+| `item_suklay.png`, `item_baso.png` | Suklay (comb), Baso (cup) — for later scenes |
+
+They were cut out of the original painting by
+[`Tools/cut_bathroom_items.py`](Tools/cut_bathroom_items.py), and the gaps
+they left were repainted by
+[`Tools/fill_bathroom_background.py`](Tools/fill_bathroom_background.py).
+`bathroom_background.png` is now the emptied room; the original is kept as
+`bathroom_background_with_items.png`. Putting every sprite back in its place
+reproduces the original to a mean difference of 0.4 / 255, so the room looks
+unchanged until something is picked up.
+
+Tabo, Sabon, Sipilyo and Tuwalya are spoken objectives in Scene 2, after the
+light is on: saying one takes that object off the shelf or wall, through
+[`PickUpItem`](Assets/Scripts/PickUpItem.cs). They have no voice-over yet, so
+the on-screen prompt carries them. Suklay and Baso stay as scenery — combing
+belongs with getting dressed in Scene 4.
+
 ## Security Notes
 
 - `Assets/Resources/SupabaseConfig.asset` is **git-ignored**; no keys are
@@ -181,8 +215,11 @@ scene to live in; the pieces are in place for when it is.
   Bukas, Ilaw). The remaining Bahay scenes (bath, dressing, breakfast, leaving)
   are designed but not yet built, and Levels 2 (Paaralan) and 3 (Parke) are
   locked on the map.
-- The score saved to the database covers **Scene 2 only**, not both scenes
-  together, so a full-run total is not yet recorded.
+- The result is saved once, at the end of the last scene, and covers the
+  whole level: [`RunScoreCounter`](Assets/Scripts/RunScoreCounter.cs) adds
+  each scene's attempts to [`RunScore`](Assets/Scripts/RunScore.cs), and
+  [`SessionScoreTracker`](Assets/Scripts/SessionScoreTracker.cs) saves that
+  total. Add a counter to any new scene or its words go uncounted.
 - **No voice-over audio yet.** The instruction-clip slots are wired and the full
   recording script exists at [`Docs/VoiceOverScript.csv`](Docs/VoiceOverScript.csv),
   but the audio files are not recorded, so the replay button logs a warning
