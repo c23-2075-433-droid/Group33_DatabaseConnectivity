@@ -6,8 +6,8 @@ using UnityEngine.UI;
 /// Drives the persistent microphone + replay/speaker buttons shown during
 /// voice-command levels. The GameObjects these buttons live on are created by
 /// Assets/Editor/VoiceUIBuilder.cs (via "Tools > SALINLAHI > Add Voice UI To
-/// Level 1", or automatically by BuildLevel1Scene.cs) - this script only
-/// drives their behavior once they exist.
+/// Level 1", and by the scene builders) - this script only drives their
+/// behavior once they exist.
 ///
 ///   - MICROPHONE BUTTON: a status indicator for VoiceCommand's listening
 ///     state (see "Mic listening indicator" below). It does not start/stop

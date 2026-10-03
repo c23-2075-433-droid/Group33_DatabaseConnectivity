@@ -1,8 +1,8 @@
 // Assets/Editor/AddVoiceUIToLevel1.cs
 //
 // Adds the microphone + replay/speaker buttons to the ALREADY-BUILT Level 1
-// scene WITHOUT regenerating it - unlike BuildLevel1Scene.cs (which recreates
-// the whole scene from scratch via NewScene), this opens
+// scene WITHOUT regenerating it. Level 1 has no builder - it is hand-tuned and
+// the scene file is the only copy of it - so this opens
 // Chapter1_Level1_UmagaNa.unity exactly as it is on disk, adds the new
 // VoiceUI_Canvas, and saves. Anything you've manually tweaked since the scene
 // was last built (prop positions, prompt text, etc.) is left untouched.
