@@ -55,11 +55,11 @@ public class AddExitTrigger
         // later change to this configuration (like adding the completion
         // panel below) always takes effect on re-run.
         //
-        // No further scenes exist yet (Bahay's bathroom/bath/dressing/
-        // breakfast scenes aren't built) - leave nextSceneName empty so
-        // LoadNextScene() just no-ops instead of trying to load something
-        // that doesn't exist. Swap this out once Scene 2 exists.
-        trigger.nextSceneName = "";
+        // Walking out of the bedroom leads to the hallway. This used to be
+        // left empty, from when no second scene existed; leaving it empty now
+        // would silently unlink Level 1 from the rest of the chapter whenever
+        // this command is re-run.
+        trigger.nextSceneName = "Chapter1_Level2_Banyo";
         trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("Magaling!");
 
         SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
