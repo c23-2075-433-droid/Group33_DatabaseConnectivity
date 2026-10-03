@@ -2,13 +2,17 @@
 //
 // One-click scene builder for the "Ang Iyong Paglalakbay" (Your Journey)
 // level-select map, assembled from the team's Canva assets (Assets/Sprites/):
-//   journey_bg, journey_title, btn_back,
-//   node_bahay(_locked), node_paaralan(_locked), node_palaruan(_locked), node_palengke(_locked)
+//   journey_bg, journey_title, btn_back, ui_name_plaque, ui_step,
+//   node_bahay(_locked), node_paaralan(_locked), node_parke(_locked), node_palengke(_locked)
 //
-// Node positions were measured directly off the Canva reference mockup
-// (2000x1125) with a pixel grid overlay, then scaled to the 1920x1080 canvas
-// used here (scale = 1920/2000 = 0.96). To tweak anything, move the object's
-// RectTransform in the Scene view - no code changes needed.
+// The signposts and the padlock on the locked ones are built by
+// Tools/build_level_nodes.py, which drops each level's illustration into one
+// shared frame so all four match. Run it after changing any of that art.
+//
+// Node positions were read off the map background with a canvas-space grid
+// overlay, placing each signpost in an open clearing beside the path as it
+// climbs from the bottom-left to the top-right. To tweak anything, move the
+// object's RectTransform in the Scene view - no code changes needed.
 //
 // Only the Bahay node has a level behind it so far (Chapter1_Level1_UmagaNa),
 // so it's the only one unlocked by default via LevelProgress. The other three
@@ -77,7 +81,7 @@ public class BuildLevelSelectScene
         bgRect.anchorMin = bgRect.anchorMax = new Vector2(0.5f, 0.5f);
         AspectRatioFitter fitter = bg.AddComponent<AspectRatioFitter>();
         fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-        fitter.aspectRatio = 2000f / 1125f;
+        fitter.aspectRatio = 1024f / 575f;   // the map artwork's own ratio
         bg.GetComponent<Image>().raycastTarget = false;
 
         // --- Title ("Ang Iyong Paglalakbay / Your Journey / A Journey Through Language") ---
@@ -88,27 +92,53 @@ public class BuildLevelSelectScene
         GameObject backBtn = CreateSpriteButton(canvasT, "BackButton", "btn_back", new Vector2(-859, 434), new Vector2(163, 154));
 
         // --- Journey nodes, bottom-left to top-right along the path ---
+        // All four signposts share one frame, so they take one size.
+        Vector2 nodeSize = new Vector2(236, 290);
+        // Bahay sits highest of the low pair so its name plaque, which hangs
+        // below the signpost, clears the bottom of the screen.
+        Vector2 pBahay    = new Vector2(-520, -272);
+        Vector2 pPaaralan = new Vector2(-180, -185);
+        Vector2 pParke    = new Vector2( 190,  -60);
+        Vector2 pPalengke = new Vector2( 560,   60);
+
+        // Stepping stones first, so the signposts sit on top of them where
+        // they meet. They trace the walk from one level to the next, starting
+        // at each signpost's base rather than its middle.
+        float baseDrop = nodeSize.y * 0.5f + 6f;
+        CreateSteps(canvasT, "Steps_1", pBahay, pPaaralan, baseDrop);
+        CreateSteps(canvasT, "Steps_2", pPaaralan, pParke, baseDrop);
+        CreateSteps(canvasT, "Steps_3", pParke, pPalengke, baseDrop);
+
         LevelSelectController.LevelNode bahay = CreateNode(canvasT, "Node_Bahay",
-            "node_bahay", "node_bahay_locked", new Vector2(-619, -331), new Vector2(221, 293),
+            "node_bahay", "node_bahay_locked", pBahay, nodeSize,
             1, "Chapter1_Level1_UmagaNa");
 
         LevelSelectController.LevelNode paaralan = CreateNode(canvasT, "Node_Paaralan",
-            "node_paaralan", "node_paaralan_locked", new Vector2(-216, -129), new Vector2(230, 293),
+            "node_paaralan", "node_paaralan_locked", pPaaralan, nodeSize,
             2, "Chapter2_Level1_Paaralan");
 
-        LevelSelectController.LevelNode palaruan = CreateNode(canvasT, "Node_Palaruan",
-            "node_palaruan", "node_palaruan_locked", new Vector2(204, 34), new Vector2(226, 293),
-            3, "Chapter3_Level1_Palaruan");
+        LevelSelectController.LevelNode parke = CreateNode(canvasT, "Node_Parke",
+            "node_parke", "node_parke_locked", pParke, nodeSize,
+            3, "Chapter3_Level1_Parke");
 
         LevelSelectController.LevelNode palengke = CreateNode(canvasT, "Node_Palengke",
-            "node_palengke", "node_palengke_locked", new Vector2(638, 120), new Vector2(230, 293),
+            "node_palengke", "node_palengke_locked", pPalengke, nodeSize,
             4, "Chapter4_Level1_Palengke");
+
+        // --- Name plaques, hung under each signpost ---
+        // The plaque art is blank and the name is drawn over it with the
+        // game's own font, so the spelling stays correct and editable instead
+        // of being baked into the picture.
+        CreatePlaque(canvasT, "Plaque_Bahay",    "Bahay",    pBahay,    baseDrop);
+        CreatePlaque(canvasT, "Plaque_Paaralan", "Paaralan", pPaaralan, baseDrop);
+        CreatePlaque(canvasT, "Plaque_Parke",    "Parke",    pParke,    baseDrop);
+        CreatePlaque(canvasT, "Plaque_Palengke", "Palengke", pPalengke, baseDrop);
 
         // --- Wire controller ---
         LevelSelectController controller = canvasGO.AddComponent<LevelSelectController>();
         controller.mainMenuSceneName = "MainMenu";
         controller.backButton = backBtn.GetComponent<Button>();
-        controller.nodes = new[] { bahay, paaralan, palaruan, palengke };
+        controller.nodes = new[] { bahay, paaralan, parke, palengke };
 
         // --- Save + insert into Build Settings ---
         System.IO.Directory.CreateDirectory("Assets/Scenes");
@@ -139,6 +169,49 @@ public class BuildLevelSelectScene
     }
 
     // ---------- helpers ----------
+
+    /// <summary>A wooden plaque under a signpost, carrying the level's name.</summary>
+    private static GameObject CreatePlaque(Transform parent, string name, string label,
+                                           Vector2 nodePos, float baseDrop)
+    {
+        Vector2 pos = new Vector2(nodePos.x, nodePos.y - baseDrop - 34f);
+        GameObject go = CreateImage(parent, name, "ui_name_plaque", pos, new Vector2(248, 100), true);
+        go.GetComponent<Image>().raycastTarget = false;
+
+        GameObject textGO = new GameObject("Label", typeof(RectTransform));
+        textGO.transform.SetParent(go.transform, false);
+        Text text = textGO.AddComponent<Text>();
+        text.text = label;
+        text.font = UIFont.Get();
+        text.fontSize = 34;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.color = new Color(0.27f, 0.15f, 0.07f);   // dark brown, reads on the wood
+        text.raycastTarget = false;
+        RectTransform tr = textGO.GetComponent<RectTransform>();
+        tr.anchorMin = new Vector2(0f, 0.5f);
+        tr.anchorMax = new Vector2(1f, 0.5f);
+        tr.offsetMin = new Vector2(26f, -26f);          // clear of the bamboo ends
+        tr.offsetMax = new Vector2(-18f, 26f);
+        return go;
+    }
+
+    /// <summary>Stepping stones tracing the walk between two signposts.</summary>
+    private static void CreateSteps(Transform parent, string name, Vector2 from, Vector2 to,
+                                    float baseDrop, int count = 3)
+    {
+        Vector2 a = new Vector2(from.x, from.y - baseDrop);
+        Vector2 b = new Vector2(to.x, to.y - baseDrop);
+        GameObject root = new GameObject(name, typeof(RectTransform));
+        root.transform.SetParent(parent, false);
+        for (int i = 1; i <= count; i++)
+        {
+            float t = i / (float)(count + 1);
+            GameObject step = CreateImage(root.transform, "Step_" + i, "ui_step",
+                                          Vector2.Lerp(a, b, t), new Vector2(66, 53), true);
+            step.GetComponent<Image>().raycastTarget = false;
+        }
+    }
 
     private static LevelSelectController.LevelNode CreateNode(Transform parent, string name,
         string unlockedSpriteFile, string lockedSpriteFile, Vector2 anchoredPos, Vector2 size,
