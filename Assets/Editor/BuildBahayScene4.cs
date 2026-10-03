@@ -1,14 +1,16 @@
 // Assets/Editor/BuildBahayScene4.cs
 //
 // One-click scene builder for Bahay Scene 4 ("Getting Dressed").
-// Teaches six words: Damit, Medyas, Sapatos, Salamin, Bag, Kunin.
+// Teaches five words: Damit, Medyas, Sapatos, Bag, Kunin.
 //
 // Reuses the bedroom, so it needs no new background. The bedroom's furniture
 // is painted INTO bedroom_background.png - bed, dresser, nightstand and door
 // are not separate objects - so everything the child names is laid out on the
 // floor in front of it. That also means the room has no mirror of its own;
-// prop_salamin was lifted out of the old dresser_v3 sprite for this scene
-// (see Tools/cut_bedroom_props.py).
+// The mirror (prop_salamin, lifted out of the old dresser_v3 sprite by
+// Tools/cut_bedroom_props.py) stays as scenery - the bedroom has none of its
+// own and the left of the floor looks bare without it - but no word points at
+// it any more.
 //
 // Kylo faces the player here rather than standing side-on, so the child can
 // see him being dressed. The walk frames stay side-on, since he only turns to
@@ -91,7 +93,7 @@ public class BuildBahayScene4
         // --- The things laid out on the floor ---
         // Each is sized by the world height it should stand, not by a scale
         // factor, so it comes out right whatever resolution the art is.
-        GameObject propSalamin = CreateProp("Prop_Salamin", "prop_salamin", -6.6f, 3.40f);
+        CreateProp("Prop_Salamin", "prop_salamin", -6.6f, 3.40f);   // scenery, no word
         GameObject propDamit   = CreateProp("Prop_Damit",   "prop_damit",   -3.9f, 1.85f);
         GameObject propMedyas  = CreateProp("Prop_Medyas",  "prop_medyas",  -2.1f, 0.85f);
         GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -0.5f, 0.95f);
@@ -174,9 +176,8 @@ public class BuildBahayScene4
         CreateWall("Wall_Left", -9.3f);
         CreateWall("Wall_Right", 9.3f);
 
-        // --- Gleams, for the two words that name something rather than take it ---
-        TimedOverlay gleamSalamin = CreateGleam("Gleam_Salamin", propSalamin, 4.2f);
-        TimedOverlay gleamBag     = CreateGleam("Gleam_Bag",     propBag,     2.8f);
+        // --- A gleam, for the one word that names something rather than takes it ---
+        TimedOverlay gleamBag = CreateGleam("Gleam_Bag", propBag, 2.8f);
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -201,7 +202,6 @@ public class BuildBahayScene4
         GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-390, -60, 0));
         GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-210, -150, 0));
         GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-50, -140, 0));
-        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin", new Vector3(-660, 100, 0));
         GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(130, -30, 0));
         GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",   new Vector3(130, 60, 0));
 
@@ -215,10 +215,8 @@ public class BuildBahayScene4
         var sapatos = MakeObjective("Sapatos", pSapatos);
         UnityEventTools.AddPersistentListener(sapatos.onCorrect, takeSapatos.PickUp);
 
-        // Salamin and Bag name something instead of taking it, so they gleam.
-        var salamin = MakeObjective("Salamin", pSalamin);
-        UnityEventTools.AddPersistentListener(salamin.onCorrect, gleamSalamin.Play);
-
+        // "Bag" names the thing instead of taking it, so it gleams; "Kunin"
+        // below is what actually picks it up.
         var bag = MakeObjective("Bag", pBag);
         UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
 
@@ -228,7 +226,7 @@ public class BuildBahayScene4
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { damit, medyas, sapatos, salamin, bag, kunin };
+        controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
@@ -242,7 +240,7 @@ public class BuildBahayScene4
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 4 built and saved to " + ScenePath +
-                   ". Words: Damit, Medyas, Sapatos, Salamin, Bag, Kunin. Damit puts him in " +
+                   ". Words: Damit, Medyas, Sapatos, Bag, Kunin. Damit puts him in " +
                    "uniform and Kunin adds the bag over it. Level 1 now ends " +
                    "here, so re-run Build Bahay Scene 3 as well - it fades into this scene " +
                    "instead of showing the result itself.");

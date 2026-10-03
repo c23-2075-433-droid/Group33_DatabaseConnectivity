@@ -139,7 +139,6 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.D)) SimulateSpeech("damit");
         else if (Input.GetKeyDown(KeyCode.Z)) SimulateSpeech("medyas");
         else if (Input.GetKeyDown(KeyCode.F)) SimulateSpeech("sapatos");
-        else if (Input.GetKeyDown(KeyCode.R)) SimulateSpeech("salamin");
         else if (Input.GetKeyDown(KeyCode.V)) SimulateSpeech("bag");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see

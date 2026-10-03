@@ -152,7 +152,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
 | `A` / `S` / `P` / `W` | "Tabo" / "Sabon" / "Sipilyo" / "Tuwalya" (Scene 2) |
 | `M` / `C` | "Maligo" / "Suklay" (Scene 3) |
-| `D` / `Z` / `F` / `R` / `V` | "Damit" / "Medyas" / "Sapatos" / "Salamin" / "Bag" (Scene 4) |
+| `D` / `Z` / `F` / `V` | "Damit" / "Medyas" / "Sapatos" / "Bag" (Scene 4) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |

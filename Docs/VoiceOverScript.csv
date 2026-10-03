@@ -55,7 +55,7 @@ word_tuwalya.wav,Word,Level 1 - Bahay,Scene 2,-,Tuwalya,Towel,"First taught here
 word_damit.wav,Word,Level 1 - Bahay,Scene 4,-,Damit,Clothes / uniform,First taught here
 word_medyas.wav,Word,Level 1 - Bahay,Scene 4,-,Medyas,Socks,First taught here
 word_sapatos.wav,Word,Level 1 - Bahay,Scene 4,-,Sapatos,Shoes,First taught here
-word_salamin.wav,Word,Level 1 - Bahay,Scene 4,-,Salamin,Mirror,First taught here
+word_salamin.wav,Word,Level 1 - Bahay,Not placed,-,Salamin,Mirror,"Dropped from Scene 4. The mirror stays in the bedroom as scenery; re-place this word in a later scene if wanted."
 word_kunin.wav,Word,Level 1 - Bahay,Scene 4,-,Kunin,Take / get,"First taught here. Picks the school bag up off the chair; swaps Kylo's art for the set drawn with the bag. Reused: L2 S5"
 word_bag.wav,Word,Level 1 - Bahay,Scene 4,-,Bag,Bag,"First taught here. Reused: L2 S5"
 word_upo.wav,Word,Level 1 - Bahay,Scene 5,-,Upo,Sit down,"First taught here. Reused: L2 S2 & S5, L3 S4"
