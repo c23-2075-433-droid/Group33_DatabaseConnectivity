@@ -177,8 +177,10 @@ rather than being a separate layer:
 
 | Files | Used in |
 |---|---|
-| `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | Scenes 1–3, before the bag is collected |
-| the same names with `_with_bag` | Scene 4 onward, after "Kunin" |
+| `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | Scenes 1–3, at home in his green tee |
+| the same names with `_uniform` | after **Damit** in Scene 4 |
+| the same names with `_uniform_with_bag` | after **Kunin** in Scene 4 |
+| the same names with `_with_bag` | the green tee plus bag — kept, currently unused |
 
 The plain set was produced from the original drawings by
 [`Tools/strip_backpack.py`](Tools/strip_backpack.py); the `_with_bag` files are
@@ -186,9 +188,13 @@ the untouched originals. Before this split, Kylo wore his school bag in bed —
 the bag appeared the moment the player said "Tayo", while the same bag was also
 sitting on the chair prop beside him.
 
-Saying **Kunin** in Scene 4 switches the prop off and swaps one set for the
-other, through [`PickUpItem`](Assets/Scripts/PickUpItem.cs) and
-`PlayerMovement.SetAppearance()`. Scene 4 is not built yet, so the word has no
+Saying **Damit** then **Kunin** in Scene 4 switches each prop off and swaps
+one art set for the next, through [`PickUpItem`](Assets/Scripts/PickUpItem.cs)
+and `PlayerMovement.SetAppearance()`, so he ends the level dressed and
+carrying his bag. The uniform sets are
+[`Tools/make_uniform.py`](Tools/make_uniform.py) recolouring the green shirt
+rather than new drawings; **Medyas** and **Sapatos** cannot dress him, because
+he is already drawn wearing socks and shoes in every pose. Scene 4 is not built yet, so the word has no
 scene to live in; the pieces are in place for when it is.
 
 ## Bathroom Objects
