@@ -32,6 +32,11 @@ public class LinkScene1ToScene2
     private const string Scene2Name = "Chapter1_Level2_Banyo";
     private const string MapSceneName = "LevelSelect";
 
+    // Scene 2 hands on to this. Stripping Scene 2's ending before it exists
+    // leaves the level with no way to finish, which is exactly what happened
+    // the first time this ran on its own.
+    private const string Scene3Path = "Assets/Scenes/Chapter1_Level3_Maligo.unity";
+
     [MenuItem("Tools/SALINLAHI/Link Scene 1 To Scene 2")]
     public static void Link()
     {
@@ -71,7 +76,21 @@ public class LinkScene1ToScene2
         Scene s2 = EditorSceneManager.OpenScene(Scene2Path, OpenSceneMode.Single);
 
         SceneFaderBuilder.Build();
-        DatabaseDemoBuilder.Remove();   // Scene 3 ends the level, not this one
+
+        // Only take Scene 2's ending away once there is somewhere for it to
+        // go. Removing it while Chapter1_Level3_Maligo is missing leaves the
+        // bathroom with no result panel AND no next scene, so the level just
+        // stops dead after the last word.
+        if (System.IO.File.Exists(Scene3Path))
+        {
+            DatabaseDemoBuilder.Remove();   // Scene 3 ends the level, not this one
+        }
+        else
+        {
+            Debug.LogWarning("[SALINLAHI] " + Scene3Path + " does not exist yet, so Scene 2 " +
+                              "keeps its result panel. Run Build Bahay Scene 3, then Build " +
+                              "Bahay Scene 2, then this command again.");
+        }
 
         EditorSceneManager.SaveScene(s2);
 
