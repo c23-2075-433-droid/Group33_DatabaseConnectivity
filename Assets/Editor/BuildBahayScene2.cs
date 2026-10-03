@@ -3,10 +3,17 @@
 // One-click scene builder for Bahay Scene 2 ("Punta sa Banyo" - walking to
 // the bathroom). Teaches five words: Lakad, Kaliwa, Kanan, Bukas, Ilaw.
 //
-// Layout: the hallway and the bathroom sit side by side along X, each scaled
-// to exactly fill one 16:9 camera view (19.2 x 10.8 world units), so the
-// player walks right out of the hallway and into the bathroom while the
-// camera follows. The bathroom starts under a dark overlay until "Ilaw".
+// Layout: the hallway and the bathroom are two rooms STACKED at the same
+// position, each scaled to exactly fill one 16:9 camera view (19.2 x 10.8
+// world units), and only one is ever active. Saying "Bukas" opens the door,
+// walks Kylo into it, and fades across to the bathroom (see RoomTransition).
+//
+// They are stacked rather than placed side by side on purpose: with two rooms
+// laid out along X the camera inevitably shows half of each at once, so the
+// player could see into the dark bathroom from the lit hallway. Stacking them
+// means the camera never has to move, and the room change is a deliberate
+// moment instead of a pan. The bathroom starts under a dark overlay until
+// "Ilaw".
 //
 // Sprites expected in Assets/Sprites/:
 //   hallway_background, bathroom_background, door_open (optional for now),
@@ -33,7 +40,25 @@ public class BuildBahayScene2
     private const float BgScale = 10.8f / 8.64f;      // 1.25
     private const float ScreenWidth = 19.2f;          // 15.36 * 1.25
     private const float FloorY = -2.98f;              // top of the floor planks
-    private const float PlayerScale = 0.40f;          // 745px art -> ~3 units, child height
+
+    // The character art imports at 120 pixels per unit (not the usual 100 -
+    // check the .meta before changing any of these numbers), so the 745px
+    // frames are 6.21 world units tall unscaled.
+    private const float SpritePPU = 120f;
+
+    // Scene 1 stands Kylo at 0.83, which is 5.15 units. Scene 2 has to use the
+    // same number or he visibly shrinks on walking through the bedroom door.
+    private const float PlayerScale = 0.83f;
+
+    // The lowest opaque pixel of the character art is row 743 of 745, and the
+    // pivot is the texture centre, so his feet sit this far below the
+    // transform. Standing him on the floor means offsetting by this, NOT by
+    // half the collider - that was what left him hovering above the boards.
+    private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
+    private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
+
+    // Centre of the bathroom door painted into the hallway art.
+    private const float DoorX = 7.31f;
 
     [MenuItem("Tools/SALINLAHI/Build Bahay Scene 2")]
     public static void BuildScene()
@@ -57,13 +82,16 @@ public class BuildBahayScene2
         camGO.tag = "MainCamera";
         camGO.AddComponent<AudioListener>();
 
-        // --- Rooms, side by side: hallway at x=0, bathroom one screen right ---
-        CreateBackground("Background_Hallway", "hallway_background", 0f);
-        CreateBackground("Background_Bathroom", "bathroom_background", ScreenWidth);
+        // --- Rooms: both at x=0, only one active at a time ---
+        GameObject hallway = new GameObject("Room_Hallway");
+        CreateBackground("Background_Hallway", "hallway_background", hallway.transform);
+
+        GameObject bathroom = new GameObject("Room_Bathroom");
+        CreateBackground("Background_Bathroom", "bathroom_background", bathroom.transform);
 
         // --- Darkness over the bathroom only; the hallway stays lit ---
         GameObject darkGO = new GameObject("BathroomDarkness");
-        darkGO.transform.position = new Vector3(ScreenWidth, 0f, 0f);
+        darkGO.transform.SetParent(bathroom.transform, false);
         SpriteRenderer darkSr = darkGO.AddComponent<SpriteRenderer>();
         darkSr.sprite = GetOrCreateWhitePixel();
         darkSr.color = new Color(0.05f, 0.08f, 0.25f, 0.88f); // deep night blue
@@ -76,10 +104,14 @@ public class BuildBahayScene2
         lightSwitch.overlay = darkSr;
         lightSwitch.darkAlpha = 0.88f;
 
+        // The bathroom only exists once Kylo walks through the door.
+        bathroom.SetActive(false);
+
         // --- Bathroom door: an OPEN door laid over the closed one painted into
         //     the hallway art, hidden until the player says "Bukas". ---
         GameObject doorOpen = new GameObject("Door_Open");
-        doorOpen.transform.position = new Vector3(7.31f, 0.18f, 0f);
+        doorOpen.transform.SetParent(hallway.transform, false);
+        doorOpen.transform.localPosition = new Vector3(DoorX, 0.18f, 0f);
         SpriteRenderer doorSr = doorOpen.AddComponent<SpriteRenderer>();
         doorSr.sprite = LoadSprite("door_open");   // may be null until the art is imported
         doorSr.sortingLayerName = "Props";
@@ -96,10 +128,7 @@ public class BuildBahayScene2
         // --- Player ---
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-6.5f, FloorY + 1.6f, 0f);
-        // The character art is 745px (7.45 world units) tall, which is nearly
-        // floor-to-ceiling in a 10.8-unit view. Scale him down to roughly a
-        // child's height against the wall.
+        playerGO.transform.position = new Vector3(-6.5f, PlayerFeetY, 0f);
         playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
@@ -110,10 +139,11 @@ public class BuildBahayScene2
         playerRb.gravityScale = 3f;
         playerRb.freezeRotation = true;
 
-        // Collider is in LOCAL units, so it gets scaled with the transform -
-        // these numbers are sized against the sprite, not the world.
+        // Collider is in LOCAL units, so it is scaled by the transform. Its
+        // height matches the art's own 6.21 units; making it taller than the
+        // sprite (it used to be 7.0) props the sprite up off the ground.
         BoxCollider2D playerCol = playerGO.AddComponent<BoxCollider2D>();
-        playerCol.size = new Vector2(1.4f, 7.0f);
+        playerCol.size = new Vector2(1.2f, FeetBelowPivot * 2f);
 
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
         player.lyingDownSprite = LoadSprite("lying_down");
@@ -131,24 +161,42 @@ public class BuildBahayScene2
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // Each room is exactly one screen wide and one screen tall, so an
-        // unconstrained follow camera immediately shows past the artwork.
-        // Clamping to the two room centres means the camera sits still inside
-        // a room and pans across only when the player changes rooms.
+        // --- Walking through the door into the bathroom ---
+        GameObject transitionGO = new GameObject("RoomTransition");
+        RoomTransition transition = transitionGO.AddComponent<RoomTransition>();
+        transition.fromRoom = hallway;
+        transition.toRoom = bathroom;
+        transition.player = playerGO.transform;
+        transition.playerMovement = player;
+        // Kylo comes out of the doorway on the left-hand side of the bathroom.
+        transition.arrivalPosition = new Vector2(-5f, PlayerFeetY);
+        transition.doorX = DoorX;
+
+        // With both rooms stacked at x=0 the camera never needs to move. It
+        // still follows the player so the component stays useful if the rooms
+        // are ever widened, but it is pinned to the room centre for now -
+        // an unconstrained follow is what made the camera show past the
+        // artwork and leave a black band down the side.
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
         follow.offset = new Vector3(0f, 0f, -10f);
         follow.clampHorizontally = true;
-        follow.minX = 0f;                 // hallway centre
-        follow.maxX = ScreenWidth;        // bathroom centre
+        follow.minX = 0f;
+        follow.maxX = 0f;
         follow.lockVertically = true;
         follow.fixedY = 0f;
 
-        // --- Floor, spanning both rooms ---
+        // --- Floor ---
         GameObject groundGO = new GameObject("Ground");
-        groundGO.transform.position = new Vector3(ScreenWidth * 0.5f, FloorY - 0.25f, 0f);
+        groundGO.transform.position = new Vector3(0f, FloorY - 0.25f, 0f);
         BoxCollider2D groundCol = groundGO.AddComponent<BoxCollider2D>();
-        groundCol.size = new Vector2(ScreenWidth * 3f, 0.5f);
+        groundCol.size = new Vector2(ScreenWidth * 2f, 0.5f);
+
+        // --- Invisible side walls ---
+        // The camera is fixed, so without these a few "Kanan"s in a row would
+        // walk Kylo straight off the edge of the picture and out of sight.
+        CreateWall("Wall_Left", -9.3f);
+        CreateWall("Wall_Right", 9.3f);
 
         // --- Word prompt canvas (world space, same pattern as Level 1) ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -170,11 +218,16 @@ public class BuildBahayScene2
         }
 
         // Positions are in canvas units (world units x100).
-        GameObject pLakad  = CreatePromptUI(uiRoot.transform, "Prompt_Lakad",  "Lakad",  new Vector3(-650, 100, 0));
-        GameObject pKaliwa = CreatePromptUI(uiRoot.transform, "Prompt_Kaliwa", "Kaliwa", new Vector3(-850, 100, 0));
-        GameObject pKanan  = CreatePromptUI(uiRoot.transform, "Prompt_Kanan",  "Kanan",  new Vector3(300, 100, 0));
-        GameObject pBukas  = CreatePromptUI(uiRoot.transform, "Prompt_Bukas",  "Bukas",  new Vector3(731, 380, 0));
-        GameObject pIlaw   = CreatePromptUI(uiRoot.transform, "Prompt_Ilaw",   "Ilaw",   new Vector3(1920, 150, 0));
+        // Kylo's head now reaches y=2.15 world (215 in canvas units), so the
+        // prompts that sit over him have to clear that.
+        GameObject pLakad  = CreatePromptUI(uiRoot.transform, "Prompt_Lakad",  "Lakad",  new Vector3(-650, 300, 0));
+        GameObject pKaliwa = CreatePromptUI(uiRoot.transform, "Prompt_Kaliwa", "Kaliwa", new Vector3(-850, 300, 0));
+        GameObject pKanan  = CreatePromptUI(uiRoot.transform, "Prompt_Kanan",  "Kanan",  new Vector3(300, 300, 0));
+        GameObject pBukas  = CreatePromptUI(uiRoot.transform, "Prompt_Bukas",  "Bukas",  new Vector3(731, 400, 0));
+        // "Ilaw" is asked inside the bathroom, which now occupies the same
+        // screen space as the hallway, so this sits top-centre over the room
+        // rather than one screen to the right.
+        GameObject pIlaw   = CreatePromptUI(uiRoot.transform, "Prompt_Ilaw",   "Ilaw",   new Vector3(0, 400, 0));
 
         // --- Objectives, in order. Each onCorrect is a persistent listener so
         //     it shows up and stays editable in the Inspector. ---
@@ -187,9 +240,12 @@ public class BuildBahayScene2
         var kanan  = MakeObjective("Kanan",  pKanan);
         UnityEventTools.AddPersistentListener(kanan.onCorrect, player.WalkRight);
 
-        // "Bukas" reveals the open-door sprite over the painted closed one.
+        // "Bukas" reveals the open-door sprite over the painted closed one,
+        // then RoomTransition walks Kylo in and fades across to the bathroom.
+        // Both run from the same event, in this order.
         var bukas  = MakeObjective("Bukas",  pBukas);
         UnityEventTools.AddBoolPersistentListener(bukas.onCorrect, doorOpen.SetActive, true);
+        UnityEventTools.AddPersistentListener(bukas.onCorrect, transition.EnterRoom);
 
         // "Ilaw" fades the darkness off the bathroom.
         var ilaw   = MakeObjective("Ilaw",   pIlaw);
@@ -220,7 +276,8 @@ public class BuildBahayScene2
                        ? "NOTE: door_open sprite not found - the Door_Open object exists but has no art yet. " +
                          "Import it and re-run this command."
                        : "Door art wired.") +
-                   " Point Scene 1's ExitTrigger at this scene to link them.");
+                   " Saying \"Bukas\" opens the door and fades across into the bathroom. " +
+                   "Point Scene 1's ExitTrigger at this scene to link them.");
     }
 
     private static SceneObjectiveController.SceneObjective MakeObjective(string word, GameObject prompt)
@@ -233,15 +290,26 @@ public class BuildBahayScene2
         };
     }
 
-    private static GameObject CreateBackground(string name, string spriteFile, float x)
+    private static GameObject CreateBackground(string name, string spriteFile, Transform parent)
     {
         GameObject go = new GameObject(name);
+        go.transform.SetParent(parent, false);
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = LoadSprite(spriteFile);
         sr.sortingLayerName = "Background";
         sr.sortingOrder = 0;
-        go.transform.position = new Vector3(x, 0f, 0f);
+        go.transform.localPosition = Vector3.zero;
         go.transform.localScale = new Vector3(BgScale, BgScale, 1f);
+        return go;
+    }
+
+    /// <summary>An invisible collider that stops the player leaving the view.</summary>
+    private static GameObject CreateWall(string name, float x)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.position = new Vector3(x, 0f, 0f);
+        BoxCollider2D col = go.AddComponent<BoxCollider2D>();
+        col.size = new Vector2(1f, 20f);
         return go;
     }
 

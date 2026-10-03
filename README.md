@@ -133,9 +133,11 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 word, so it works in any scene without needing a key per word. Press it
 repeatedly to walk through a whole scene.
 
-Scene 1 ends by walking out of the bedroom, which fades into Scene 2. After
-Scene 2's five words, the completion panel shows your score and the recent
-records read back from Supabase.
+Scene 1 ends by walking out of the bedroom, which fades into Scene 2. In Scene
+2, saying **Bukas** opens the bathroom door, walks Kylo through it and fades
+across into the bathroom, which stays dark until **Ilaw**. After Scene 2's five
+words, the completion panel shows your score and the recent records read back
+from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
 
@@ -174,11 +176,13 @@ scene to live in; the pieces are in place for when it is.
 
 ## Known Limitations / Unfinished Parts
 
-- Only **Scene 1 of Level 1** (the wake-up sequence) is playable. The remaining
-  Bahay scenes (bathroom, bath, dressing, breakfast, leaving) are designed but
-  not yet built, and Levels 2 (Paaralan) and 3 (Parke) are locked on the map.
-- Reaching the exit shows a **placeholder completion panel**; it does not load a
-  next scene, because no next scene exists yet.
+- Only the **first two scenes of Level 1** are playable: the wake-up sequence
+  (Bangon, Tayo, Lakad) and walking to the bathroom (Lakad, Kaliwa, Kanan,
+  Bukas, Ilaw). The remaining Bahay scenes (bath, dressing, breakfast, leaving)
+  are designed but not yet built, and Levels 2 (Paaralan) and 3 (Parke) are
+  locked on the map.
+- The score saved to the database covers **Scene 2 only**, not both scenes
+  together, so a full-run total is not yet recorded.
 - **No voice-over audio yet.** The instruction-clip slots are wired and the full
   recording script exists at [`Docs/VoiceOverScript.csv`](Docs/VoiceOverScript.csv),
   but the audio files are not recorded, so the replay button logs a warning

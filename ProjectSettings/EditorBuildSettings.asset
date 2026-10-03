@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/MainScene.unity
     guid: 9aa4a216f56c44d4987af147d992feb0
+  - enabled: 1
+    path: Assets/Scenes/Chapter1_Level2_Banyo.unity
+    guid: 192b357144d9a4681bae0bdc11119dba
   m_configObjects: {}

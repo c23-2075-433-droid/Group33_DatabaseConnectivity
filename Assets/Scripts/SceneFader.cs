@@ -45,6 +45,23 @@ public class SceneFader : MonoBehaviour
             () => SceneManager.LoadScene(sceneName)));
     }
 
+    /// <summary>
+    /// Fades to black, runs an action while the screen is covered, then fades
+    /// back in. Used to move between rooms inside one scene, so swapping the
+    /// artwork is hidden behind the fade.
+    /// </summary>
+    public void FadeOutAndThen(System.Action whileBlack)
+    {
+        StartCoroutine(FadeThroughRoutine(whileBlack));
+    }
+
+    private IEnumerator FadeThroughRoutine(System.Action whileBlack)
+    {
+        yield return FadeRoutine(CurrentAlpha(), 1f, fadeOutDuration, null);
+        whileBlack?.Invoke();
+        yield return FadeRoutine(1f, 0f, fadeInDuration, null);
+    }
+
     private IEnumerator FadeRoutine(float from, float to, float duration, System.Action onDone)
     {
         if (fadeImage == null)
