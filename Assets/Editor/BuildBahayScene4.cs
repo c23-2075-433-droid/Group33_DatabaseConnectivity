@@ -10,10 +10,15 @@
 // prop_salamin was lifted out of the old dresser_v3 sprite for this scene
 // (see Tools/cut_bedroom_props.py).
 //
-// Kylo has only one outfit, so this scene is about PICKING THINGS UP rather
-// than changing clothes: showing him dressed would need a second character
-// set drawn in every pose. "Kunin" is the exception that does change him - it
-// swaps in the art drawn with the school bag on his back.
+// Two of the words actually dress him. "Damit" swaps his green tee for the
+// white school uniform, and "Kunin" puts the bag on over it - so by the end
+// of the scene he is in uniform with his bag, not just standing beside a pile
+// of props. The uniform art is Tools/make_uniform.py recolouring the green
+// shirt; see that script for why a recolour rather than new drawings.
+//
+// Medyas and Sapatos do NOT change him, because he is already drawn wearing
+// white socks and navy shoes in every pose. Making those two dress him would
+// mean redrawing his feet bare, and then with socks, in all five poses.
 //
 // This is now the LAST playable scene of Level 1, so the level's result is
 // saved and shown here. Scene 3 fades into this one. When Scene 5 is built,
@@ -123,15 +128,26 @@ public class BuildBahayScene4
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Kunin" is the one word that changes Kylo: he puts the bag on, and
-        // from here to the end of the level he is drawn wearing it.
+        // "Damit" dresses him: the green tee becomes the white uniform.
+        takeDamit.player = player;
+        takeDamit.carryingStandingSprite = LoadSprite("standing_uniform");
+        takeDamit.carryingWalkFrames = new[]
+        {
+            LoadSprite("walk_frame_1_uniform"), LoadSprite("walk_frame_2_uniform"),
+            LoadSprite("walk_frame_3_uniform"), LoadSprite("walk_frame_4_uniform"),
+        };
+
+        // "Kunin" puts the bag on OVER the uniform. These are the uniform
+        // frames with the bag, not the green-shirt ones - the words are
+        // answered in a fixed order, so by the time this runs he is already
+        // dressed, and reusing the green set here would undress him again.
         PickUpItem takeBag = AddPickUp(propBag);
         takeBag.player = player;
-        takeBag.carryingStandingSprite = LoadSprite("standing_with_bag");
+        takeBag.carryingStandingSprite = LoadSprite("standing_uniform_with_bag");
         takeBag.carryingWalkFrames = new[]
         {
-            LoadSprite("walk_frame_1_with_bag"), LoadSprite("walk_frame_2_with_bag"),
-            LoadSprite("walk_frame_3_with_bag"), LoadSprite("walk_frame_4_with_bag"),
+            LoadSprite("walk_frame_1_uniform_with_bag"), LoadSprite("walk_frame_2_uniform_with_bag"),
+            LoadSprite("walk_frame_3_uniform_with_bag"), LoadSprite("walk_frame_4_uniform_with_bag"),
         };
 
         // The room is one screen wide, so the camera never moves.
@@ -219,7 +235,8 @@ public class BuildBahayScene4
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 4 built and saved to " + ScenePath +
-                   ". Words: Damit, Medyas, Sapatos, Salamin, Bag, Kunin. Level 1 now ends " +
+                   ". Words: Damit, Medyas, Sapatos, Salamin, Bag, Kunin. Damit puts him in " +
+                   "uniform and Kunin adds the bag over it. Level 1 now ends " +
                    "here, so re-run Build Bahay Scene 3 as well - it fades into this scene " +
                    "instead of showing the result itself.");
     }
