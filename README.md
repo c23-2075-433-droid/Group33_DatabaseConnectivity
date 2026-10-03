@@ -239,11 +239,6 @@ belongs with getting dressed in Scene 4.
   Palengke are locked on the map.
 - Scene 3's **Maligo** is a water-and-suds overlay rather than an animation;
   the character art has only standing and walking poses.
-- **Scene 4 is missing three props.** `prop_medyas`, `prop_sapatos` and
-  `prop_bag` are generated but not yet imported, so the socks, shoes and bag
-  build as invisible objects with a warning in the Console. The scene still
-  plays — the words still count — but there is nothing on the floor to see.
-  Drop the three PNGs into `Assets/Sprites/` and re-run Build Bahay Scene 4.
 - The result is saved once, at the end of the last scene, and covers the
   whole level: [`RunScoreCounter`](Assets/Scripts/RunScoreCounter.cs) adds
   each scene's attempts to [`RunScore`](Assets/Scripts/RunScore.cs), and
