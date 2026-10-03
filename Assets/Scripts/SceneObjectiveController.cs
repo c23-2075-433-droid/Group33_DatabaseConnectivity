@@ -42,7 +42,7 @@ public class SceneObjectiveController : MonoBehaviour
         public AudioClip instructionClip;
 
         [Tooltip("Invoked when the player says this word correctly - wire to PlayerMovement.Bangon(), a door-open animation, etc.")]
-        public UnityEvent onCorrect;
+        public UnityEvent onCorrect = new UnityEvent();
     }
 
     [Tooltip("The VoiceCommand that recognizes speech for this scene.")]
@@ -52,7 +52,11 @@ public class SceneObjectiveController : MonoBehaviour
     public SceneObjective[] objectives;
 
     [Tooltip("Invoked once every objective in this list has been completed.")]
-    public UnityEvent onAllObjectivesComplete;
+    // Constructed here, not left to Unity. A component created with
+    // AddComponent - which every scene builder does - gets null for a
+    // UnityEvent field, and UnityEventTools.AddPersistentListener throws on
+    // it. Loading a saved scene replaces this instance, so it costs nothing.
+    public UnityEvent onAllObjectivesComplete = new UnityEvent();
 
     private int currentIndex = -1;
     private AudioSource audioSource;
