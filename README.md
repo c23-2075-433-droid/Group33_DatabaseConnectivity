@@ -178,6 +178,7 @@ rather than being a separate layer:
 | Files | Used in |
 |---|---|
 | `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | Scenes 1–3, at home in his green tee |
+| `talking.png` | Scene 4, where he faces the player while being dressed |
 | the same names with `_uniform` | after **Damit** in Scene 4 |
 | the same names with `_uniform_with_bag` | after **Kunin** in Scene 4 |
 | the same names with `_with_bag` | the green tee plus bag — kept, currently unused |

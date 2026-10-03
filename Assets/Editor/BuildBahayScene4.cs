@@ -10,6 +10,10 @@
 // prop_salamin was lifted out of the old dresser_v3 sprite for this scene
 // (see Tools/cut_bedroom_props.py).
 //
+// Kylo faces the player here rather than standing side-on, so the child can
+// see him being dressed. The walk frames stay side-on, since he only turns to
+// walk and this scene has no walking word.
+//
 // Two of the words actually dress him. "Damit" swaps his green tee for the
 // white school uniform, and "Kunin" puts the bag on over it - so by the end
 // of the scene he is in uniform with his bag, not just standing beside a pile
@@ -105,7 +109,10 @@ public class BuildBahayScene4
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
         playerSr.sortingLayerName = "Player";
-        playerSr.sprite = LoadSprite("standing");
+        // Face the child, not side-on: they are dressing him, so they should
+        // see the uniform go on from the front. 'talking' is the same height
+        // and foot position as 'standing', so nothing else has to move.
+        playerSr.sprite = LoadSprite("talking");
 
         Rigidbody2D playerRb = playerGO.AddComponent<Rigidbody2D>();
         playerRb.gravityScale = 3f;
@@ -117,7 +124,7 @@ public class BuildBahayScene4
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
         player.lyingDownSprite = LoadSprite("lying_down");
         player.sittingUpSprite = LoadSprite("sitting_up");
-        player.standingSprite = LoadSprite("standing");
+        player.standingSprite = LoadSprite("talking");
         player.walkFrames = new[]
         {
             LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
@@ -130,7 +137,7 @@ public class BuildBahayScene4
 
         // "Damit" dresses him: the green tee becomes the white uniform.
         takeDamit.player = player;
-        takeDamit.carryingStandingSprite = LoadSprite("standing_uniform");
+        takeDamit.carryingStandingSprite = LoadSprite("talking_uniform");
         takeDamit.carryingWalkFrames = new[]
         {
             LoadSprite("walk_frame_1_uniform"), LoadSprite("walk_frame_2_uniform"),
@@ -143,7 +150,7 @@ public class BuildBahayScene4
         // dressed, and reusing the green set here would undress him again.
         PickUpItem takeBag = AddPickUp(propBag);
         takeBag.player = player;
-        takeBag.carryingStandingSprite = LoadSprite("standing_uniform_with_bag");
+        takeBag.carryingStandingSprite = LoadSprite("talking_uniform_with_bag");
         takeBag.carryingWalkFrames = new[]
         {
             LoadSprite("walk_frame_1_uniform_with_bag"), LoadSprite("walk_frame_2_uniform_with_bag"),
