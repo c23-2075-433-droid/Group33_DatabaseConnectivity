@@ -1,7 +1,8 @@
 // Assets/Editor/LinkScene1ToScene2.cs
 //
-// Joins Bahay Scene 1 to Scene 2 and moves the "level finished" moment to
-// the end of Scene 2, which is now where the playable content stops.
+// Joins Bahay Scene 1 to Scene 2, and makes sure neither of them tries to end
+// the level. Level 1 now runs Scene 1 -> Scene 2 -> Scene 3, and the scene
+// that ends a level is the one that saves and shows the result.
 //
 // Scene 1 (bedroom):
 //   * exit trigger loads Chapter1_Level2_Banyo instead of showing a panel
@@ -9,10 +10,11 @@
 //   * gains a fader so leaving the room fades instead of cutting
 //
 // Scene 2 (hallway + bathroom):
-//   * gains the database demo - score saved, recent records read back and
-//     shown on the level-complete panel once all five words are done
-//   * its OKAY button returns to the journey map
+//   * any leftover database demo is removed - it belongs in Scene 3 now,
+//     and two scenes both saving a result would write two records per run
 //   * gains a fader so arriving fades in
+//
+// Scene 2's own hand-off to Scene 3 is set by Build Bahay Scene 2, not here.
 //
 // Safe to re-run.
 //
@@ -65,19 +67,16 @@ public class LinkScene1ToScene2
         Debug.Log("[SALINLAHI] Scene 1 now leads to " + Scene2Name +
                    ", with the complete panel and database demo removed.");
 
-        // ---- Scene 2: becomes the ending ----
+        // ---- Scene 2: a middle scene, not an ending ----
         Scene s2 = EditorSceneManager.OpenScene(Scene2Path, OpenSceneMode.Single);
 
         SceneFaderBuilder.Build();
-        bool ok = DatabaseDemoBuilder.Build("Bahay - Scene 2: Punta sa Banyo", MapSceneName);
+        DatabaseDemoBuilder.Remove();   // Scene 3 ends the level, not this one
 
         EditorSceneManager.SaveScene(s2);
 
-        if (ok)
-        {
-            Debug.Log("[SALINLAHI] Scene 2 now saves the session and shows the recent scores when " +
-                       "all five words are finished. OKAY returns to " + MapSceneName + ". " +
-                       "Both scenes fade in and out.");
-        }
+        Debug.Log("[SALINLAHI] Scene 1 fades into Scene 2, and Scene 2 holds no ending of its " +
+                   "own - Scene 3 saves the result and returns to " + MapSceneName + ". " +
+                   "Both scenes fade in and out.");
     }
 }

@@ -60,6 +60,9 @@ public class BuildBahayScene2
     // Centre of the bathroom door painted into the hallway art.
     private const float DoorX = 7.31f;
 
+    // Where the level carries on once the bathroom's words are done.
+    private const string NextScene = "Chapter1_Level3_Maligo";
+
     [MenuItem("Tools/SALINLAHI/Build Bahay Scene 2")]
     public static void BuildScene()
     {
@@ -309,15 +312,23 @@ public class BuildBahayScene2
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
 
         // --- Fade in on arrival from Scene 1 ---
-        SceneFaderBuilder.Build();
+        SceneFader fader = SceneFaderBuilder.Build();
 
-        // --- This is currently the last playable scene, so the level's
-        //     result is saved and the recent scores shown here. The score is
-        //     the whole level's, gathered by RunScoreCounter across both
-        //     scenes, so the record is named for the level and not for this
-        //     scene. When Scene 3 is built, move this on with Link Scene 1 To
-        //     Scene 2's approach. ---
-        DatabaseDemoBuilder.Build("Bahay - Level 1", "LevelSelect");
+        // --- This scene's words count towards the level's total ---
+        // DatabaseDemoBuilder used to add this on its way past. It now runs
+        // in Scene 3, so without this the bathroom's nine words would be
+        // dropped from the result the player is shown.
+        GameObject runScoreGO = new GameObject("RunScore");
+        RunScoreCounter runScore = runScoreGO.AddComponent<RunScoreCounter>();
+        runScore.voiceCommand = voiceCommand;
+        runScore.resetOnStart = false;   // Scene 1 starts the run, not this one
+
+        // --- Scene 2 hands on to Scene 3 (the bath) ---
+        // The level's result is saved and shown in whichever scene ends the
+        // level, and that is no longer this one. Fading out of the last word
+        // rather than stopping here keeps the score running across both.
+        UnityEventTools.AddStringPersistentListener(
+            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -330,7 +341,8 @@ public class BuildBahayScene2
                          "Import it and re-run this command."
                        : "Door art wired.") +
                    " Saying \"Bukas\" opens the door and fades across into the bathroom. " +
-                   "Point Scene 1's ExitTrigger at this scene to link them.");
+                   "The last word now fades on into " + NextScene + " - build that scene too, " +
+                   "or the level stops at a black screen.");
     }
 
     private static SceneObjectiveController.SceneObjective MakeObjective(string word, GameObject prompt)

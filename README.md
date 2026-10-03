@@ -41,6 +41,7 @@ Level 1 ("Bahay — Umaga na!") asks the player to say, across two scenes:
 5. **Bukas** — open (the bathroom door)
 6. **Ilaw** — turn the light on
 7. **Tabo**, **Sabon**, **Sipilyo**, **Tuwalya** — dipper, soap, toothbrush, towel
+8. **Maligo**, **Suklay** — take a bath, comb
 
 When the sequence is finished, the session result is saved to the database, and
 the most recent scores are retrieved and displayed on the completion panel.
@@ -113,11 +114,14 @@ In Unity, run in order:
 1. **Tools → SALINLAHI → Add Exit Trigger To Level 1**
 2. **Tools → SALINLAHI → Add Run Score Counter To Level 1**
 3. **Tools → SALINLAHI → Build Bahay Scene 2**
-4. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
+4. **Tools → SALINLAHI → Build Bahay Scene 3**
+5. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
 
-Step 2 makes the bedroom's words count towards the final result. Step 4 joins
-the two scenes with a fade and puts the score and recent-scores panel at the
-end of Scene 2, which is where the playable content currently stops.
+Step 2 makes the bedroom's words count towards the final result. Step 5 joins
+Scene 1 to Scene 2 with a fade and makes sure neither of them tries to end the
+level: Level 1 runs Scene 1 → Scene 2 → Scene 3, and the score and
+recent-scores panel sit at the end of Scene 3, where the playable content
+currently stops.
 
 ### 5. Play
 Open `Assets/Scenes/MainMenu.unity` and press Play.
@@ -131,6 +135,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
 | `A` / `S` / `P` / `W` | "Tabo" / "Sabon" / "Sipilyo" / "Tuwalya" (Scene 2) |
+| `M` / `C` | "Maligo" / "Suklay" (Scene 3) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4 onward) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
@@ -141,9 +146,9 @@ repeatedly to walk through a whole scene.
 
 Scene 1 ends by walking out of the bedroom, which fades into Scene 2. In Scene
 2, saying **Bukas** opens the bathroom door, walks Kylo through it and fades
-across into the bathroom, which stays dark until **Ilaw**. After Scene 2's five
-words, the completion panel shows your score and the recent records read back
-from Supabase.
+across into the bathroom, which stays dark until **Ilaw**. Scene 2's last word
+fades on into Scene 3, the bath. After Scene 3, the completion panel shows your
+score for the whole level and the recent records read back from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
 
@@ -210,11 +215,12 @@ belongs with getting dressed in Scene 4.
 
 ## Known Limitations / Unfinished Parts
 
-- Only the **first two scenes of Level 1** are playable: the wake-up sequence
-  (Bangon, Tayo, Lakad) and walking to the bathroom (Lakad, Kaliwa, Kanan,
-  Bukas, Ilaw). The remaining Bahay scenes (bath, dressing, breakfast, leaving)
-  are designed but not yet built, and Levels 2 (Paaralan) and 3 (Parke) are
-  locked on the map.
+- The **first three scenes of Level 1** are playable: the wake-up sequence, the
+  walk to the bathroom, and the bath. The remaining Bahay scenes (dressing,
+  breakfast, leaving) are designed but not yet built, and Paaralan, Parke and
+  Palengke are locked on the map.
+- Scene 3's **Maligo** is a water-and-suds overlay rather than an animation;
+  the character art has only standing and walking poses.
 - The result is saved once, at the end of the last scene, and covers the
   whole level: [`RunScoreCounter`](Assets/Scripts/RunScoreCounter.cs) adds
   each scene's attempts to [`RunScore`](Assets/Scripts/RunScore.cs), and
