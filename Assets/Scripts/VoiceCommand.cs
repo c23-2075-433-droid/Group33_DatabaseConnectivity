@@ -127,6 +127,11 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.O)) SimulateSpeech("bukas");
         else if (Input.GetKeyDown(KeyCode.I)) SimulateSpeech("ilaw");
         else if (Input.GetKeyDown(KeyCode.U)) SimulateSpeech("kunin");
+        // The four things in the bathroom (Scene 2, after the light is on).
+        else if (Input.GetKeyDown(KeyCode.A)) SimulateSpeech("tabo");
+        else if (Input.GetKeyDown(KeyCode.S)) SimulateSpeech("sabon");
+        else if (Input.GetKeyDown(KeyCode.P)) SimulateSpeech("sipilyo");
+        else if (Input.GetKeyDown(KeyCode.W)) SimulateSpeech("tuwalya");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see
         // attempts counted without the objective advancing.

@@ -50,16 +50,17 @@ public class SceneFader : MonoBehaviour
     /// back in. Used to move between rooms inside one scene, so swapping the
     /// artwork is hidden behind the fade.
     /// </summary>
-    public void FadeOutAndThen(System.Action whileBlack)
+    public void FadeOutAndThen(System.Action whileBlack, System.Action onDone = null)
     {
-        StartCoroutine(FadeThroughRoutine(whileBlack));
+        StartCoroutine(FadeThroughRoutine(whileBlack, onDone));
     }
 
-    private IEnumerator FadeThroughRoutine(System.Action whileBlack)
+    private IEnumerator FadeThroughRoutine(System.Action whileBlack, System.Action onDone)
     {
         yield return FadeRoutine(CurrentAlpha(), 1f, fadeOutDuration, null);
         whileBlack?.Invoke();
         yield return FadeRoutine(1f, 0f, fadeInDuration, null);
+        onDone?.Invoke();
     }
 
     private IEnumerator FadeRoutine(float from, float to, float duration, System.Action onDone)

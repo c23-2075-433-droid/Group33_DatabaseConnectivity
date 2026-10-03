@@ -46,11 +46,12 @@ word_kaliwa.wav,Word,Level 1 - Bahay,Scene 2,-,Kaliwa,Left,First taught here
 word_kanan.wav,Word,Level 1 - Bahay,Scene 2,-,Kanan,Right,First taught here
 word_bukas.wav,Word,Level 1 - Bahay,Scene 2,-,Bukas,Open,"First taught here. Reused: L1 S6, L2 S1 & S2"
 word_ilaw.wav,Word,Level 1 - Bahay,Scene 2,-,Ilaw,Light (turn on),First taught here
+word_tabo.wav,Word,Level 1 - Bahay,Scene 2,-,Tabo,Dipper,"First taught here. The blue dipper on the water jar - takes it off the jar when said."
 word_maligo.wav,Word,Level 1 - Bahay,Scene 3,-,Maligo,Take a bath,First taught here
-word_sabon.wav,Word,Level 1 - Bahay,Scene 3,-,Sabon,Soap,First taught here
+word_sabon.wav,Word,Level 1 - Bahay,Scene 2,-,Sabon,Soap,"First taught here. Reused: L1 S3"
 word_suklay.wav,Word,Level 1 - Bahay,Scene 3,-,Suklay,Comb,First taught here
-word_sipilyo.wav,Word,Level 1 - Bahay,Scene 3,-,Sipilyo,Toothbrush,First taught here
-word_tuwalya.wav,Word,Level 1 - Bahay,Scene 3,-,Tuwalya,Towel,First taught here
+word_sipilyo.wav,Word,Level 1 - Bahay,Scene 2,-,Sipilyo,Toothbrush,"First taught here. Reused: L1 S3"
+word_tuwalya.wav,Word,Level 1 - Bahay,Scene 2,-,Tuwalya,Towel,"First taught here. Reused: L1 S3"
 word_damit.wav,Word,Level 1 - Bahay,Scene 4,-,Damit,Clothes / uniform,First taught here
 word_medyas.wav,Word,Level 1 - Bahay,Scene 4,-,Medyas,Socks,First taught here
 word_sapatos.wav,Word,Level 1 - Bahay,Scene 4,-,Sapatos,Shoes,First taught here

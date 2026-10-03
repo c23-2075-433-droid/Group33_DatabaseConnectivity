@@ -51,6 +51,12 @@ public class RoomTransition : MonoBehaviour
     [Tooltip("Seconds to wait after the door opens before the player starts walking in, so the player sees the door open first.")]
     public float doorPause = 0.6f;
 
+    [Header("Objectives")]
+    [Tooltip("Optional. If empty, one is looked up in the scene. The objective " +
+             "sequence is held while the transition runs, so the next word is " +
+             "not asked - or answered - while Kylo is still walking through the door.")]
+    public SceneObjectiveController objectiveController;
+
     [Header("Fade")]
     [Tooltip("Optional. If empty, one is looked up in the scene. Without a fader the swap is instant.")]
     public SceneFader fader;
@@ -62,6 +68,7 @@ public class RoomTransition : MonoBehaviour
     void Awake()
     {
         if (fader == null) fader = FindFirstObjectByType<SceneFader>();
+        if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
     }
 
     /// <summary>
@@ -72,6 +79,14 @@ public class RoomTransition : MonoBehaviour
     {
         if (hasEntered) return;
         hasEntered = true;
+
+        // Hold the objectives straight away, before anything yields. The word
+        // after this one is armed the moment this one is answered, so without
+        // this the next word is live for the whole walk and fade and can be
+        // answered behind the black screen - which finished the scene early
+        // and had the results panel already up on arrival.
+        if (objectiveController != null) objectiveController.SetPaused(true);
+
         StartCoroutine(EnterRoomRoutine());
     }
 
@@ -92,13 +107,19 @@ public class RoomTransition : MonoBehaviour
 
         if (fader != null)
         {
-            fader.FadeOutAndThen(SwapRooms);
+            fader.FadeOutAndThen(SwapRooms, Resume);
         }
         else
         {
             // No fader in the scene: still correct, just without the fade.
             SwapRooms();
+            Resume();
         }
+    }
+
+    private void Resume()
+    {
+        if (objectiveController != null) objectiveController.SetPaused(false);
     }
 
     private void SwapRooms()

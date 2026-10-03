@@ -57,6 +57,50 @@ public class SceneObjectiveController : MonoBehaviour
     private int currentIndex = -1;
     private AudioSource audioSource;
 
+    // Set while something else is mid-animation and the player should not be
+    // asked anything yet - walking through the bathroom door, for instance.
+    // Without it the next word goes live the instant the previous one is
+    // answered, so the game asks for "Ilaw" while Kylo is still walking and
+    // the screen is fading, and that word can be answered behind the fade.
+    private bool isPaused = false;
+    private bool completionPending = false;
+
+    /// <summary>True while the sequence is held, see SetPaused.</summary>
+    public bool IsPaused => isPaused;
+
+    /// <summary>
+    /// Holds the sequence: hides the prompt and stops matching answers, so
+    /// nothing can be answered during a cutaway. Releasing it puts the
+    /// current objective back up where it left off.
+    /// </summary>
+    public void SetPaused(bool paused)
+    {
+        if (isPaused == paused) return;
+        isPaused = paused;
+
+        if (paused)
+        {
+            HideAllPrompts();
+            ClearTargetWord();
+            return;
+        }
+
+        if (completionPending)
+        {
+            completionPending = false;
+            onAllObjectivesComplete?.Invoke();
+            return;
+        }
+        ShowObjective(currentIndex);
+    }
+
+    private void ClearTargetWord()
+    {
+        if (voiceCommand == null) return;
+        voiceCommand.currentTargetWord = "";
+        voiceCommand.currentTargetWordVariants = null;
+    }
+
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
@@ -90,12 +134,25 @@ public class SceneObjectiveController : MonoBehaviour
         {
             // Sequence finished - stop checking answers against a specific
             // word so general listening (e.g. "Talon") keeps working normally.
-            if (voiceCommand != null)
+            ClearTargetWord();
+
+            // If the last word started a transition, the scene is still
+            // mid-move; hold the completion until it lands, or the results
+            // panel appears over the fade.
+            if (isPaused)
             {
-                voiceCommand.currentTargetWord = "";
-                voiceCommand.currentTargetWordVariants = null;
+                completionPending = true;
+                return;
             }
             onAllObjectivesComplete?.Invoke();
+            return;
+        }
+
+        // While held, remember where we are but ask for nothing. SetPaused
+        // puts this back up when the transition finishes.
+        if (isPaused)
+        {
+            ClearTargetWord();
             return;
         }
 
@@ -114,6 +171,7 @@ public class SceneObjectiveController : MonoBehaviour
     private void HandleAnswerChecked(string spokenText, bool isCorrect)
     {
         if (!isCorrect) return;
+        if (isPaused) return;
         if (currentIndex < 0 || currentIndex >= objectives.Length) return;
 
         SceneObjective objective = objectives[currentIndex];
