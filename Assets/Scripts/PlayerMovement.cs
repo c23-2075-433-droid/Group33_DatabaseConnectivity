@@ -238,6 +238,33 @@ public class PlayerMovement : MonoBehaviour
     }
 
     /// <summary>
+    /// Swaps the standing and walking art for a different set, and redraws the
+    /// current pose straight away so the change is visible without waiting for
+    /// the next step.
+    ///
+    /// This is how Kylo starts carrying his school bag: the character art is
+    /// drawn with and without it, and saying "Kunin" swaps one set for the
+    /// other (see PickUpItem). Passing null for either argument leaves that
+    /// part of the art alone.
+    /// </summary>
+    public void SetAppearance(Sprite newStanding, Sprite[] newWalkFrames)
+    {
+        if (newStanding != null) standingSprite = newStanding;
+        if (newWalkFrames != null && newWalkFrames.Length > 0) walkFrames = newWalkFrames;
+
+        currentWalkFrame = 0;
+        walkFrameTimer = 0f;
+
+        // Only repaint when the player is actually on the standing pose;
+        // mid-walk the animation picks the new frames up on its own, and
+        // while lying down or sitting up those sprites still apply.
+        if (spriteRenderer != null && currentWakeStage == WakeStage.Standing && standingSprite != null)
+        {
+            spriteRenderer.sprite = standingSprite;
+        }
+    }
+
+    /// <summary>
     /// Cycles through walkFrames while isMoving is true, otherwise resets to the
     /// standing sprite. Called every Update() once the player has stood up.
     /// Safe to call with an empty/unassigned walkFrames array — it just no-ops

@@ -125,6 +125,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `Enter` | **whatever word the scene is currently asking for** |
 | `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
+| `U` | "Kunin" (take — picks the school bag up, Scene 4 onward) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
 

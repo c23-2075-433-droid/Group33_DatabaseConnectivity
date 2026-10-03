@@ -126,6 +126,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.N)) SimulateSpeech("kanan");
         else if (Input.GetKeyDown(KeyCode.O)) SimulateSpeech("bukas");
         else if (Input.GetKeyDown(KeyCode.I)) SimulateSpeech("ilaw");
+        else if (Input.GetKeyDown(KeyCode.U)) SimulateSpeech("kunin");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see
         // attempts counted without the objective advancing.
