@@ -135,6 +135,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // Scene 3, the bath.
         else if (Input.GetKeyDown(KeyCode.M)) SimulateSpeech("maligo");
         else if (Input.GetKeyDown(KeyCode.C)) SimulateSpeech("suklay");
+        // Scene 4, getting dressed. ("Kunin" is U, above.)
+        else if (Input.GetKeyDown(KeyCode.D)) SimulateSpeech("damit");
+        else if (Input.GetKeyDown(KeyCode.Z)) SimulateSpeech("medyas");
+        else if (Input.GetKeyDown(KeyCode.F)) SimulateSpeech("sapatos");
+        else if (Input.GetKeyDown(KeyCode.R)) SimulateSpeech("salamin");
+        else if (Input.GetKeyDown(KeyCode.V)) SimulateSpeech("bag");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see
         // attempts counted without the objective advancing.

@@ -7,10 +7,8 @@
 // water jar and the comb are the two things Kylo uses, placed back where the
 // artwork had them; saying their word uses them up.
 //
-// This is now the LAST playable scene of Level 1, so the level's result is
-// saved and shown here (DatabaseDemoBuilder). Scene 2 fades into this one
-// instead of ending the level. When Scene 4 is built, move the database demo
-// on to it the same way.
+// A middle scene: Scene 2 fades into it and it fades on into Scene 4, which
+// is where the level now ends and where the result is saved and shown.
 //
 // Sprites expected in Assets/Sprites/:
 //   bathroom_background, item_tabo, item_suklay, item_baso, fx_bath,
@@ -38,6 +36,9 @@ public class BuildBahayScene3
     private const float PlayerScale = 0.83f;
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
+
+    // Where the level carries on once the bath is done.
+    private const string NextScene = "Chapter1_Level4_Damit";
 
     [MenuItem("Tools/SALINLAHI/Build Bahay Scene 3")]
     public static void BuildScene()
@@ -182,19 +183,28 @@ public class BuildBahayScene3
         controller.objectives = new[] { kaliwa, maligo, suklay };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFaderBuilder.Build();
+        SceneFader fader = SceneFaderBuilder.Build();
 
-        // --- Last playable scene of the level, so the result lands here ---
-        DatabaseDemoBuilder.Build("Bahay - Level 1", "LevelSelect");
+        // --- This scene's words count towards the level's total ---
+        // The scene that ends a level gets a counter from DatabaseDemoBuilder;
+        // a middle scene has to carry its own, or its words are dropped from
+        // the result the player is shown.
+        GameObject runScoreGO = new GameObject("RunScore");
+        RunScoreCounter runScore = runScoreGO.AddComponent<RunScoreCounter>();
+        runScore.voiceCommand = voiceCommand;
+        runScore.resetOnStart = false;   // Scene 1 starts the run
+
+        // --- Hand on to Scene 4 (getting dressed) ---
+        UnityEventTools.AddStringPersistentListener(
+            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 3 built and saved to " + ScenePath +
-                   ". Words: Kaliwa, Maligo, Suklay. This is now where Level 1 ends, so " +
-                   "re-run Build Bahay Scene 2 as well - it fades into this scene instead " +
-                   "of showing the result itself.");
+                   ". Words: Kaliwa, Maligo, Suklay. Its last word fades on into " +
+                   NextScene + " - build that scene too, or the level stops at a black screen.");
     }
 
     private static SceneObjectiveController.SceneObjective MakeObjective(string word, GameObject prompt)
