@@ -39,6 +39,11 @@ public class SessionScoreTracker : MonoBehaviour
     [Header("Session")]
     [Tooltip("Stored in the 'level' column so records can be told apart later.")]
     public string levelName = "Bahay - Scene 1: Umaga na!";
+
+    [Tooltip("1-based number of this level on the journey map. Finishing it " +
+             "unlocks the next node and earns this level's badge. Leave at 0 " +
+             "in a scene that does not end a level.")]
+    public int levelIndex = 0;
     [Tooltip("How many past records to pull back and list.")]
     public int recentRecordsToShow = 5;
 
@@ -79,6 +84,11 @@ public class SessionScoreTracker : MonoBehaviour
 
         // Playing again starts from zero rather than adding to this run.
         RunScore.Reset();
+
+        // Finishing the level earns its badge and opens the next node on the
+        // map. Nothing called this before, so the map stayed locked however
+        // many times Bahay was completed.
+        if (levelIndex > 0) LevelProgress.MarkComplete(levelIndex);
 
         ShowPanel();
         SetText(scoreText, "Player: " + record.player_name +

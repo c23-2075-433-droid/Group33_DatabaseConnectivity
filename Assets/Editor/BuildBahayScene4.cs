@@ -233,7 +233,9 @@ public class BuildBahayScene4
 
         // Last playable scene of the level, so the result lands here. This
         // also adds the scene's RunScoreCounter.
-        DatabaseDemoBuilder.Build("Bahay - Level 1", "LevelSelect");
+        // Level 1 on the map, so finishing here earns the Bahay badge and
+        // unlocks Paaralan.
+        DatabaseDemoBuilder.Build("Bahay - Level 1", "LevelSelect", 1, "badge_bahay");
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
