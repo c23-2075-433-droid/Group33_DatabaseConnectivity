@@ -39,12 +39,16 @@ public class BuildPaaralanScene1
 
     private const float ViewHeight = 10.8f;           // camera is orthographic 5.4
     private const float ViewWidth = 19.2f;
-    private const float FloorY = -2.70f;              // the path across the schoolyard
+    private const float FloorY = -3.20f;              // the paved yard inside the gate
 
     // The character art imports at 120 pixels per unit, and its feet sit this
     // far below the pivot - see BuildBahayScene2 for where these come from.
     private const float SpritePPU = 120f;
-    private const float PlayerScale = 0.83f;
+    // Smaller than Bahay's 0.83 on purpose. This is a wide establishing shot
+    // across a schoolyard, not a room you are standing in: at 0.83 Kylo is
+    // taller than the gate and nearly as tall as the school building. 0.45
+    // puts him at 2.8 units, which reads correctly against both.
+    private const float PlayerScale = 0.45f;
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
 
@@ -159,9 +163,11 @@ public class BuildPaaralanScene1
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(-650, 300, 0));
-        GameObject pPasok   = CreatePromptUI(uiRoot.transform, "Prompt_Pasok",   "Pasok",   new Vector3(-300, 300, 0));
-        GameObject pTakbo   = CreatePromptUI(uiRoot.transform, "Prompt_Takbo",   "Takbo",   new Vector3(200, 300, 0));
+        // Kylo's head reaches y=-0.4 at this scale, so the prompts sit just
+        // above that rather than up in the treetops.
+        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(-650, 80, 0));
+        GameObject pPasok   = CreatePromptUI(uiRoot.transform, "Prompt_Pasok",   "Pasok",   new Vector3(-300, 80, 0));
+        GameObject pTakbo   = CreatePromptUI(uiRoot.transform, "Prompt_Takbo",   "Takbo",   new Vector3(250, 80, 0));
 
         // --- Objectives: greet, go in, hurry to class ---
         var kumusta = MakeObjective("Kumusta", pKumusta);
