@@ -351,6 +351,9 @@ public class BuildBahayScene2
         {
             word = word,
             promptRoot = prompt,
+            // Attached by name, not by hand - a rebuild would wipe anything
+            // assigned in the Inspector. See VoiceClipLibrary.
+            instructionClip = VoiceClipLibrary.ForWord(word),
             onCorrect = new UnityEngine.Events.UnityEvent(),
         };
     }

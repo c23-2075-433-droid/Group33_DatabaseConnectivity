@@ -252,6 +252,7 @@ public class BuildBahayScene4
         {
             word = word,
             promptRoot = prompt,
+            instructionClip = VoiceClipLibrary.ForWord(word),
             onCorrect = new UnityEngine.Events.UnityEvent(),
         };
     }

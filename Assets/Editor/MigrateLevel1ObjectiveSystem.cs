@@ -88,19 +88,25 @@ public class MigrateLevel1ObjectiveSystem
 
         SceneObjectiveController.SceneObjective bangonObjective = new SceneObjectiveController.SceneObjective
         {
-            word = "Bangon", promptRoot = promptBangon.gameObject, onCorrect = new UnityEngine.Events.UnityEvent()
+            word = "Bangon", promptRoot = promptBangon.gameObject,
+            instructionClip = VoiceClipLibrary.ForWord("Bangon"),
+            onCorrect = new UnityEngine.Events.UnityEvent()
         };
         UnityEventTools.AddPersistentListener(bangonObjective.onCorrect, playerMovement.Bangon);
 
         SceneObjectiveController.SceneObjective tayoObjective = new SceneObjectiveController.SceneObjective
         {
-            word = "Tayo", promptRoot = promptTayo.gameObject, onCorrect = new UnityEngine.Events.UnityEvent()
+            word = "Tayo", promptRoot = promptTayo.gameObject,
+            instructionClip = VoiceClipLibrary.ForWord("Tayo"),
+            onCorrect = new UnityEngine.Events.UnityEvent()
         };
         UnityEventTools.AddPersistentListener(tayoObjective.onCorrect, playerMovement.TayoUp);
 
         SceneObjectiveController.SceneObjective lakadObjective = new SceneObjectiveController.SceneObjective
         {
-            word = "Lakad", promptRoot = promptLakad.gameObject, onCorrect = new UnityEngine.Events.UnityEvent()
+            word = "Lakad", promptRoot = promptLakad.gameObject,
+            instructionClip = VoiceClipLibrary.ForWord("Lakad"),
+            onCorrect = new UnityEngine.Events.UnityEvent()
         };
         UnityEventTools.AddPersistentListener(lakadObjective.onCorrect, playerMovement.WalkForward);
 
