@@ -63,9 +63,18 @@ def load_frame():
     cx, cy = (xs.min() + xs.max()) / 2.0, (ys.min() + ys.max()) / 2.0
     radius = min(xs.max() - xs.min(), ys.max() - ys.min()) / 2.0
 
+    alpha = np.where(outside, 0.0, 255.0)
+
+    # Clear the blank middle too. It is opaque cream in the generated art, so
+    # leaving it would simply cover the illustration placed underneath.
+    yy, xx = np.mgrid[0:H, 0:W]
+    d = np.hypot(xx - cx, yy - cy)
+    keep = np.clip((d - (radius - 3.0)) / 3.0, 0, 1)   # feathered at the rope
+    alpha = alpha * keep
+
     out = np.zeros((H, W, 4), np.uint8)
     out[..., :3] = rgb
-    out[..., 3] = np.where(outside, 0, 255)
+    out[..., 3] = np.clip(alpha, 0, 255).astype(np.uint8)
     return Image.fromarray(out), (cx, cy), radius
 
 def circular(path, size):
