@@ -140,6 +140,10 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.Z)) SimulateSpeech("medyas");
         else if (Input.GetKeyDown(KeyCode.F)) SimulateSpeech("sapatos");
         else if (Input.GetKeyDown(KeyCode.V)) SimulateSpeech("bag");
+        // Paaralan Scene 1, arriving at school.
+        else if (Input.GetKeyDown(KeyCode.Q)) SimulateSpeech("kumusta");
+        else if (Input.GetKeyDown(KeyCode.E)) SimulateSpeech("pasok");
+        else if (Input.GetKeyDown(KeyCode.G)) SimulateSpeech("takbo");
         else if (Input.GetKeyDown(KeyCode.J)) SimulateSpeech(triggerWord);
         // A deliberately wrong answer, to test the "try again" path and see
         // attempts counted without the objective advancing.
