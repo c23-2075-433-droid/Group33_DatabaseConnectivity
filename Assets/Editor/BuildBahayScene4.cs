@@ -7,10 +7,9 @@
 // is painted INTO bedroom_background.png - bed, dresser, nightstand and door
 // are not separate objects - so everything the child names is laid out on the
 // floor in front of it. That also means the room has no mirror of its own;
-// The mirror (prop_salamin, lifted out of the old dresser_v3 sprite by
-// Tools/cut_bedroom_props.py) stays as scenery - the bedroom has none of its
-// own and the left of the floor looks bare without it - but no word points at
-// it any more.
+// The bedroom's furniture is painted INTO bedroom_background.png - bed,
+// dresser, nightstand and door are not separate objects - so everything the
+// child names is laid out on the floor in front of it.
 //
 // Kylo faces the player here rather than standing side-on, so the child can
 // see him being dressed. The walk frames stay side-on, since he only turns to
@@ -31,7 +30,7 @@
 // move the database demo on to it the same way.
 //
 // Sprites expected in Assets/Sprites/:
-//   bedroom_background, prop_salamin, prop_damit, prop_medyas, prop_sapatos,
+//   bedroom_background, prop_damit, prop_medyas, prop_sapatos,
 //   prop_bag, fx_gleam, standing(_with_bag), walk_frame_1..4(_with_bag),
 //   ui_arrow, ui_word_badge
 //
@@ -93,11 +92,10 @@ public class BuildBahayScene4
         // --- The things laid out on the floor ---
         // Each is sized by the world height it should stand, not by a scale
         // factor, so it comes out right whatever resolution the art is.
-        CreateProp("Prop_Salamin", "prop_salamin", -6.6f, 3.40f);   // scenery, no word
-        GameObject propDamit   = CreateProp("Prop_Damit",   "prop_damit",   -3.9f, 1.85f);
-        GameObject propMedyas  = CreateProp("Prop_Medyas",  "prop_medyas",  -2.1f, 0.85f);
-        GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -0.5f, 0.95f);
-        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      1.3f, 2.10f);
+        GameObject propDamit   = CreateProp("Prop_Damit",   "prop_damit",   -6.0f, 1.85f);
+        GameObject propMedyas  = CreateProp("Prop_Medyas",  "prop_medyas",  -3.8f, 0.85f);
+        GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -2.0f, 0.95f);
+        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      0.2f, 2.10f);
 
         PickUpItem takeDamit   = AddPickUp(propDamit);
         PickUpItem takeMedyas  = AddPickUp(propMedyas);
@@ -199,11 +197,11 @@ public class BuildBahayScene4
         }
 
         // Each prompt sits above the thing it names.
-        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-390, -60, 0));
-        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-210, -150, 0));
-        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-50, -140, 0));
-        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(130, -30, 0));
-        GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",   new Vector3(130, 60, 0));
+        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-600, -60, 0));
+        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-380, -150, 0));
+        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-200, -140, 0));
+        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(20, -30, 0));
+        GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",   new Vector3(20, 60, 0));
 
         // --- Objectives, in the order you would actually get dressed ---
         var damit = MakeObjective("Damit", pDamit);
