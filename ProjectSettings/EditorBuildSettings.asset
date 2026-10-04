@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1_Level3_Maligo.unity
     guid: d9947e9b5b6354ec88ae4b11357fa302
+  - enabled: 1
+    path: Assets/Scenes/Chapter2_Level1_Paaralan.unity
+    guid: 6ebcde278e09d4223bcbba2024d7a157
   m_configObjects: {}
