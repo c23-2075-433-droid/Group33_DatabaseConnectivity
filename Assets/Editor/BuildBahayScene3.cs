@@ -7,11 +7,16 @@
 // water jar and the comb are the two things Kylo uses, placed back where the
 // artwork had them; saying their word uses them up.
 //
+// "Maligo" leaves him in a towel. The bath should visibly change him, not
+// just wash water across the screen - and it pays off the towel he took in
+// Scene 2, which he is now wearing.
+//
 // A middle scene: Scene 2 fades into it and it fades on into Scene 4, which
 // is where the level now ends and where the result is saved and shown.
 //
 // Sprites expected in Assets/Sprites/:
 //   bathroom_background, item_tabo, item_suklay, item_baso, fx_bath,
+//   standing_towel,
 //   standing / walk_frame_1..4, ui_arrow, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 3
@@ -124,6 +129,13 @@ public class BuildBahayScene3
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
+        // Out of the bath and into a towel. He does not walk again in this
+        // scene, so only the standing pose needs a towel version.
+        GameObject towelGO = new GameObject("Pose_Towel");
+        PoseSwitch towel = towelGO.AddComponent<PoseSwitch>();
+        towel.player = player;
+        towel.standingSprite = LoadSprite("standing_towel");
+
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
         follow.offset = new Vector3(0f, 0f, -10f);
@@ -174,6 +186,7 @@ public class BuildBahayScene3
         var maligo = MakeObjective("Maligo", pMaligo);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, useTabo.PickUp);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
