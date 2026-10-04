@@ -93,7 +93,16 @@ public class BuildBahayScene3
         fxSr.sortingLayerName = "Props";
         fxSr.sortingOrder = 100;                      // over the player too - he is in it
         fxSr.color = new Color(1f, 1f, 1f, 0f);
-        fxGO.transform.localScale = new Vector3(BgScale, BgScale, 1f);
+        // Sized from its own art, not from BgScale. The bathroom objects were
+        // cut out of the background and share its scale, but this was drawn
+        // separately and is smaller, so borrowing that number left the water
+        // as a rectangle floating in the middle of the room with visible
+        // edges. Cover the whole camera instead, whatever size the art is.
+        float fxScale = 1f;
+        if (fxSr.sprite != null && fxSr.sprite.bounds.size.x > 0.0001f)
+            fxScale = Mathf.Max(ScreenWidth / fxSr.sprite.bounds.size.x,
+                                cam.orthographicSize * 2f / fxSr.sprite.bounds.size.y);
+        fxGO.transform.localScale = new Vector3(fxScale, fxScale, 1f);
 
         TimedOverlay bathFx = fxGO.AddComponent<TimedOverlay>();
         bathFx.overlay = fxSr;
