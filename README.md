@@ -154,6 +154,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `M` / `C` | "Maligo" / "Suklay" (Scene 3) |
 | `D` / `Z` / `F` / `V` | "Damit" / "Medyas" / "Sapatos" / "Bag" (Scene 4) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4) |
+| `Q` / `E` / `G` | "Kumusta" / "Pasok" / "Takbo" (Paaralan Scene 1) |
 | `X` | a wrong answer (counts an attempt, does not advance) |
 | `J` | "Talon" (jump) |
 

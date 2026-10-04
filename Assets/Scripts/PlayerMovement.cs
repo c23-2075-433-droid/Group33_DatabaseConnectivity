@@ -53,6 +53,17 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("How many walk frames to show per second.")]
     public float walkFramesPerSecond = 8f;
 
+    [Tooltip("How much faster Takbo (run) is than Lakad (walk), in both speed " +
+             "and how quickly the walk frames cycle.")]
+    public float runMultiplier = 1.9f;
+
+    // Counts down alongside voiceWalkTimer while a run is in effect, so a run
+    // is an ordinary walk that simply moves and animates faster.
+    private float runTimer = 0f;
+
+    /// <summary>True while "Takbo" is still running.</summary>
+    private bool IsRunning => runTimer > 0f;
+
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
 
@@ -108,6 +119,7 @@ public class PlayerMovement : MonoBehaviour
             // direction and count down, ignoring the keyboard until it finishes.
             moveInput = voiceWalkDirection;
             voiceWalkTimer -= Time.deltaTime;
+            if (runTimer > 0f) runTimer -= Time.deltaTime;
         }
         else
         {
@@ -144,7 +156,8 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
+        float speed = moveSpeed * (IsRunning ? runMultiplier : 1f);
+        rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
     }
 
     /// <summary>
@@ -195,6 +208,20 @@ public class PlayerMovement : MonoBehaviour
 
     /// <summary>"Kanan" - walk right.</summary>
     public void WalkRight() => WalkInDirection(1f);
+
+    /// <summary>
+    /// "Takbo" - run forward. The same walk, moving and animating faster for
+    /// its duration, so it needs no separate run art.
+    /// </summary>
+    public void Takbo() => RunInDirection(1f, 1.4f);
+
+    /// <summary>Runs in a direction for a time. See Takbo.</summary>
+    public void RunInDirection(float direction, float duration = 1.4f)
+    {
+        if (currentWakeStage != WakeStage.Standing) return;
+        WalkInDirection(direction, duration);
+        runTimer = duration;
+    }
 
     /// <summary>
     /// "Bangon" (get up / sit up). Called when the player says "Bangon" while
@@ -296,7 +323,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         walkFrameTimer += Time.deltaTime;
-        float frameDuration = 1f / Mathf.Max(0.01f, walkFramesPerSecond);
+        float fps = walkFramesPerSecond * (IsRunning ? runMultiplier : 1f);
+        float frameDuration = 1f / Mathf.Max(0.01f, fps);
 
         if (walkFrameTimer >= frameDuration)
         {
