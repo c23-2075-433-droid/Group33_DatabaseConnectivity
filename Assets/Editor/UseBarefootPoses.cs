@@ -31,9 +31,12 @@ public class UseBarefootPoses
         "Assets/Scenes/Chapter1_Level4_Damit.unity",
     };
 
+    // 'talking' is the forward-facing pose Scene 4 starts in, before the towel
+    // was drawn. Leaving it out of this list was why Scene 4 kept its shoes
+    // while the three scenes before it lost theirs.
     private static readonly string[] Poses =
     {
-        "lying_down", "sitting_up", "standing",
+        "lying_down", "sitting_up", "standing", "talking",
         "walk_frame_1", "walk_frame_2", "walk_frame_3", "walk_frame_4",
     };
 
