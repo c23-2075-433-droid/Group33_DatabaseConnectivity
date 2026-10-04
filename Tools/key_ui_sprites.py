@@ -7,16 +7,22 @@ is connected to the edge of the image is removed. White enclosed by artwork is
 left alone.
 
 Run from the repository root:  python3 Tools/key_ui_sprites.py
-Reads  Art/<name>_raw.png
+Reads  Art/<name>_raw.png (or .jpg/.jpeg)
 Writes Assets/Sprites/<name>.png
+
+Downloads land in ~/Downloads/Sprites, so anything named <name>_raw.* there is
+moved into Art/ first. Doing that by hand was the step most often forgotten,
+and forgetting it just prints "skip" - which reads like the tool deciding the
+sprite was not needed.
 """
 from PIL import Image
 import numpy as np
 from scipy import ndimage
-import io, os
+import io, os, shutil
 
 SPRITES = 'Assets/Sprites'   # where finished sprites go
 ART = 'Art'                  # source illustrations, outside Unity's import path
+INBOX = os.path.expanduser('~/Downloads/Sprites')   # where downloads land
 NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
          'prop_medyas', 'prop_sapatos', 'prop_bag',
          'char_guard',
@@ -80,7 +86,23 @@ def write_meta(name, model='item_tabo'):
     t = t.replace(model + '_0', name + '_0')
     io.open(out, 'w', encoding='utf-8').write(t)
 
+def collect_downloads(names):
+    """Move any freshly downloaded <name>_raw.* from the inbox into Art/."""
+    if not os.path.isdir(INBOX):
+        return
+    for n in names:
+        if any(os.path.exists(os.path.join(ART, n + '_raw' + e))
+               for e in ('.png', '.jpg', '.jpeg')):
+            continue
+        for e in ('.png', '.jpg', '.jpeg'):
+            src = os.path.join(INBOX, n + '_raw' + e)
+            if os.path.exists(src):
+                shutil.copy2(src, os.path.join(ART, n + '_raw' + e))
+                print('  picked up %s from Downloads' % os.path.basename(src))
+                break
+
 if __name__ == '__main__':
+    collect_downloads(NAMES)
     done = 0
     for n in NAMES:
         # Canva hands these back as .jpeg as often as .png, so take either
