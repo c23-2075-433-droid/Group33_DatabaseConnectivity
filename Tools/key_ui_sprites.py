@@ -82,9 +82,16 @@ def write_meta(name, model='item_tabo'):
 if __name__ == '__main__':
     done = 0
     for n in NAMES:
-        src = os.path.join(ART, n + '_raw.png')
-        if not os.path.exists(src):
-            print('  skip %-16s (no %s_raw.png yet)' % (n, n)); continue
+        # Canva hands these back as .jpeg as often as .png, so take either
+        # rather than making every import a manual convert-and-rename.
+        src = None
+        for ext in ('.png', '.jpg', '.jpeg'):
+            cand = os.path.join(ART, n + '_raw' + ext)
+            if os.path.exists(cand):
+                src = cand
+                break
+        if src is None:
+            print('  skip %-16s (no %s_raw.png/.jpg/.jpeg yet)' % (n, n)); continue
         size, solid = key(src, os.path.join(SPRITES, n + '.png'))
         write_meta(n)
         print('  %-16s -> %dx%d, %.0f%% opaque' % (n + '.png', size[0], size[1], solid*100))
