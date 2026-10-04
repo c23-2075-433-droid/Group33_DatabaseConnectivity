@@ -27,7 +27,10 @@ NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
          'prop_medyas', 'prop_sapatos', 'prop_bag',
          'char_guard',
          'talking_barefoot', 'talking_socks',
-         'standing_towel', 'talking_towel']
+         'standing_towel', 'talking_towel',
+         'standing_barefoot', 'lying_down_barefoot', 'sitting_up_barefoot',
+         'walk_frame_1_barefoot', 'walk_frame_2_barefoot',
+         'walk_frame_3_barefoot', 'walk_frame_4_barefoot']
 
 # Poses of Kylo himself. The generator returns these far larger than the
 # original art and at whatever size it feels like, which left him twice his own
@@ -35,7 +38,14 @@ NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
 # height as 'standing' and imported with the same settings, so a costume change
 # only changes the costume.
 CHARACTER = {'talking_barefoot': 'standing', 'talking_socks': 'standing',
-             'standing_towel': 'standing', 'talking_towel': 'standing'}
+             'standing_towel': 'standing', 'talking_towel': 'standing',
+             'standing_barefoot': 'standing',
+             'lying_down_barefoot': 'lying_down',
+             'sitting_up_barefoot': 'sitting_up',
+             'walk_frame_1_barefoot': 'walk_frame_1',
+             'walk_frame_2_barefoot': 'walk_frame_2',
+             'walk_frame_3_barefoot': 'walk_frame_3',
+             'walk_frame_4_barefoot': 'walk_frame_4'}
 WHITE = 238          # at or above this in every channel counts as background
 FEATHER = 1.0        # softens the cut edge
 

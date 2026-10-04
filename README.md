@@ -200,16 +200,23 @@ shirt rather than new drawings.
 
 **Medyas** and **Sapatos** only mean something because he starts the morning
 barefoot, and the original art had him in shoes in every pose — in bed, in the
-bath, in the towel. [`Tools/make_barefoot.py`](Tools/make_barefoot.py) takes
-them off: it finds the sock and shoe by the one thing that always separates
-them from the navy shorts, which is that a shoe meets something white and
-shorts do not, then grows the shin down out of the leg's own pixels and draws
-a bare foot sized from the shoe it replaces. Recolouring the shoe leaves an
-orange sneaker, laces and all, and asking an image model for barefoot walk
-frames returns four different strides that no longer loop — working from the
-art that is already there is what keeps the frames on-model with each other.
-Lying down and sitting up are turned upright first and turned back after, so
-the same "leg above, floor below" reasoning applies to them too.
+bath, in the towel. The `_barefoot` set is the same seven poses redrawn
+without them, generated from the shod art one pose at a time so the character,
+the clothes and the framing stay the same.
+
+Two things were tried first and did not work, which is why the files are
+generated rather than computed. Recolouring the shoe leaves an orange sneaker:
+the laces, the stitching and the sole all survive the recolour. Drawing a foot
+onto the leg instead leaves a visible step where the new shin meets the old
+one, and feet that read as flat paddles at playing size. The walk frames come
+back with a narrower stride than the shod ones, which is fine — Scenes 1–3
+only ever show the barefoot set, so the four frames only have to match each
+other, not the originals.
+
+[`Tools/key_ui_sprites.py`](Tools/key_ui_sprites.py) imports them: it cuts the
+white background, scales each pose to the body height of the art it stands in
+for, and keeps the existing `.meta`, so the sprite keeps its GUID and every
+scene that already points at it carries on working.
 
 Scenes 2–4 ask for the barefoot art through
 [`CharacterPoses`](Assets/Editor/CharacterPoses.cs) when they are built. Scene
