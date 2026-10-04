@@ -19,7 +19,7 @@
 // corrected when the art turned out not to be 100 PPU.
 //
 // Sprites expected in Assets/Sprites/:
-//   paaralan_background, standing_uniform_with_bag,
+//   paaralan_background, char_guard, fx_gleam, standing_uniform_with_bag,
 //   walk_frame_1..4_uniform_with_bag, talking_uniform_with_bag,
 //   ui_arrow, ui_word_badge, badge_paaralan
 //
@@ -88,10 +88,16 @@ public class BuildPaaralanScene1
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
 
+        // --- The guard on the gate ---
+        // Kumusta needs someone to greet. Without him the child is told to
+        // say hello to an empty yard, which teaches the word in a vacuum.
+        // Sized against Kylo: an adult at 3.9 units to his 2.8.
+        GameObject guard = CreateStanding("Char_Guard", "char_guard", -4.3f, 3.90f);
+
         // --- Player, arriving at the gate on the left ---
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-6.5f, PlayerFeetY, 0f);
+        playerGO.transform.position = new Vector3(-7.0f, PlayerFeetY, 0f);
         playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
@@ -120,6 +126,10 @@ public class BuildPaaralanScene1
         PoseSwitch greet = greetGO.AddComponent<PoseSwitch>();
         greet.player = player;
         greet.standingSprite = LoadSprite("talking_uniform_with_bag");
+
+        // The guard lights up when he is greeted, so the child can see the
+        // hello land on someone rather than just watching Kylo wave.
+        TimedOverlay guardGleam = CreateGleam("Gleam_Guard", guard, 4.4f);
 
         // "Pasok" turns him side-on again before he walks in.
         GameObject walkPoseGO = new GameObject("Pose_Walk");
@@ -172,6 +182,7 @@ public class BuildPaaralanScene1
         // --- Objectives: greet, go in, hurry to class ---
         var kumusta = MakeObjective("Kumusta", pKumusta);
         UnityEventTools.AddPersistentListener(kumusta.onCorrect, greet.Apply);
+        UnityEventTools.AddPersistentListener(kumusta.onCorrect, guardGleam.Play);
 
         var pasok = MakeObjective("Pasok", pPasok);
         UnityEventTools.AddPersistentListener(pasok.onCorrect, facingWalk.Apply);
@@ -202,9 +213,56 @@ public class BuildPaaralanScene1
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 1 built and saved to " + ScenePath +
-                   ". Words: Kumusta, Pasok, Takbo. Finishing it earns the Paaralan badge " +
+                   ". Words: Kumusta, Pasok, Takbo, greeting the guard on the gate. " +
+                   "Finishing it earns the Paaralan badge " +
                    "and unlocks Parke. It is Level 2's only scene for now, so it both starts " +
                    "and ends the run - when Scene 2 exists, move the database demo there.");
+    }
+
+    /// <summary>
+    /// A character or object standing on the floor, sized by the world height
+    /// it should be rather than by a scale factor, so the art's resolution
+    /// does not decide how big it looks.
+    /// </summary>
+    private static GameObject CreateStanding(string name, string spriteFile, float x, float worldHeight)
+    {
+        GameObject go = new GameObject(name);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = LoadSprite(spriteFile);
+        sr.sortingLayerName = "Props";
+        sr.sortingOrder = 5;
+
+        float s = 1f;
+        if (sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            s = worldHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(s, s, 1f);
+        go.transform.position = new Vector3(x, FloorY + worldHeight * 0.5f, 0f);
+        return go;
+    }
+
+    /// <summary>A gleam centred on something, for a word that points at it.</summary>
+    private static TimedOverlay CreateGleam(string name, GameObject target, float worldSize)
+    {
+        GameObject go = new GameObject(name);
+        go.transform.position = target.transform.position;
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = LoadSprite("fx_gleam");
+        sr.sortingLayerName = "Props";
+        sr.sortingOrder = 40;
+        sr.color = new Color(1f, 1f, 1f, 0f);
+
+        float s = 1f;
+        if (sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            s = worldSize / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(s, s, 1f);
+
+        TimedOverlay fx = go.AddComponent<TimedOverlay>();
+        fx.overlay = sr;
+        fx.peakAlpha = 0.9f;
+        fx.fadeInDuration = 0.25f;
+        fx.holdDuration = 0.5f;
+        fx.fadeOutDuration = 0.6f;
+        return fx;
     }
 
     private static Sprite[] UniformWalkFrames()

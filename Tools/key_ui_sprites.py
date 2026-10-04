@@ -18,7 +18,8 @@ import io, os
 SPRITES = 'Assets/Sprites'   # where finished sprites go
 ART = 'Art'                  # source illustrations, outside Unity's import path
 NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
-         'prop_medyas', 'prop_sapatos', 'prop_bag']
+         'prop_medyas', 'prop_sapatos', 'prop_bag',
+         'char_guard']
 WHITE = 238          # at or above this in every channel counts as background
 FEATHER = 1.0        # softens the cut edge
 
