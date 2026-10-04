@@ -26,7 +26,8 @@ INBOX = os.path.expanduser('~/Downloads/Sprites')   # where downloads land
 NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
          'prop_medyas', 'prop_sapatos', 'prop_bag',
          'char_guard',
-         'talking_barefoot', 'talking_socks']
+         'talking_barefoot', 'talking_socks',
+         'standing_towel', 'talking_towel']
 WHITE = 238          # at or above this in every channel counts as background
 FEATHER = 1.0        # softens the cut edge
 

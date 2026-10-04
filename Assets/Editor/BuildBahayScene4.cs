@@ -17,7 +17,7 @@
 //
 // Four of the five words visibly dress him, in order:
 //
-//   start    barefoot, green tee      (he has just come out of the bath)
+//   start    a towel                  (he walks in from the bath wearing it)
 //   Damit    barefoot, white uniform
 //   Medyas   socks, uniform
 //   Sapatos  shoes, uniform
@@ -36,7 +36,7 @@
 // move the database demo on to it the same way.
 //
 // Sprites expected in Assets/Sprites/:
-//   bedroom_background, prop_damit, prop_medyas, prop_sapatos,
+//   bedroom_background, talking_towel, prop_damit, prop_medyas, prop_sapatos,
 //   prop_bag, fx_gleam, standing(_with_bag), walk_frame_1..4(_with_bag),
 //   ui_arrow, ui_word_badge
 //
@@ -118,7 +118,7 @@ public class BuildBahayScene4
         // Face the child, not side-on: they are dressing him, so they should
         // see the uniform go on from the front. 'talking' is the same height
         // and foot position as 'standing', so nothing else has to move.
-        playerSr.sprite = LoadSprite("talking_barefoot");
+        playerSr.sprite = LoadSprite("talking_towel");
 
         Rigidbody2D playerRb = playerGO.AddComponent<Rigidbody2D>();
         playerRb.gravityScale = 3f;
@@ -130,7 +130,7 @@ public class BuildBahayScene4
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
         player.lyingDownSprite = LoadSprite("lying_down");
         player.sittingUpSprite = LoadSprite("sitting_up");
-        player.standingSprite = LoadSprite("talking_barefoot");
+        player.standingSprite = LoadSprite("talking_towel");
         player.walkFrames = new[]
         {
             LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
