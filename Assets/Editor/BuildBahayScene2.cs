@@ -17,7 +17,8 @@
 //
 // Sprites expected in Assets/Sprites/:
 //   hallway_background, bathroom_background, door_open (optional for now),
-//   lying_down / sitting_up / standing / walk_frame_1, ui_arrow, ui_word_badge
+//   lying_down / sitting_up / standing / walk_frame_1..4 - all _barefoot,
+//   because the shoes do not go on until Scene 4 - ui_arrow, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 2
 
@@ -159,7 +160,7 @@ public class BuildBahayScene2
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
         playerSr.sortingLayerName = "Player";
-        playerSr.sprite = LoadSprite("standing");  // this scene opens already awake
+        playerSr.sprite = CharacterPoses.Barefoot("standing");  // this scene opens already awake
 
         Rigidbody2D playerRb = playerGO.AddComponent<Rigidbody2D>();
         playerRb.gravityScale = 3f;
@@ -172,14 +173,10 @@ public class BuildBahayScene2
         playerCol.size = new Vector2(1.2f, FeetBelowPivot * 2f);
 
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
-        player.lyingDownSprite = LoadSprite("lying_down");
-        player.sittingUpSprite = LoadSprite("sitting_up");
-        player.standingSprite = LoadSprite("standing");
-        player.walkFrames = new[]
-        {
-            LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
-            LoadSprite("walk_frame_3"), LoadSprite("walk_frame_4"),
-        };
+        player.lyingDownSprite = CharacterPoses.Barefoot("lying_down");
+        player.sittingUpSprite = CharacterPoses.Barefoot("sitting_up");
+        player.standingSprite = CharacterPoses.Barefoot("standing");
+        player.walkFrames = CharacterPoses.BarefootWalk();
         // The player is already up and about in this scene, so movement is
         // unlocked from the start rather than gated behind Bangon/Tayo.
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;

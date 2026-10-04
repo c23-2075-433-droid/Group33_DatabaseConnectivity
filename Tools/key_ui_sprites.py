@@ -28,6 +28,14 @@ NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
          'char_guard',
          'talking_barefoot', 'talking_socks',
          'standing_towel', 'talking_towel']
+
+# Poses of Kylo himself. The generator returns these far larger than the
+# original art and at whatever size it feels like, which left him twice his own
+# height the moment he changed clothes. Every pose is scaled to the same body
+# height as 'standing' and imported with the same settings, so a costume change
+# only changes the costume.
+CHARACTER = {'talking_barefoot': 'standing', 'talking_socks': 'standing',
+             'standing_towel': 'standing', 'talking_towel': 'standing'}
 WHITE = 238          # at or above this in every channel counts as background
 FEATHER = 1.0        # softens the cut edge
 
@@ -76,6 +84,18 @@ def key(path_in, path_out):
     Image.fromarray(out[y0:y1, x0:x1].astype(np.uint8)).save(path_out)
     return (x1-x0, y1-y0), float((out[..., 3] > 128).mean())
 
+def match_pose(name, model):
+    """Scale a pose to the body height of the art it stands in for."""
+    path = os.path.join(SPRITES, name + '.png')
+    im = Image.open(path)
+    want = Image.open(os.path.join(SPRITES, model + '.png')).size[1]
+    if im.size[1] == want:
+        return im.size
+    w = max(1, int(round(im.size[0] * want / float(im.size[1]))))
+    im.resize((w, want), Image.LANCZOS).save(path)
+    return (w, want)
+
+
 def write_meta(name, model='item_tabo'):
     """Copy a working sprite's import settings so Unity imports this as a Sprite."""
     import re, uuid
@@ -117,7 +137,9 @@ if __name__ == '__main__':
         if src is None:
             print('  skip %-16s (no %s_raw.png/.jpg/.jpeg yet)' % (n, n)); continue
         size, solid = key(src, os.path.join(SPRITES, n + '.png'))
-        write_meta(n)
+        if n in CHARACTER:
+            size = match_pose(n, CHARACTER[n])
+        write_meta(n, CHARACTER.get(n, 'item_tabo'))
         print('  %-16s -> %dx%d, %.0f%% opaque' % (n + '.png', size[0], size[1], solid*100))
         done += 1
     if not done:

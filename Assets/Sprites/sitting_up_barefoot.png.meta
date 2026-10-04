@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3ad98f298efd40409c05478938849a40
+guid: 715c2223d2114aa28c58db2f037f5b4c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5071563641634004584
-    second: talking_barefoot_uniform_0
+      213: 4341923114717100158
+    second: sitting_up_barefoot_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: talking_barefoot_uniform_0
+      name: sitting_up_barefoot_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 214
-        height: 745
+        width: 471
+        height: 600
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8916e9cfcbf2e99b0800000000000000
-      internalID: -5071563641634004584
+      spriteID: e7835ce711c914c30800000000000000
+      internalID: 4341923114717100158
       vertices: []
       indices: 
       edges: []

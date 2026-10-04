@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3ad98f298efd40409c05478938849a40
+guid: c0ec0432770a4e2a849fa0ff4095b5b9
 TextureImporter:
   internalIDToNameTable:
   - first:
       213: -5071563641634004584
-    second: talking_barefoot_uniform_0
+    second: standing_barefoot_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,7 +128,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: talking_barefoot_uniform_0
+      name: standing_barefoot_0
       rect:
         serializedVersion: 2
         x: 0

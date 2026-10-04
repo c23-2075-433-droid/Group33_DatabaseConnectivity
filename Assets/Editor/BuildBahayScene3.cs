@@ -17,7 +17,8 @@
 // Sprites expected in Assets/Sprites/:
 //   bathroom_background, item_tabo, item_suklay, item_baso, fx_bath,
 //   standing_towel,
-//   standing / walk_frame_1..4, ui_arrow, ui_word_badge
+//   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
+//   on until Scene 4 - ui_arrow, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 3
 
@@ -106,7 +107,7 @@ public class BuildBahayScene3
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
         playerSr.sortingLayerName = "Player";
-        playerSr.sprite = LoadSprite("standing");
+        playerSr.sprite = CharacterPoses.Barefoot("standing");
 
         Rigidbody2D playerRb = playerGO.AddComponent<Rigidbody2D>();
         playerRb.gravityScale = 3f;
@@ -116,14 +117,10 @@ public class BuildBahayScene3
         playerCol.size = new Vector2(1.2f, FeetBelowPivot * 2f);
 
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
-        player.lyingDownSprite = LoadSprite("lying_down");
-        player.sittingUpSprite = LoadSprite("sitting_up");
-        player.standingSprite = LoadSprite("standing");
-        player.walkFrames = new[]
-        {
-            LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
-            LoadSprite("walk_frame_3"), LoadSprite("walk_frame_4"),
-        };
+        player.lyingDownSprite = CharacterPoses.Barefoot("lying_down");
+        player.sittingUpSprite = CharacterPoses.Barefoot("sitting_up");
+        player.standingSprite = CharacterPoses.Barefoot("standing");
+        player.walkFrames = CharacterPoses.BarefootWalk();
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;
 
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
