@@ -28,7 +28,10 @@ import io, os, re, uuid
 SPRITES = 'Assets/Sprites'
 # 'talking' is the front-facing pose. Scene 4 uses it instead of the side-on
 # 'standing', because the child is dressing him and should see him face on.
-POSES = ['standing', 'talking',
+# talking_barefoot and talking_socks are Scene 4's dressing stages. Their
+# uniform versions are derived here rather than generated, so the shirt is
+# identical across all of them.
+POSES = ['standing', 'talking', 'talking_barefoot', 'talking_socks',
          'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4']
 
 # where the white shirt's brightness lands: deep fold -> lit highlight

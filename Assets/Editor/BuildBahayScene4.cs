@@ -15,15 +15,21 @@
 // see him being dressed. The walk frames stay side-on, since he only turns to
 // walk and this scene has no walking word.
 //
-// Two of the words actually dress him. "Damit" swaps his green tee for the
-// white school uniform, and "Kunin" puts the bag on over it - so by the end
-// of the scene he is in uniform with his bag, not just standing beside a pile
-// of props. The uniform art is Tools/make_uniform.py recolouring the green
-// shirt; see that script for why a recolour rather than new drawings.
+// Four of the five words visibly dress him, in order:
 //
-// Medyas and Sapatos do NOT change him, because he is already drawn wearing
-// white socks and navy shoes in every pose. Making those two dress him would
-// mean redrawing his feet bare, and then with socks, in all five poses.
+//   start    barefoot, green tee      (he has just come out of the bath)
+//   Damit    barefoot, white uniform
+//   Medyas   socks, uniform
+//   Sapatos  shoes, uniform
+//   Kunin    shoes, uniform, bag
+//
+// Only "Bag" leaves him unchanged - it names the thing, and Kunin takes it.
+//
+// The barefoot and socks poses were redrawn from the front-facing art; the
+// uniform versions of each are Tools/make_uniform.py recolouring the green
+// shirt, so the shirt is identical across every stage. Only the front-facing
+// pose has these stages: the walk frames are still shod, which is why he is
+// only barefoot in this scene and not in Scenes 1-3.
 //
 // This is now the LAST playable scene of Level 1, so the level's result is
 // saved and shown here. Scene 3 fades into this one. When Scene 5 is built,
@@ -112,7 +118,7 @@ public class BuildBahayScene4
         // Face the child, not side-on: they are dressing him, so they should
         // see the uniform go on from the front. 'talking' is the same height
         // and foot position as 'standing', so nothing else has to move.
-        playerSr.sprite = LoadSprite("talking");
+        playerSr.sprite = LoadSprite("talking_barefoot");
 
         Rigidbody2D playerRb = playerGO.AddComponent<Rigidbody2D>();
         playerRb.gravityScale = 3f;
@@ -124,7 +130,7 @@ public class BuildBahayScene4
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
         player.lyingDownSprite = LoadSprite("lying_down");
         player.sittingUpSprite = LoadSprite("sitting_up");
-        player.standingSprite = LoadSprite("talking");
+        player.standingSprite = LoadSprite("talking_barefoot");
         player.walkFrames = new[]
         {
             LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
@@ -135,14 +141,21 @@ public class BuildBahayScene4
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Damit" dresses him: the green tee becomes the white uniform.
+        // Each clothing word moves him on one stage. The order is fixed, so
+        // each sprite already carries everything put on before it.
         takeDamit.player = player;
-        takeDamit.carryingStandingSprite = LoadSprite("talking_uniform");
+        takeDamit.carryingStandingSprite = LoadSprite("talking_barefoot_uniform");
         takeDamit.carryingWalkFrames = new[]
         {
             LoadSprite("walk_frame_1_uniform"), LoadSprite("walk_frame_2_uniform"),
             LoadSprite("walk_frame_3_uniform"), LoadSprite("walk_frame_4_uniform"),
         };
+
+        takeMedyas.player = player;
+        takeMedyas.carryingStandingSprite = LoadSprite("talking_socks_uniform");
+
+        takeSapatos.player = player;
+        takeSapatos.carryingStandingSprite = LoadSprite("talking_uniform");
 
         // "Kunin" puts the bag on OVER the uniform. These are the uniform
         // frames with the bag, not the green-shirt ones - the words are
@@ -240,8 +253,8 @@ public class BuildBahayScene4
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 4 built and saved to " + ScenePath +
-                   ". Words: Damit, Medyas, Sapatos, Bag, Kunin. Damit puts him in " +
-                   "uniform and Kunin adds the bag over it. Level 1 now ends " +
+                   ". Words: Damit, Medyas, Sapatos, Bag, Kunin - he starts barefoot " +
+                   "and each word dresses him one stage further. Level 1 now ends " +
                    "here, so re-run Build Bahay Scene 3 as well - it fades into this scene " +
                    "instead of showing the result itself.");
     }
