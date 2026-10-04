@@ -25,6 +25,15 @@ public static class DatabaseDemoBuilder
     /// if the scene is missing the voice or objective components it needs.
     /// </summary>
     public static bool Build(string levelName, string returnSceneName)
+        => Build(levelName, returnSceneName, 0, null);
+
+    /// <summary>
+    /// levelIndex is the 1-based number on the journey map. Passing it lets
+    /// finishing the level unlock the next node and award its badge; 0 means
+    /// "not a level ending", and neither happens.
+    /// </summary>
+    public static bool Build(string levelName, string returnSceneName,
+                             int levelIndex, string badgeSpriteFile)
     {
         VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
         SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
@@ -37,7 +46,7 @@ public static class DatabaseDemoBuilder
             return false;
         }
 
-        GameObject panel = LevelCompleteUIBuilder.BuildPanel("Magaling!");
+        GameObject panel = LevelCompleteUIBuilder.BuildPanel("Magaling!", badgeSpriteFile);
         Transform panelRoot = panel.transform.Find("Panel");
         Text scoreText = FindText(panelRoot, "ScoreText");
         Text recordsText = FindText(panelRoot, "RecordsText");
@@ -69,6 +78,7 @@ public static class DatabaseDemoBuilder
         tracker.scoreText = scoreText;
         tracker.recordsText = recordsText;
         tracker.levelName = levelName;
+        tracker.levelIndex = levelIndex;
 
         // Counting lives here, not on the tracker, so every scene of a level
         // adds to the same running total (RunScore). This is a later scene of

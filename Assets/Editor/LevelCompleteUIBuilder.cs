@@ -42,7 +42,15 @@ public static class LevelCompleteUIBuilder
     /// Children are named TitleText / ScoreText / RecordsText so callers can
     /// find and wire them.
     /// </summary>
-    public static GameObject BuildPanel(string message)
+    public static GameObject BuildPanel(string message) => BuildPanel(message, null);
+
+    /// <summary>
+    /// The panel, optionally with a level's badge pinned to its top edge.
+    /// The badge hangs over the frame rather than sitting inside it: the
+    /// interior is already full with the title, the score and six rows of
+    /// recent scores, and a badge in there would squeeze the leaderboard.
+    /// </summary>
+    public static GameObject BuildPanel(string message, string badgeSpriteFile)
     {
         // NOTE: GameObject.Find() can't be used here - this canvas is created
         // INACTIVE, and Find() only searches active objects, so it would never
@@ -121,6 +129,22 @@ public static class LevelCompleteUIBuilder
             new Vector2(0, interiorTop - 340), new Vector2(interiorWidth, 330),
             32, FontStyle.Bold, TextAnchor.UpperCenter, cream);
         records.lineSpacing = 1.15f;
+
+        // The level's badge, pinned over the top edge. Skipped silently when
+        // the level has none yet, so the panel is unchanged for those.
+        Sprite badge = string.IsNullOrEmpty(badgeSpriteFile) ? null : LoadSprite(badgeSpriteFile);
+        if (badge != null)
+        {
+            GameObject badgeGO = new GameObject("Badge", typeof(RectTransform));
+            badgeGO.transform.SetParent(panel.transform, false);
+            Image badgeImg = badgeGO.AddComponent<Image>();
+            badgeImg.sprite = badge;
+            badgeImg.preserveAspect = true;
+            badgeImg.raycastTarget = false;
+            RectTransform badgeRect = badgeGO.GetComponent<RectTransform>();
+            badgeRect.sizeDelta = new Vector2(230, 230);
+            badgeRect.anchoredPosition = new Vector2(0, PanelHeight * 0.5f - 24f);
+        }
 
         // OKAY returns to the journey map, so the player isn't stranded on a
         // dead-end panel (and the demo can loop straight into another run).
