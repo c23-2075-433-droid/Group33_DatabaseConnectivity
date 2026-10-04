@@ -178,10 +178,11 @@ rather than being a separate layer:
 
 | Files | Used in |
 |---|---|
-| `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | Scenes 1–3, at home in his green tee |
-| `talking.png` | Scene 4, where he faces the player while being dressed |
-| the same names with `_uniform` | after **Damit** in Scene 4 |
+| `lying_down`, `sitting_up`, `standing`, `walk_frame_1..4`, all with `_barefoot` | Scenes 1–3, at home in his green tee, no shoes on yet |
+| `talking_towel.png` | Scene 3 onwards, straight out of the bath |
+| `talking_barefoot_uniform`, `talking_socks_uniform`, `talking_uniform` | Scene 4, one stage per word while he is dressed |
 | the same names with `_uniform_with_bag` | after **Kunin** in Scene 4 |
+| `standing.png`, `walk_frame_1..4.png`, `talking.png`, `celebrate.png` | the shod green-tee set the barefoot one is drawn from |
 | the same names with `_with_bag` | the green tee plus bag — kept, currently unused |
 
 The plain set was produced from the original drawings by
@@ -190,14 +191,30 @@ the untouched originals. Before this split, Kylo wore his school bag in bed —
 the bag appeared the moment the player said "Tayo", while the same bag was also
 sitting on the chair prop beside him.
 
-Saying **Damit** then **Kunin** in Scene 4 switches each prop off and swaps
-one art set for the next, through [`PickUpItem`](Assets/Scripts/PickUpItem.cs)
-and `PlayerMovement.SetAppearance()`, so he ends the level dressed and
-carrying his bag. The uniform sets are
-[`Tools/make_uniform.py`](Tools/make_uniform.py) recolouring the green shirt
-rather than new drawings; **Medyas** and **Sapatos** cannot dress him, because
-he is already drawn wearing socks and shoes in every pose. Scene 4 is not built yet, so the word has no
-scene to live in; the pieces are in place for when it is.
+Each word in Scene 4 switches one prop off and swaps one art set for the next,
+through [`PickUpItem`](Assets/Scripts/PickUpItem.cs) and
+`PlayerMovement.SetAppearance()`: **Damit**, **Medyas**, **Sapatos**, then
+**Kunin**, so he ends the level dressed and carrying his bag. The uniform sets
+are [`Tools/make_uniform.py`](Tools/make_uniform.py) recolouring the green
+shirt rather than new drawings.
+
+**Medyas** and **Sapatos** only mean something because he starts the morning
+barefoot, and the original art had him in shoes in every pose — in bed, in the
+bath, in the towel. [`Tools/make_barefoot.py`](Tools/make_barefoot.py) takes
+them off: it finds the sock and shoe by the one thing that always separates
+them from the navy shorts, which is that a shoe meets something white and
+shorts do not, then grows the shin down out of the leg's own pixels and draws
+a bare foot sized from the shoe it replaces. Recolouring the shoe leaves an
+orange sneaker, laces and all, and asking an image model for barefoot walk
+frames returns four different strides that no longer loop — working from the
+art that is already there is what keeps the frames on-model with each other.
+Lying down and sitting up are turned upright first and turned back after, so
+the same "leg above, floor below" reasoning applies to them too.
+
+Scenes 2–4 ask for the barefoot art through
+[`CharacterPoses`](Assets/Editor/CharacterPoses.cs) when they are built. Scene
+1 has no builder, so **Tools > SALINLAHI > Use Barefoot Poses (Bahay)** edits
+all four scenes in place instead.
 
 ## Bathroom Objects
 

@@ -128,14 +128,10 @@ public class BuildBahayScene4
         playerCol.size = new Vector2(1.2f, FeetBelowPivot * 2f);
 
         PlayerMovement player = playerGO.AddComponent<PlayerMovement>();
-        player.lyingDownSprite = LoadSprite("lying_down");
-        player.sittingUpSprite = LoadSprite("sitting_up");
+        player.lyingDownSprite = CharacterPoses.Barefoot("lying_down");
+        player.sittingUpSprite = CharacterPoses.Barefoot("sitting_up");
         player.standingSprite = LoadSprite("talking_towel");
-        player.walkFrames = new[]
-        {
-            LoadSprite("walk_frame_1"), LoadSprite("walk_frame_2"),
-            LoadSprite("walk_frame_3"), LoadSprite("walk_frame_4"),
-        };
+        player.walkFrames = CharacterPoses.BarefootWalk();
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;
 
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
