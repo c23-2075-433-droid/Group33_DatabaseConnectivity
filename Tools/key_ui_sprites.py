@@ -25,6 +25,8 @@ ART = 'Art'                  # source illustrations, outside Unity's import path
 INBOX = os.path.expanduser('~/Downloads/Sprites')   # where downloads land
 NAMES = ['ui_name_plaque', 'ui_lock', 'ui_step',
          'prop_medyas', 'prop_sapatos', 'prop_bag',
+         'prop_kanin', 'prop_itlog',
+         'prop_kanin_empty', 'prop_itlog_empty',
          'char_guard',
          'talking_barefoot', 'talking_socks',
          'standing_towel', 'talking_towel',

@@ -31,9 +31,9 @@
 // pose has these stages: the walk frames are still shod, which is why he is
 // only barefoot in this scene and not in Scenes 1-3.
 //
-// This is now the LAST playable scene of Level 1, so the level's result is
-// saved and shown here. Scene 3 fades into this one. When Scene 5 is built,
-// move the database demo on to it the same way.
+// Scene 3 fades into this one, and this one now fades on into Scene 5
+// (breakfast), which owns the level's result. Until Scene 5 was built this
+// scene ended the level and carried the database demo itself.
 //
 // Sprites expected in Assets/Sprites/:
 //   bedroom_background, talking_towel, prop_damit, prop_medyas, prop_sapatos,
@@ -53,6 +53,7 @@ public class BuildBahayScene4
 {
     private const string SpriteFolder = "Assets/Sprites/";
     private const string ScenePath = "Assets/Scenes/Chapter1_Level4_Damit.unity";
+    private const string NextScene = "Chapter1_Level5_Almusal";
 
     // The bedroom art imports at 169 pixels per unit, not the 100 the other
     // backgrounds use, so at Scene 1's scale of 1.9458 it comes out 19.3 x
@@ -236,13 +237,19 @@ public class BuildBahayScene4
         controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFaderBuilder.Build();
+        SceneFader fader = SceneFaderBuilder.Build();
 
-        // Last playable scene of the level, so the result lands here. This
-        // also adds the scene's RunScoreCounter.
-        // Level 1 on the map, so finishing here earns the Bahay badge and
-        // unlocks Paaralan.
-        DatabaseDemoBuilder.Build("Bahay - Level 1", "LevelSelect", 1, "badge_bahay");
+        // No longer the last scene of the level: breakfast follows. A middle
+        // scene carries its own RunScoreCounter, or the words said here are
+        // dropped from the result shown at the end.
+        GameObject runScoreGO = new GameObject("RunScore");
+        RunScoreCounter runScore = runScoreGO.AddComponent<RunScoreCounter>();
+        runScore.voiceCommand = voiceCommand;
+        runScore.resetOnStart = false;   // Scene 1 starts the run
+
+        // --- Hand on to Scene 5 (breakfast) ---
+        UnityEventTools.AddStringPersistentListener(
+            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -250,9 +257,8 @@ public class BuildBahayScene4
 
         Debug.Log("[SALINLAHI] Bahay Scene 4 built and saved to " + ScenePath +
                    ". Words: Damit, Medyas, Sapatos, Bag, Kunin - he starts barefoot " +
-                   "and each word dresses him one stage further. Level 1 now ends " +
-                   "here, so re-run Build Bahay Scene 3 as well - it fades into this scene " +
-                   "instead of showing the result itself.");
+                   "and each word dresses him one stage further. Its last word now fades " +
+                   "on into Scene 5 (breakfast), which owns the level result.");
     }
 
     private static SceneObjectiveController.SceneObjective MakeObjective(string word, GameObject prompt)
