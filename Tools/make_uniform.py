@@ -31,8 +31,19 @@ SPRITES = 'Assets/Sprites'
 # talking_barefoot and talking_socks are Scene 4's dressing stages. Their
 # uniform versions are derived here rather than generated, so the shirt is
 # identical across all of them.
+# Poses to recolour. 'sitting_desk' is Scene 5's "Upo" - Kylo already wears
+# the uniform by breakfast, so the seated pose needs a white shirt like the
+# rest.
 POSES = ['standing', 'talking', 'talking_barefoot', 'talking_socks',
-         'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4']
+         'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4',
+         'sitting_desk']
+
+# The green-to-white brightness range is measured across THESE poses only, not
+# across POSES. It has to stay fixed: re-measuring it every time a pose is
+# added shifts the white a little on every other sprite, so the shirt would
+# change shade across the whole game each time someone adds one frame.
+RANGE_POSES = ['standing', 'talking', 'talking_barefoot', 'talking_socks',
+               'walk_frame_1', 'walk_frame_2', 'walk_frame_3', 'walk_frame_4']
 
 # where the white shirt's brightness lands: deep fold -> lit highlight
 SHADOW, HIGHLIGHT = 168.0, 250.0
@@ -94,7 +105,7 @@ def recolour(src, dst, lo, hi):
     return int(shirt.sum())
 
 if __name__ == '__main__':
-    sources = [p + s for p in POSES for s in ('', '_with_bag')
+    sources = [p + s for p in RANGE_POSES for s in ('', '_with_bag')
                if os.path.exists(os.path.join(SPRITES, p + s + '.png'))]
     lo, hi = green_range(sources)
     print('green brightness across all poses: %.0f..%.0f -> white %.0f..%.0f\n'

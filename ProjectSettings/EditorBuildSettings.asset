@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter2_Level1_Paaralan.unity
     guid: 6ebcde278e09d4223bcbba2024d7a157
+  - enabled: 1
+    path: Assets/Scenes/Chapter1_Level5_Almusal.unity
+    guid: 8f4aeb3cff2bc48eeb9eddadf4e03e22
   m_configObjects: {}
