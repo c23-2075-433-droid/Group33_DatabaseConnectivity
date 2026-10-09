@@ -41,6 +41,10 @@ public class BuildPaaralanScene1
     private const float ViewWidth = 19.2f;
     private const float FloorY = -3.20f;              // the paved yard inside the gate
 
+    // Where the path meets the school steps in paaralan_background, measured
+    // off the art against the gate and the guard. "Takbo" ends here.
+    private const float SchoolEntranceX = -1.10f;
+
     // The character art imports at 120 pixels per unit, and its feet sit this
     // far below the pivot - see BuildBahayScene2 for where these come from.
     private const float SpritePPU = 120f;
@@ -95,9 +99,13 @@ public class BuildPaaralanScene1
         GameObject guard = CreateStanding("Char_Guard", "char_guard", -4.3f, 3.90f);
 
         // --- Player, arriving at the gate on the left ---
+        // Not further left than this: the art puts planters and a raised kerb
+        // against the wall out there, and they are painted nearer the camera
+        // than the ground the gate stands on, so a character placed over them
+        // reads as standing on top of the pots rather than on the path.
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-7.0f, PlayerFeetY, 0f);
+        playerGO.transform.position = new Vector3(-6.1f, PlayerFeetY, 0f);
         playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
@@ -116,6 +124,21 @@ public class BuildPaaralanScene1
         player.standingSprite = LoadSprite("standing_uniform_with_bag");
         player.walkFrames = UniformWalkFrames();
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;
+
+        // The journey across this yard is two words long, so each one has to
+        // cover its own half of it. "Pasok" is a step through the gate, not the
+        // whole walk to the building - at the default 1.2s it carried Kylo all
+        // the way to the door and left "Takbo" with nowhere to run but past the
+        // flagpole and into the right-hand wall.
+        player.voiceWalkDuration = 0.6f;                 // through the gate: -7.0 -> -4.0
+
+        // "Takbo" then runs the rest, stopping at the foot of the steps rather
+        // than after a fixed time. Marker rather than a number so moving the
+        // building in the art means moving this, not re-deriving a duration.
+        GameObject entrance = new GameObject("SchoolEntrance");
+        entrance.transform.position = new Vector3(SchoolEntranceX, FloorY, 0f);
+        player.walkTarget = entrance.transform;
+        player.walkTargetThreshold = 0.35f;
 
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
