@@ -65,6 +65,18 @@ public class AddExitTrigger
         SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
         if (controller != null) trigger.objectiveController = controller;
 
+        // "Lakad" has to walk Kylo all the way to this trigger, however far it
+        // sits from the bed. Pointing the player's walkTarget at it makes the
+        // walk end on arrival instead of after a fixed time - without this the
+        // walk covers voiceWalkDuration x moveSpeed units and stops wherever
+        // that lands, which left him short of the door.
+        PlayerMovement player = Object.FindFirstObjectByType<PlayerMovement>(FindObjectsInactive.Include);
+        if (player != null)
+        {
+            player.walkTarget = trigger.transform;
+            EditorUtility.SetDirty(player);
+        }
+
         EditorSceneManager.SaveScene(scene);
 
         Debug.Log("[SALINLAHI] " + (isNew ? "Added" : "Updated") + " the ExitTrigger in " + ScenePath +
