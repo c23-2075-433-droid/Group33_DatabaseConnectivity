@@ -45,8 +45,15 @@ public class RoomTransition : MonoBehaviour
     public float doorX = 7.31f;
 
     [Header("Timing")]
-    [Tooltip("Seconds the player walks toward the door before the fade starts. 0 skips the walk.")]
-    public float walkInDuration = 1.0f;
+    [Tooltip("Longest the walk to the door may take, in seconds. The walk now ends " +
+             "as soon as the player actually reaches doorX, so this is only a safety " +
+             "cap that stops a mispositioned door hanging the transition. 0 skips the " +
+             "walk. It used to be a fixed duration, which left Kylo short of the door " +
+             "whenever he was further away than this many seconds of walking.")]
+    public float walkInDuration = 3.0f;
+
+    [Tooltip("How close to doorX counts as having arrived, in world units.")]
+    public float arriveThreshold = 0.35f;
 
     [Tooltip("Seconds to wait after the door opens before the player starts walking in, so the player sees the door open first.")]
     public float doorPause = 0.6f;
@@ -102,7 +109,22 @@ public class RoomTransition : MonoBehaviour
         {
             float direction = (player != null && player.position.x > doorX) ? -1f : 1f;
             playerMovement.WalkInDirection(direction, walkInDuration);
-            yield return new WaitForSeconds(walkInDuration);
+
+            // Walk until the doorway is actually reached rather than for a
+            // fixed time. "Bukas" can be said from anywhere in the hallway, so
+            // the distance left to cover is not known in advance - a fixed
+            // duration faded the screen while Kylo was still short of the door.
+            float elapsed = 0f;
+            while (elapsed < walkInDuration)
+            {
+                if (player != null && Mathf.Abs(player.position.x - doorX) <= arriveThreshold) break;
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            // Stop him at the door instead of letting the walk run on behind
+            // the fade.
+            playerMovement.StopVoiceWalk();
         }
 
         if (fader != null)

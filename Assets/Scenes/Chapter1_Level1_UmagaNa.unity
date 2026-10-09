@@ -2385,6 +2385,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
+  voiceWalkDuration: 3
+  walkTarget: {fileID: 36507801}
+  walkTargetThreshold: 0.35
   jumpForce: 9
   groundLayer:
     serializedVersion: 2

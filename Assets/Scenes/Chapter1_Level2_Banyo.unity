@@ -4743,7 +4743,8 @@ MonoBehaviour:
   playerMovement: {fileID: 1552517913}
   arrivalPosition: {x: -5, y: -0.41391683}
   doorX: 7.31
-  walkInDuration: 1
+  walkInDuration: 3
+  arriveThreshold: 0.35
   doorPause: 0.6
   objectiveController: {fileID: 1289281746}
   fader: {fileID: 0}

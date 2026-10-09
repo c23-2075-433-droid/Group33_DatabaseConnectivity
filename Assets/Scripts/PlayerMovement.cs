@@ -57,6 +57,24 @@ public class PlayerMovement : MonoBehaviour
              "and how quickly the walk frames cycle.")]
     public float runMultiplier = 1.9f;
 
+    [Tooltip("How long one spoken walk word (Lakad / Kaliwa / Kanan) keeps the " +
+             "character moving, in seconds. With no walkTarget set this is the " +
+             "whole walk, covering this many seconds times moveSpeed. With a " +
+             "walkTarget set the walk ends on arrival instead, and this is only " +
+             "a safety cap. Set per scene in the Inspector.")]
+    public float voiceWalkDuration = 1.2f;
+
+    [Header("Walk Target (optional)")]
+    [Tooltip("If set, a spoken walk word heads for this object and stops on " +
+             "arrival rather than after a fixed time. Level 1 points this at the " +
+             "ExitTrigger, so Lakad always reaches the door however far away it " +
+             "is - the same walk-until-you-arrive rule RoomTransition uses for " +
+             "the hallway door. Leave empty in scenes where a walk is just a walk.")]
+    public Transform walkTarget;
+
+    [Tooltip("How close to walkTarget counts as having arrived, in world units.")]
+    public float walkTargetThreshold = 0.35f;
+
     // Counts down alongside voiceWalkTimer while a run is in effect, so a run
     // is an ordinary walk that simply moves and animates faster.
     private float runTimer = 0f;
@@ -120,6 +138,17 @@ public class PlayerMovement : MonoBehaviour
             moveInput = voiceWalkDirection;
             voiceWalkTimer -= Time.deltaTime;
             if (runTimer > 0f) runTimer -= Time.deltaTime;
+
+            // With a walkTarget set, arriving ends the walk instead of the
+            // timer running out. A fixed duration only reaches the target when
+            // the distance happens to match, which is what left Kylo standing
+            // short of the Level 1 door.
+            if (walkTarget != null)
+            {
+                float dx = walkTarget.position.x - transform.position.x;
+                bool headingToward = (dx > 0f) == (voiceWalkDirection > 0f);
+                if (headingToward && Mathf.Abs(dx) <= walkTargetThreshold) StopVoiceWalk();
+            }
         }
         else
         {
@@ -201,13 +230,26 @@ public class PlayerMovement : MonoBehaviour
     // SceneObjectiveController) can target them directly - Unity's persistent
     // UnityEvent listeners can only call methods with no parameters.
     /// <summary>"Lakad" - walk forward (right).</summary>
-    public void WalkForward() => WalkInDirection(1f);
+    public void WalkForward() => WalkInDirection(1f, voiceWalkDuration);
 
     /// <summary>"Kaliwa" - walk left.</summary>
-    public void WalkLeft() => WalkInDirection(-1f);
+    public void WalkLeft() => WalkInDirection(-1f, voiceWalkDuration);
 
     /// <summary>"Kanan" - walk right.</summary>
-    public void WalkRight() => WalkInDirection(1f);
+    public void WalkRight() => WalkInDirection(1f, voiceWalkDuration);
+
+    /// <summary>
+    /// Ends a voice walk early. RoomTransition calls this the moment the
+    /// player reaches the doorway, so Kylo stops at the door instead of
+    /// drifting past it for the rest of the duration.
+    /// </summary>
+    public void StopVoiceWalk()
+    {
+        voiceWalkTimer = 0f;
+        runTimer = 0f;
+        moveInput = 0f;
+        if (rb != null) rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+    }
 
     /// <summary>
     /// "Takbo" - run forward. The same walk, moving and animating faster for
