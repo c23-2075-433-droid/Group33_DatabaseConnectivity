@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -58,8 +59,29 @@ public class SceneObjectiveController : MonoBehaviour
     // it. Loading a saved scene replaces this instance, so it costs nothing.
     public UnityEvent onAllObjectivesComplete = new UnityEvent();
 
+    [Header("Pacing")]
+    [Tooltip("Finish the action a word started - the walk, the run, the pick-up - " +
+             "before the next word is asked or the level is completed. Without this " +
+             "the next prompt appears, or the results panel opens, while Kylo is " +
+             "still moving, so the result is shown before the action it describes " +
+             "has happened.")]
+    public bool waitForActionToFinish = true;
+
+    [Tooltip("The character whose movement is waited on. Left empty, one is found " +
+             "in the scene.")]
+    public PlayerMovement playerMovement;
+
+    [Tooltip("Safety cap in seconds, so an action that never ends cannot stall the " +
+             "sequence.")]
+    public float maxActionWait = 4f;
+
+    [Tooltip("Beat held after the action finishes, so the next prompt does not appear " +
+             "the instant the character stops.")]
+    public float settlePause = 0.25f;
+
     private int currentIndex = -1;
     private AudioSource audioSource;
+    private Coroutine advanceRoutine;
 
     // Set while something else is mid-animation and the player should not be
     // asked anything yet - walking through the bathroom door, for instance.
@@ -181,7 +203,54 @@ public class SceneObjectiveController : MonoBehaviour
         SceneObjective objective = objectives[currentIndex];
         if (objective.promptRoot != null) objective.promptRoot.SetActive(false);
         objective.onCorrect?.Invoke();
-        ShowObjective(currentIndex + 1);
+
+        if (!waitForActionToFinish)
+        {
+            ShowObjective(currentIndex + 1);
+            return;
+        }
+
+        if (advanceRoutine != null) StopCoroutine(advanceRoutine);
+        advanceRoutine = StartCoroutine(AdvanceWhenActionFinishes(currentIndex + 1));
+    }
+
+    /// <summary>
+    /// Holds the sequence until the action the answered word started has
+    /// finished, then asks the next word - or completes the scene.
+    ///
+    /// The word is answered the moment it is recognised, but the thing it does
+    /// takes time: Lakad walks to the door, Takbo runs across the yard. Moving
+    /// straight on put the next prompt on screen, or the results panel up,
+    /// while the character was still mid-stride.
+    /// </summary>
+    private IEnumerator AdvanceWhenActionFinishes(int nextIndex)
+    {
+        // Nothing is asked while the action plays out, so the next word cannot
+        // be answered over the top of the one still running.
+        ClearTargetWord();
+
+        // The answered word is finished with, even though the next one is not
+        // up yet. Without this a transition resuming mid-wait would put the
+        // word just answered back on screen.
+        currentIndex = nextIndex;
+
+        if (playerMovement == null) playerMovement = FindFirstObjectByType<PlayerMovement>();
+
+        // One frame first: the action is raised this frame and has not started
+        // moving anything yet.
+        yield return null;
+
+        float waited = 0f;
+        while (playerMovement != null && playerMovement.IsVoiceWalking && waited < maxActionWait)
+        {
+            waited += Time.deltaTime;
+            yield return null;
+        }
+
+        if (settlePause > 0f) yield return new WaitForSeconds(settlePause);
+
+        advanceRoutine = null;
+        ShowObjective(currentIndex);
     }
 
     /// <summary>

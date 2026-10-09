@@ -82,6 +82,13 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>True while "Takbo" is still running.</summary>
     private bool IsRunning => runTimer > 0f;
 
+    /// <summary>
+    /// True while a spoken walk or run is still playing out. Read by
+    /// SceneObjectiveController, which waits for the action a word started to
+    /// finish before asking the next word or completing the scene.
+    /// </summary>
+    public bool IsVoiceWalking => voiceWalkTimer > 0f;
+
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
 
