@@ -1,19 +1,31 @@
 // Assets/Editor/LevelCompleteUIBuilder.cs
 //
-// Shared helper that builds a simple "Scene Complete!" panel (Screen Space
-// Overlay canvas: dim backdrop + dark wood-tinted panel + centered text),
-// wired to ExitDoorTrigger.levelCompleteUI and shown when the player reaches
-// the end of the scene.
+// Builds the level-summary screen from the group's UI kit, cut into sprites by
+// Tools/cut_summary_kit.py.
 //
-// This is a PLACEHOLDER: Level 1 (Bahay) only has its first scene ("Waking
-// Up") built so far, so ExitDoorTrigger has nowhere real to send the player
-// yet - nextSceneName is left empty and this panel just says so, instead of
-// trying to load a scene that doesn't exist. Once Scene 2 (the bathroom)
-// exists, swap this out for a real transition - ExitDoorTrigger doesn't care
-// what levelCompleteUI looks like, only that it exists.
+// The kit supersedes the finished mock-up this screen was first built from.
+// That version had to undo a picture: painted labels blended off the board,
+// stars prised off the wood they sat on, medallions masked by assuming they
+// were circles. Here the board arrives empty and every piece is separate, so
+// the layout below is an arrangement rather than a repair.
 //
-// Used by AddExitTrigger.cs (patches the already-built Level 1 scene) and by
-// DatabaseDemoBuilder.cs (the scene that ends a level).
+// The three statistics are SALINLAHI's own. The kit's labels belong to a
+// different game, so its word art for them is left unused and the labels are
+// set as text:
+//
+//   WORDS SAID        Filipino words said correctly, out of those asked
+//   VOICE TRIES       attempts it took
+//   WORDS PRACTISED   which words they were
+//
+// Buttons are assembled rather than composed: one wooden frame sprite with a
+// glyph laid over it, so Replay and Main Menu share a frame and a glyph can be
+// swapped without recutting art.
+//
+// LAYOUT is in board-relative units - the board is BoardW x BoardH and
+// everything on it is placed from its centre. Nothing is measured off a
+// source picture any more.
+//
+// Used by AddExitTrigger.cs and DatabaseDemoBuilder.cs.
 
 using System.Collections.Generic;
 using UnityEditor;
@@ -26,35 +38,58 @@ public static class LevelCompleteUIBuilder
 {
     private const string CanvasName = "LevelComplete_Canvas";
 
-    // Panel art is 1014x793 (~1.28:1); the size below keeps that ratio so the
-    // bamboo frame isn't stretched.
-    private const float PanelWidth = 1100f;
-    private const float PanelHeight = PanelWidth / (1014f / 793f);
+    // The board, and the canvas it sits on (1920x1080 reference).
+    private const float BoardW = 980f, BoardH = 566f;
+    private const float BoardY = 55f;
 
-    /// <summary>
-    /// Builds the "Scene Complete!" canvas (inactive by default -
-    /// SessionScoreTracker / ExitDoorTrigger turn it on when the player
-    /// finishes). Any existing copies are destroyed and rebuilt, so the panel
-    /// always matches the current code - this is generated placeholder UI, so
-    /// there's nothing hand-authored to preserve, and rebuilding avoids stale
-    /// panels missing newly added text fields.
-    ///
-    /// Children are named TitleText / ScoreText / RecordsText so callers can
-    /// find and wire them.
-    /// </summary>
+    // Left of the board: the badge plaque, with the star rating beneath it.
+    private const float PlaqueX = -235f, PlaqueY = 66f;
+    private const float PlaqueW = 294f, PlaqueH = 245f;
+    private const float StarY = -140f, StarGap = 118f, StarSize = 92f;
+
+    // Right of the board: three rows, each a symbol with its figure beside it.
+    // The rows sit higher than an even split would put them, so the last one -
+    // the list of words practised - has the whole lower third of the board to
+    // wrap into. A full level can be nine words long.
+    // The symbol sits well left of its figure: at 58 the "8 of 8" started
+    // almost against the medallion's rim.
+    private const float IconX = 20f, IconSize = 86f;
+    private const float TextX = 300f, TextW = 320f;
+    private const float RowWordsY = 160f, RowTriesY = 30f, RowLearnedY = -100f;
+
+    private static readonly Color LabelBrown = new Color(0.33f, 0.16f, 0.03f);
+    private static readonly Color ValueCream = new Color(0.99f, 0.91f, 0.74f);
+
     public static GameObject BuildPanel(string message) => BuildPanel(message, null);
 
     /// <summary>
-    /// The panel, optionally with a level's badge pinned to its top edge.
-    /// The badge hangs over the frame rather than sitting inside it: the
-    /// interior is already full with the title, the score and six rows of
-    /// recent scores, and a badge in there would squeeze the leaderboard.
+    /// Builds the summary canvas, inactive. SessionScoreTracker turns it on
+    /// and fills in the figures.
+    ///
+    /// Children are named so DatabaseDemoBuilder can find them:
+    ///   Panel/Board/StatWords/WordsValue   (and Tries, Learned)
+    ///   Panel/Board/StarRow/Star1..3
+    ///   Panel/Board/Plaque/ScoreText
+    ///   Panel/NextButton
     /// </summary>
     public static GameObject BuildPanel(string message, string badgeSpriteFile)
     {
-        // NOTE: GameObject.Find() can't be used here - this canvas is created
-        // INACTIVE, and Find() only searches active objects, so it would never
-        // see an existing one.
+        // Before anything else: this project does not import PNGs as sprites
+        // by default, and an Image handed a null sprite draws a white box. The
+        // whole screen came out as white rectangles once for exactly that
+        // reason, so the art is made loadable and checked up front.
+        SpriteImportFixer.Verify(new[]
+        {
+            "ui_summary_board", "ui_summary_plaque", "ui_summary_title",
+            "ui_summary_icon_chest", "ui_summary_icon_clock", "ui_summary_icon_gem",
+            "ui_summary_btn_frame", "ui_summary_glyph_replay", "ui_summary_glyph_home",
+            "btn_summary_next", "ui_summary_word_replay", "ui_summary_word_home",
+            "ui_summary_word_next", "ui_summary_star_on", "ui_summary_star_off",
+            badgeSpriteFile,
+        }, "Level-complete panel");
+
+        // GameObject.Find() can't be used - this canvas is created INACTIVE,
+        // and Find() only searches active objects.
         foreach (GameObject stale in FindAllInScene(CanvasName))
         {
             Debug.Log("[SALINLAHI] Replacing existing " + CanvasName + ".");
@@ -72,104 +107,204 @@ public static class LevelCompleteUIBuilder
 
         if (Object.FindFirstObjectByType<EventSystem>() == null)
         {
-            GameObject eventSystemGO = new GameObject("EventSystem");
-            eventSystemGO.AddComponent<EventSystem>();
-            eventSystemGO.AddComponent<StandaloneInputModule>();
+            GameObject es = new GameObject("EventSystem");
+            es.AddComponent<EventSystem>();
+            es.AddComponent<StandaloneInputModule>();
         }
 
-        Transform canvasT = canvasGO.transform;
-
-        // Dim backdrop so the panel reads clearly over the level behind it.
         GameObject dim = new GameObject("Dim", typeof(RectTransform));
-        dim.transform.SetParent(canvasT, false);
+        dim.transform.SetParent(canvasGO.transform, false);
         Image dimImg = dim.AddComponent<Image>();
-        dimImg.color = new Color(0, 0, 0, 0.5f);
+        dimImg.color = new Color(0, 0, 0, 0.55f);
         RectTransform dimRect = dim.GetComponent<RectTransform>();
         dimRect.anchorMin = Vector2.zero;
         dimRect.anchorMax = Vector2.one;
         dimRect.offsetMin = Vector2.zero;
         dimRect.offsetMax = Vector2.zero;
 
-        GameObject panel = new GameObject("Panel", typeof(RectTransform));
-        panel.transform.SetParent(canvasT, false);
-        Image panelImg = panel.AddComponent<Image>();
-        panelImg.sprite = LoadSprite("ui_results_panel");
-        panelImg.raycastTarget = false;
-        RectTransform panelRect = panel.GetComponent<RectTransform>();
-        panelRect.anchoredPosition = Vector2.zero;
-        panelRect.sizeDelta = new Vector2(PanelWidth, PanelHeight);
+        // "Panel" is a container, not the board: the title and the buttons sit
+        // outside the board but belong to the same screen. The name is kept
+        // because the rest of the project looks the panel up by it.
+        GameObject root = new GameObject("Panel", typeof(RectTransform));
+        root.transform.SetParent(canvasGO.transform, false);
+        root.GetComponent<RectTransform>().sizeDelta = new Vector2(1400, 1040);
+        Transform rootT = root.transform;
 
-        // The bamboo frame eats the outer edges of the sprite, so everything
-        // below is laid out inside the measured interior rather than the full
-        // panel rect (insets measured from the art: 11.2% / 11.4% / 17.5% / 14.2%).
-        float interiorTop = PanelHeight * 0.5f - PanelHeight * 0.175f;
-        float interiorBottom = -PanelHeight * 0.5f + PanelHeight * 0.142f;
-        float interiorWidth = PanelWidth * (1f - 0.112f - 0.114f);
+        AddImage(rootT, "Title", "ui_summary_title", new Vector2(0f, 430f), new Vector2(760f, 98f));
 
-        // Cream text: the panel interior is mid-brown wood, so dark text would
-        // not read against it (same pairing as the menu title).
-        Color cream = new Color(0.99f, 0.96f, 0.89f);
+        GameObject board = AddImage(rootT, "Board", "ui_summary_board",
+            new Vector2(0f, BoardY), new Vector2(BoardW, BoardH));
+        Transform boardT = board.transform;
 
-        // Headline message. Kept short by callers so it stays on one line -
-        // a wrapped title steals room the leaderboard needs.
-        CreateText(panel.transform, "TitleText", message,
-            new Vector2(0, interiorTop - 48), new Vector2(interiorWidth, 96),
-            46, FontStyle.Bold, TextAnchor.MiddleCenter, cream);
+        BuildPlaque(boardT, badgeSpriteFile);
+        BuildStars(boardT);
 
-        // This session's result - filled in at runtime by SessionScoreTracker.
-        CreateText(panel.transform, "ScoreText", "",
-            new Vector2(0, interiorTop - 128), new Vector2(interiorWidth, 76),
-            34, FontStyle.Bold, TextAnchor.MiddleCenter, cream);
+        // The medallion icons, not the kit's loose glyphs. The kit draws its
+        // symbols for a light background - the chest is dark brown with a
+        // cream outline - so dropping one on a dark disc leaves dark on dark.
+        // These came off the finished mock-up with the disc already around
+        // them, which is what the reference actually shows.
+        BuildStatRow(boardT, "Words", "ui_summary_icon_chest", "WORDS SAID", RowWordsY, 40);
+        BuildStatRow(boardT, "Tries", "ui_summary_icon_clock", "VOICE TRIES", RowTriesY, 40);
+        // A list rather than a figure: set smaller, and given the room below
+        // it to run onto as many lines as the level's words need.
+        BuildStatRow(boardT, "Learned", "ui_summary_icon_gem", "WORDS PRACTISED", RowLearnedY, 25);
 
-        // Records read back OUT of the database - the "display retrieved data"
-        // half of the Activity 5 requirement. Sized close to the score line
-        // rather than half of it, with extra line spacing, so six stacked rows
-        // stay legible over the wood grain.
-        Text records = CreateText(panel.transform, "RecordsText", "",
-            new Vector2(0, interiorTop - 340), new Vector2(interiorWidth, 330),
-            32, FontStyle.Bold, TextAnchor.UpperCenter, cream);
-        records.lineSpacing = 1.15f;
+        // No recent-scores list: the group asked for it off the screen.
+        // SessionScoreTracker still saves the record and still reads the
+        // recent ones back - its Text references simply go unassigned, which
+        // SetText tolerates - so the Activity 5 round trip still happens and
+        // still logs to the Console. Only the display is gone.
 
-        // The level's badge, pinned over the top edge. Skipped silently when
-        // the level has none yet, so the panel is unchanged for those.
-        Sprite badge = string.IsNullOrEmpty(badgeSpriteFile) ? null : LoadSprite(badgeSpriteFile);
-        if (badge != null)
-        {
-            GameObject badgeGO = new GameObject("Badge", typeof(RectTransform));
-            badgeGO.transform.SetParent(panel.transform, false);
-            Image badgeImg = badgeGO.AddComponent<Image>();
-            badgeImg.sprite = badge;
-            badgeImg.preserveAspect = true;
-            badgeImg.raycastTarget = false;
-            RectTransform badgeRect = badgeGO.GetComponent<RectTransform>();
-            badgeRect.sizeDelta = new Vector2(230, 230);
-            badgeRect.anchoredPosition = new Vector2(0, PanelHeight * 0.5f - 24f);
-        }
+        BuildButtons(rootT);
 
-        // OKAY returns to the journey map, so the player isn't stranded on a
-        // dead-end panel (and the demo can loop straight into another run).
-        GameObject okayGO = new GameObject("OkayButton", typeof(RectTransform));
-        okayGO.transform.SetParent(panel.transform, false);
-        Image okayImg = okayGO.AddComponent<Image>();
-        okayImg.sprite = LoadSprite("btn_okay");
-        RectTransform okayRect = okayGO.GetComponent<RectTransform>();
-        okayRect.sizeDelta = new Vector2(360, 360f / (1733f / 407f));
-        okayRect.anchoredPosition = new Vector2(0, interiorBottom + 58);
-        Button okayButton = okayGO.AddComponent<Button>();
-        okayButton.targetGraphic = okayImg;
-        ColorBlock colors = okayButton.colors;
-        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
-        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
-        colors.fadeDuration = 0.08f;
-        okayButton.colors = colors;
-        okayGO.AddComponent<LoadSceneOnClick>().sceneName = "LevelSelect";
-
-        canvasGO.SetActive(false); // SessionScoreTracker/ExitDoorTrigger turn this on when the player finishes
+        canvasGO.SetActive(false);
         return canvasGO;
     }
 
-    private static Text CreateText(Transform parent, string name, string content,
-        Vector2 anchoredPos, Vector2 size, int fontSize, FontStyle style, TextAnchor alignment, Color color)
+    /// <summary>
+    /// The plaque, holding the level's badge with the player's name beneath.
+    /// The kit's "7" is not used: a painted level number cannot serve a game
+    /// with three levels, and the badge is what this screen actually awards.
+    /// </summary>
+    private static void BuildPlaque(Transform board, string badgeSpriteFile)
+    {
+        GameObject plaque = AddImage(board, "Plaque", "ui_summary_plaque",
+            new Vector2(PlaqueX, PlaqueY), new Vector2(PlaqueW, PlaqueH));
+
+        Sprite badge = string.IsNullOrEmpty(badgeSpriteFile) ? null : LoadSprite(badgeSpriteFile);
+        if (badge != null)
+        {
+            GameObject badgeGO = AddImage(plaque.transform, "Badge", null,
+                new Vector2(0f, 22f), new Vector2(136f, 136f));
+            Image img = badgeGO.GetComponent<Image>();
+            img.sprite = badge;
+            img.preserveAspect = true;
+        }
+
+        // Clear of the plaque's inner moulding, which is about a fifth of its
+        // height - higher up, the name loses its descenders to the frame.
+        AddText(plaque.transform, "ScoreText", "",
+            new Vector2(0f, -72f), new Vector2(250f, 44f),
+            24, FontStyle.Bold, TextAnchor.MiddleCenter, LabelBrown);
+    }
+
+    /// <summary>Three stars, all starting unearned. SessionScoreTracker lights them.</summary>
+    private static void BuildStars(Transform board)
+    {
+        GameObject row = new GameObject("StarRow", typeof(RectTransform));
+        row.transform.SetParent(board, false);
+        RectTransform rowRect = row.GetComponent<RectTransform>();
+        rowRect.anchoredPosition = new Vector2(PlaqueX, StarY);
+        rowRect.sizeDelta = new Vector2(StarGap * 3f, StarSize);
+
+        for (int i = 0; i < 3; i++)
+        {
+            GameObject star = AddImage(row.transform, "Star" + (i + 1), "ui_summary_star_off",
+                new Vector2((i - 1) * StarGap, 0f), new Vector2(StarSize, StarSize));
+            star.GetComponent<Image>().preserveAspect = true;
+        }
+    }
+
+    /// <summary>
+    /// One statistic: the kit's symbol, with its label above the figure.
+    /// The value Text is named "&lt;key&gt;Value" so DatabaseDemoBuilder can find it.
+    /// </summary>
+    private static void BuildStatRow(Transform board, string key, string iconSprite,
+                                      string label, float y, int valueFontSize)
+    {
+        GameObject row = new GameObject("Stat" + key, typeof(RectTransform));
+        row.transform.SetParent(board, false);
+        RectTransform rowRect = row.GetComponent<RectTransform>();
+        rowRect.anchoredPosition = new Vector2(0f, y);
+        rowRect.sizeDelta = new Vector2(BoardW, 120f);
+
+        GameObject icon = AddImage(row.transform, "Icon", iconSprite,
+            new Vector2(IconX, 0f), new Vector2(IconSize, IconSize));
+        icon.GetComponent<Image>().preserveAspect = true;
+
+        AddText(row.transform, "Label", label,
+            new Vector2(TextX, 30f), new Vector2(TextW, 32f),
+            25, FontStyle.Bold, TextAnchor.MiddleLeft, LabelBrown);
+
+        Text value = AddText(row.transform, key + "Value", "-",
+            new Vector2(TextX, -24f), new Vector2(TextW, 48f),
+            valueFontSize, FontStyle.Bold, TextAnchor.MiddleLeft, ValueCream);
+        value.horizontalOverflow = HorizontalWrapMode.Wrap;
+        value.lineSpacing = 0.92f;
+    }
+
+    /// <summary>
+    /// Replay, Main Menu and Next Level. The first two are the kit's wooden
+    /// frame with a glyph over it; Next Level is its own arrow with the kit's
+    /// word art on top. Captions use the kit's word art rather than text, so
+    /// they match the rest of the screen.
+    /// </summary>
+    private static void BuildButtons(Transform root)
+    {
+        string thisScene = SceneManager.GetActiveScene().name;
+        // Moved up now that nothing sits between them and the board.
+        const float ButtonY = -340f, CaptionY = -449f;
+
+        GameObject replay = MakeButton(root, "ReplayButton", "ui_summary_btn_frame",
+            new Vector2(-330f, ButtonY), new Vector2(190f, 159f), thisScene);
+        AddImage(replay.transform, "Glyph", "ui_summary_glyph_replay",
+            new Vector2(0f, 6f), new Vector2(84f, 80f)).GetComponent<Image>().preserveAspect = true;
+
+        GameObject home = MakeButton(root, "HomeButton", "ui_summary_btn_frame",
+            new Vector2(0f, ButtonY), new Vector2(190f, 159f), "MainMenu");
+        AddImage(home.transform, "Glyph", "ui_summary_glyph_home",
+            new Vector2(0f, 6f), new Vector2(88f, 78f)).GetComponent<Image>().preserveAspect = true;
+
+        GameObject next = MakeButton(root, "NextButton", "btn_summary_next",
+            new Vector2(340f, ButtonY), new Vector2(250f, 127f), "LevelSelect");
+        // Sat left of centre: the arrowhead takes the right third of the sprite.
+        AddImage(next.transform, "Caption", "ui_summary_word_next",
+            new Vector2(-30f, 2f), new Vector2(132f, 29f)).GetComponent<Image>().preserveAspect = true;
+
+        AddImage(root, "ReplayCaption", "ui_summary_word_replay",
+            new Vector2(-330f, CaptionY), new Vector2(124f, 46f)).GetComponent<Image>().preserveAspect = true;
+        AddImage(root, "HomeCaption", "ui_summary_word_home",
+            new Vector2(0f, CaptionY), new Vector2(196f, 38f)).GetComponent<Image>().preserveAspect = true;
+    }
+
+    private static GameObject MakeButton(Transform parent, string name, string sprite,
+                                          Vector2 position, Vector2 size, string sceneName)
+    {
+        GameObject go = AddImage(parent, name, sprite, position, size);
+        Image img = go.GetComponent<Image>();
+        img.raycastTarget = true;
+        img.preserveAspect = true;
+
+        Button button = go.AddComponent<Button>();
+        button.targetGraphic = img;
+        ColorBlock colors = button.colors;
+        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
+        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
+        colors.fadeDuration = 0.08f;
+        button.colors = colors;
+
+        go.AddComponent<LoadSceneOnClick>().sceneName = sceneName;
+        return go;
+    }
+
+    private static GameObject AddImage(Transform parent, string name, string sprite,
+                                        Vector2 position, Vector2 size)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        Image img = go.AddComponent<Image>();
+        if (!string.IsNullOrEmpty(sprite)) img.sprite = LoadSprite(sprite);
+        img.raycastTarget = false;
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+        return go;
+    }
+
+    private static Text AddText(Transform parent, string name, string content,
+        Vector2 position, Vector2 size, int fontSize, FontStyle style,
+        TextAnchor alignment, Color color)
     {
         GameObject go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
@@ -180,19 +315,12 @@ public static class LevelCompleteUIBuilder
         text.fontStyle = style;
         text.alignment = alignment;
         text.color = color;
-        text.horizontalOverflow = HorizontalWrapMode.Wrap;
-        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.supportRichText = false;
         text.raycastTarget = false;
-
-        // Dark edge around every glyph. Cream on mid-brown woodgrain has weak
-        // contrast on its own - the grain runs right through the letters at
-        // small sizes - and this is what makes the leaderboard rows legible.
-        Outline outline = go.AddComponent<Outline>();
-        outline.effectColor = new Color(0.16f, 0.09f, 0.04f, 0.95f);
-        outline.effectDistance = new Vector2(2.2f, -2.2f);
-
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
         RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchoredPosition = anchoredPos;
+        rect.anchoredPosition = position;
         rect.sizeDelta = size;
         return text;
     }
@@ -201,28 +329,21 @@ public static class LevelCompleteUIBuilder
     {
         string path = "Assets/Sprites/" + spriteFile + ".png";
         Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-        if (sprite == null)
-            Debug.LogWarning("[SALINLAHI] Could not load sprite at '" + path + "'. Make sure it's imported as Sprite (2D and UI).");
+        if (sprite == null) Debug.LogWarning("[SALINLAHI] Could not load sprite at " + path);
         return sprite;
     }
 
-    /// <summary>Finds every GameObject with this name in the open scene, including INACTIVE ones (unlike GameObject.Find).</summary>
     private static List<GameObject> FindAllInScene(string name)
     {
         List<GameObject> matches = new List<GameObject>();
         foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects())
-        {
-            CollectByName(root.transform, name, matches);
-        }
+            Collect(root.transform, name, matches);
         return matches;
     }
 
-    private static void CollectByName(Transform t, string name, List<GameObject> matches)
+    private static void Collect(Transform t, string name, List<GameObject> matches)
     {
         if (t.name == name) matches.Add(t.gameObject);
-        for (int i = 0; i < t.childCount; i++)
-        {
-            CollectByName(t.GetChild(i), name, matches);
-        }
+        for (int i = 0; i < t.childCount; i++) Collect(t.GetChild(i), name, matches);
     }
 }
