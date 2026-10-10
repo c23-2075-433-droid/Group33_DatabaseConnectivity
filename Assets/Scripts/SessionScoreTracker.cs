@@ -90,6 +90,11 @@ public class SessionScoreTracker : MonoBehaviour
         // many times Bahay was completed.
         if (levelIndex > 0) LevelProgress.MarkComplete(levelIndex);
 
+        // The last scene of a level does not fade on to another scene, so it
+        // marks itself here instead of in SceneFader.
+        LevelProgress.MarkSceneComplete(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
         ShowPanel();
         SetText(scoreText, "Player: " + record.player_name +
                             "\nScore: " + record.score + " / " + record.attempts + " attempts");

@@ -41,6 +41,14 @@ public class SceneFader : MonoBehaviour
     {
         if (isLoading || string.IsNullOrEmpty(sceneName)) return;
         isLoading = true;
+
+        // Every scene hands on through here, so this is the one place that
+        // knows a scene has been finished. The map unlocks step by step now,
+        // not level by level, and only the last scene of a level has a
+        // SessionScoreTracker - without this the middle scenes would open
+        // nothing and the path would stay locked behind Scene 1. Marked after
+        // the guard, so a scene with nowhere to go does not count as passed.
+        LevelProgress.MarkSceneComplete(SceneManager.GetActiveScene().name);
         StartCoroutine(FadeRoutine(CurrentAlpha(), 1f, fadeOutDuration,
             () => SceneManager.LoadScene(sceneName)));
     }

@@ -1,25 +1,28 @@
 // Assets/Editor/BuildLevelSelectScene.cs
 //
-// One-click scene builder for the "Ang Iyong Paglalakbay" (Your Journey)
-// level-select map, assembled from the team's Canva assets (Assets/Sprites/):
-//   journey_bg, journey_title, btn_back, ui_name_plaque, ui_step,
-//   node_bahay(_locked), node_paaralan(_locked), node_parke(_locked), node_palengke(_locked)
+// One-click builder for the level select screen.
 //
-// The signposts and the padlock on the locked ones are built by
-// Tools/build_level_nodes.py, which drops each level's illustration into one
-// shared frame so all four match. Run it after changing any of that art.
+// This used to be a winding journey map with the house, the school and the
+// market drawn as landmarks along a road. It is now a plain grid: one row per
+// level, the level's name beside it, and a numbered wooden tile for each of
+// its scenes. Nothing to read but the numbers.
 //
-// Node positions were read off the map background with a canvas-space grid
-// overlay, placing each signpost in an open clearing beside the path as it
-// climbs from the bottom-left to the top-right. To tweak anything, move the
-// object's RectTransform in the Scene view - no code changes needed.
+// The order still comes from JourneyMap.Steps, which LevelProgress also counts
+// along, so the screen and the save file cannot disagree about what comes
+// next. Adding a scene there adds a tile here; nothing in this file needs
+// changing.
 //
-// Only the Bahay node has a level behind it so far (Chapter1_Level1_UmagaNa),
-// so it's the only one unlocked by default via LevelProgress. The other three
-// point at scene names that don't exist yet - build them and they'll just work.
+// A scene's tile carries its number within its level - scene 3 of Bahay gets
+// the tile with a 3 on it - which is why the artwork's baked-in numbers can be
+// used directly instead of drawing text over blank tiles. No level has more
+// than the seven the sheet provides.
 //
-// Also inserts LevelSelect into Build Settings, between MainMenu and
-// Chapter1_Level1_UmagaNa.
+// A tile is enterable only when the player has reached it AND the scene has
+// actually been built. Anything else shows the padlock, because from the
+// child's side "not yet" and "not made yet" are the same thing.
+//
+// Sprites expected in Assets/Sprites/ (cut by Tools/slice_level_buttons.py):
+//   btn_level_1 .. btn_level_7, btn_level_locked, ui_select_levels, btn_back
 //
 // Run via: Tools > SALINLAHI > Build Level Select Scene
 
@@ -27,8 +30,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BuildLevelSelectScene
 {
@@ -36,6 +39,23 @@ public class BuildLevelSelectScene
     private const string MainMenuScenePath = "Assets/Scenes/MainMenu.unity";
     private const string LevelSelectScenePath = "Assets/Scenes/LevelSelect.unity";
     private const string FirstLevelPath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";
+
+    // The sheet's own backdrop, lifted a little so the tiles' dark wood frames
+    // still read against it.
+    private static readonly Color Backdrop = new Color(0.106f, 0.122f, 0.071f);
+
+    // Sized for a child's finger on a tablet rather than for fitting the most
+    // tiles on screen: six across a row is the worst case and still leaves a
+    // margin either side.
+    private const float TileWidth = 196f;      // tile heights follow their art
+    private const float TilePitch = 224f;
+    private const float FirstTileX = -390f;    // centre of the first tile
+    private const float LabelRightX = -528f;   // where the level name ends
+
+    private const float FirstRowY = 60f;       // bottom edge of the top row
+    private const float RowPitch = 230f;
+
+    private const int HighestNumberedTile = 7; // what the artwork provides
 
     [MenuItem("Tools/SALINLAHI/Build Level Select Scene")]
     public static void BuildScene()
@@ -48,18 +68,16 @@ public class BuildLevelSelectScene
 
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-        // --- Camera ---
         GameObject camGO = new GameObject("Main Camera");
         Camera cam = camGO.AddComponent<Camera>();
         cam.orthographic = true;
         cam.orthographicSize = 5.4f;
         cam.transform.position = new Vector3(0, 0, -10);
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = Color.black;
+        cam.backgroundColor = Backdrop;
         camGO.tag = "MainCamera";
         camGO.AddComponent<AudioListener>();
 
-        // --- Canvas: 1920x1080 reference, landscape ---
         GameObject canvasGO = new GameObject("LevelSelect_Canvas");
         Canvas canvas = canvasGO.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -75,82 +93,183 @@ public class BuildLevelSelectScene
 
         Transform canvasT = canvasGO.transform;
 
-        // --- Background: covers the whole screen without stretching ---
-        GameObject bg = CreateImage(canvasT, "Background", "journey_bg", Vector2.zero, new Vector2(1920, 1080), false);
-        RectTransform bgRect = bg.GetComponent<RectTransform>();
-        bgRect.anchorMin = bgRect.anchorMax = new Vector2(0.5f, 0.5f);
-        AspectRatioFitter fitter = bg.AddComponent<AspectRatioFitter>();
-        fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-        fitter.aspectRatio = 1024f / 575f;   // the map artwork's own ratio
-        bg.GetComponent<Image>().raycastTarget = false;
+        // A flat panel rather than a picture: the camera's clear colour does
+        // not reach a Screen Space Overlay canvas, so the backdrop has to be
+        // drawn as the first thing on the canvas itself.
+        GameObject backdrop = new GameObject("Backdrop", typeof(RectTransform));
+        backdrop.transform.SetParent(canvasT, false);
+        Image backdropImage = backdrop.AddComponent<Image>();
+        backdropImage.color = Backdrop;
+        backdropImage.raycastTarget = false;
+        RectTransform backdropRect = backdrop.GetComponent<RectTransform>();
+        backdropRect.anchorMin = Vector2.zero;
+        backdropRect.anchorMax = Vector2.one;
+        backdropRect.offsetMin = Vector2.zero;
+        backdropRect.offsetMax = Vector2.zero;
 
-        // --- Title ("Ang Iyong Paglalakbay / Your Journey / A Journey Through Language") ---
-        GameObject title = CreateImage(canvasT, "Title", "journey_title", new Vector2(0, 345), new Vector2(1100, 435), true);
+        GameObject title = CreateImage(canvasT, "Title", "ui_select_levels",
+                                       new Vector2(0f, 380f), new Vector2(820f, 124f), true);
         title.GetComponent<Image>().raycastTarget = false;
 
-        // --- Back button, top-left ---
-        GameObject backBtn = CreateSpriteButton(canvasT, "BackButton", "btn_back", new Vector2(-859, 434), new Vector2(163, 154));
+        // --- One row per level, one tile per scene ---
+        List<LevelSelectController.StepNode> built = new List<LevelSelectController.StepNode>();
+        int row = 0;
+        int skipped = 0;
 
-        // --- Journey nodes, bottom-left to top-right along the path ---
-        // All four signposts share one frame, so they take one size.
-        Vector2 nodeSize = new Vector2(236, 290);
-        // Bahay sits highest of the low pair so its name plaque, which hangs
-        // below the signpost, clears the bottom of the screen.
-        Vector2 pBahay    = new Vector2(-520, -272);
-        Vector2 pPaaralan = new Vector2(-180, -185);
-        Vector2 pParke    = new Vector2( 190,  -60);
-        Vector2 pPalengke = new Vector2( 560,   60);
+        foreach (int levelIndex in LevelsInOrder())
+        {
+            List<int> sceneSteps = SceneStepsOf(levelIndex);
+            if (sceneSteps.Count == 0)
+            {
+                // A level with nothing behind it would be a heading over an
+                // empty row. Give it scenes in JourneyMap and it appears.
+                skipped++;
+                continue;
+            }
 
-        // Stepping stones first, so the signposts sit on top of them where
-        // they meet. They trace the walk from one level to the next, starting
-        // at each signpost's base rather than its middle.
-        float baseDrop = nodeSize.y * 0.5f + 6f;
-        CreateSteps(canvasT, "Steps_1", pBahay, pPaaralan, baseDrop);
-        CreateSteps(canvasT, "Steps_2", pPaaralan, pParke, baseDrop);
-        CreateSteps(canvasT, "Steps_3", pParke, pPalengke, baseDrop);
+            float baseline = FirstRowY - row * RowPitch;
+            CreateRowLabel(canvasT, LevelNameOf(levelIndex), baseline);
 
-        LevelSelectController.LevelNode bahay = CreateNode(canvasT, "Node_Bahay",
-            "node_bahay", "node_bahay_locked", pBahay, nodeSize,
-            1, "Chapter1_Level1_UmagaNa");
+            for (int i = 0; i < sceneSteps.Count; i++)
+            {
+                int stepIndex = sceneSteps[i];
+                float x = FirstTileX + i * TilePitch;
+                built.Add(CreateTile(canvasT, stepIndex, JourneyMap.Steps[stepIndex], x, baseline));
+            }
 
-        LevelSelectController.LevelNode paaralan = CreateNode(canvasT, "Node_Paaralan",
-            "node_paaralan", "node_paaralan_locked", pPaaralan, nodeSize,
-            2, "Chapter2_Level1_Paaralan");
+            row++;
+        }
 
-        LevelSelectController.LevelNode parke = CreateNode(canvasT, "Node_Parke",
-            "node_parke", "node_parke_locked", pParke, nodeSize,
-            3, "Chapter3_Level1_Parke");
+        GameObject back = CreateSpriteButton(canvasT, "Button_Back", "btn_back",
+                                             new Vector2(-860f, 430f), new Vector2(120f, 120f));
 
-        LevelSelectController.LevelNode palengke = CreateNode(canvasT, "Node_Palengke",
-            "node_palengke", "node_palengke_locked", pPalengke, nodeSize,
-            4, "Chapter4_Level1_Palengke");
-
-        // --- Name plaques, hung under each signpost ---
-        // The plaque art is blank and the name is drawn over it with the
-        // game's own font, so the spelling stays correct and editable instead
-        // of being baked into the picture.
-        CreatePlaque(canvasT, "Plaque_Bahay",    "Bahay",    pBahay,    baseDrop);
-        CreatePlaque(canvasT, "Plaque_Paaralan", "Paaralan", pPaaralan, baseDrop);
-        CreatePlaque(canvasT, "Plaque_Parke",    "Parke",    pParke,    baseDrop);
-        CreatePlaque(canvasT, "Plaque_Palengke", "Palengke", pPalengke, baseDrop);
-
-        // --- Wire controller ---
         LevelSelectController controller = canvasGO.AddComponent<LevelSelectController>();
         controller.mainMenuSceneName = "MainMenu";
-        controller.backButton = backBtn.GetComponent<Button>();
-        controller.nodes = new[] { bahay, paaralan, parke, palengke };
+        controller.backButton = back.GetComponent<Button>();
+        controller.nodes = built.ToArray();
+        controller.playerMarker = null;   // no map to walk along any more
 
-        // --- Save + insert into Build Settings ---
+        SceneFaderBuilder.Build();
+
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, LevelSelectScenePath);
         SetBuildOrder();
 
-        Debug.Log("[SALINLAHI] Level Select map built from Canva assets and saved to " + LevelSelectScenePath +
-                   ". Build Settings now runs MainMenu -> LevelSelect -> Chapter 1 Level 1. " +
-                   "Only Bahay is unlocked until the other chapters' scenes exist and call LevelProgress.MarkComplete().");
+        int playable = 0;
+        foreach (LevelSelectController.StepNode n in built)
+            if (!string.IsNullOrEmpty(n.sceneName)) playable++;
+
+        Debug.Log("[SALINLAHI] Level select built and saved to " + LevelSelectScenePath +
+                  ". " + row + " level rows, " + built.Count + " tiles, " + playable +
+                  " of them with a scene behind them. " +
+                  (skipped > 0
+                      ? skipped + " level(s) have no scenes in JourneyMap yet and were left out."
+                      : "Every level has scenes."));
     }
 
-    /// <summary>MainMenu, then LevelSelect, then Chapter 1 Level 1, then anything else already listed.</summary>
+    /// <summary>Level numbers in the order JourneyMap lists them, without repeats.</summary>
+    private static List<int> LevelsInOrder()
+    {
+        List<int> order = new List<int>();
+        foreach (JourneyMap.Step s in JourneyMap.Steps)
+            if (!order.Contains(s.levelIndex)) order.Add(s.levelIndex);
+        return order;
+    }
+
+    /// <summary>Indices into JourneyMap.Steps of one level's scenes, in order.</summary>
+    private static List<int> SceneStepsOf(int levelIndex)
+    {
+        List<int> steps = new List<int>();
+        for (int i = 0; i < JourneyMap.Steps.Length; i++)
+        {
+            JourneyMap.Step s = JourneyMap.Steps[i];
+            if (s.levelIndex == levelIndex && s.kind == JourneyMap.StepKind.Scene)
+                steps.Add(i);
+        }
+        return steps;
+    }
+
+    /// <summary>The level marker's label - "Bahay" - or a number if there isn't one.</summary>
+    private static string LevelNameOf(int levelIndex)
+    {
+        foreach (JourneyMap.Step s in JourneyMap.Steps)
+            if (s.levelIndex == levelIndex && s.kind == JourneyMap.StepKind.Level)
+                return s.label;
+        return "Level " + levelIndex;
+    }
+
+    private static void CreateRowLabel(Transform parent, string text, float baseline)
+    {
+        GameObject go = new GameObject("Label_" + text, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+
+        Text label = go.AddComponent<Text>();
+        label.text = text;
+        label.font = UIFont.Get();
+        label.fontSize = 56;
+        label.fontStyle = FontStyle.Bold;
+        label.alignment = TextAnchor.MiddleRight;
+        label.color = new Color(0.98f, 0.88f, 0.64f);
+        label.raycastTarget = false;
+
+        Outline outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.22f, 0.13f, 0.05f, 0.95f);
+        outline.effectDistance = new Vector2(2f, -2f);
+
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.pivot = new Vector2(1f, 0f);
+        rect.sizeDelta = new Vector2(520f, 80f);
+        rect.anchoredPosition = new Vector2(LabelRightX, baseline + 44f);
+    }
+
+    private static LevelSelectController.StepNode CreateTile(
+        Transform parent, int stepIndex, JourneyMap.Step step, float x, float baseline)
+    {
+        string unlocked = TileSpriteFor(step.label);
+        Sprite unlockedSprite = LoadSprite(unlocked);
+
+        // Each tile keeps its own proportions. The ones with a leaf sprouting
+        // over the top are taller than the bare ones, and forcing them all
+        // into one box would squash exactly those.
+        float height = TileWidth;
+        if (unlockedSprite != null && unlockedSprite.rect.width > 0f)
+            height = TileWidth * (unlockedSprite.rect.height / unlockedSprite.rect.width);
+
+        string name = "Tile_L" + step.levelIndex + "_S" + step.label;
+        GameObject go = CreateSpriteButton(parent, name, unlocked,
+                                           new Vector2(x, baseline), new Vector2(TileWidth, height));
+
+        // Sitting the tiles on a shared baseline keeps the numbers in a line
+        // whether or not a tile has a leaf on its head.
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.pivot = new Vector2(0.5f, 0f);
+        rect.anchoredPosition = new Vector2(x, baseline);
+
+        return new LevelSelectController.StepNode
+        {
+            button = go.GetComponent<Button>(),
+            icon = go.GetComponent<Image>(),
+            unlockedSprite = unlockedSprite,
+            lockedSprite = LoadSprite("btn_level_locked"),
+            lockOverlay = null,          // the locked tile has its own padlock
+            stepIndex = stepIndex,
+            sceneName = step.sceneName,
+        };
+    }
+
+    /// <summary>The numbered tile for a scene, or the padlock if it runs past the set.</summary>
+    private static string TileSpriteFor(string label)
+    {
+        int number;
+        if (int.TryParse(label, out number) && number >= 1 && number <= HighestNumberedTile)
+            return "btn_level_" + number;
+
+        Debug.LogWarning("[SALINLAHI] No numbered tile for scene label '" + label +
+                         "'. The artwork goes up to " + HighestNumberedTile +
+                         "; using the padlock tile instead.");
+        return "btn_level_locked";
+    }
+
     private static void SetBuildOrder()
     {
         var scenes = new List<EditorBuildSettingsScene>();
@@ -168,79 +287,6 @@ public class BuildLevelSelectScene
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 
-    // ---------- helpers ----------
-
-    /// <summary>A wooden plaque under a signpost, carrying the level's name.</summary>
-    private static GameObject CreatePlaque(Transform parent, string name, string label,
-                                           Vector2 nodePos, float baseDrop)
-    {
-        Vector2 pos = new Vector2(nodePos.x, nodePos.y - baseDrop - 34f);
-        GameObject go = CreateImage(parent, name, "ui_name_plaque", pos, new Vector2(248, 100), true);
-        go.GetComponent<Image>().raycastTarget = false;
-
-        GameObject textGO = new GameObject("Label", typeof(RectTransform));
-        textGO.transform.SetParent(go.transform, false);
-        Text text = textGO.AddComponent<Text>();
-        text.text = label;
-        text.font = UIFont.Get();
-        text.fontSize = 34;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = new Color(0.27f, 0.15f, 0.07f);   // dark brown, reads on the wood
-        text.raycastTarget = false;
-        RectTransform tr = textGO.GetComponent<RectTransform>();
-        tr.anchorMin = new Vector2(0f, 0.5f);
-        tr.anchorMax = new Vector2(1f, 0.5f);
-        tr.offsetMin = new Vector2(26f, -26f);          // clear of the bamboo ends
-        tr.offsetMax = new Vector2(-18f, 26f);
-        return go;
-    }
-
-    /// <summary>Stepping stones tracing the walk between two signposts.</summary>
-    private static void CreateSteps(Transform parent, string name, Vector2 from, Vector2 to,
-                                    float baseDrop, int count = 3)
-    {
-        Vector2 a = new Vector2(from.x, from.y - baseDrop);
-        Vector2 b = new Vector2(to.x, to.y - baseDrop);
-        GameObject root = new GameObject(name, typeof(RectTransform));
-        root.transform.SetParent(parent, false);
-        for (int i = 1; i <= count; i++)
-        {
-            float t = i / (float)(count + 1);
-            GameObject step = CreateImage(root.transform, "Step_" + i, "ui_step",
-                                          Vector2.Lerp(a, b, t), new Vector2(66, 53), true);
-            step.GetComponent<Image>().raycastTarget = false;
-        }
-    }
-
-    private static LevelSelectController.LevelNode CreateNode(Transform parent, string name,
-        string unlockedSpriteFile, string lockedSpriteFile, Vector2 anchoredPos, Vector2 size,
-        int levelIndex, string sceneName)
-    {
-        GameObject go = CreateImage(parent, name, unlockedSpriteFile, anchoredPos, size, true);
-        Image icon = go.GetComponent<Image>();
-
-        Button button = go.AddComponent<Button>();
-        button.targetGraphic = icon;
-        ColorBlock colors = button.colors;
-        colors.normalColor = Color.white;
-        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
-        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
-        colors.disabledColor = Color.white; // locked look comes from the grayscale sprite, not a tint
-        colors.fadeDuration = 0.08f;
-        button.colors = colors;
-
-        return new LevelSelectController.LevelNode
-        {
-            button = button,
-            icon = icon,
-            unlockedSprite = LoadSprite(unlockedSpriteFile),
-            lockedSprite = LoadSprite(lockedSpriteFile),
-            levelIndex = levelIndex,
-            sceneName = sceneName,
-        };
-    }
-
     private static GameObject CreateImage(Transform parent, string name, string spriteFile,
         Vector2 anchoredPos, Vector2 size, bool preserveAspect)
     {
@@ -255,7 +301,6 @@ public class BuildLevelSelectScene
         return go;
     }
 
-    /// <summary>A button whose whole look is the Canva sprite. Darkens slightly when pressed.</summary>
     private static GameObject CreateSpriteButton(Transform parent, string name, string spriteFile,
         Vector2 anchoredPos, Vector2 size)
     {
@@ -266,6 +311,7 @@ public class BuildLevelSelectScene
         colors.normalColor = Color.white;
         colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
         colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
+        colors.disabledColor = new Color(0.78f, 0.78f, 0.78f, 1f);
         colors.fadeDuration = 0.08f;
         button.colors = colors;
         return go;
