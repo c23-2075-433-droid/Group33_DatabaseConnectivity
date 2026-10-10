@@ -61,3 +61,6 @@ crashlytics-build.properties
 .DS_Store?
 ._*
 Thumbs.db
+
+# A Claude installer that landed in the project folder; never part of the game.
+Claude Setup*.exe
