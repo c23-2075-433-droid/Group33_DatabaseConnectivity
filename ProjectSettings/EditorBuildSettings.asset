@@ -32,4 +32,31 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1_Level5_Almusal.unity
     guid: 8f4aeb3cff2bc48eeb9eddadf4e03e22
+  - enabled: 1
+    path: Assets/Scenes/Chapter2_Level2_Klasrum.unity
+    guid: 10820585cb9d8e64e9f09f8357cb1de3
+  - enabled: 1
+    path: Assets/Scenes/Chapter2_Level3_Aralin.unity
+    guid: 12b4b0e7543905f4a8ba9a497c53d512
+  - enabled: 1
+    path: Assets/Scenes/Chapter2_Level4_Recess.unity
+    guid: 7d5cbbefd128c914785321b3e70e5a8b
+  - enabled: 1
+    path: Assets/Scenes/Chapter2_Level5_Uwian.unity
+    guid: f58d7d46f5a44704da236ce5bfbf81a9
+  - enabled: 1
+    path: Assets/Scenes/Chapter3_Level1_Parke.unity
+    guid: 58f81331ae643b247be2f03c2762f569
+  - enabled: 1
+    path: Assets/Scenes/Chapter3_Level2_Palaruan.unity
+    guid: 689afaf281d5e064c9a7d8d5c33eb549
+  - enabled: 1
+    path: Assets/Scenes/Chapter3_Level3_Kaibigan.unity
+    guid: f86b11062cd47644b9f254448f778a31
+  - enabled: 1
+    path: Assets/Scenes/Chapter3_Level4_Piknik.unity
+    guid: 8b0cd13395a66334b8bc01f2970b33c9
+  - enabled: 1
+    path: Assets/Scenes/Chapter3_Level5_Uwi.unity
+    guid: 5877827083941554db5332212c1165d3
   m_configObjects: {}
