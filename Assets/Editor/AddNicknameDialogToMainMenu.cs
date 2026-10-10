@@ -55,12 +55,14 @@ public class AddNicknameDialogToMainMenu
         controller.nicknameInput = dialog.input;
         controller.nicknameOkayButton = dialog.okay;
         controller.nicknameCancelButton = dialog.cancel;
+        controller.nicknameAvailability = NicknameCheckBuilder.Build(dialog);
 
         EditorSceneManager.SaveScene(scene);
 
         Debug.Log("[SALINLAHI] Nickname dialog added to " + ScenePath + ". " +
-                   "Play now opens the popup; OKAY saves the name via NicknameManager and loads the " +
-                   "journey map, CANCEL closes it. The name becomes player_name on the database record.");
+                   "Play opens the popup; OKAY checks the name against the ones already saved and, " +
+                   "if it is taken, fills in a free one (Kylo -> Kylo01) instead of starting. " +
+                   "Without a filled-in SupabaseConfig the check is skipped and every name is accepted.");
     }
 
     private static void RemoveByName(Scene scene, string name)

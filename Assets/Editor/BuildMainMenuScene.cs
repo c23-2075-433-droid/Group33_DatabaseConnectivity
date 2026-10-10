@@ -114,6 +114,9 @@ public class BuildMainMenuScene
         controller.nicknameInput = nicknameDialog.input;
         controller.nicknameOkayButton = nicknameDialog.okay;
         controller.nicknameCancelButton = nicknameDialog.cancel;
+        // Same wiring the patcher does, so a fresh rebuild does not quietly
+        // drop the "already taken" check that Add Nickname Dialog adds.
+        controller.nicknameAvailability = NicknameCheckBuilder.Build(nicknameDialog);
         controller.playButton = playBtn.GetComponent<Button>();
         controller.settingsButton = settingsBtn.GetComponent<Button>();
         controller.aboutButton = aboutBtn.GetComponent<Button>();
