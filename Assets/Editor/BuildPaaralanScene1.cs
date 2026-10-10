@@ -3,11 +3,11 @@
 // One-click scene builder for Paaralan Scene 1 ("Arriving at School").
 // Teaches three words: Kumusta, Pasok, Takbo.
 //
-// This is Level 2's FIRST scene and, for now, its only one - so it both
-// starts the run (RunScoreCounter.resetOnStart) and ends it (the database
-// demo, the Paaralan badge, unlocking Parke). When Scene 2 is built, move the
-// database demo on to whichever scene becomes last and set resetOnStart false
-// there, exactly as Bahay's scenes do.
+// This is Level 2's FIRST scene: it starts the run
+// (RunScoreCounter.resetOnStart) and fades into Scene 2, which ends it. The
+// database demo, the Paaralan badge and unlocking Parke now live at the end of
+// Scene 2 - see BuildPaaralanScene2 - exactly as Bahay's scenes do. Until
+// Scene 2 existed this scene did both jobs itself.
 //
 // Kylo arrives already in his school uniform with his bag, carried over from
 // the end of Bahay. The three words are the arrival in order: greet, go in,
@@ -36,6 +36,7 @@ public class BuildPaaralanScene1
 {
     private const string SpriteFolder = "Assets/Sprites/";
     private const string ScenePath = "Assets/Scenes/Chapter2_Level1_Paaralan.unity";
+    private const string NextScene = "Chapter2_Level2_Klasrum";
 
     private const float ViewHeight = 10.8f;           // camera is orthographic 5.4
     private const float ViewWidth = 19.2f;
@@ -221,15 +222,18 @@ public class BuildPaaralanScene1
         controller.objectives = new[] { kumusta, pasok, takbo };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFaderBuilder.Build();
+        SceneFader fader = SceneFaderBuilder.Build();
 
-        // --- Level 2's only scene, so it both starts and ends the run ---
+        // --- Level 2's first scene, so it starts the run; Scene 2 ends it ---
         GameObject runScoreGO = new GameObject("RunScore");
         RunScoreCounter runScore = runScoreGO.AddComponent<RunScoreCounter>();
         runScore.voiceCommand = voiceCommand;
         runScore.resetOnStart = true;   // a fresh level, so a fresh total
 
-        DatabaseDemoBuilder.Build("Paaralan - Level 2", "LevelSelect", 2, "badge_paaralan");
+        // Getting through the gate hands over to the classroom. The result
+        // panel, the badge and the Parke unlock sit at the end of Scene 2.
+        UnityEventTools.AddStringPersistentListener(
+            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -237,9 +241,9 @@ public class BuildPaaralanScene1
 
         Debug.Log("[SALINLAHI] Paaralan Scene 1 built and saved to " + ScenePath +
                    ". Words: Kumusta, Pasok, Takbo, greeting the guard on the gate. " +
-                   "Finishing it earns the Paaralan badge " +
-                   "and unlocks Parke. It is Level 2's only scene for now, so it both starts " +
-                   "and ends the run - when Scene 2 exists, move the database demo there.");
+                   "It starts Level 2's run and fades into " + NextScene + ", which ends it " +
+                   "and awards the Paaralan badge - so build Paaralan Scene 2 as well, or " +
+                   "the level runs into a scene that is not there.");
     }
 
     /// <summary>
