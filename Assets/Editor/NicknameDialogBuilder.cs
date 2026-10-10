@@ -46,6 +46,7 @@ public static class NicknameDialogBuilder
         public InputField input;
         public Button okay;
         public Button cancel;
+        public Text status;
     }
 
     /// <summary>
@@ -92,6 +93,14 @@ public static class NicknameDialogBuilder
         GameObject cancelGO = CreateImage(panelT, "CancelButton", "btn_cancel",
             new Vector2(ContentCentreX + buttonSpread, buttonY), buttonSize);
 
+        // "Kylo is taken. Try Kylo01." Sits BELOW the buttons:
+        // the gap between the input slot and the button row is about six
+        // pixels at this scale, which is not a line of text, and the panel art
+        // has clear bamboo-free interior under the buttons.
+        GameObject statusGO = CreateStatusText(panelT,
+            new Vector2(ContentCentreX, -285f * Scale),
+            new Vector2(1100f * Scale, 72f * Scale));
+
         root.SetActive(false); // MainMenuController turns this on when Play is pressed
 
         return new Dialog
@@ -100,7 +109,39 @@ public static class NicknameDialogBuilder
             input = input,
             okay = MakeButton(okayGO),
             cancel = MakeButton(cancelGO),
+            status = statusGO.GetComponent<Text>(),
         };
+    }
+
+    /// <summary>
+    /// The line that explains a rejected nickname. Starts switched off, so an
+    /// untouched dialog shows nothing; NicknameAvailability turns it on when
+    /// it has something to say.
+    /// </summary>
+    private static GameObject CreateStatusText(Transform parent, Vector2 position, Vector2 size)
+    {
+        GameObject go = new GameObject("StatusText", typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchoredPosition = position;
+        rect.sizeDelta = size;
+
+        Text text = go.AddComponent<Text>();
+        text.font = UIFont.Get();
+        text.fontSize = 30;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.supportRichText = false;
+        text.raycastTarget = false;
+        // Warm cream, like the other text on the menu's wooden surfaces, but
+        // pushed towards amber so it reads as a notice rather than a label.
+        text.color = new Color(1f, 0.90f, 0.72f);
+        text.text = "";
+
+        go.SetActive(false);
+        return go;
     }
 
     private static InputField BuildInputField(GameObject slot)

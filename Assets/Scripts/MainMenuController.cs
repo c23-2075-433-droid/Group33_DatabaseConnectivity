@@ -16,6 +16,9 @@ public class MainMenuController : MonoBehaviour
     public Button nicknameOkayButton;
     [Tooltip("Closes the popup without starting the game.")]
     public Button nicknameCancelButton;
+    [Tooltip("Optional. Checks the name is not already in use and offers a free one instead. " +
+              "Leave empty and any name is accepted, which is how older scenes behave.")]
+    public NicknameAvailability nicknameAvailability;
 
     [Header("Buttons")]
     public Button playButton;
@@ -116,6 +119,9 @@ public class MainMenuController : MonoBehaviour
         nicknamePanel.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
+        // Otherwise a reopened dialog still shows the last "already taken"
+        // line, about a name the child may since have changed.
+        if (nicknameAvailability != null) nicknameAvailability.ResetStatus();
 
         if (nicknameInput != null)
         {
@@ -132,9 +138,22 @@ public class MainMenuController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// OKAY no longer starts the game outright. The name goes to
+    /// NicknameAvailability first, which calls back only once it is settled -
+    /// so a taken name leaves the dialog open with a free one filled in, and
+    /// the child presses OKAY again. With no checker wired, this is the
+    /// straight-through behaviour it always had.
+    /// </summary>
     private void OnNicknameConfirmed()
     {
-        StartGame();
+        if (nicknameAvailability == null)
+        {
+            StartGame();
+            return;
+        }
+
+        nicknameAvailability.Check(nicknameInput != null ? nicknameInput.text : "", StartGame);
     }
 
     private void CloseNicknameDialog()

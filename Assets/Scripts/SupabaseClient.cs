@@ -40,6 +40,18 @@ public class SupabaseClient : MonoBehaviour
         StartCoroutine(FetchRoutine(limit, onDone));
     }
 
+    /// <summary>
+    /// GETs the player names that begin with <paramref name="stem"/>, for the
+    /// main menu's nickname check. Only the name column is selected, so the
+    /// response stays small even for a name that has been played many times.
+    /// onDone(names, error) - error is null on success.
+    /// </summary>
+    public void FetchNamesLike(string stem, int limit, Action<List<string>, string> onDone)
+    {
+        if (!HasValidConfig((ok, err) => onDone?.Invoke(null, err))) return;
+        StartCoroutine(FetchNamesRoutine(stem, limit, onDone));
+    }
+
     private bool HasValidConfig(Action<bool, string> onDone)
     {
         if (config == null)
@@ -117,6 +129,47 @@ public class SupabaseClient : MonoBehaviour
             List<ScoreRecord> records = ParseRecords(request.downloadHandler.text);
             Debug.Log("SupabaseClient: fetched " + records.Count + " record(s).");
             onDone?.Invoke(records, null);
+        }
+    }
+
+    private IEnumerator FetchNamesRoutine(string stem, int limit, Action<List<string>, string> onDone)
+    {
+        // PostgREST: "ilike" is the case-insensitive LIKE, and "*" is its
+        // wildcard - it becomes "%" server-side. The escaping is Uri's rather
+        // than UnityWebRequest.EscapeURL's, because that one encodes a space
+        // as "+", which PostgREST would then match literally.
+        string pattern = Uri.EscapeDataString(stem == null ? "" : stem.Trim()) + "*";
+        string url = config.TableEndpoint + "?select=player_name&player_name=ilike." + pattern +
+                      "&limit=" + Mathf.Max(1, limit);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            ApplyHeaders(request);
+
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                // A warning, not an error: the caller lets the player through
+                // when this fails, so it is not a broken game.
+                string msg = "Name lookup failed (" + request.responseCode + "): " + request.error +
+                              " | " + request.downloadHandler.text;
+                Debug.LogWarning("SupabaseClient: " + msg);
+                onDone?.Invoke(null, msg);
+                yield break;
+            }
+
+            // The rows arrive with only player_name filled in; the rest of
+            // ScoreRecord stays at its defaults. Reusing it here costs nothing
+            // and saves keeping a second parser in step with this one.
+            List<string> names = new List<string>();
+            foreach (ScoreRecord row in ParseRecords(request.downloadHandler.text))
+            {
+                if (!string.IsNullOrEmpty(row.player_name)) names.Add(row.player_name);
+            }
+
+            Debug.Log("SupabaseClient: " + names.Count + " existing name(s) begin with \"" + stem + "\".");
+            onDone?.Invoke(names, null);
         }
     }
 
