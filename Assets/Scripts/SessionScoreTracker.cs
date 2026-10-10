@@ -31,10 +31,24 @@ public class SessionScoreTracker : MonoBehaviour
     [Header("Level Complete UI")]
     [Tooltip("The panel shown when the session ends (LevelComplete_Canvas).")]
     public GameObject levelCompletePanel;
-    [Tooltip("Shows this session's result.")]
+    [Tooltip("Shows who played.")]
     public Text scoreText;
     [Tooltip("Shows records retrieved back from the database.")]
     public Text recordsText;
+
+    [Header("Level Complete Statistics")]
+    [Tooltip("Words said correctly, e.g. \"8 of 9\".")]
+    public Text wordsValueText;
+    [Tooltip("Total voice attempts this run.")]
+    public Text triesValueText;
+    [Tooltip("The Filipino words practised, listed.")]
+    public Text learnedValueText;
+    [Tooltip("Star1..Star3, lit according to accuracy. Left empty, no stars are shown.")]
+    public Image[] stars;
+    [Tooltip("Lit star art.")]
+    public Sprite starOnSprite;
+    [Tooltip("Unlit star art.")]
+    public Sprite starOffSprite;
 
     [Header("Session")]
     [Tooltip("Stored in the 'level' column so records can be told apart later.")]
@@ -59,6 +73,48 @@ public class SessionScoreTracker : MonoBehaviour
         if (objectiveController != null) objectiveController.onAllObjectivesComplete.RemoveListener(HandleSessionComplete);
     }
 
+    /// <summary>
+    /// Fills the three statistic rows and the star rating.
+    ///
+    /// These replace the "total score / time / gems collected" of the mock-up
+    /// this panel is modelled on. None of those exist here: the game keeps no
+    /// points, collects nothing, and deliberately does not time a child who is
+    /// sounding out a word in a second language. What it does know is how many
+    /// words landed, how many tries that took, and which words they were -
+    /// and the last of those is the one a parent or a teacher would ask about.
+    /// </summary>
+    private void FillStatistics(int correct, int attempts, List<string> practised, float accuracy)
+    {
+        SetText(wordsValueText, correct + " of " + Mathf.Max(correct, practised.Count));
+        SetText(triesValueText, attempts.ToString());
+        SetText(learnedValueText, DescribePractised(practised));
+
+        if (stars == null || stars.Length == 0) return;
+
+        // Earned on accuracy, not speed. Every word right first time is three
+        // stars; the third is worth reaching for without being punishing,
+        // because a child who needed a second try still said the word.
+        int earned = accuracy >= 0.95f ? 3 : accuracy >= 0.7f ? 2 : 1;
+        for (int i = 0; i < stars.Length; i++)
+        {
+            if (stars[i] == null) continue;
+            Sprite wanted = i < earned ? starOnSprite : starOffSprite;
+            if (wanted != null) stars[i].sprite = wanted;
+        }
+    }
+
+    /// <summary>
+    /// Every word practised, named. There is no cap: the whole point of this
+    /// line is for a child to see what they said and a parent to see what was
+    /// learned, and "+1 more" withholds exactly that. The panel gives the row
+    /// the lower third of the board to wrap into instead.
+    /// </summary>
+    private static string DescribePractised(List<string> practised)
+    {
+        if (practised == null || practised.Count == 0) return "none yet";
+        return string.Join(", ", practised.ToArray());
+    }
+
     // ---- 1. SAVE ----
 
     private void HandleSessionComplete()
@@ -72,6 +128,10 @@ public class SessionScoreTracker : MonoBehaviour
         // scene, not just the words said in this one.
         int correctAnswers = RunScore.Correct;
         int totalAttempts = RunScore.Attempts;
+        // Taken now, because Reset() below empties all of this before the
+        // panel is filled in.
+        List<string> practised = new List<string>(RunScore.Practised);
+        float accuracy = RunScore.Accuracy;
 
         ScoreInsert record = new ScoreInsert
         {
@@ -96,8 +156,8 @@ public class SessionScoreTracker : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 
         ShowPanel();
-        SetText(scoreText, "Player: " + record.player_name +
-                            "\nScore: " + record.score + " / " + record.attempts + " attempts");
+        SetText(scoreText, record.player_name);
+        FillStatistics(correctAnswers, totalAttempts, practised, accuracy);
         SetText(recordsText, "Saving your result...");
 
         if (supabaseClient == null)
