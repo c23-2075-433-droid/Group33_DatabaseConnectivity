@@ -46,6 +46,14 @@ public class SceneObjectiveController : MonoBehaviour
         public UnityEvent onCorrect = new UnityEvent();
     }
 
+    /// <summary>
+    /// Raised with an objective's own word each time one is answered
+    /// correctly, for anything that needs to know WHICH word rather than just
+    /// that a word landed - RunScoreCounter uses it to build the list the
+    /// level-complete panel shows.
+    /// </summary>
+    public event System.Action<string> OnObjectiveCompleted;
+
     [Tooltip("The VoiceCommand that recognizes speech for this scene.")]
     public VoiceCommand voiceCommand;
 
@@ -203,6 +211,12 @@ public class SceneObjectiveController : MonoBehaviour
         SceneObjective objective = objectives[currentIndex];
         if (objective.promptRoot != null) objective.promptRoot.SetActive(false);
         objective.onCorrect?.Invoke();
+
+        // Reported from here, not read off VoiceCommand.currentTargetWord by
+        // the listener, because both branches below clear or advance that word
+        // synchronously - so whether a listener saw the answered word or the
+        // next one came down to which of them subscribed first.
+        OnObjectiveCompleted?.Invoke(objective.word);
 
         if (!waitForActionToFinish)
         {

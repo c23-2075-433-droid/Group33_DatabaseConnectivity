@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /// <summary>
 /// The running total for one playthrough of a level, kept across its scenes.
 ///
@@ -19,11 +21,45 @@ public static class RunScore
     /// <summary>Every voice attempt so far this run, right or wrong.</summary>
     public static int Attempts { get; private set; }
 
+    private static readonly List<string> practised = new List<string>();
+
+    /// <summary>
+    /// The Filipino words said correctly this run, in the order they were
+    /// met and without repeats. This is what the level-complete panel shows
+    /// and what a parent or teacher would actually want to know - two counts
+    /// say how well it went, this says what was learned.
+    /// </summary>
+    public static IList<string> Practised => practised.AsReadOnly();
+
+    /// <summary>
+    /// How many of the attempts landed, 0..1. Used for the star rating, which
+    /// is why it reports 0 rather than dividing by zero on an empty run.
+    /// </summary>
+    public static float Accuracy => Attempts > 0 ? (float)Correct / Attempts : 0f;
+
     /// <summary>Records one voice attempt.</summary>
     public static void Add(bool wasCorrect)
     {
         Attempts++;
         if (wasCorrect) Correct++;
+    }
+
+    /// <summary>
+    /// Notes a word the child got right. Kept separate from Add because the
+    /// two arrive from different places: the count comes from the recogniser's
+    /// verdict, the word from whichever objective was being asked, which only
+    /// SceneObjectiveController knows for certain.
+    /// </summary>
+    public static void NotePractised(string word)
+    {
+        if (string.IsNullOrWhiteSpace(word)) return;
+
+        string trimmed = word.Trim();
+        foreach (string seen in practised)
+        {
+            if (string.Equals(seen, trimmed, System.StringComparison.OrdinalIgnoreCase)) return;
+        }
+        practised.Add(trimmed);
     }
 
     /// <summary>
@@ -35,5 +71,6 @@ public static class RunScore
     {
         Correct = 0;
         Attempts = 0;
+        practised.Clear();
     }
 }
