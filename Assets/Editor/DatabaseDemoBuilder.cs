@@ -48,15 +48,18 @@ public static class DatabaseDemoBuilder
 
         GameObject panel = LevelCompleteUIBuilder.BuildPanel("Magaling!", badgeSpriteFile);
         Transform panelRoot = panel.transform.Find("Panel");
-        Text scoreText = FindText(panelRoot, "ScoreText");
+        // Paths follow the summary layout: the board carries the statistics,
+        // the container around it carries the records strip and the buttons.
+        Text scoreText = FindText(panelRoot, "Board/Plaque/ScoreText");
         Text recordsText = FindText(panelRoot, "RecordsText");
 
-        // The panel's OKAY button goes back to whatever scene this one should
-        // return to (usually the journey map).
-        Transform okay = panelRoot != null ? panelRoot.Find("OkayButton") : null;
-        if (okay != null)
+        // "Next Level" is the button that leaves for whatever scene this one
+        // should return to - usually the journey map. Replay and Main Menu
+        // already know where they go and are left alone.
+        Transform next = panelRoot != null ? panelRoot.Find("NextButton") : null;
+        if (next != null)
         {
-            LoadSceneOnClick loader = okay.GetComponent<LoadSceneOnClick>();
+            LoadSceneOnClick loader = next.GetComponent<LoadSceneOnClick>();
             if (loader != null) loader.sceneName = returnSceneName;
         }
 
@@ -79,6 +82,23 @@ public static class DatabaseDemoBuilder
         tracker.recordsText = recordsText;
         tracker.levelName = levelName;
         tracker.levelIndex = levelIndex;
+
+        // The three statistic rows and the star rating, built by
+        // LevelCompleteUIBuilder. Found by the names it gives them rather than
+        // assigned by hand, so a rebuilt panel re-wires itself.
+        tracker.wordsValueText = FindText(panelRoot, "Board/StatWords/WordsValue");
+        tracker.triesValueText = FindText(panelRoot, "Board/StatTries/TriesValue");
+        tracker.learnedValueText = FindText(panelRoot, "Board/StatLearned/LearnedValue");
+        tracker.starOnSprite = LoadSprite("ui_summary_star_on");
+        tracker.starOffSprite = LoadSprite("ui_summary_star_off");
+
+        List<Image> stars = new List<Image>();
+        for (int i = 1; i <= 3; i++)
+        {
+            Transform star = panelRoot != null ? panelRoot.Find("Board/StarRow/Star" + i) : null;
+            if (star != null) stars.Add(star.GetComponent<Image>());
+        }
+        tracker.stars = stars.ToArray();
 
         // Counting lives here, not on the tracker, so every scene of a level
         // adds to the same running total (RunScore). This is a later scene of
@@ -117,6 +137,15 @@ public static class DatabaseDemoBuilder
         if (parent == null) return null;
         Transform t = parent.Find(name);
         return t != null ? t.GetComponent<Text>() : null;
+    }
+
+    /// <summary>
+    /// Star art for the rating row. Missing art is not fatal: the panel keeps
+    /// whatever sprite it was built with, so the stars simply never light.
+    /// </summary>
+    private static Sprite LoadSprite(string spriteFile)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/" + spriteFile + ".png");
     }
 
     private static List<GameObject> FindAllInScene(string name)
