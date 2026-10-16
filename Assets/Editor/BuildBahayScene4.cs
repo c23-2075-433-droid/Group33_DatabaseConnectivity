@@ -237,7 +237,9 @@ public class BuildBahayScene4
         controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // No longer the last scene of the level: breakfast follows. A middle
         // scene carries its own RunScoreCounter, or the words said here are
@@ -247,9 +249,8 @@ public class BuildBahayScene4
         runScore.voiceCommand = voiceCommand;
         runScore.resetOnStart = false;   // Scene 1 starts the run
 
-        // --- Hand on to Scene 5 (breakfast) ---
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- The scene's summary, whose Next button hands on to Scene 5 ---
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);

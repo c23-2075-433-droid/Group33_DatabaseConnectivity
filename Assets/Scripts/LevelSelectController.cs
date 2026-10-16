@@ -30,6 +30,11 @@ public class LevelSelectController : MonoBehaviour
         [Tooltip("Padlock shown over a step the player has not reached.")]
         public GameObject lockOverlay;
 
+        [Tooltip("The number drawn on the tile. Always shown - a locked tile is " +
+                 "dimmed rather than covered, so the journey can be counted " +
+                 "end to end whether or not it has been reached.")]
+        public GameObject numberLabel;
+
         [Tooltip("Index into JourneyMap.Steps.")]
         public int stepIndex;
 
@@ -48,6 +53,14 @@ public class LevelSelectController : MonoBehaviour
 
     [Tooltip("How far above a node the portrait sits.")]
     public float markerLift = 86f;
+
+    [Tooltip("Number colour on a tile that can be entered.")]
+    public Color numberColor = new Color(0.99f, 0.95f, 0.85f);
+
+    [Tooltip("Number colour on a tile that cannot. The button dims the tile " +
+             "itself; the number is a child of it, so it has to be dimmed to " +
+             "match or it sits bright on a greyed tile.")]
+    public Color lockedNumberColor = new Color(0.56f, 0.51f, 0.45f);
 
     void Start()
     {
@@ -71,6 +84,15 @@ public class LevelSelectController : MonoBehaviour
             // tiles carry theirs, so the grid leaves this null and the sprite
             // swap above does the whole job.
             if (node.lockOverlay != null) node.lockOverlay.SetActive(!reached);
+
+            // Every tile keeps its number, so the levels can be counted straight
+            // through. A tile that cannot be entered is dimmed instead.
+            if (node.numberLabel != null)
+            {
+                Text numberText = node.numberLabel.GetComponent<Text>();
+                if (numberText != null)
+                    numberText.color = playable ? numberColor : lockedNumberColor;
+            }
 
             if (node.button != null)
             {

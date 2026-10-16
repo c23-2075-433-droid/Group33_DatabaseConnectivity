@@ -202,7 +202,9 @@ public class BuildBahayScene3
         controller.objectives = new[] { kaliwa, maligo, suklay };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // --- This scene's words count towards the level's total ---
         // The scene that ends a level gets a counter from DatabaseDemoBuilder;
@@ -213,9 +215,8 @@ public class BuildBahayScene3
         runScore.voiceCommand = voiceCommand;
         runScore.resetOnStart = false;   // Scene 1 starts the run
 
-        // --- Hand on to Scene 4 (getting dressed) ---
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- The scene's summary, whose Next button hands on to Scene 4 ---
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);

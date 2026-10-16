@@ -12,17 +12,22 @@
 // next. Adding a scene there adds a tile here; nothing in this file needs
 // changing.
 //
-// A scene's tile carries its number within its level - scene 3 of Bahay gets
-// the tile with a 3 on it - which is why the artwork's baked-in numbers can be
-// used directly instead of drawing text over blank tiles. No level has more
-// than the seven the sheet provides.
+// The tiles are numbered straight through the whole journey rather than
+// restarting inside each level: Bahay is 1 to 6, Paaralan carries on at 7, and
+// so on to 16. The sheet only prints 1 to 7, so the numbers are drawn by Unity
+// onto a blank tile that slice_level_buttons.py makes by painting the printed
+// number off one.
 //
 // A tile is enterable only when the player has reached it AND the scene has
-// actually been built. Anything else shows the padlock, because from the
-// child's side "not yet" and "not made yet" are the same thing.
+// actually been built. Anything else is dimmed, keeping its number: the sheet's
+// padlock tile would hide the number, and a numbering that runs 1 to 16 is only
+// worth having if all of it can be read.
 //
-// Sprites expected in Assets/Sprites/ (cut by Tools/slice_level_buttons.py):
-//   btn_level_1 .. btn_level_7, btn_level_locked, ui_select_levels, btn_back
+// Sprites expected in Assets/Sprites/:
+//   btn_level_blank, btn_level_blank_leaf, ui_select_levels
+//     - cut by Tools/slice_level_buttons.py
+//   levelselect_bg - made by Tools/make_levelselect_bg.py
+//   btn_back
 //
 // Run via: Tools > SALINLAHI > Build Level Select Scene
 
@@ -49,13 +54,16 @@ public class BuildLevelSelectScene
     // margin either side.
     private const float TileWidth = 196f;      // tile heights follow their art
     private const float TilePitch = 224f;
-    private const float FirstTileX = -390f;    // centre of the first tile
-    private const float LabelRightX = -528f;   // where the level name ends
 
     private const float FirstRowY = 60f;       // bottom edge of the top row
     private const float RowPitch = 230f;
 
-    private const int HighestNumberedTile = 7; // what the artwork provides
+    private const string BlankTile = "btn_level_blank";
+    private const string BlankLeafTile = "btn_level_blank_leaf";
+
+    // Every fourth tile sprouts a leaf. One picture repeated sixteen times
+    // reads as a spreadsheet; this is the variety the sheet itself has.
+    private const int LeafEvery = 4;
 
     [MenuItem("Tools/SALINLAHI/Build Level Select Scene")]
     public static void BuildScene()
@@ -101,11 +109,21 @@ public class BuildLevelSelectScene
         Image backdropImage = backdrop.AddComponent<Image>();
         backdropImage.color = Backdrop;
         backdropImage.raycastTarget = false;
-        RectTransform backdropRect = backdrop.GetComponent<RectTransform>();
-        backdropRect.anchorMin = Vector2.zero;
-        backdropRect.anchorMax = Vector2.one;
-        backdropRect.offsetMin = Vector2.zero;
-        backdropRect.offsetMax = Vector2.zero;
+        Stretch(backdrop.GetComponent<RectTransform>());
+
+        // On top of the flat colour, not instead of it: an Image with no sprite
+        // draws a white rectangle, so a missing file would white out the screen
+        // rather than fall back to something sensible.
+        Sprite backgroundSprite = LoadSprite("levelselect_bg");
+        if (backgroundSprite != null)
+        {
+            GameObject background = new GameObject("Background", typeof(RectTransform));
+            background.transform.SetParent(canvasT, false);
+            Image backgroundImage = background.AddComponent<Image>();
+            backgroundImage.sprite = backgroundSprite;
+            backgroundImage.raycastTarget = false;
+            Stretch(background.GetComponent<RectTransform>());
+        }
 
         GameObject title = CreateImage(canvasT, "Title", "ui_select_levels",
                                        new Vector2(0f, 380f), new Vector2(820f, 124f), true);
@@ -115,26 +133,33 @@ public class BuildLevelSelectScene
         List<LevelSelectController.StepNode> built = new List<LevelSelectController.StepNode>();
         int row = 0;
         int skipped = 0;
+        int number = 1;            // runs straight through every level
 
         foreach (int levelIndex in LevelsInOrder())
         {
             List<int> sceneSteps = SceneStepsOf(levelIndex);
             if (sceneSteps.Count == 0)
             {
-                // A level with nothing behind it would be a heading over an
-                // empty row. Give it scenes in JourneyMap and it appears.
+                // A level with nothing behind it would be an empty row. Give it
+                // scenes in JourneyMap and it appears.
                 skipped++;
                 continue;
             }
 
             float baseline = FirstRowY - row * RowPitch;
-            CreateRowLabel(canvasT, LevelNameOf(levelIndex), baseline);
+
+            // Rows hold different numbers of scenes, so each is centred on its
+            // own. Starting them all at one x would leave the short rows
+            // hanging off to the left.
+            float firstX = -(sceneSteps.Count - 1) * TilePitch * 0.5f;
 
             for (int i = 0; i < sceneSteps.Count; i++)
             {
                 int stepIndex = sceneSteps[i];
-                float x = FirstTileX + i * TilePitch;
-                built.Add(CreateTile(canvasT, stepIndex, JourneyMap.Steps[stepIndex], x, baseline));
+                float x = firstX + i * TilePitch;
+                built.Add(CreateTile(canvasT, stepIndex, JourneyMap.Steps[stepIndex],
+                                     number, x, baseline));
+                number++;
             }
 
             row++;
@@ -160,7 +185,8 @@ public class BuildLevelSelectScene
             if (!string.IsNullOrEmpty(n.sceneName)) playable++;
 
         Debug.Log("[SALINLAHI] Level select built and saved to " + LevelSelectScenePath +
-                  ". " + row + " level rows, " + built.Count + " tiles, " + playable +
+                  ". " + row + " level rows, " + built.Count + " tiles numbered 1-" +
+                  (number - 1) + ", " + playable +
                   " of them with a scene behind them. " +
                   (skipped > 0
                       ? skipped + " level(s) have no scenes in JourneyMap yet and were left out."
@@ -189,53 +215,30 @@ public class BuildLevelSelectScene
         return steps;
     }
 
-    /// <summary>The level marker's label - "Bahay" - or a number if there isn't one.</summary>
-    private static string LevelNameOf(int levelIndex)
+    /// <summary>Pin a RectTransform to every edge of its parent.</summary>
+    private static void Stretch(RectTransform rect)
     {
-        foreach (JourneyMap.Step s in JourneyMap.Steps)
-            if (s.levelIndex == levelIndex && s.kind == JourneyMap.StepKind.Level)
-                return s.label;
-        return "Level " + levelIndex;
-    }
-
-    private static void CreateRowLabel(Transform parent, string text, float baseline)
-    {
-        GameObject go = new GameObject("Label_" + text, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-
-        Text label = go.AddComponent<Text>();
-        label.text = text;
-        label.font = UIFont.Get();
-        label.fontSize = 56;
-        label.fontStyle = FontStyle.Bold;
-        label.alignment = TextAnchor.MiddleRight;
-        label.color = new Color(0.98f, 0.88f, 0.64f);
-        label.raycastTarget = false;
-
-        Outline outline = go.AddComponent<Outline>();
-        outline.effectColor = new Color(0.22f, 0.13f, 0.05f, 0.95f);
-        outline.effectDistance = new Vector2(2f, -2f);
-
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.pivot = new Vector2(1f, 0f);
-        rect.sizeDelta = new Vector2(520f, 80f);
-        rect.anchoredPosition = new Vector2(LabelRightX, baseline + 44f);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
     }
 
     private static LevelSelectController.StepNode CreateTile(
-        Transform parent, int stepIndex, JourneyMap.Step step, float x, float baseline)
+        Transform parent, int stepIndex, JourneyMap.Step step, int number,
+        float x, float baseline)
     {
-        string unlocked = TileSpriteFor(step.label);
+        bool leafed = number % LeafEvery == 1;
+        string unlocked = leafed ? BlankLeafTile : BlankTile;
         Sprite unlockedSprite = LoadSprite(unlocked);
 
-        // Each tile keeps its own proportions. The ones with a leaf sprouting
-        // over the top are taller than the bare ones, and forcing them all
-        // into one box would squash exactly those.
+        // Each tile keeps its own proportions. The leafed one is taller than
+        // the bare one, and forcing them into one box would squash exactly it.
         float height = TileWidth;
         if (unlockedSprite != null && unlockedSprite.rect.width > 0f)
             height = TileWidth * (unlockedSprite.rect.height / unlockedSprite.rect.width);
 
-        string name = "Tile_L" + step.levelIndex + "_S" + step.label;
+        string name = "Tile_" + number + "_L" + step.levelIndex + "_S" + step.label;
         GameObject go = CreateSpriteButton(parent, name, unlocked,
                                            new Vector2(x, baseline), new Vector2(TileWidth, height));
 
@@ -245,29 +248,72 @@ public class BuildLevelSelectScene
         rect.pivot = new Vector2(0.5f, 0f);
         rect.anchoredPosition = new Vector2(x, baseline);
 
+        GameObject numberGO = CreateNumber(go.transform, number, leafed);
+
         return new LevelSelectController.StepNode
         {
             button = go.GetComponent<Button>(),
             icon = go.GetComponent<Image>(),
             unlockedSprite = unlockedSprite,
-            lockedSprite = LoadSprite("btn_level_locked"),
-            lockOverlay = null,          // the locked tile has its own padlock
+            // The same tile either way. The padlock tile would cover the number,
+            // and the numbering is only useful if the whole journey can be read
+            // off the screen, so a tile that cannot be entered is dimmed instead.
+            lockedSprite = unlockedSprite,
+            lockOverlay = null,
+            numberLabel = numberGO,
             stepIndex = stepIndex,
             sceneName = step.sceneName,
         };
     }
 
-    /// <summary>The numbered tile for a scene, or the padlock if it runs past the set.</summary>
-    private static string TileSpriteFor(string label)
+    /// <summary>The number painted on a blank tile, sitting on the panel.</summary>
+    private static GameObject CreateNumber(Transform tile, int number, bool leafed)
     {
-        int number;
-        if (int.TryParse(label, out number) && number >= 1 && number <= HighestNumberedTile)
-            return "btn_level_" + number;
+        GameObject go = new GameObject("Number", typeof(RectTransform));
+        go.transform.SetParent(tile, false);
 
-        Debug.LogWarning("[SALINLAHI] No numbered tile for scene label '" + label +
-                         "'. The artwork goes up to " + HighestNumberedTile +
-                         "; using the padlock tile instead.");
-        return "btn_level_locked";
+        Text text = go.AddComponent<Text>();
+        text.text = number.ToString();
+        text.font = UIFont.Get();
+        text.fontSize = 86;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.MiddleCenter;
+        // Best-fit so 16 sits on the panel as comfortably as 1 does, rather
+        // than two digits running into the frame.
+        text.resizeTextForBestFit = true;
+        text.resizeTextMinSize = 28;
+        text.resizeTextMaxSize = 86;
+        text.color = new Color(0.99f, 0.95f, 0.85f);
+        text.raycastTarget = false;
+
+        Outline outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0.36f, 0.21f, 0.09f, 0.85f);
+        outline.effectDistance = new Vector2(2f, -2f);
+
+        RectTransform rect = go.GetComponent<RectTransform>();
+        Stretch(rect);
+        // The panel is inset inside the wooden frame, and on a leafed tile the
+        // leaf takes a slice off the top, so the number has to come down with
+        // it or it sits on the frame instead of the panel.
+        float inset = TileWidth * 0.17f;
+        float leafPad = leafed ? LeafAllowance() : 0f;
+        rect.offsetMin = new Vector2(inset, inset * 0.9f);
+        rect.offsetMax = new Vector2(-inset, -(inset * 0.9f + leafPad));
+
+        return go;
+    }
+
+    /// <summary>How much taller the leafed tile is, in layout units.</summary>
+    private static float LeafAllowance()
+    {
+        Sprite plain = LoadSprite(BlankTile);
+        Sprite leaf = LoadSprite(BlankLeafTile);
+        if (plain == null || leaf == null || plain.rect.width <= 0f || leaf.rect.width <= 0f)
+            return 0f;
+
+        float plainRatio = plain.rect.height / plain.rect.width;
+        float leafRatio = leaf.rect.height / leaf.rect.width;
+        return TileWidth * (leafRatio - plainRatio);
     }
 
     private static void SetBuildOrder()
@@ -311,7 +357,9 @@ public class BuildLevelSelectScene
         colors.normalColor = Color.white;
         colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
         colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
-        colors.disabledColor = new Color(0.78f, 0.78f, 0.78f, 1f);
+        // Carries the whole locked/unlocked signal now that no padlock does, so
+        // it has to be darker than a normal greyed-out control.
+        colors.disabledColor = new Color(0.46f, 0.43f, 0.40f, 1f);
         colors.fadeDuration = 0.08f;
         button.colors = colors;
         return go;
