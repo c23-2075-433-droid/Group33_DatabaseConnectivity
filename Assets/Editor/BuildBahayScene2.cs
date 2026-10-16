@@ -309,7 +309,9 @@ public class BuildBahayScene2
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
 
         // --- Fade in on arrival from Scene 1 ---
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // --- This scene's words count towards the level's total ---
         // DatabaseDemoBuilder used to add this on its way past. It now runs
@@ -320,12 +322,11 @@ public class BuildBahayScene2
         runScore.voiceCommand = voiceCommand;
         runScore.resetOnStart = false;   // Scene 1 starts the run, not this one
 
-        // --- Scene 2 hands on to Scene 3 (the bath) ---
-        // The level's result is saved and shown in whichever scene ends the
-        // level, and that is no longer this one. Fading out of the last word
-        // rather than stopping here keeps the score running across both.
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- Scene 2 ends on its summary, which hands on to Scene 3 ---
+        // The level's result is still saved and shown in whichever scene ends
+        // the level; this panel is the scene's own, and its Next button starts
+        // the same fade the objective used to start by itself.
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
