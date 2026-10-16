@@ -227,7 +227,9 @@ public class BuildParkeScene1
         controller.objectives = new[] { lakad, takbo, tingin, tuwa, pasok };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // --- Level 3's first scene, so it starts the run ---
         GameObject runScoreGO = new GameObject("RunScore");
@@ -236,9 +238,10 @@ public class BuildParkeScene1
         runScore.objectiveController = controller;
         runScore.resetOnStart = true;   // a fresh level, so a fresh total
 
-        // ...and hands over to the playground, which ends it.
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- The scene's summary, whose Next button hands on ---
+        // The same panel the Bahay scenes stop on, so a child sees how the
+        // scene went instead of the next room arriving unannounced.
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);
