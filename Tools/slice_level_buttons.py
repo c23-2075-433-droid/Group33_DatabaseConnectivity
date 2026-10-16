@@ -45,6 +45,16 @@ PLAIN = {
     'ui_select_levels': (755, 292, 3586, 719),
 }
 
+# The sheet numbers its tiles 1 to 7, but the levels run 1 to 16 end to end, so
+# the numbers have to be drawn by Unity instead. These tiles have their printed
+# number painted out to make a blank to draw on. Two of them, because every
+# tile sharing one picture loses the leaves that give the set its life.
+BLANKS = {
+    'btn_level_3': 'btn_level_blank',        # bare
+    'btn_level_1': 'btn_level_blank_leaf',   # a leaf over the top corner
+}
+NUMBER_LUM = 190     # the panel sits near 154, the printed number near 225
+
 
 def lit_mask(a):
     return a.mean(2) > LIT
@@ -99,6 +109,59 @@ def cut(im, box):
     return Image.fromarray(out[y0:y1, x0:x1].astype(np.uint8))
 
 
+def inpaint(rgb, hole):
+    """Fill the hole from the pixels around it, coarsest level first.
+
+    The panel behind the number is a smooth shaded tan, so pulling the
+    surrounding colour inwards through an image pyramid rebuilds it without a
+    seam. Painting one flat colour over the number would leave a patch that
+    does not follow the shading.
+    """
+    def resize(arr, w, h):
+        if arr.ndim == 2:
+            return np.asarray(Image.fromarray(arr.astype(np.float32))
+                              .resize((w, h), Image.BILINEAR)).astype(float)
+        return np.dstack([resize(arr[:, :, c], w, h) for c in range(arr.shape[2])])
+
+    known = (~hole).astype(float)
+    ci, cw, pyr = rgb * known[..., None], known, []
+    while min(ci.shape[0], ci.shape[1]) > 6:
+        pyr.append((ci, cw))
+        nh, nw = max(1, ci.shape[0] // 2), max(1, ci.shape[1] // 2)
+        ci, cw = resize(ci, nw, nh), resize(cw, nw, nh)
+
+    fill = ci / np.maximum(cw, 1e-6)[..., None]
+    for im_l, w_l in reversed(pyr):
+        up = resize(fill, im_l.shape[1], im_l.shape[0])
+        wl = w_l[..., None]
+        fill = np.where(wl > 1e-3, im_l / np.maximum(wl, 1e-3), up)
+    return fill
+
+
+def erase_number(source, name):
+    """Paint the printed number off a tile, leaving a blank to draw on."""
+    a = np.asarray(Image.open(os.path.join(SPRITES, source + '.png'))
+                   .convert('RGBA')).astype(float)
+    h, w = a.shape[:2]
+    lum = a[..., :3].mean(2)
+
+    # Only the panel. The tile's pale outline is just as bright as the number.
+    inner = np.zeros((h, w), bool)
+    inner[int(h * 0.20):int(h * 0.88), int(x_in(w)):w - int(x_in(w))] = True
+
+    hole = ndimage.binary_dilation((lum > NUMBER_LUM) & inner, iterations=3)
+    out = a.copy()
+    out[..., :3] = inpaint(a[..., :3], hole)
+    Image.fromarray(np.clip(out, 0, 255).astype(np.uint8)).save(
+        os.path.join(SPRITES, name + '.png'))
+    write_meta(name)
+    return hole.sum()
+
+
+def x_in(w):
+    return w * 0.16
+
+
 def write_meta(name):
     out = os.path.join(SPRITES, name + '.png.meta')
     if os.path.exists(out):
@@ -123,6 +186,10 @@ def main():
         spr.save(os.path.join(SPRITES, name + '.png'))
         write_meta(name)
         print('  %-18s %dx%d  (cut at y=%d)' % (name + '.png', spr.width, spr.height, y1))
+
+    for source, name in sorted(BLANKS.items()):
+        painted = erase_number(source, name)
+        print('  %-18s blank from %s (%d px painted out)' % (name + '.png', source, painted))
 
     for name, box in PLAIN.items():
         spr = cut(im, box)
