@@ -156,7 +156,7 @@ public static class NicknameDialogBuilder
 
         // Dark text, because this slot's interior is white (unlike the wooden
         // surfaces elsewhere in the menu, which take cream text).
-        Text placeholder = CreateFieldText(slot.transform, "Placeholder", "Pangalan mo?",
+        Text placeholder = CreateFieldText(slot.transform, "Placeholder", "Your name?",
             new Color(0.45f, 0.38f, 0.30f, 0.8f), FontStyle.Italic, offsetMin, offsetMax);
         Text text = CreateFieldText(slot.transform, "Text", "",
             new Color(0.20f, 0.13f, 0.07f), FontStyle.Bold, offsetMin, offsetMax);

@@ -46,10 +46,10 @@ public static class SettingsAboutDialogBuilder
     public static Dialog BuildSettings(Transform canvas)
     {
         float h = PanelWidth / PanelAspect;
-        Dialog d = BuildShell(canvas, SettingsRootName, "Mga Setting");
+        Dialog d = BuildShell(canvas, SettingsRootName, "Settings");
         Transform panel = d.root.transform.Find("Panel");
 
-        CreateText(panel, "VolumeLabel", "Lakas ng Tunog", new Vector2(0, h * 0.06f),
+        CreateText(panel, "VolumeLabel", "Volume", new Vector2(0, h * 0.06f),
             new Vector2(PanelWidth * 0.7f, h * 0.1f), 42, FontStyle.Normal);
 
         d.slider = BuildSlider(panel, new Vector2(0, -h * 0.07f),
@@ -62,11 +62,11 @@ public static class SettingsAboutDialogBuilder
     public static Dialog BuildAbout(Transform canvas)
     {
         float h = PanelWidth / PanelAspect;
-        Dialog d = BuildShell(canvas, AboutRootName, "Tungkol Dito");
+        Dialog d = BuildShell(canvas, AboutRootName, "About");
         Transform panel = d.root.transform.Find("Panel");
 
         CreateText(panel, "AboutBody",
-            "Isang laro para matuto ng salitang Filipino sa pamamagitan ng boses.\n\n" +
+            "A game for learning Filipino words by speaking them out loud.\n\n" +
             "BSIT Capstone Project\nUniversity of Perpetual Help System Laguna\n\n" +
             "Daquis, Jhesza Mhei G.\nLacida, Kylo Bryan\nManzanero, Kyla Samantha",
             new Vector2(0, -h * 0.02f), new Vector2(PanelWidth * 0.66f, h * 0.44f), 30, FontStyle.Normal);
