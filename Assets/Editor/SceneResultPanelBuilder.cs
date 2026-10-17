@@ -64,7 +64,7 @@ public static class SceneResultPanelBuilder
     public static SceneResultPanel Build(SceneObjectiveController controller,
                                          VoiceCommand voiceCommand,
                                          string nextSceneName,
-                                         string title = "TAPOS NA!")
+                                         string title = "WELL DONE!")
     {
         // GameObject.Find skips inactive objects and this canvas is created
         // inactive, so a stale one would never be found and the scene would

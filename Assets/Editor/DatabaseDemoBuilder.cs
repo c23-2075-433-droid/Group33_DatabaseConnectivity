@@ -46,7 +46,7 @@ public static class DatabaseDemoBuilder
             return false;
         }
 
-        GameObject panel = LevelCompleteUIBuilder.BuildPanel("Magaling!", badgeSpriteFile);
+        GameObject panel = LevelCompleteUIBuilder.BuildPanel("LEVEL COMPLETE", badgeSpriteFile);
         Transform panelRoot = panel.transform.Find("Panel");
         // Paths follow the summary layout: the board carries the statistics,
         // the container around it carries the records strip and the buttons.
