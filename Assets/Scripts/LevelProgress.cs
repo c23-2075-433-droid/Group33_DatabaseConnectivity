@@ -67,7 +67,15 @@ public static class LevelProgress
                              "so finishing it unlocks nothing. Add it to JourneyMap.Steps.");
             return;
         }
-        if (index + 1 > HighestUnlockedStep) HighestUnlockedStep = index + 1;
+        // Step over anything that can never be finished - a level marker, or a
+        // scene that is designed but not built yet - or the journey dams
+        // behind it. Bahay's sixth scene is exactly that: unbuilt, and sitting
+        // between breakfast and Paaralan, so advancing a single step would
+        // leave every later scene locked for good however well the child did.
+        int next = index + 1;
+        while (next < JourneyMap.Steps.Length && !JourneyMap.Steps[next].IsPlayable) next++;
+
+        if (next > HighestUnlockedStep) HighestUnlockedStep = next;
     }
 
     /// <summary>
@@ -80,8 +88,26 @@ public static class LevelProgress
         if (last >= 0 && last + 1 > HighestUnlockedStep) HighestUnlockedStep = last + 1;
     }
 
+    /// <summary>
+    /// The level's first SCENE, not its marker.
+    ///
+    /// Every level begins with a marker, which is not a place the player can
+    /// go. Returning that left a fresh install sitting on step 0 with the
+    /// first scene one step beyond it, so the whole game read as locked on
+    /// any device that had never been played before - which is every device
+    /// but the one it was developed on.
+    /// </summary>
     private static int FirstStepOfLevel(int levelIndex)
     {
+        for (int i = 0; i < JourneyMap.Steps.Length; i++)
+        {
+            JourneyMap.Step step = JourneyMap.Steps[i];
+            if (step.levelIndex == levelIndex && step.kind == JourneyMap.StepKind.Scene)
+                return i;
+        }
+
+        // A level with no scenes at all - Palengke, so far. Its marker is as
+        // far as anyone can get.
         for (int i = 0; i < JourneyMap.Steps.Length; i++)
             if (JourneyMap.Steps[i].levelIndex == levelIndex) return i;
         return 0;

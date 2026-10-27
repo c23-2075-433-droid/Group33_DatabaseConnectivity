@@ -49,7 +49,8 @@ public static class JourneyMap
 
     /// <summary>
     /// The journey in order. Twenty steps: four level markers and the sixteen
-    /// scenes the design document lays out. Six of those scenes are built.
+    /// scenes the design document lays out. Fifteen of those scenes are built;
+    /// only Bahay's sixth, leaving for school, is still to come.
     /// </summary>
     public static readonly Step[] Steps = new[]
     {
@@ -63,17 +64,17 @@ public static class JourneyMap
 
         Level("Paaralan", 2, "map_paaralan"),
         Scene("1", 2, "Chapter2_Level1_Paaralan"),
-        Scene("2", 2, ""),                               // Entering the Classroom
-        Scene("3", 2, ""),                               // Vocabulary Lesson
-        Scene("4", 2, ""),                               // Recess
-        Scene("5", 2, ""),                               // Afternoon / Dismissal
+        Scene("2", 2, "Chapter2_Level2_Klasrum"),
+        Scene("3", 2, "Chapter2_Level3_Aralin"),
+        Scene("4", 2, "Chapter2_Level4_Recess"),
+        Scene("5", 2, "Chapter2_Level5_Uwian"),
 
         Level("Parke", 3, "map_parke"),
-        Scene("1", 3, ""),                               // Walking to the Park
-        Scene("2", 3, ""),                               // Playground
-        Scene("3", 3, ""),                               // Meeting New Friends
-        Scene("4", 3, ""),                               // Picnic
-        Scene("5", 3, ""),                               // Heading Home
+        Scene("1", 3, "Chapter3_Level1_Parke"),
+        Scene("2", 3, "Chapter3_Level2_Palaruan"),
+        Scene("3", 3, "Chapter3_Level3_Kaibigan"),
+        Scene("4", 3, "Chapter3_Level4_Piknik"),
+        Scene("5", 3, "Chapter3_Level5_Uwi"),
 
         Level("Palengke", 4, "map_palengke"),
     };

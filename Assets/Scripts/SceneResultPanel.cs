@@ -75,6 +75,12 @@ public class SceneResultPanel : MonoBehaviour
              "scene was finished, so it is never worth none.")]
     [Range(0f, 1f)] public float twoStarAccuracy = 0.7f;
 
+    [Header("Level endings")]
+    [Tooltip("Tick in a scene that ends a level. The panel then shows nothing " +
+             "on its own and waits for SessionScoreTracker to hand it the " +
+             "whole level's totals, which are the ones worth showing there.")]
+    public bool waitForExternalTotals = false;
+
     [Header("Timing")]
     [Tooltip("Beat between the last word landing and the panel arriving, so " +
              "the child sees the thing they just did finish happening.")]
@@ -127,10 +133,33 @@ public class SceneResultPanel : MonoBehaviour
 
     private void HandleSceneComplete()
     {
+        // A level's last scene shows the level's totals, not this scene's, and
+        // only SessionScoreTracker has them - so there, this does nothing and
+        // ShowWithTotals is what opens the panel.
+        if (waitForExternalTotals) return;
+
         // The objective sequence can re-fire if a scene replays its last step;
         // the panel should not stack up or restart its delay.
         if (shown) return;
         shown = true;
+        StartCoroutine(ShowAfterBeat());
+    }
+
+    /// <summary>
+    /// Opens the panel on figures worked out elsewhere - the whole level's,
+    /// gathered across all of its scenes.
+    ///
+    /// They have to be handed in rather than read from RunScore here, because
+    /// SessionScoreTracker clears RunScore as soon as it has saved the record,
+    /// which happens before this panel's opening beat has finished. Reading it
+    /// afterwards would show nothing but zeros.
+    /// </summary>
+    public void ShowWithTotals(int levelCorrect, int levelAttempts)
+    {
+        if (shown) return;
+        shown = true;
+        correct = levelCorrect;
+        attempts = levelAttempts;
         StartCoroutine(ShowAfterBeat());
     }
 

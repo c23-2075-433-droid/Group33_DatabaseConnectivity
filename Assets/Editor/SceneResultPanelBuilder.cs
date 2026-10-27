@@ -57,14 +57,34 @@ public static class SceneResultPanelBuilder
 
     private static readonly Color Cream = new Color(0.99f, 0.96f, 0.89f);
 
+    /// <summary>What a caller needs to wire the panel up afterwards.</summary>
+    public class Built
+    {
+        /// <summary>The canvas. Stays active; Content is what is shown and hidden.</summary>
+        public GameObject canvas;
+
+        /// <summary>The part that is switched on when the scene is finished.</summary>
+        public GameObject content;
+
+        public SceneResultPanel panel;
+
+        /// <summary>The records strip, or null on a scene that does not end a level.</summary>
+        public Text recordsText;
+    }
+
     /// <summary>
     /// Adds the panel to the open scene. nextSceneName empty means this scene
     /// ends its level, and Next returns to the level select.
+    ///
+    /// levelEnd adds the strip of saved scores read back from the database,
+    /// and leaves the panel waiting to be handed the whole level's totals
+    /// rather than showing this one scene's.
     /// </summary>
-    public static SceneResultPanel Build(SceneObjectiveController controller,
-                                         VoiceCommand voiceCommand,
-                                         string nextSceneName,
-                                         string title = "TAPOS NA!")
+    public static Built Build(SceneObjectiveController controller,
+                              VoiceCommand voiceCommand,
+                              string nextSceneName,
+                              string title = "TAPOS NA!",
+                              bool levelEnd = false)
     {
         // GameObject.Find skips inactive objects and this canvas is created
         // inactive, so a stale one would never be found and the scene would
@@ -129,9 +149,22 @@ public static class SceneResultPanelBuilder
 
         SceneResultPanel.StarSlot[] stars = CreateStars(panel.transform, interiorTop - 170f);
 
+        // Pulled up when a records strip follows, so the two do not collide.
         Text scoreText = CreateText(panel.transform, "ScoreText", "",
-            new Vector2(0f, interiorTop - 300f), new Vector2(interiorWidth, 80f),
-            40, TextAnchor.MiddleCenter);
+            new Vector2(0f, interiorTop - (levelEnd ? 330f : 300f)),
+            new Vector2(interiorWidth, 80f), 40, TextAnchor.MiddleCenter);
+
+        // Only on a level's last scene: the scores read back out of the
+        // database, which is the half of the Activity 5 requirement that has
+        // to be visible on screen rather than merely fetched.
+        Text recordsText = null;
+        if (levelEnd)
+        {
+            recordsText = CreateText(panel.transform, "RecordsText", "",
+                new Vector2(0f, interiorTop - 408f), new Vector2(interiorWidth, 190f),
+                26, TextAnchor.UpperCenter);
+            recordsText.lineSpacing = 1.15f;
+        }
 
         // Home, Replay, Next - in that order, so the one that carries on sits
         // under the thumb on the right. Laid out from the row's total width so
@@ -161,11 +194,19 @@ public static class SceneResultPanelBuilder
         result.replayButton = replay;
         result.homeButton = home;
         result.nextSceneName = nextSceneName;
+        result.waitForExternalTotals = levelEnd;
 
         // Hidden here rather than left for Awake, so the panel is already off
         // in the saved scene and never flashes up on the first frame.
         content.SetActive(false);
-        return result;
+
+        return new Built
+        {
+            canvas = canvasGO,
+            content = content,
+            panel = result,
+            recordsText = recordsText,
+        };
     }
 
     private static SceneResultPanel.StarSlot[] CreateStars(Transform parent, float y)
