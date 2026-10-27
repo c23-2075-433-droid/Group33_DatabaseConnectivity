@@ -91,12 +91,34 @@ public static class JourneyMap
     /// <summary>
     /// The next step a player can actually enter after this one, skipping
     /// level markers and scenes that have no scene behind them yet.
+    /// -1 once there is nothing enterable left.
     /// </summary>
     public static int NextPlayable(int fromIndex)
     {
         for (int i = fromIndex + 1; i < Steps.Length; i++)
             if (Steps[i].IsPlayable) return i;
         return -1;
+    }
+
+    /// <summary>
+    /// The step to open once <paramref name="fromIndex"/> has been finished.
+    ///
+    /// Anything that can never be finished has to be stepped over - a level
+    /// marker, or a scene that is designed but not built yet - or the journey
+    /// dams behind it. Bahay's sixth scene is exactly that: unbuilt, and
+    /// sitting between breakfast and Paaralan, so opening the very next step
+    /// would leave every later scene locked for good however well the child
+    /// did.
+    ///
+    /// Past the last playable step there is nothing left to enter, so this
+    /// gives the end of the journey. That opens the closing marker rather than
+    /// stopping one short of it, which is what tells the last level it has
+    /// been completed.
+    /// </summary>
+    public static int StepAfter(int fromIndex)
+    {
+        int next = NextPlayable(fromIndex);
+        return next >= 0 ? next : Steps.Length - 1;
     }
 
     /// <summary>Every step belonging to one level, markers included.</summary>

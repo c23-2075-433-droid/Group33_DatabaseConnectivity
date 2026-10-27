@@ -67,25 +67,31 @@ public static class LevelProgress
                              "so finishing it unlocks nothing. Add it to JourneyMap.Steps.");
             return;
         }
-        // Step over anything that can never be finished - a level marker, or a
-        // scene that is designed but not built yet - or the journey dams
-        // behind it. Bahay's sixth scene is exactly that: unbuilt, and sitting
-        // between breakfast and Paaralan, so advancing a single step would
-        // leave every later scene locked for good however well the child did.
-        int next = index + 1;
-        while (next < JourneyMap.Steps.Length && !JourneyMap.Steps[next].IsPlayable) next++;
-
-        if (next > HighestUnlockedStep) HighestUnlockedStep = next;
+        Open(JourneyMap.StepAfter(index));
     }
 
     /// <summary>
     /// Older call, kept so the scenes already wired to it keep working: a
     /// level being finished means everything up to its last step is passed.
+    ///
+    /// This has to step over the unenterable just as MarkSceneComplete does.
+    /// A level's last step is followed by the next level's marker, so opening
+    /// the step straight after it would open a marker and leave that level's
+    /// first scene locked - the same dam, reached by the other door. It went
+    /// unnoticed because the only caller runs MarkSceneComplete four lines
+    /// later and progress never falls, so the right answer arrived anyway.
     /// </summary>
     public static void MarkComplete(int levelIndex)
     {
         int last = LastStepOfLevel(levelIndex);
-        if (last >= 0 && last + 1 > HighestUnlockedStep) HighestUnlockedStep = last + 1;
+        if (last < 0) return;
+        Open(JourneyMap.StepAfter(last));
+    }
+
+    /// <summary>Moves progress forward to this step, never back.</summary>
+    private static void Open(int stepIndex)
+    {
+        if (stepIndex > HighestUnlockedStep) HighestUnlockedStep = stepIndex;
     }
 
     /// <summary>
