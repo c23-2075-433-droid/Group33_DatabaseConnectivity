@@ -60,7 +60,7 @@ public class AddExitTrigger
         // would silently unlink Level 1 from the rest of the chapter whenever
         // this command is re-run.
         trigger.nextSceneName = "Chapter1_Level2_Banyo";
-        trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("Magaling!");
+        trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("LEVEL COMPLETE");
 
         SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
         if (controller != null) trigger.objectiveController = controller;

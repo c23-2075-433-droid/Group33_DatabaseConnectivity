@@ -222,7 +222,9 @@ public class BuildPaaralanScene1
         controller.objectives = new[] { kumusta, pasok, takbo };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // --- Level 2's first scene, so it starts the run; Scene 2 ends it ---
         GameObject runScoreGO = new GameObject("RunScore");
@@ -230,10 +232,10 @@ public class BuildPaaralanScene1
         runScore.voiceCommand = voiceCommand;
         runScore.resetOnStart = true;   // a fresh level, so a fresh total
 
-        // Getting through the gate hands over to the classroom. The result
-        // panel, the badge and the Parke unlock sit at the end of Scene 2.
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- The scene's summary, whose Next button hands on ---
+        // The same panel the Bahay scenes stop on, so a child sees how the
+        // scene went instead of the next room arriving unannounced.
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);

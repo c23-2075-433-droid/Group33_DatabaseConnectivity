@@ -258,7 +258,9 @@ public class BuildPaaralanScene4
         controller.objectives = new[] { labas, kain, laro, tawa, tulong };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
-        SceneFader fader = SceneFaderBuilder.Build();
+        // Still needed in the scene: SceneResultPanel looks the fader up at
+        // run time to fade out of whichever button is pressed.
+        SceneFaderBuilder.Build();
 
         // --- A middle scene of Level 2 now: Scene 5 ends it ---
         // The counter is added by hand, because DatabaseDemoBuilder used to
@@ -270,9 +272,10 @@ public class BuildPaaralanScene4
         runScore.objectiveController = controller;
         runScore.resetOnStart = false;   // Scene 1 starts the run
 
-        // Break is over and the class goes back in.
-        UnityEventTools.AddStringPersistentListener(
-            controller.onAllObjectivesComplete, fader.FadeOutAndLoad, NextScene);
+        // --- The scene's summary, whose Next button hands on ---
+        // The same panel the Bahay scenes stop on, so a child sees how the
+        // scene went instead of the next room arriving unannounced.
+        SceneResultPanelBuilder.Build(controller, voiceCommand, NextScene);
 
         System.IO.Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, ScenePath);

@@ -83,7 +83,7 @@ public static class SceneResultPanelBuilder
     public static Built Build(SceneObjectiveController controller,
                               VoiceCommand voiceCommand,
                               string nextSceneName,
-                              string title = "TAPOS NA!",
+                              string title = "WELL DONE!",
                               bool levelEnd = false)
     {
         // GameObject.Find skips inactive objects and this canvas is created

@@ -35,7 +35,7 @@ public class SceneResultPanel : MonoBehaviour
 
     public Text titleText;
 
-    [Tooltip("This scene's result, e.g. \"5 / 6 tama\".")]
+    [Tooltip("This scene's result, e.g. \"5 / 6 correct\".")]
     public Text scoreText;
 
     /// <summary>
@@ -168,10 +168,10 @@ public class SceneResultPanel : MonoBehaviour
         if (showDelay > 0f) yield return new WaitForSeconds(showDelay);
 
         if (titleText != null && string.IsNullOrEmpty(titleText.text))
-            titleText.text = "TAPOS NA!";
+            titleText.text = "WELL DONE!";
 
         if (scoreText != null)
-            scoreText.text = correct + " / " + Mathf.Max(attempts, correct) + " tama";
+            scoreText.text = correct + " / " + Mathf.Max(attempts, correct) + " correct";
 
         ShowStars(EarnedStars());
         WireButtons();
