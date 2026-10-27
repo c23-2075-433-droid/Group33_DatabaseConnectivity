@@ -130,7 +130,9 @@ public class LevelSelectController : MonoBehaviour
     {
         if (node.stars == null) return;
 
-        int earned = LevelProgress.StarsFor(node.sceneName);
+        // The summary panel rates out of five and these tiles hold three, so
+        // the rating is scaled rather than read straight.
+        int earned = LevelProgress.StarsScaledTo(node.sceneName, node.stars.Length);
         for (int i = 0; i < node.stars.Length; i++)
         {
             Image star = node.stars[i];

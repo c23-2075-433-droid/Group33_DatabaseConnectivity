@@ -49,9 +49,27 @@ public static class LevelProgress
     // does better should keep the better one without the journey moving.
     private const string StarsKeyPrefix = "SALINLAHI_Stars_";
 
-    /// <summary>Best rating a scene has been finished with, 0 if never.</summary>
+    /// <summary>The best a scene can be done. The summary panel rates out of this.</summary>
+    public const int MaxStars = 5;
+
+    /// <summary>Best rating a scene has been finished with, 0..MaxStars, 0 if never.</summary>
     public static int StarsFor(string sceneName) =>
         string.IsNullOrEmpty(sceneName) ? 0 : PlayerPrefs.GetInt(StarsKeyPrefix + sceneName, 0);
+
+    /// <summary>
+    /// The same rating in however many stars a screen has room for.
+    ///
+    /// The summary panel rates out of five; the level select's tiles have
+    /// three printed under them. Rounding up keeps the two agreeing about the
+    /// only thing that matters at tile size - a scene that earned something
+    /// never shows empty, and only a perfect run fills all three.
+    /// </summary>
+    public static int StarsScaledTo(string sceneName, int slots)
+    {
+        int stars = StarsFor(sceneName);
+        if (stars <= 0 || slots <= 0) return 0;
+        return Mathf.Min(slots, Mathf.CeilToInt(stars * slots / (float)MaxStars));
+    }
 
     /// <summary>
     /// Remembers how a scene went, keeping the best run rather than the last.
@@ -61,7 +79,7 @@ public static class LevelProgress
     public static void RecordStars(string sceneName, int stars)
     {
         if (string.IsNullOrEmpty(sceneName)) return;
-        stars = Mathf.Clamp(stars, 0, 3);
+        stars = Mathf.Clamp(stars, 0, MaxStars);
         if (stars <= StarsFor(sceneName)) return;
         PlayerPrefs.SetInt(StarsKeyPrefix + sceneName, stars);
         PlayerPrefs.Save();

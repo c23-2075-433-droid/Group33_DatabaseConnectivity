@@ -50,7 +50,7 @@ public static class DatabaseDemoBuilder
         // does not look like a different game. LevelCompleteUIBuilder and its
         // ui_summary_* artwork are left in the project but no longer called.
         SceneResultPanelBuilder.Built summary = SceneResultPanelBuilder.Build(
-            controller, voiceCommand, "", "LEVEL COMPLETE", levelEnd: true);
+            controller, voiceCommand, "", levelEnd: true);
         GameObject panel = summary.canvas;
 
         // Next has nowhere further to go at the end of a level, so it returns
