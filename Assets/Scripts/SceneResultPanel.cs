@@ -173,7 +173,15 @@ public class SceneResultPanel : MonoBehaviour
         if (scoreText != null)
             scoreText.text = correct + " / " + Mathf.Max(attempts, correct) + " correct";
 
-        ShowStars(EarnedStars());
+        int earned = EarnedStars();
+
+        // The level select reads these back, so the rating has to outlive the
+        // panel. On a level's last scene the figures are the whole level's
+        // rather than this scene's, and the rating is saved against the scene
+        // the child is standing in either way - that is the tile it appears on.
+        LevelProgress.RecordStars(SceneManager.GetActiveScene().name, earned);
+
+        ShowStars(earned);
         WireButtons();
 
         if (panelRoot != null) panelRoot.SetActive(true);

@@ -43,6 +43,30 @@ public static class LevelProgress
 
     public static bool IsStepUnlocked(int stepIndex) => stepIndex <= HighestUnlockedStep;
 
+    // How well each scene has been done, keyed by scene name. Kept apart from
+    // the step count on purpose: progress is one number about the journey,
+    // while this is a verdict on each scene, and a child who goes back and
+    // does better should keep the better one without the journey moving.
+    private const string StarsKeyPrefix = "SALINLAHI_Stars_";
+
+    /// <summary>Best rating a scene has been finished with, 0 if never.</summary>
+    public static int StarsFor(string sceneName) =>
+        string.IsNullOrEmpty(sceneName) ? 0 : PlayerPrefs.GetInt(StarsKeyPrefix + sceneName, 0);
+
+    /// <summary>
+    /// Remembers how a scene went, keeping the best run rather than the last.
+    /// Replaying a scene the child has already three-starred, and stumbling
+    /// this time, should not take the stars off the level select.
+    /// </summary>
+    public static void RecordStars(string sceneName, int stars)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return;
+        stars = Mathf.Clamp(stars, 0, 3);
+        if (stars <= StarsFor(sceneName)) return;
+        PlayerPrefs.SetInt(StarsKeyPrefix + sceneName, stars);
+        PlayerPrefs.Save();
+    }
+
     /// <summary>True once every step of this level has been passed.</summary>
     public static bool IsLevelComplete(int levelIndex)
     {
