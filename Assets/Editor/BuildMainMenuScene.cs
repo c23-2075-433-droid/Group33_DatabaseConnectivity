@@ -2,11 +2,12 @@
 //
 // One-click scene builder for the SALINLAHI main menu, assembled from the
 // team's Canva assets (Assets/Sprites/):
-//   menu_bg, menu_title, menu_boy, btn_play, btn_settings, btn_about
+//   menu_room_bg, menu_title, btn_play, btn_settings, btn_about
 //
-// Positions/sizes were measured from the Canva reference layout (2000x1125)
-// and scaled to the 1920x1080 canvas used here. To tweak anything, move the
-// object's RectTransform in the Scene view - no code changes needed.
+// Positions/sizes were measured from the composed Canva mockup, kept at
+// Art/menu_layout_reference.png (2000x1125), and scaled by 0.96 to the
+// 1920x1080 canvas used here. To tweak anything, move the object's
+// RectTransform in the Scene view - no code changes needed.
 //
 // Includes the "Enter Nickname" popup opened by Play (see
 // NicknameDialogBuilder.cs), which feeds NicknameManager and therefore the
@@ -40,6 +41,13 @@ public class BuildMainMenuScene
             return;
         }
 
+        // An Image handed a null sprite draws a white box, with nothing but a
+        // console warning to say why. Make the art loadable first.
+        SpriteImportFixer.Verify(new[]
+        {
+            "menu_room_bg", "menu_title", "btn_play", "btn_settings", "btn_about",
+        }, "Main Menu Scene");
+
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
         // --- Camera ---
@@ -72,7 +80,7 @@ public class BuildMainMenuScene
         // --- Background: always covers the whole screen without stretching
         //     (wider phones like 19.5:9 crop a little top/bottom instead of
         //     showing black bars or squashing the art). ---
-        GameObject bg = CreateImage(canvasT, "Background", "menu_bg", Vector2.zero, new Vector2(1920, 1080), false);
+        GameObject bg = CreateImage(canvasT, "Background", "menu_room_bg", Vector2.zero, new Vector2(1920, 1080), false);
         RectTransform bgRect = bg.GetComponent<RectTransform>();
         bgRect.anchorMin = bgRect.anchorMax = new Vector2(0.5f, 0.5f);
         AspectRatioFitter fitter = bg.AddComponent<AspectRatioFitter>();
@@ -80,23 +88,18 @@ public class BuildMainMenuScene
         fitter.aspectRatio = 2000f / 1125f;
         bg.GetComponent<Image>().raycastTarget = false;
 
-        // --- Title (drawn before the boy: his hair overlaps the left leaf) ---
-        GameObject title = CreateImage(canvasT, "Title", "menu_title", new Vector2(43, 282), new Vector2(1233, 516), true);
+        // --- Title, across the top. The mockup runs the sun's top rays off the
+        //     top of the page, so the rect sits high enough to clip them the
+        //     same way rather than pulling the whole logo down to fit. ---
+        GameObject title = CreateImage(canvasT, "Title", "menu_title", new Vector2(-50, 317), new Vector2(1278, 537), true);
         title.GetComponent<Image>().raycastTarget = false;
 
-        // --- Boy, anchored to the bottom-left so he stays on the left edge
-        //     on wider screens. Cut off at the knees by the screen bottom,
-        //     same as the Canva layout. ---
-        GameObject boy = CreateImage(canvasT, "Boy", "menu_boy", Vector2.zero, new Vector2(381, 994), true);
-        RectTransform boyRect = boy.GetComponent<RectTransform>();
-        boyRect.anchorMin = boyRect.anchorMax = new Vector2(0, 0);
-        boyRect.anchoredPosition = new Vector2(334, 372); // centre = (-626,-168) from screen centre
-        boy.GetComponent<Image>().raycastTarget = false;
-
-        // --- Buttons ---
-        GameObject playBtn = CreateSpriteButton(canvasT, "PlayButton", "btn_play", new Vector2(81, -86), new Vector2(412, 258));
-        GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(-88, -319), new Vector2(356, 199));
-        GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(274, -312), new Vector2(350, 192));
+        // --- Buttons: PLAY on the centre line, SETTINGS and ABOUT level with
+        //     each other beneath it. Heights follow each sprite's own ratio so
+        //     preserveAspect has nothing left to shrink. ---
+        GameObject playBtn = CreateSpriteButton(canvasT, "PlayButton", "btn_play", new Vector2(-4, -74), new Vector2(492, 309));
+        GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(-219, -367), new Vector2(421, 236));
+        GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(220, -367), new Vector2(428, 236));
 
         // --- Settings and About popups, in the same bamboo style as the
         //     nickname dialog (see SettingsAboutDialogBuilder). Both start
