@@ -37,6 +37,11 @@ public class ExitDoorTrigger : MonoBehaviour
              "hides the current prompt once the player exits through the door.")]
     public SceneObjectiveController objectiveController;
 
+    [Tooltip("The scene's summary panel. If assigned, reaching the door opens " +
+             "it and nothing is loaded here - the panel's own CONTINUE button " +
+             "is what moves on, the same as every other scene.")]
+    public SceneResultPanel resultPanel;
+
     private bool exitTriggered = false;
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -59,6 +64,17 @@ public class ExitDoorTrigger : MonoBehaviour
         Debug.Log("ExitDoorTrigger: player reached the door. Loading next scene: " + nextSceneName);
 
         if (objectiveController != null) objectiveController.HideAllPrompts();
+
+        // With a summary panel, the door is the end of the scene rather than a
+        // way out of it. The panel opens on its own beat and its CONTINUE
+        // button does the loading, so this stops here - otherwise the scene
+        // would slide away a second after the child was handed their stars.
+        if (resultPanel != null)
+        {
+            resultPanel.Show();
+            return;
+        }
+
         if (levelCompleteUI != null) levelCompleteUI.SetActive(true);
 
         if (delayBeforeLoad <= 0f)

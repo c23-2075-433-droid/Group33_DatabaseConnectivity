@@ -95,6 +95,11 @@ public class SceneResultPanel : MonoBehaviour
              "whole level's totals, which are the ones worth showing there.")]
     public bool waitForExternalTotals = false;
 
+    [Tooltip("Tick when something other than the last objective decides the " +
+             "scene is over - Level 1's door. The panel then waits to be told " +
+             "with Show() rather than opening itself.")]
+    public bool waitForCue = false;
+
     [Header("Timing")]
     [Tooltip("Beat between the last word landing and the panel arriving, so " +
              "the child sees the thing they just did finish happening.")]
@@ -158,6 +163,25 @@ public class SceneResultPanel : MonoBehaviour
         // ShowWithTotals is what opens the panel.
         if (waitForExternalTotals) return;
 
+        // And in a scene whose ending is not its last objective, something
+        // else says when. Level 1 is the one: its objectives are Bangon,
+        // Tayo and Lakad, all of them done while the child still has to walk
+        // out of the room, so opening here would hand them a summary with the
+        // door still ahead of them.
+        if (waitForCue) return;
+
+        Show();
+    }
+
+    /// <summary>
+    /// Opens the panel on the tally it has kept itself.
+    ///
+    /// For a scene that ends somewhere other than its last objective - Level
+    /// 1 ends when the child reaches the door, which ExitDoorTrigger knows
+    /// about and the objectives do not.
+    /// </summary>
+    public void Show()
+    {
         // The objective sequence can re-fire if a scene replays its last step;
         // the panel should not stack up or restart its delay.
         if (shown) return;
