@@ -10,6 +10,11 @@ already has (`SceneObjectiveController`, `VoiceInteractionUI`, the
 `word_<word>.wav` clip library) or is a new, self-contained component bolted on
 beside it.
 
+**Status: implemented** (see §6). It runs with no recordings — every line
+appears as an on-screen Filipino caption, paced as though it had been spoken —
+so the flow below is playable today and the voice-over slots in later without
+further code changes.
+
 ---
 
 ## 1. Narration approach
@@ -245,144 +250,154 @@ Notes that matter in practice:
 
 The replay button already exists, is already wired, and already sits beside the
 mic (`VoiceUIBuilder`, `VoiceInteractionUI.OnReplayPressed` →
-`SceneObjectiveController.PlayCurrentInstruction()`). Four small upgrades,
+`SceneObjectiveController.PlayCurrentInstruction()`). Four upgrades, all built,
 no new UI:
 
 1. **Replay plays the full prompt**, not just the bare word:
-   `"Pakinggan mo ulit:"` + `word_<word>.wav`. One line of change inside
-   `PlayCurrentInstruction()`.
-2. **Press it twice** (within 3 s) and the word is said **slowly** — the same
-   clip played at `AudioSource.pitch = 0.85f`, then repeated once after a
-   0.4 s gap. No extra recording.
+   `"Pakinggan mo ulit:"` + `word_<word>.wav`.
+2. **Press it twice** within 3 s and the word is said **slowly**, at
+   `pitch 0.85`. No extra recording
+   (`VoiceInteractionUI.slowReplayWindow`).
 3. **Automatic replay** after the 2nd miss on a word, so a child who cannot
    reach the button still gets help. This is the single most important
-   accessibility behaviour in the whole system.
+   accessibility behaviour in the whole system
+   (`VoicePromptDirector.missesBeforeHint`).
 4. **Replay never counts as an attempt.** `RunScoreCounter` increments on
-   `OnAnswerChecked`, and replay does not raise that event, so this already
-   holds — keep it that way, and say so in your documentation. Asking for help
-   should never cost score.
+   `OnAnswerChecked`, and replay does not raise that event. Asking for help
+   should never cost score — worth stating in your documentation.
 
 Optional, if time allows: long-press the badge to hear the English gloss
 ("LAKAD — walk"). Useful for parents; not required for the capstone.
 
 ---
 
-## 6. Implementation plan
+## 6. Implementation — built
 
-Additive. One new script, one new asset type, one small builder helper, and
-four short hooks into files that already exist. No scene has to be re-laid out,
-no gameplay script changes behaviour.
+The system is implemented and in the repository. It runs **with no recordings
+at all**: every line Rachel would say appears as an on-screen Filipino caption
+and the pause the clip would have taken is still held, so the flow, the pacing
+and the vocabulary are all playable and demonstrable today. Dropping the .wav
+files in later only adds the sound.
 
-### 6.1 New file — `Assets/Scripts/VoiceNarrator.cs`
+### 6.1 New files
 
-A single `MonoBehaviour` per scene that owns *all* spoken output. One
-`AudioSource`, one queue, so two lines can never overlap.
+| File | What it does |
+|---|---|
+| `Assets/Scripts/VoiceNarrator.cs` | Rachel's voice. One `AudioSource`, one queue, so two lines can never overlap. Plays a line, or captions it if it has no recording. Suspends the microphone while speaking. Builds its own caption bar in code. |
+| `Assets/Scripts/VoicePromptDirector.cs` | Decides **what** she says and **when** — prompts, feedback, hints, idle nudges, scene intro/outro. All of it hangs off events the scene already raises. Also contains `VoicePromptBootstrap`. |
+| `Assets/Scripts/NarratorScript.cs` | The script, compiled in: the id of every line, and the Filipino text of the short reusable ones. This is what makes the game prompt correctly on a fresh checkout with no assets. |
+| `Assets/Scripts/NarratorVoiceBank.cs` | A `ScriptableObject` holding every line's text + clip, loaded at runtime from `Assets/Resources/`. |
+| `Assets/Editor/NarratorVoiceBankTool.cs` | `Tools > SALINLAHI > Refresh Narrator Voice Bank` — regenerates the bank from `Docs/VoiceOverScript.csv` plus whatever is in `Assets/Audio/VO/`. |
 
-```csharp
-public class VoiceNarrator : MonoBehaviour
-{
-    public NarratorVoiceBank bank;      // ScriptableObject, §6.2
-    public VoiceCommand voiceCommand;   // suspended while speaking
+### 6.2 Changes to existing files
 
-    public bool IsSpeaking { get; private set; }
-    public event System.Action OnFinishedSpeaking;
+Small and additive. No level, no gameplay rule and no existing screen changed.
 
-    /// Frame + word, e.g. "Sabihin mo:" + word_lakad.wav
-    public void SpeakPrompt(string word, AudioClip overrideClip = null);
+**`SceneObjectiveController.cs`**
+- New `OnObjectiveShown` event, raised when a word actually goes live. This is
+  the single thing the narration hangs off, and it is why nothing narrates
+  mid-walk: the controller does not raise an objective while Kylo is moving.
+- New `CurrentObjective` property, backed by an `objectiveLive` flag.
+  `currentIndex` alone could not answer "is a word being asked right now?" —
+  `AdvanceWhenActionFinishes` moves it on to the next objective while that
+  objective is still waiting to be shown.
+- `PlayCurrentInstruction()` now goes through the narrator, so the replay
+  button says *"Pakinggan mo ulit: LAKAD"* instead of a bare word and cannot
+  talk over her. It also no longer replays between words — pressing replay
+  mid-walk used to play the **next** word's clip, giving away a word the
+  player had not been asked for.
 
-    /// Rotating "Tama!" / "Magaling!" / "Ang galing mo!"
-    public void SpeakCorrect();
+**`VoiceCommand.cs`**
+- `SuspendListening()` / `ResumeListening()`, plus guards so a suspended
+  recognizer cannot be restarted by the continuous-listening loop and so the
+  result `Cancel()` delivers is not mistaken for the player's answer.
+- `OnNothingHeard` — raised only when the player **actually spoke** and the
+  recognizer could not make it out. Silence does not raise it: the recognizer
+  times out every few seconds while nobody is talking, and a game that said
+  *"Hindi kita narinig"* every five seconds at a child who is still thinking
+  would be unbearable. Pure silence belongs to the idle nudge instead. This
+  uses the plugin's `OnBeginningOfSpeech` callback, which was empty before.
+- `OnMicrophoneUnavailable` — permission denied or no recognizer on the device.
 
-    /// missCount decides: retry line, then hint, then "press replay"
-    public void SpeakRetry(int missCount);
-    public void SpeakNotHeard(int missCount);
-    public void SpeakIdleNudge();
-    public void SpeakMicBlocked();
+None of these change what is scored. `OnAnswerChecked` fires exactly as
+before, so `RunScoreCounter` and the level-complete panel are untouched.
 
-    /// Intro/outro and anything else already recorded whole
-    public void Speak(AudioClip clip);
+### 6.3 Why no scene builder changed
 
-    public void StopSpeaking();
-}
-```
+The scenes are generated — anything added to one by hand is wiped the next
+time someone runs `Build Bahay Scene 2`. So nothing is added by hand:
+`VoicePromptBootstrap` creates the director at runtime, with
+`[RuntimeInitializeOnLoadMethod]` plus `sceneLoaded`, in every scene that has
+a `SceneObjectiveController`. It runs after every `Awake` and before every
+`Start`, so it is subscribed in time for the scene's first objective. The
+narrator creates itself on first use. Nothing in a saved scene refers to
+either, so a rebuild cannot break them.
 
-Behaviour: `Speak*` enqueues clips; a coroutine plays them back to back with a
-0.15 s gap; `voiceCommand.SuspendListening()` on the first clip and
-`ResumeListening()` after the last. A missing clip is skipped silently — the
-game must stay playable before a single line is recorded, exactly as
-`PlayCurrentInstruction()` does today.
+### 6.4 Running it now, before any recordings
 
-### 6.2 New asset — `NarratorVoiceBank` (ScriptableObject)
+Open any chapter scene and press Play. Rachel's lines appear as captions
+across the top of the screen in the right places and with the right pacing.
+In the Editor, the existing keyboard fallback drives the whole loop:
 
-Holds the twelve shared clips in named fields (`frameSabihin`, `correct[]`,
-`retry[]`, `notHeard[]`, `idleNudge`, `micBlocked`, …), plus a
-`AudioClip WordClip(string word)` lookup for the per-word clips.
+- **Enter** — say the word currently being asked (correct answer → *"Tama!"*)
+- **X** — a deliberately wrong answer (→ *"Hindi pa tama. Subukan mo ulit."*,
+  then the automatic slow repeat on the second miss)
+- wait 10 s — the idle nudge, then the prompt repeated every 20 s
+- the replay button — *"Pakinggan mo ulit: LAKAD"*
 
-Why a ScriptableObject and not `Resources.Load`: your scenes are **generated**,
-and `VoiceClipLibrary` is an Editor-only class (it uses `AssetDatabase`), so it
-cannot run in a build. One asset at `Assets/Audio/VO/NarratorVoiceBank.asset`,
-assigned by the builders the same way clips are attached today, survives every
-rebuild and shows up in the Inspector where your team can check it.
+The voice bank is optional at this stage; `NarratorScript` carries the text.
 
-For the per-word lookup at runtime, the simplest approach that fits your setup:
-have the bank hold a serialized `AudioClip[] words` array that an editor button
-(`Tools > SALINLAHI > Refresh Voice Bank`) fills from `Assets/Audio/VO/word_*`.
-Re-run it after each recording session.
+### 6.5 Adding the recordings
 
-### 6.3 New builder helper — `Assets/Editor/NarratorBuilder.cs`
+1. Record and drop the files in `Assets/Audio/VO/`, named as in
+   `Docs/VoiceOverScript.csv` (`rachel_frame_sabihin.wav`, `word_lakad.wav`, …).
+2. Run **Tools > SALINLAHI > Refresh Narrator Voice Bank**.
+3. That is all. Each line switches from caption to audio the moment its clip
+   exists; captions default to showing only for lines that are still silent
+   (`VoiceNarrator.captionMode`), so they disappear by themselves as the
+   recordings arrive. Set the mode to `Always` to keep them as subtitles.
 
-Mirrors `VoiceUIBuilder` exactly: `AddNarrator(voiceCommand, controller)`
-creates the `Narrator` GameObject, assigns the bank via
-`AssetDatabase.LoadAssetAtPath`, and reuses an existing one if the scene
-already has it. Each `Build*Scene*.cs` gains **one line** next to its existing
-`VoiceUIBuilder.BuildVoiceUI(...)` call.
+Start with the 12 shared lines and Level 1's 20 words — that is enough for a
+fully voiced Level 1 demo.
 
-### 6.4 Hooks into existing files
+### 6.6 Tuning
 
-| File | Change | Lines |
-|---|---|---|
-| `SceneObjectiveController.ShowObjective()` | after setting `currentTargetWord`, call `narrator.SpeakPrompt(objective.word, objective.instructionClip)` | ~2 |
-| `SceneObjectiveController.HandleAnswerChecked()` | correct → `narrator.SpeakCorrect()`; the existing `if (!isCorrect) return;` becomes `if (!isCorrect) { missCount++; narrator.SpeakRetry(missCount); return; }`, and `missCount` resets in `ShowObjective` | ~6 |
-| `SceneObjectiveController.PlayCurrentInstruction()` | route through the narrator with the `"Pakinggan mo ulit:"` frame instead of its own `PlayOneShot` | ~3 |
-| `VoiceCommand` | add `SuspendListening()` / `ResumeListening()` and an `isSuspended` guard in `StartListening()` and in the `listenContinuously` restart | ~15 |
-| `VoiceCommand.OnResultReceived` | pass the error/empty case through a new `OnNotHeard` event so *not heard* and *wrong word* can differ | ~4 |
-| New `SceneNarration.cs` (tiny) | `introClip` played in `Start()` before the first objective; `outroClip` wired to `onAllObjectivesComplete` | new, ~40 |
-| New `IdleNudge.cs` (tiny) | 10 s timer, reset on any `OnAnswerChecked`; calls `narrator.SpeakIdleNudge()` | new, ~35 |
+Everything worth arguing about is a field in the Inspector, on the
+`VoicePromptDirector` and `VoiceNarrator` objects that appear in the hierarchy
+at runtime: `missesBeforeHint`, `missesBeforeReplayHint`, `idleNudgeSeconds`,
+`idleRepromptSeconds`, `speakSceneLines`, `cueListeningOnFirstWord`,
+`captionMode`, `captionBarHeight`, `slowPitch`, `tailPause`.
 
-Everything else — the pulsing mic, the badge, the replay button, scoring, the
-level-complete panel — is untouched.
+To change a default permanently, edit the field initialiser in the script —
+the objects are created at runtime, so Inspector edits last only for that Play
+session.
 
-### 6.5 Suggested order of work
+### 6.7 Still to do
 
-| Step | Work | Effort |
-|---|---|---|
-| 1 | `VoiceNarrator` + `NarratorVoiceBank` + refresh button | half a day |
-| 2 | Hook into `SceneObjectiveController`; test in Editor with the existing keyboard fallback (`Enter` = say the current word) | half a day |
-| 3 | `SuspendListening` / `ResumeListening` in `VoiceCommand` — **test on a real phone with the speaker on**, this is the step that can bite | half a day |
-| 4 | Record the 12 shared clips + Level 1's 20 word clips; drop in `Assets/Audio/VO/`; refresh the bank | one session |
-| 5 | `SceneNarration` + `IdleNudge`, one scene first (Bahay Scene 1) | half a day |
-| 6 | Roll out: one `NarratorBuilder.AddNarrator()` line per scene builder, rebuild all fifteen | half a day |
-| 7 | Record the remaining 33 word clips and the intro/outro lines | as available |
+- **Record the clips.** Nothing else in the plan is blocked on anything.
+- **Test suspend/resume on a real phone with the speaker at full volume.**
+  This is the one step that can misbehave on device and cannot be verified in
+  the Editor, where the speech plugin does not run.
+- **Scene intro/outro lines** stay silent until the voice bank is generated —
+  they are long, per-scene English story lines, and a caption bar holding the
+  screen for one is worse than nothing. The short Filipino prompting lines do
+  not have this restriction.
+- Optional: long-press the badge for the English gloss.
 
-The game is demonstrable after step 4 with Level 1 alone.
+### 6.8 Recording notes
 
-### 6.6 Recording notes (add to `Assets/Audio/VO/README.txt`)
+See `Assets/Audio/VO/README.txt`, which now also covers the prompt frames:
+record them in the same session, same mic and same distance as the word clips
+or the join is audible; give them a rising, unfinished intonation; trim the
+tail hard, because 200 ms of air at the end of a frame is a stutter before
+every single prompt.
 
-- Mono, 44.1 kHz, WAV, silence trimmed hard at both ends. A frame clip with
-  200 ms of dead air at the end is heard as a stutter before every word.
-- Record the **frames** with a rising, unfinished intonation — "Sabihin mo:" —
-  so they join naturally to the word that follows. Record them in the same
-  session, same mic, same distance as the word clips, or the join will be
-  audible.
-- Record the **word clips** flat and slightly slow: these are the pronunciation
-  model the child copies.
-- Keep feedback clips under 0.8 s; they overlap the start of Kylo's action.
-
-### 6.7 Risks
+### 6.9 Risks
 
 | Risk | Mitigation |
 |---|---|
-| Recogniser hears Rachel through the speaker and scores it as the player | §6.4 suspend/resume; verify on device with speaker volume at 100% |
-| `fil-PH` unavailable on the test device, so prompts and recognition disagree | Already handled — `PronunciationChecker` is fuzzy and `VoiceCommand` falls back to the device language; keep the variants list filled for words that mis-transcribe |
-| Narration makes the game feel slow on replay | All prompts are interruptible: any recognised speech calls `StopSpeaking()` |
-| Clips not recorded by the defense date | Everything degrades to silence + badge, which is the current behaviour — nothing breaks |
+| Recognizer hears Rachel through the speaker and scores it as the player | Listening is suspended for the whole run of queued lines and results arriving while suspended are discarded. Still verify on device at full volume. |
+| `Cancel()` delivers its result late, after listening resumed | The window is far shorter than the shortest line, so in practice it lands while still suspended. If a phantom wrong answer ever shows up right after a prompt, this is the first place to look. |
+| `fil-PH` unavailable on the test device | Already handled — `PronunciationChecker` is fuzzy and `VoiceCommand` falls back to the device language. Keep the per-word `variants` list filled for words that mis-transcribe. |
+| Narration feels slow on replay | `VoiceNarrator.StopSpeaking()` drops everything mid-clip; `tailPause` and `secondsPerWordWhenSilent` tune the pacing. |
+| Clips not recorded by the defense date | The game prompts in Filipino on screen regardless. Nothing is blocked. |
