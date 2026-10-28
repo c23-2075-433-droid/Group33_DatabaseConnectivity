@@ -25,16 +25,18 @@ public class VoiceNarrator : MonoBehaviour
 {
     public enum CaptionMode
     {
-        /// <summary>Caption only lines that have not been recorded yet. The default.</summary>
-        WhenNoAudio,
-        /// <summary>Always caption - subtitles, and useful on a muted phone.</summary>
+        /// <summary>Subtitle every line, recorded or not. The default.</summary>
         Always,
+        /// <summary>Caption only lines that have not been recorded yet.</summary>
+        WhenNoAudio,
         /// <summary>Never caption.</summary>
         Never,
     }
 
-    [Header("Captions")]
-    public CaptionMode captionMode = CaptionMode.WhenNoAudio;
+    [Header("Subtitles")]
+    [Tooltip("Always: subtitle every line, so the child can read along with Rachel and the game still works on a muted phone. " +
+             "WhenNoAudio: caption only the lines that have not been recorded yet.")]
+    public CaptionMode captionMode = CaptionMode.Always;
 
     [Tooltip("Height of the caption bar across the top of the screen, at the 1920x1080 reference size.")]
     public float captionBarHeight = 88f;

@@ -96,8 +96,23 @@ public class SceneObjectiveController : MonoBehaviour
              "the instant the character stops.")]
     public float settlePause = 0.25f;
 
+    [Header("Holding a new word while Rachel introduces it")]
+    [Tooltip("Show a new word faint while the narrator is still saying it, and brighten it " +
+             "into the player's turn when she finishes. Without this the badge and arrow go " +
+             "up at full strength while the child is still being told about them.")]
+    public bool holdPromptUntilNarrationEnds = true;
+
+    [Tooltip("How faint the badge is while Rachel is still speaking (1 = no dimming).")]
+    [Range(0f, 1f)]
+    public float dimmedPromptAlpha = 0.45f;
+
+    [Tooltip("Safety cap in seconds, so narration that never finishes cannot leave a word " +
+             "dimmed and unanswerable forever.")]
+    public float maxNarrationWait = 15f;
+
     private int currentIndex = -1;
     private bool objectiveLive = false;
+    private Coroutine revealRoutine;
     private AudioSource audioSource;
     private Coroutine advanceRoutine;
 
@@ -139,6 +154,7 @@ public class SceneObjectiveController : MonoBehaviour
 
         if (paused)
         {
+            CancelReveal();
             HideAllPrompts();
             ClearTargetWord();
             return;
@@ -189,6 +205,7 @@ public class SceneObjectiveController : MonoBehaviour
     {
         currentIndex = index;
         objectiveLive = false;
+        CancelReveal();
         HideAllPrompts();
 
         if (index < 0 || index >= objectives.Length)
@@ -218,7 +235,40 @@ public class SceneObjectiveController : MonoBehaviour
         }
 
         SceneObjective objective = objectives[index];
-        if (objective.promptRoot != null) objective.promptRoot.SetActive(true);
+
+        // The word goes up faint first: Rachel is still introducing it, so it
+        // is not the player's turn yet. GoLive brightens it and starts
+        // accepting the answer once she has finished.
+        if (objective.promptRoot != null)
+        {
+            objective.promptRoot.SetActive(true);
+            SetPromptAlpha(objective.promptRoot, dimmedPromptAlpha);
+        }
+
+        // Raised BEFORE the word is set, so the narrator has already been
+        // asked to speak by the time we check below - VoiceNarrator.Enqueue
+        // marks itself speaking synchronously inside this call.
+        if (OnObjectiveShown != null) OnObjectiveShown(objective);
+
+        VoiceNarrator narrator = VoiceNarrator.Instance;
+        if (holdPromptUntilNarrationEnds && narrator != null && narrator.IsSpeaking)
+            revealRoutine = StartCoroutine(RevealWhenNarrationEnds(index));
+        else
+            GoLive(index);
+    }
+
+    /// <summary>
+    /// The word is now the player's to say: full brightness, and the
+    /// recognizer starts matching against it.
+    /// </summary>
+    private void GoLive(int index)
+    {
+        if (index != currentIndex) return;
+        if (index < 0 || index >= objectives.Length) return;
+
+        SceneObjective objective = objectives[index];
+        if (objective.promptRoot != null) SetPromptAlpha(objective.promptRoot, 1f);
+
         if (voiceCommand != null)
         {
             voiceCommand.currentTargetWord = objective.word;
@@ -226,7 +276,50 @@ public class SceneObjectiveController : MonoBehaviour
         }
 
         objectiveLive = true;
-        if (OnObjectiveShown != null) OnObjectiveShown(objective);
+    }
+
+    /// <summary>
+    /// Waits for the narrator to stop talking, then hands the word to the
+    /// player. The cap means a line that never ends cannot strand a word
+    /// dimmed and unanswerable; a narrator destroyed mid-line reads as null
+    /// and ends the wait the same way.
+    /// </summary>
+    private IEnumerator RevealWhenNarrationEnds(int index)
+    {
+        float waited = 0f;
+        VoiceNarrator narrator = VoiceNarrator.Instance;
+
+        while (narrator != null && narrator.IsSpeaking && waited < maxNarrationWait)
+        {
+            waited += Time.deltaTime;
+            yield return null;
+        }
+
+        revealRoutine = null;
+
+        // The scene may have moved on or been paused while she was speaking.
+        if (isPaused || index != currentIndex) yield break;
+
+        GoLive(index);
+    }
+
+    private void CancelReveal()
+    {
+        if (revealRoutine == null) return;
+        StopCoroutine(revealRoutine);
+        revealRoutine = null;
+    }
+
+    /// <summary>
+    /// Fades a prompt's badge, word and arrow together. A CanvasGroup is
+    /// added on demand rather than built into CreatePromptUI, so none of the
+    /// fifteen scene builders has to change and no scene has to be rebuilt.
+    /// </summary>
+    private void SetPromptAlpha(GameObject promptRoot, float alpha)
+    {
+        CanvasGroup group = promptRoot.GetComponent<CanvasGroup>();
+        if (group == null) group = promptRoot.AddComponent<CanvasGroup>();
+        group.alpha = alpha;
     }
 
     // Called whenever VoiceCommand finishes checking a spoken answer against
