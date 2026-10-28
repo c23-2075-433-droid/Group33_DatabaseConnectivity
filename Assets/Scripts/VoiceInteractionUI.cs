@@ -41,6 +41,11 @@ public class VoiceInteractionUI : MonoBehaviour
     public float replayPunchScale = 0.85f;
     public float replayPunchDuration = 0.15f;
 
+    [Tooltip("Press replay again within this many seconds and the word is said slowly, for a child who heard it but could not catch it.")]
+    public float slowReplayWindow = 3f;
+
+    private float lastReplayTime = -99f;
+
     private Coroutine pulseRoutine;
 
     void OnEnable()
@@ -124,7 +129,13 @@ public class VoiceInteractionUI : MonoBehaviour
     private void OnReplayPressed()
     {
         StartCoroutine(ReplayPunchRoutine());
-        if (objectiveController != null) objectiveController.PlayCurrentInstruction();
+        if (objectiveController == null) return;
+
+        bool secondPress = Time.time - lastReplayTime <= slowReplayWindow;
+        lastReplayTime = Time.time;
+
+        if (secondPress) objectiveController.PlayCurrentInstructionSlowly();
+        else objectiveController.PlayCurrentInstruction();
     }
 
     /// <summary>Subtle press feedback: shrink briefly then spring back to full size.</summary>

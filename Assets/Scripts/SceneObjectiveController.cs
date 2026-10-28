@@ -54,6 +54,15 @@ public class SceneObjectiveController : MonoBehaviour
     /// </summary>
     public event System.Action<string> OnObjectiveCompleted;
 
+    /// <summary>
+    /// Raised each time an objective goes live - the prompt is up, the word
+    /// is set, and the player is expected to say it. VoicePromptDirector
+    /// listens for this to speak the prompt, which is why nothing narrates
+    /// while Kylo is mid-walk: no objective is raised until the action she
+    /// started has finished.
+    /// </summary>
+    public event System.Action<SceneObjective> OnObjectiveShown;
+
     [Tooltip("The VoiceCommand that recognizes speech for this scene.")]
     public VoiceCommand voiceCommand;
 
@@ -88,6 +97,7 @@ public class SceneObjectiveController : MonoBehaviour
     public float settlePause = 0.25f;
 
     private int currentIndex = -1;
+    private bool objectiveLive = false;
     private AudioSource audioSource;
     private Coroutine advanceRoutine;
 
@@ -101,6 +111,21 @@ public class SceneObjectiveController : MonoBehaviour
 
     /// <summary>True while the sequence is held, see SetPaused.</summary>
     public bool IsPaused => isPaused;
+
+    /// <summary>
+    /// The word the player is being asked for right now, or null if nothing is
+    /// being asked - between words, during an action, while paused, and once
+    /// the scene is finished.
+    /// </summary>
+    public SceneObjective CurrentObjective
+    {
+        get
+        {
+            if (!objectiveLive) return null;
+            if (currentIndex < 0 || currentIndex >= objectives.Length) return null;
+            return objectives[currentIndex];
+        }
+    }
 
     /// <summary>
     /// Holds the sequence: hides the prompt and stops matching answers, so
@@ -130,6 +155,7 @@ public class SceneObjectiveController : MonoBehaviour
 
     private void ClearTargetWord()
     {
+        objectiveLive = false;
         if (voiceCommand == null) return;
         voiceCommand.currentTargetWord = "";
         voiceCommand.currentTargetWordVariants = null;
@@ -162,6 +188,7 @@ public class SceneObjectiveController : MonoBehaviour
     private void ShowObjective(int index)
     {
         currentIndex = index;
+        objectiveLive = false;
         HideAllPrompts();
 
         if (index < 0 || index >= objectives.Length)
@@ -197,6 +224,9 @@ public class SceneObjectiveController : MonoBehaviour
             voiceCommand.currentTargetWord = objective.word;
             voiceCommand.currentTargetWordVariants = objective.variants;
         }
+
+        objectiveLive = true;
+        if (OnObjectiveShown != null) OnObjectiveShown(objective);
     }
 
     // Called whenever VoiceCommand finishes checking a spoken answer against
@@ -274,21 +304,41 @@ public class SceneObjectiveController : MonoBehaviour
     /// </summary>
     public void PlayCurrentInstruction()
     {
-        if (currentIndex < 0 || currentIndex >= objectives.Length)
+        Replay(false);
+    }
+
+    /// <summary>
+    /// The same replay, with the word said slowly. The replay button calls
+    /// this when it is pressed twice in quick succession - see
+    /// VoiceInteractionUI.
+    /// </summary>
+    public void PlayCurrentInstructionSlowly()
+    {
+        Replay(true);
+    }
+
+    private void Replay(bool slowly)
+    {
+        // Only while a word is actually being asked. Replaying between words
+        // used to play the NEXT word's clip, giving away a word the player had
+        // not been asked for yet.
+        SceneObjective objective = CurrentObjective;
+        if (objective == null)
         {
-            Debug.LogWarning("SceneObjectiveController: no active objective to replay.");
+            Debug.Log("SceneObjectiveController: nothing is being asked right now, so there is nothing to replay.");
             return;
         }
 
-        AudioClip clip = objectives[currentIndex].instructionClip;
-        if (clip != null)
+        VoiceNarrator narrator = VoiceNarrator.Instance;
+        if (narrator != null)
         {
-            audioSource.PlayOneShot(clip);
+            narrator.SpeakReplay(objective.word, objective.instructionClip, slowly);
+            return;
         }
-        else
-        {
-            Debug.LogWarning("SceneObjectiveController: no instructionClip assigned for '" + objectives[currentIndex].word + "' yet.");
-        }
+
+        // No narrator (shouldn't happen - one is created on demand), so fall
+        // back to the plain clip.
+        if (objective.instructionClip != null) audioSource.PlayOneShot(objective.instructionClip);
     }
 
     /// <summary>Hides every objective's prompt UI. Called by ExitDoorTrigger when the player leaves the scene mid-sequence.</summary>
