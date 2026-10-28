@@ -85,9 +85,11 @@ SCENE LOADS
         └─ on clip end → first objective goes live
 
 OBJECTIVE BECOMES ACTIVE  (SceneObjectiveController.ShowObjective)
-  ├─ Word badge + arrow appear over the target object      [SEEN]
-  ├─ [VOICE] "Sabihin mo:" + word_<word>.wav               [HEARD]
-  └─ on clip end → mic resumes, mic icon starts pulsing    [READY TO LISTEN]
+  ├─ Word badge + arrow appear over the target object, FAINT  [SEEN, not yet your turn]
+  ├─ [VOICE] "Sabihin mo:" + word_<word>.wav                  [HEARD]
+  ├─ subtitle bar carries the same words across the top       [READ]
+  └─ on clip end → badge brightens to full, the word starts being
+     matched, mic resumes, mic icon starts pulsing            [READY TO LISTEN]
 
 PLAYER SPEAKS
   ├─ CORRECT  → badge hides, [VOICE] "Tama!" (short), onCorrect action plays
@@ -106,6 +108,11 @@ NO SPEECH FOR 10 SECONDS
 ALL OBJECTIVES DONE
   └─ [VOICE] Rachel outro (existing rachel_lX_sY_outro.wav) → scene transition
 ```
+
+The faint badge is the whole point of the hold: the child sees where the word
+belongs while Rachel introduces it, and the word only becomes theirs to say
+when she stops. Nothing is matched during that window, so an eager answer over
+the top of the prompt cannot be scored.
 
 ### 2.3 When Rachel must *not* speak
 
@@ -221,13 +228,23 @@ animated), the word badge, and Rachel. No new screen, no new panel.
 
 | State | Audio | Mic icon | Word badge | On-screen text |
 |---|---|---|---|---|
-| **Prompting** (Rachel speaking) | frame + word clip | still, dimmed to 60% | visible, small pop-in | — |
-| **Ready to listen** | *(silence; optional "Nakikinig ako" once per scene)* | **pulsing** — `VoiceInteractionUI.PulseRoutine`, already built | visible, full brightness | "Nakikinig…" |
+| **Prompting** (Rachel speaking) | frame + word clip | still, no pulse | **visible but faint** (`dimmedPromptAlpha`, 0.45) | subtitle: "Sabihin mo: LAKAD" |
+| **Ready to listen** | *(silence; optional "Nakikinig ako" once per scene)* | **pulsing** — `VoiceInteractionUI.PulseRoutine`, already built | **brightens to full** | "Nakikinig…" |
 | **Heard something, checking** | — | pulse stops, icon held bright | visible | the partial text, as now (`OnPartialResultReceived`) |
-| **Correct** | "Tama!" / "Magaling!" / "Ang galing mo!" | still | **green flash, then hides** | — |
-| **Wrong word** | "Hindi pa tama. Subukan mo ulit." | still, then resumes pulsing | **shakes ~8 px, stays up** | — |
-| **Not recognised** | "Hindi kita narinig. Pakiulit." | brief grey tint, then pulses | unchanged, stays up | "Hindi narinig" |
-| **Mic blocked / unavailable** | "Pindutin ang mikropono para magsalita." | **red tint, no pulse** | stays up | "Pindutin ang mikropono" |
+| **Correct** | "Tama!" / "Magaling!" / "Ang galing mo!" | still | **green flash, then hides** | subtitle: "Tama!" |
+| **Wrong word** | "Hindi pa tama. Subukan mo ulit." | still, then resumes pulsing | **shakes ~8 px, stays up, full brightness** | subtitle: the retry line |
+| **Not recognised** | "Hindi kita narinig. Pakiulit." | brief grey tint, then pulses | unchanged, stays up | subtitle: the not-heard line |
+| **Mic blocked / unavailable** | "Pindutin ang mikropono para magsalita." | **red tint, no pulse** | stays up | subtitle: "Pindutin ang mikropono…" |
+
+Every spoken line is subtitled across the top of the screen, recorded or not
+(`VoiceNarrator.captionMode = Always`). The subtitle is not a stand-in for the
+missing voice-over - it stays once the clips are recorded, so the child can read
+along with Rachel and the game still works on a muted phone. `WhenNoAudio` is
+the opt-out if you ever want them to disappear as the recordings land.
+
+A word that has already been missed stays **bright**: the dimming applies only
+while a word is being introduced for the first time. A child who got it wrong
+needs to keep seeing the word at full strength.
 
 Notes that matter in practice:
 
@@ -283,7 +300,7 @@ files in later only adds the sound.
 
 | File | What it does |
 |---|---|
-| `Assets/Scripts/VoiceNarrator.cs` | Rachel's voice. One `AudioSource`, one queue, so two lines can never overlap. Plays a line, or captions it if it has no recording. Suspends the microphone while speaking. Builds its own caption bar in code. |
+| `Assets/Scripts/VoiceNarrator.cs` | Rachel's voice. One `AudioSource`, one queue, so two lines can never overlap. Plays a line and subtitles it. Suspends the microphone while speaking. Builds its own subtitle bar in code. |
 | `Assets/Scripts/VoicePromptDirector.cs` | Decides **what** she says and **when** — prompts, feedback, hints, idle nudges, scene intro/outro. All of it hangs off events the scene already raises. Also contains `VoicePromptBootstrap`. |
 | `Assets/Scripts/NarratorScript.cs` | The script, compiled in: the id of every line, and the Filipino text of the short reusable ones. This is what makes the game prompt correctly on a fresh checkout with no assets. |
 | `Assets/Scripts/NarratorVoiceBank.cs` | A `ScriptableObject` holding every line's text + clip, loaded at runtime from `Assets/Resources/`. |
@@ -301,6 +318,16 @@ Small and additive. No level, no gameplay rule and no existing screen changed.
   `currentIndex` alone could not answer "is a word being asked right now?" —
   `AdvanceWhenActionFinishes` moves it on to the next objective while that
   objective is still waiting to be shown.
+- A new word is announced **faint** and only goes live when the narrator stops:
+  `ShowObjective()` puts the badge up at `dimmedPromptAlpha`, raises
+  `OnObjectiveShown` (which is what makes the director speak), then waits on
+  `VoiceNarrator.IsSpeaking` before `GoLive()` brightens the badge and hands the
+  word to the recognizer. Dimming uses a `CanvasGroup` added on demand, so the
+  badge, its text and its arrow fade together and **no scene builder changes**.
+  `maxNarrationWait` caps the wait so a line that never ends cannot strand a
+  word unanswerable, and `CancelReveal()` drops a pending reveal when the scene
+  is paused or moves on. Turn the whole behaviour off with
+  `holdPromptUntilNarrationEnds`.
 - `PlayCurrentInstruction()` now goes through the narrator, so the replay
   button says *"Pakinggan mo ulit: LAKAD"* instead of a bare word and cannot
   talk over her. It also no longer replays between words — pressing replay
@@ -339,6 +366,9 @@ Open any chapter scene and press Play. Rachel's lines appear as captions
 across the top of the screen in the right places and with the right pacing.
 In the Editor, the existing keyboard fallback drives the whole loop:
 
+- watch a new word appear faint while Rachel introduces it, then brighten —
+  **Enter** during the faint window reports no active objective, which is the
+  on-device behaviour too (the mic is suspended while she speaks)
 - **Enter** — say the word currently being asked (correct answer → *"Tama!"*)
 - **X** — a deliberately wrong answer (→ *"Hindi pa tama. Subukan mo ulit."*,
   then the automatic slow repeat on the second miss)
@@ -352,10 +382,11 @@ The voice bank is optional at this stage; `NarratorScript` carries the text.
 1. Record and drop the files in `Assets/Audio/VO/`, named as in
    `Docs/VoiceOverScript.csv` (`rachel_frame_sabihin.wav`, `word_lakad.wav`, …).
 2. Run **Tools > SALINLAHI > Refresh Narrator Voice Bank**.
-3. That is all. Each line switches from caption to audio the moment its clip
-   exists; captions default to showing only for lines that are still silent
-   (`VoiceNarrator.captionMode`), so they disappear by themselves as the
-   recordings arrive. Set the mode to `Always` to keep them as subtitles.
+3. That is all. Each line switches from subtitle-only to subtitle-plus-audio
+   the moment its clip exists. Subtitles stay on by default
+   (`VoiceNarrator.captionMode = Always`) — they are a feature, not a
+   stand-in. Set the mode to `WhenNoAudio` if you ever want them to disappear
+   as the recordings arrive, or `Never` to turn them off.
 
 Start with the 12 shared lines and Level 1's 20 words — that is enough for a
 fully voiced Level 1 demo.
@@ -366,7 +397,9 @@ Everything worth arguing about is a field in the Inspector, on the
 `VoicePromptDirector` and `VoiceNarrator` objects that appear in the hierarchy
 at runtime: `missesBeforeHint`, `missesBeforeReplayHint`, `idleNudgeSeconds`,
 `idleRepromptSeconds`, `speakSceneLines`, `cueListeningOnFirstWord`,
-`captionMode`, `captionBarHeight`, `slowPitch`, `tailPause`.
+`captionMode`, `captionBarHeight`, `slowPitch`, `tailPause`. The hold itself is
+on `SceneObjectiveController`, which is part of each scene:
+`holdPromptUntilNarrationEnds`, `dimmedPromptAlpha`, `maxNarrationWait`.
 
 To change a default permanently, edit the field initialiser in the script —
 the objects are created at runtime, so Inspector edits last only for that Play
