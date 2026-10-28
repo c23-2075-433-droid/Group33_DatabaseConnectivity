@@ -59,10 +59,12 @@ public static class RestyleSceneResultPanels
             string nextSceneName = old.nextSceneName;
             string levelSelectSceneName = old.levelSelectSceneName;
             bool levelEnd = old.waitForExternalTotals;
+            bool waitForCue = old.waitForCue;
 
             SceneResultPanelBuilder.Built rebuilt =
                 SceneResultPanelBuilder.Build(controller, voiceCommand, nextSceneName, levelEnd);
             rebuilt.panel.levelSelectSceneName = levelSelectSceneName;
+            rebuilt.panel.waitForCue = waitForCue;
 
             // The two things outside the panel that hold on to a piece of it.
             // Both are wired by DatabaseDemoBuilder on a level's last scene and
@@ -75,7 +77,16 @@ public static class RestyleSceneResultPanels
             }
 
             ExitDoorTrigger exit = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
-            if (exit != null && levelEnd) exit.levelCompleteUI = rebuilt.content;
+            if (exit != null)
+            {
+                if (levelEnd) exit.levelCompleteUI = rebuilt.content;
+
+                // Level 1's door is what opens its panel, so it has to be
+                // pointed at the new one. Missing this once left the scene
+                // ending on nothing at all: the door had a destroyed panel to
+                // open, and the panel was still waiting to be told.
+                if (waitForCue) exit.resultPanel = rebuilt.panel;
+            }
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
