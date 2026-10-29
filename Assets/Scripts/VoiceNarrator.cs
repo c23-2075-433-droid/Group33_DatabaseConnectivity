@@ -21,6 +21,18 @@ using UnityEngine.UI;
 /// Nothing has to be wired in the Inspector and no scene has to be rebuilt:
 /// VoicePromptDirector asks for Instance, which finds or creates one.
 /// </summary>
+/// <summary>
+/// Something that can show Rachel's words. The narrator builds a plain bar of
+/// its own and uses that unless a presenter is registered, so the prompting
+/// system works on its own and a nicer panel - GameplayHUD's - is a skin over
+/// it rather than a second subtitle system.
+/// </summary>
+public interface ICaptionPresenter
+{
+    /// <summary>Show this line, or hide the caption when text is null/empty.</summary>
+    void ShowCaption(string text);
+}
+
 public class VoiceNarrator : MonoBehaviour
 {
     public enum CaptionMode
@@ -43,6 +55,38 @@ public class VoiceNarrator : MonoBehaviour
 
     [Tooltip("Caption text size at the 1920x1080 reference size.")]
     public int captionFontSize = 34;
+
+    /// <summary>
+    /// Where captions are drawn. Set by GameplayHUD so Rachel's lines appear in
+    /// her own wooden panel; left null the narrator draws its own plain bar
+    /// across the top, exactly as before. Registering and clearing this is the
+    /// presenter's job - see GameplayHUD.Awake/OnDestroy.
+    ///
+    /// Taking over hands the presenter whatever is on screen at that moment.
+    /// Without that, whoever ran first would decide: VoicePromptDirector queues
+    /// the scene intro in its own Awake, and the director and the HUD are
+    /// installed by two bootstraps in the same pass with no order between them,
+    /// so Rachel can already be mid-line when the panel arrives. Replaying the
+    /// current caption makes the order stop mattering.
+    /// </summary>
+    public ICaptionPresenter CaptionPresenter
+    {
+        get => captionPresenter;
+        set
+        {
+            if (ReferenceEquals(captionPresenter, value)) return;
+            captionPresenter = value;
+
+            if (value == null) return;
+            if (captionCanvas != null) captionCanvas.gameObject.SetActive(false);
+            value.ShowCaption(CurrentCaption);
+        }
+    }
+
+    private ICaptionPresenter captionPresenter;
+
+    /// <summary>The caption on screen right now, or null between lines.</summary>
+    public string CurrentCaption { get; private set; }
 
     [Header("Pacing")]
     [Tooltip("Silence between the parts of one line, e.g. between \"Sabihin mo:\" and the word itself.")]
@@ -165,6 +209,7 @@ public class VoiceNarrator : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
+        ApplyNarrationVolume();
 
         BuildCaptionUI();
     }
@@ -272,6 +317,17 @@ public class VoiceNarrator : MonoBehaviour
         NarratorLine line = bank != null ? bank.Find(id) : null;
         if (line != null && (line.clip != null || !string.IsNullOrEmpty(line.text))) return true;
         return !string.IsNullOrEmpty(NarratorScript.DefaultText(id));
+    }
+
+    /// <summary>
+    /// Takes Rachel's volume from the saved settings. Her voice has its own
+    /// slider because it is the one sound a parent or a classroom is likely to
+    /// want quieter on its own - the instruction still reads on screen.
+    /// Called by VolumeSettings.Apply() whenever the slider moves.
+    /// </summary>
+    public void ApplyNarrationVolume()
+    {
+        if (audioSource != null) audioSource.volume = VolumeSettings.Narration;
     }
 
     /// <summary>Drops everything queued and stops mid-clip. Used for barge-in and scene changes.</summary>
@@ -527,6 +583,19 @@ public class VoiceNarrator : MonoBehaviour
 
     private void ShowCaption(string text)
     {
+        CurrentCaption = string.IsNullOrEmpty(text) ? null : text;
+
+        if (captionPresenter != null)
+        {
+            // The built-in bar was built before anyone registered, so make sure
+            // it is not sitting behind the panel that replaced it.
+            if (captionCanvas != null && captionCanvas.gameObject.activeSelf)
+                captionCanvas.gameObject.SetActive(false);
+
+            captionPresenter.ShowCaption(text);
+            return;
+        }
+
         if (captionCanvas == null) return;
 
         if (string.IsNullOrEmpty(text))
