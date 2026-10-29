@@ -23,6 +23,9 @@ public class NarratorLine
     [TextArea(1, 3)]
     public string text;
 
+    [Tooltip("What the word means in English, from the CSV's English Gloss column. Empty for Rachel's own lines, which gloss nothing.")]
+    public string gloss;
+
     [Tooltip("The recording, once it exists. Leave empty until it does.")]
     public AudioClip clip;
 }

@@ -6,10 +6,11 @@
 // Run it after every recording session:
 //     Tools > SALINLAHI > Refresh Narrator Voice Bank
 //
-// The CSV stays the single source of truth for what Rachel says - this tool
-// only copies it into a form a BUILD can read. VoiceClipLibrary cannot be used
-// at runtime (it is an Editor class and uses AssetDatabase), which is the whole
-// reason the bank asset exists.
+// The CSV stays the single source of truth for what Rachel says, and for what
+// each vocabulary word means in English - this tool only copies it into a form
+// a BUILD can read. VoiceClipLibrary cannot be used at runtime (it is an
+// Editor class and uses AssetDatabase), which is the whole reason the bank
+// asset exists.
 //
 // Lines with no recording yet are kept, with their text and a null clip, so
 // VoiceNarrator can caption them and hold the pause. That is what lets the
@@ -47,10 +48,10 @@ public static class NarratorVoiceBankTool
 
         // 1. Everything the recording script asks for, recorded or not.
         int fromCsv = 0;
-        foreach (KeyValuePair<string, string> row in ReadScript())
+        foreach (ScriptRow row in ReadScript())
         {
-            if (!seen.Add(row.Key)) continue;
-            lines.Add(new NarratorLine { id = row.Key, text = row.Value, clip = FindClip(row.Key) });
+            if (!seen.Add(row.id)) continue;
+            lines.Add(new NarratorLine { id = row.id, text = row.text, gloss = row.gloss, clip = FindClip(row.id) });
             fromCsv++;
         }
 
@@ -89,10 +90,18 @@ public static class NarratorVoiceBankTool
 
     // ---------------------------------------------------------------------
 
-    /// <summary>id (file name without extension) -> what Rachel says, from the CSV.</summary>
-    private static List<KeyValuePair<string, string>> ReadScript()
+    /// <summary>One row of the recording script: its id, what is said, and what it means.</summary>
+    private struct ScriptRow
     {
-        List<KeyValuePair<string, string>> script = new List<KeyValuePair<string, string>>();
+        public string id;
+        public string text;
+        public string gloss;
+    }
+
+    /// <summary>The CSV's rows: id (file name without extension), spoken text, English gloss.</summary>
+    private static List<ScriptRow> ReadScript()
+    {
+        List<ScriptRow> script = new List<ScriptRow>();
 
         string path = Application.dataPath + CsvRelative;
         if (!File.Exists(path))
@@ -112,11 +121,25 @@ public static class NarratorVoiceBankTool
             if (fileName.Length == 0) continue;
             if (fileName == "File Name") continue;                 // header
 
-            string id = Path.GetFileNameWithoutExtension(fileName);
-            string text = row[5].Trim();
-            script.Add(new KeyValuePair<string, string>(id, text));
+            script.Add(new ScriptRow
+            {
+                id    = Path.GetFileNameWithoutExtension(fileName),
+                text  = row[5].Trim(),
+                gloss = row.Length > 6 ? Gloss(row[6]) : null,
+            });
         }
         return script;
+    }
+
+    /// <summary>
+    /// The English Gloss column, or null. Rachel's own lines carry "-" there
+    /// rather than a meaning, and a word panel showing a dash under the word
+    /// is worse than showing nothing.
+    /// </summary>
+    private static string Gloss(string field)
+    {
+        string gloss = field.Trim();
+        return (gloss.Length == 0 || gloss == "-") ? null : gloss;
     }
 
     /// <summary>Every clip currently sitting in Assets/Audio/VO/, by file stem.</summary>
