@@ -121,6 +121,44 @@ public static class JourneyMap
         return next >= 0 ? next : Steps.Length - 1;
     }
 
+    /// <summary>
+    /// The name of a level, from its own marker on the journey - "Bahay" for
+    /// level 1. Empty for a level number that is not on the map.
+    /// </summary>
+    public static string LevelLabel(int levelIndex)
+    {
+        foreach (Step s in Steps)
+            if (s.kind == StepKind.Level && s.levelIndex == levelIndex) return s.label;
+        return "";
+    }
+
+    /// <summary>
+    /// How a scene names itself on screen: "BAHAY: LEVEL 1".
+    ///
+    /// Built here rather than in the HUD because this file already claims to
+    /// be the one place the journey is written down, and because the naming is
+    /// genuinely confusing - a scene called Chapter1_Level1 is level 1 of the
+    /// game and scene 1 of the voice-over script, and its PLACE comes from the
+    /// marker it sits under rather than from its own name. Somewhere that is
+    /// worked out once is better than somewhere it is worked out again.
+    ///
+    /// Empty for a scene that is not on the journey, such as the main menu, so
+    /// a caller can simply not show the label.
+    /// </summary>
+    public static string PlaceLabel(string sceneName)
+    {
+        int index = IndexOfScene(sceneName);
+        if (index < 0) return "";
+
+        Step step = Steps[index];
+        string place = LevelLabel(step.levelIndex);
+        if (string.IsNullOrEmpty(place)) return "";
+
+        return string.IsNullOrEmpty(step.label)
+            ? place.ToUpperInvariant()
+            : place.ToUpperInvariant() + ": LEVEL " + step.label;
+    }
+
     /// <summary>Every step belonging to one level, markers included.</summary>
     public static IEnumerable<Step> InLevel(int levelIndex)
     {

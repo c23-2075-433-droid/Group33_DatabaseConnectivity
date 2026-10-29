@@ -78,6 +78,16 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     /// </summary>
     public event Action OnMicrophoneUnavailable;
 
+    /// <summary>
+    /// Raised the moment the recognizer notices the player has started
+    /// talking, before it knows what they said. The gap between this and
+    /// OnAnswerChecked is the only window in which the game is genuinely
+    /// working something out, which is what the status panel shows as
+    /// "PROCESSING...". It is a notification only - nothing here decides
+    /// anything or is scored.
+    /// </summary>
+    public event Action OnSpeechBegan;
+
     // --- Microphone button listening indicator (see VoiceInteractionUI) ---
     // True while the device's speech recognizer is actively listening for the
     // player to speak (between OnReadyForSpeech and the next result). The mic
@@ -293,7 +303,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     void ISpeechToTextListener.OnBeginningOfSpeech()
     {
+        if (isShuttingDown || this == null) return;
         speechStartedThisSession = true;
+        OnSpeechBegan?.Invoke();
     }
 
     void ISpeechToTextListener.OnVoiceLevelChanged(float normalizedVoiceLevel) { }
