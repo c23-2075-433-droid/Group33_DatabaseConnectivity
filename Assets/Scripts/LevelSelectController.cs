@@ -3,15 +3,24 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// Drives "Ang Iyong Paglalakbay": the whole journey as one winding path, a
-/// node per step of JourneyMap - each level marker and every scene between
-/// them - rather than four level nodes with everything inside them hidden.
+/// Drives the level select: one page per place, flipped through with the
+/// arrows either side of the board.
 ///
-/// A node is open when the player has reached its step. Scenes that are
-/// designed but not built have no scene behind them, so they show as locked
-/// however far the player gets; the path still shows where the journey goes.
+/// The screen used to show all sixteen scenes at once, numbered straight
+/// through. A page per place numbers them the way a child would say it -
+/// Bahay one to six, then Paaralan one to five - and leaves the tiles big
+/// enough for a small finger. The dots under the board say how many places
+/// there are and which one is open.
 ///
-/// Built by BuildLevelSelectScene.cs, which lays the nodes out and fills in
+/// A tile can be entered once the player has reached its step AND the scene
+/// behind it has been built. Anything else wears the padlock: from the
+/// child's side "not yet" and "not made" are the same answer.
+///
+/// Under each tile are the stars it was last finished with, read back from
+/// LevelProgress - the one thing on this screen that rewards going back to a
+/// scene that is already open.
+///
+/// Built by BuildLevelSelectScene.cs, which lays the pages out and fills in
 /// the references below.
 /// </summary>
 public class LevelSelectController : MonoBehaviour
@@ -21,50 +30,69 @@ public class LevelSelectController : MonoBehaviour
     {
         public Button button;
 
-        [Tooltip("The node's own picture - a stepping stone, or a level's illustration.")]
+        [Tooltip("The tile itself - the numbered wood, or the padlock.")]
         public Image icon;
 
+        [Tooltip("The tile printed with this scene's number within its place.")]
         public Sprite unlockedSprite;
+
+        [Tooltip("The padlock tile, shown when the scene cannot be entered.")]
         public Sprite lockedSprite;
 
-        [Tooltip("Padlock shown over a step the player has not reached.")]
-        public GameObject lockOverlay;
-
-        [Tooltip("The number drawn on the tile. Always shown - a locked tile is " +
-                 "dimmed rather than covered, so the journey can be counted " +
-                 "end to end whether or not it has been reached.")]
-        public GameObject numberLabel;
+        [Tooltip("The three stars under the tile, left to right.")]
+        public Image[] stars;
 
         [Tooltip("Index into JourneyMap.Steps.")]
         public int stepIndex;
 
-        [Tooltip("Scene to load. Empty for a level marker, or a scene not built yet.")]
+        [Tooltip("Scene to load. Empty for a place with nothing built yet.")]
         public string sceneName;
+    }
+
+    [System.Serializable]
+    public class Page
+    {
+        [Tooltip("Holds this page's tiles. Only the open page is active.")]
+        public GameObject root;
+
+        [Tooltip("This page's dot in the strip under the board.")]
+        public Image dot;
+
+        [Tooltip("The place this page shows. Used in the console line only.")]
+        public string label;
+
+        [Tooltip("First step of this place in JourneyMap, marker included. " +
+                 "The screen opens on the last page the player has reached.")]
+        public int firstStep;
     }
 
     [Tooltip("Scene loaded by the Back button.")]
     public string mainMenuSceneName = "MainMenu";
 
     public Button backButton;
+
+    [Tooltip("The arrows either side of the board.")]
+    public Button previousPageButton;
+    public Button nextPageButton;
+
     public StepNode[] nodes;
+    public Page[] pages;
 
-    [Tooltip("Kylo's portrait, moved to the furthest step the player has reached.")]
-    public RectTransform playerMarker;
+    [Header("Stars")]
+    public Sprite starOnSprite;
+    public Sprite starOffSprite;
 
-    [Tooltip("How far above a node the portrait sits.")]
-    public float markerLift = 86f;
+    [Header("Page dots")]
+    public Sprite dotOnSprite;
+    public Sprite dotOffSprite;
 
-    [Tooltip("Number colour on a tile that can be entered.")]
-    public Color numberColor = new Color(0.99f, 0.95f, 0.85f);
-
-    [Tooltip("Number colour on a tile that cannot. The button dims the tile " +
-             "itself; the number is a child of it, so it has to be dimmed to " +
-             "match or it sits bright on a greyed tile.")]
-    public Color lockedNumberColor = new Color(0.56f, 0.51f, 0.45f);
+    private int openPage;
 
     void Start()
     {
         if (backButton != null) backButton.onClick.AddListener(OnBackPressed);
+        if (previousPageButton != null) previousPageButton.onClick.AddListener(() => Turn(-1));
+        if (nextPageButton != null) nextPageButton.onClick.AddListener(() => Turn(1));
 
         foreach (StepNode node in nodes)
         {
@@ -73,26 +101,13 @@ public class LevelSelectController : MonoBehaviour
             bool reached = LevelProgress.IsStepUnlocked(node.stepIndex);
             bool playable = reached && !string.IsNullOrEmpty(node.sceneName);
 
-            // The padlock tile stands for "you cannot go in here", which covers
-            // both a step the player has not reached and a scene that has not
-            // been built. From the child's side those are the same thing, and a
-            // numbered tile that does nothing when tapped is worse than a lock.
-            if (node.icon != null && node.unlockedSprite != null && node.lockedSprite != null)
-                node.icon.sprite = playable ? node.unlockedSprite : node.lockedSprite;
-
-            // Only for a node whose art has no padlock of its own. The wooden
-            // tiles carry theirs, so the grid leaves this null and the sprite
-            // swap above does the whole job.
-            if (node.lockOverlay != null) node.lockOverlay.SetActive(!reached);
-
-            // Every tile keeps its number, so the levels can be counted straight
-            // through. A tile that cannot be entered is dimmed instead.
-            if (node.numberLabel != null)
+            if (node.icon != null)
             {
-                Text numberText = node.numberLabel.GetComponent<Text>();
-                if (numberText != null)
-                    numberText.color = playable ? numberColor : lockedNumberColor;
+                Sprite face = playable ? node.unlockedSprite : node.lockedSprite;
+                if (face != null) node.icon.sprite = face;
             }
+
+            ShowStars(node);
 
             if (node.button != null)
             {
@@ -105,29 +120,68 @@ public class LevelSelectController : MonoBehaviour
             }
         }
 
-        PlaceMarker();
+        // Open where the child left off rather than at the beginning, so
+        // carrying on is the thing that needs no taps.
+        ShowPage(FurthestPage());
     }
 
-    /// <summary>Puts Kylo's portrait on the furthest step reached.</summary>
-    private void PlaceMarker()
+    /// <summary>Lights as many stars as this scene has been finished with.</summary>
+    private void ShowStars(StepNode node)
     {
-        if (playerMarker == null || nodes == null || nodes.Length == 0) return;
+        if (node.stars == null) return;
 
-        StepNode here = null;
-        foreach (StepNode node in nodes)
+        // The summary panel rates out of five and these tiles hold three, so
+        // the rating is scaled rather than read straight.
+        int earned = LevelProgress.StarsScaledTo(node.sceneName, node.stars.Length);
+        for (int i = 0; i < node.stars.Length; i++)
         {
-            if (node == null || node.button == null) continue;
-            if (!LevelProgress.IsStepUnlocked(node.stepIndex)) continue;
-            if (here == null || node.stepIndex > here.stepIndex) here = node;
+            Image star = node.stars[i];
+            if (star == null) continue;
+            Sprite face = i < earned ? starOnSprite : starOffSprite;
+            if (face != null) star.sprite = face;
         }
-        if (here == null || here.button == null) return;
+    }
 
-        RectTransform target = here.button.GetComponent<RectTransform>();
-        if (target == null) return;
+    /// <summary>
+    /// The last page the player has reached. Pages are places in journey
+    /// order, so this is the last one that begins at or before the furthest
+    /// step unlocked.
+    /// </summary>
+    private int FurthestPage()
+    {
+        if (pages == null || pages.Length == 0) return 0;
 
-        playerMarker.SetParent(target.parent, false);
-        playerMarker.anchoredPosition = target.anchoredPosition + new Vector2(0f, markerLift);
-        playerMarker.SetAsLastSibling();
+        int reached = LevelProgress.HighestUnlockedStep;
+        int best = 0;
+        for (int i = 0; i < pages.Length; i++)
+            if (pages[i] != null && pages[i].firstStep <= reached) best = i;
+        return best;
+    }
+
+    private void Turn(int direction) => ShowPage(openPage + direction);
+
+    private void ShowPage(int index)
+    {
+        if (pages == null || pages.Length == 0) return;
+        openPage = Mathf.Clamp(index, 0, pages.Length - 1);
+
+        for (int i = 0; i < pages.Length; i++)
+        {
+            Page page = pages[i];
+            if (page == null) continue;
+            if (page.root != null) page.root.SetActive(i == openPage);
+            if (page.dot != null)
+            {
+                Sprite face = i == openPage ? dotOnSprite : dotOffSprite;
+                if (face != null) page.dot.sprite = face;
+            }
+        }
+
+        // Dimmed rather than hidden at the ends: an arrow that disappears
+        // moves everything else, and a child who was aiming at it has to look
+        // for where the screen went.
+        if (previousPageButton != null) previousPageButton.interactable = openPage > 0;
+        if (nextPageButton != null) nextPageButton.interactable = openPage < pages.Length - 1;
     }
 
     private void OnNodePressed(string sceneName)

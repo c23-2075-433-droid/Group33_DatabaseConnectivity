@@ -31,6 +31,11 @@ public class SessionScoreTracker : MonoBehaviour
     [Header("Level Complete UI")]
     [Tooltip("The panel shown when the session ends (LevelComplete_Canvas).")]
     public GameObject levelCompletePanel;
+
+    [Tooltip("The scene summary, when the level ends on one. It is handed the " +
+             "level's totals and opens itself; levelCompletePanel is then left " +
+             "empty so the two do not both try to show something.")]
+    public SceneResultPanel resultPanel;
     [Tooltip("Shows who played.")]
     public Text scoreText;
     [Tooltip("Shows records retrieved back from the database.")]
@@ -155,6 +160,9 @@ public class SessionScoreTracker : MonoBehaviour
         LevelProgress.MarkSceneComplete(
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 
+        // The summary is given the figures captured above rather than left to
+        // read RunScore, which Reset() has already emptied by this point.
+        if (resultPanel != null) resultPanel.ShowWithTotals(correctAnswers, totalAttempts);
         ShowPanel();
         SetText(scoreText, record.player_name);
         FillStatistics(correctAnswers, totalAttempts, practised, accuracy);

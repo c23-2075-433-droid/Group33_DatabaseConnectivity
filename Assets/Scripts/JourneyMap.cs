@@ -49,7 +49,8 @@ public static class JourneyMap
 
     /// <summary>
     /// The journey in order. Twenty steps: four level markers and the sixteen
-    /// scenes the design document lays out. Six of those scenes are built.
+    /// scenes the design document lays out. Fifteen of those scenes are built;
+    /// only Bahay's sixth, leaving for school, is still to come.
     /// </summary>
     public static readonly Step[] Steps = new[]
     {
@@ -63,17 +64,17 @@ public static class JourneyMap
 
         Level("Paaralan", 2, "map_paaralan"),
         Scene("1", 2, "Chapter2_Level1_Paaralan"),
-        Scene("2", 2, ""),                               // Entering the Classroom
-        Scene("3", 2, ""),                               // Vocabulary Lesson
-        Scene("4", 2, ""),                               // Recess
-        Scene("5", 2, ""),                               // Afternoon / Dismissal
+        Scene("2", 2, "Chapter2_Level2_Klasrum"),
+        Scene("3", 2, "Chapter2_Level3_Aralin"),
+        Scene("4", 2, "Chapter2_Level4_Recess"),
+        Scene("5", 2, "Chapter2_Level5_Uwian"),
 
         Level("Parke", 3, "map_parke"),
-        Scene("1", 3, ""),                               // Walking to the Park
-        Scene("2", 3, ""),                               // Playground
-        Scene("3", 3, ""),                               // Meeting New Friends
-        Scene("4", 3, ""),                               // Picnic
-        Scene("5", 3, ""),                               // Heading Home
+        Scene("1", 3, "Chapter3_Level1_Parke"),
+        Scene("2", 3, "Chapter3_Level2_Palaruan"),
+        Scene("3", 3, "Chapter3_Level3_Kaibigan"),
+        Scene("4", 3, "Chapter3_Level4_Piknik"),
+        Scene("5", 3, "Chapter3_Level5_Uwi"),
 
         Level("Palengke", 4, "map_palengke"),
     };
@@ -90,12 +91,34 @@ public static class JourneyMap
     /// <summary>
     /// The next step a player can actually enter after this one, skipping
     /// level markers and scenes that have no scene behind them yet.
+    /// -1 once there is nothing enterable left.
     /// </summary>
     public static int NextPlayable(int fromIndex)
     {
         for (int i = fromIndex + 1; i < Steps.Length; i++)
             if (Steps[i].IsPlayable) return i;
         return -1;
+    }
+
+    /// <summary>
+    /// The step to open once <paramref name="fromIndex"/> has been finished.
+    ///
+    /// Anything that can never be finished has to be stepped over - a level
+    /// marker, or a scene that is designed but not built yet - or the journey
+    /// dams behind it. Bahay's sixth scene is exactly that: unbuilt, and
+    /// sitting between breakfast and Paaralan, so opening the very next step
+    /// would leave every later scene locked for good however well the child
+    /// did.
+    ///
+    /// Past the last playable step there is nothing left to enter, so this
+    /// gives the end of the journey. That opens the closing marker rather than
+    /// stopping one short of it, which is what tells the last level it has
+    /// been completed.
+    /// </summary>
+    public static int StepAfter(int fromIndex)
+    {
+        int next = NextPlayable(fromIndex);
+        return next >= 0 ? next : Steps.Length - 1;
     }
 
     /// <summary>Every step belonging to one level, markers included.</summary>
