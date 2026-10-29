@@ -107,11 +107,17 @@ public static class UIThemeTool
     /// path so dropping a different family in Assets/Fonts still resolves -
     /// the same rule UIFont.Get() follows for the Editor-built UI, kept in
     /// step so the HUD and the rest of the game letter the same.
+    ///
+    /// Matched on "-Bold", not "Bold", because "Fredoka-SemiBold" contains
+    /// "Bold" too and FindAssets returns no particular order - so a loose
+    /// match picked whichever of the two Unity happened to hand back first,
+    /// and the headings came out a different weight on different machines.
     /// </summary>
     private static Font FindFont(string weight)
     {
         if (!AssetDatabase.IsValidFolder(FontFolder)) return null;
 
+        string suffix = "-" + weight + ".";
         Font fallback = null;
         foreach (string guid in AssetDatabase.FindAssets("t:Font", new[] { FontFolder }))
         {
@@ -125,7 +131,7 @@ public static class UIThemeTool
             Font font = AssetDatabase.LoadAssetAtPath<Font>(path);
             if (font == null) continue;
 
-            if (path.Contains(weight)) return font;
+            if (path.Contains(suffix)) return font;
             fallback ??= font;
         }
         return fallback;
