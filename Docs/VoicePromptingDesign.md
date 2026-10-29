@@ -197,12 +197,25 @@ Keep each under 0.8 s — it plays on top of Kylo starting to move.
 | `rachel_feedback_incorrect_2.wav` | **"Malapit na! Ulitin mo."** | "Almost! Say it again." | 3rd miss and after |
 | `rachel_hint_pakinggan.wav` | **"Pakinggan mong mabuti."** | "Listen carefully." | Prefixes the 2-miss auto-hint |
 
-> **Wording note.** Your CSV currently has `rachel_feedback_incorrect_1` as
-> *"Mali, subukan muli."* A bare **"Mali!"** is a hard word to hear repeatedly
-> at five years old, and the child will hear it often — Tagalog recognition is
-> noisy. *"Hindi pa tama"* ("not yet correct") says the same thing and keeps the
-> door open. The row has been updated; revert it if your adviser prefers the
-> original.
+> **Wording note — decided, keep.** The script originally had
+> `rachel_feedback_incorrect_1` as *"Mali, subukan muli."* A bare **"Mali!"**
+> is a hard word to hear repeatedly at five years old, and the child will hear
+> it often — Tagalog recognition is noisy. *"Hindi pa tama"* ("not yet
+> correct") says the same thing and keeps the door open.
+>
+> Three feedback lines differ from the original script for this reason, and
+> Kyla confirmed on 29 Oct 2026 that they stay:
+>
+> | id | original | now |
+> |---|---|---|
+> | `rachel_feedback_incorrect_1` | "Mali, subukan muli." | "Hindi pa tama. Subukan mo ulit." |
+> | `rachel_feedback_incorrect_2` | "Hindi pa tama, subukan ulit." | "Malapit na! Ulitin mo." |
+> | `rachel_feedback_correct_3` | "Ang galing!" | "Ang galing mo!" |
+>
+> The third is not a rewrite but a correction: the CSV and
+> `NarratorScript.Defaults` disagreed, and the game was already saying "Ang
+> galing mo!". Worth having the reasoning to hand if a panel asks why the
+> recording script does not match the written one.
 
 ### 3.5 Nothing recognised
 
