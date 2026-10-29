@@ -3,14 +3,17 @@
 // Builds the summary panel a scene ends on, and wires SceneResultPanel to it.
 //
 // Scenes used to fade straight into the next one the moment the last word was
-// said. This puts a panel in between: how the scene went, then Home, Replay
-// and Next.
+// said. This puts a panel in between: how the scene went, then Replay and
+// Continue, with a cross in the corner back to the map.
 //
-// THE PANEL AND BUTTON ART IS STILL PROVISIONAL - the bamboo results panel and
-// the okay, replay and back buttons are stand-ins, because the purchased LEVEL
-// COMPLETE sheet is not in the project yet. The SPRITES block below is the
-// whole swap: nothing outside this file names a sprite, and SceneResultPanel
-// does not care what it is pointed at. The stars are real.
+// The LEVEL COMPLETE sheet has landed, so the stand-ins are gone. The board
+// prints SCORE: and TIME: itself, which is why this builder places only the
+// figures that follow them, and why the scene is timed at all - the label
+// came with the art. The banner is a sprite rather than text, and which of
+// the two it shows is SceneResultPanel's call once it knows the rating.
+//
+// Positions were measured off the composed mockup, kept beside the pieces as
+// Art/result_layout_reference.png, and scaled by 0.96 to the 1920x1080 canvas.
 //
 // Used by the scene builders in place of their old
 //   onAllObjectivesComplete -> SceneFader.FadeOutAndLoad(NextScene)
@@ -27,45 +30,106 @@ public static class SceneResultPanelBuilder
 {
     private const string CanvasName = "SceneResult_Canvas";
 
-    // ---- SPRITES: the whole of the swap when the new sheet lands ----
-    private const string PanelSprite = "ui_results_panel";
-    private const string NextSprite = "btn_okay";
-    private const string ReplaySprite = "btn_replay";
-    private const string HomeSprite = "btn_back";
-    // The trio is a drawn arrangement, so each slot has its own pair rather
-    // than one star scaled three times. Cut by Tools/slice_stars.py.
-    private static readonly string[] StarSlots = { "left", "mid", "right" };
-    private const float StarWidthSide = 112f;
-    private const float StarWidthMid = 152f;
-    private const float StarSpacing = 148f;
-    private const float StarMidLift = 24f;
+    // ---- SPRITES, cut by Tools/import_result_panel_art.py ----
+    private const string PanelSprite = "ui_result_board";
+    private const string TitleCompleteSprite = "ui_result_title_complete";
+    private const string TitleTryAgainSprite = "ui_result_title_tryagain";
+    private const string NextSprite = "btn_result_continue";
+    private const string ReplaySprite = "btn_result_replay";
+    private const string CloseSprite = "btn_result_close";
 
-    // ui_results_panel is 1014x793; keeping the ratio stops the bamboo frame
-    // stretching.
-    private const float PanelWidth = 1000f;
-    private const float PanelHeight = PanelWidth / (1014f / 793f);
+    // ui_result_board is 712x1061; keeping the ratio stops the frame
+    // stretching. SCORE: and TIME: are printed into it, so this builder places
+    // only the figures that follow them.
+    private const float PanelWidth = 680f;
+    private const float PanelHeight = 1015f;
 
-    // The frame eats the outer edges, so the contents sit inside the measured
-    // interior rather than the full rect.
-    private const float InsetTop = 0.175f;
-    private const float InsetBottom = 0.142f;
-    private const float InsetSide = 0.113f;
+    // Everything below was measured off the composed mockup, kept beside the
+    // pieces as Art/result_layout_reference.png (2000x1125), and scaled by
+    // 0.96 to the 1920x1080 canvas.
+    private static readonly Vector2 TitlePos = new Vector2(0f, 244f);
+    private static readonly Vector2 TitleSize = new Vector2(680f, 235f);
+    private static readonly Vector2 ClosePos = new Vector2(252f, 378f);
+    private const float CloseSize = 106f;
 
-    private const float SmallButton = 104f;
-    private const float NextButtonWidth = 300f;
-    private const float ButtonGap = 40f;
+    // Where the figures sit: left-aligned in a column beside the two printed
+    // labels, whose right edges the mockup puts at -16 and -55.
+    private const float ValueLeft = 10f;
+    private const float ValueWidth = 290f;
+    private const float ScoreY = -77f;
+    private const float TimeY = -160f;
+
+    private const float ButtonWidth = 246f;   // height follows the plank's own ratio
+    private const float ButtonX = 130f;
+    private const float ButtonRowY = -290f;
+
+    // A level's last scene also shows the saved scores, which needs the room
+    // between TIME: and the buttons - so the buttons drop towards the board's
+    // empty lower panel and the strip takes the space they leave.
+    private const float ButtonRowYLevelEnd = -370f;
+    private static readonly Vector2 RecordsPos = new Vector2(0f, -250f);
+    private static readonly Vector2 RecordsSize = new Vector2(560f, 150f);
+
+    /// <summary>
+    /// Where each star sits and how big it is. The row is drawn rather than
+    /// tiled - it swells towards the middle and the outer pairs sit lower,
+    /// following the arc in the art - so no slot can be worked out from the
+    /// one beside it.
+    /// </summary>
+    private struct StarPlace
+    {
+        public float x, y, w, h;
+    }
+
+    private static readonly StarPlace[] StarPlaces =
+    {
+        new StarPlace { x = -215f, y = 36f, w = 70f,  h = 72f  },
+        new StarPlace { x = -128f, y = 55f, w = 106f, h = 108f },
+        new StarPlace { x = 0f,    y = 82f, w = 158f, h = 163f },
+        new StarPlace { x = 127f,  y = 55f, w = 105f, h = 108f },
+        new StarPlace { x = 214f,  y = 36f, w = 70f,  h = 72f  },
+    };
 
     private static readonly Color Cream = new Color(0.99f, 0.96f, 0.89f);
+
+    /// <summary>What a caller needs to wire the panel up afterwards.</summary>
+    public class Built
+    {
+        /// <summary>The canvas. Stays active; Content is what is shown and hidden.</summary>
+        public GameObject canvas;
+
+        /// <summary>The part that is switched on when the scene is finished.</summary>
+        public GameObject content;
+
+        public SceneResultPanel panel;
+
+        /// <summary>The records strip, or null on a scene that does not end a level.</summary>
+        public Text recordsText;
+    }
 
     /// <summary>
     /// Adds the panel to the open scene. nextSceneName empty means this scene
     /// ends its level, and Next returns to the level select.
+    ///
+    /// levelEnd adds the strip of saved scores read back from the database,
+    /// and leaves the panel waiting to be handed the whole level's totals
+    /// rather than showing this one scene's.
     /// </summary>
-    public static SceneResultPanel Build(SceneObjectiveController controller,
-                                         VoiceCommand voiceCommand,
-                                         string nextSceneName,
-                                         string title = "WELL DONE!")
+    public static Built Build(SceneObjectiveController controller,
+                              VoiceCommand voiceCommand,
+                              string nextSceneName,
+                              bool levelEnd = false)
     {
+        // An Image handed a null sprite draws a white box, with nothing but a
+        // console warning to say why. Make the art loadable first.
+        SpriteImportFixer.Verify(new[]
+        {
+            PanelSprite, TitleCompleteSprite, TitleTryAgainSprite,
+            NextSprite, ReplaySprite, CloseSprite,
+            "star_gold_1", "star_gold_2", "star_gold_3", "star_gold_4", "star_gold_5",
+            "star_grey_1", "star_grey_2", "star_grey_3", "star_grey_4", "star_grey_5",
+        }, "Scene Result Panel");
+
         // GameObject.Find skips inactive objects and this canvas is created
         // inactive, so a stale one would never be found and the scene would
         // quietly collect a second panel on every rebuild.
@@ -119,85 +183,101 @@ public static class SceneResultPanelBuilder
         panelRect.anchoredPosition = Vector2.zero;
         panelRect.sizeDelta = new Vector2(PanelWidth, PanelHeight);
 
-        float interiorTop = PanelHeight * (0.5f - InsetTop);
-        float interiorBottom = -PanelHeight * (0.5f - InsetBottom);
-        float interiorWidth = PanelWidth * (1f - InsetSide * 2f);
+        // The banner. Which of the two it shows is SceneResultPanel's call, at
+        // the moment it knows the rating; this only puts it there.
+        GameObject titleGO = new GameObject("TitleBanner", typeof(RectTransform));
+        titleGO.transform.SetParent(panel.transform, false);
+        Image titleImage = titleGO.AddComponent<Image>();
+        titleImage.sprite = LoadSprite(TitleCompleteSprite);
+        titleImage.preserveAspect = true;
+        titleImage.raycastTarget = false;
+        RectTransform titleRect = titleGO.GetComponent<RectTransform>();
+        titleRect.anchoredPosition = TitlePos;
+        titleRect.sizeDelta = TitleSize;
 
-        Text titleText = CreateText(panel.transform, "TitleText", title,
-            new Vector2(0f, interiorTop - 50f), new Vector2(interiorWidth, 96f),
-            52, TextAnchor.MiddleCenter);
+        SceneResultPanel.StarSlot[] stars = CreateStars(panel.transform);
 
-        SceneResultPanel.StarSlot[] stars = CreateStars(panel.transform, interiorTop - 170f);
-
+        // Left-aligned beside the labels printed on the board, so the two
+        // figures line up as a column however long they are.
         Text scoreText = CreateText(panel.transform, "ScoreText", "",
-            new Vector2(0f, interiorTop - 300f), new Vector2(interiorWidth, 80f),
-            40, TextAnchor.MiddleCenter);
+            new Vector2(ValueLeft + ValueWidth * 0.5f, ScoreY),
+            new Vector2(ValueWidth, 72f), 46, TextAnchor.MiddleLeft);
 
-        // Home, Replay, Next - in that order, so the one that carries on sits
-        // under the thumb on the right. Laid out from the row's total width so
-        // the three stay centred as a group; spacing them by eye left the set
-        // sitting off to one side.
-        float row = interiorBottom + 110f;
-        float total = SmallButton * 2f + NextButtonWidth + ButtonGap * 2f;
-        float x = -total * 0.5f + SmallButton * 0.5f;
+        Text timeText = CreateText(panel.transform, "TimeText", "",
+            new Vector2(ValueLeft + ValueWidth * 0.5f, TimeY),
+            new Vector2(ValueWidth, 72f), 46, TextAnchor.MiddleLeft);
 
-        Button home = CreateButton(panel.transform, "HomeButton", HomeSprite,
-                                   new Vector2(x, row), SmallButton);
-        x += SmallButton * 0.5f + ButtonGap + SmallButton * 0.5f;
+        // Only on a level's last scene: the scores read back out of the
+        // database, which is the half of the Activity 5 requirement that has
+        // to be visible on screen rather than merely fetched.
+        Text recordsText = null;
+        if (levelEnd)
+        {
+            recordsText = CreateText(panel.transform, "RecordsText", "",
+                RecordsPos, RecordsSize, 22, TextAnchor.UpperCenter);
+            recordsText.lineSpacing = 1.15f;
+        }
+
+        float row = levelEnd ? ButtonRowYLevelEnd : ButtonRowY;
+
         Button replay = CreateButton(panel.transform, "ReplayButton", ReplaySprite,
-                                     new Vector2(x, row), SmallButton);
-        x += SmallButton * 0.5f + ButtonGap + NextButtonWidth * 0.5f;
+                                     new Vector2(-ButtonX, row), ButtonWidth);
         Button next = CreateButton(panel.transform, "NextButton", NextSprite,
-                                   new Vector2(x, row), NextButtonWidth);
+                                   new Vector2(ButtonX, row), ButtonWidth);
+        Button close = CreateButton(panel.transform, "CloseButton", CloseSprite,
+                                    ClosePos, CloseSize);
 
         SceneResultPanel result = canvasGO.AddComponent<SceneResultPanel>();
         result.objectiveController = controller;
         result.voiceCommand = voiceCommand;
         result.panelRoot = content;
-        result.titleText = titleText;
+        result.titleImage = titleImage;
+        result.completeSprite = LoadSprite(TitleCompleteSprite);
+        result.tryAgainSprite = LoadSprite(TitleTryAgainSprite);
         result.scoreText = scoreText;
+        result.timeText = timeText;
         result.stars = stars;
         result.nextButton = next;
         result.replayButton = replay;
-        result.homeButton = home;
+        result.closeButton = close;
         result.nextSceneName = nextSceneName;
+        result.waitForExternalTotals = levelEnd;
 
         // Hidden here rather than left for Awake, so the panel is already off
         // in the saved scene and never flashes up on the first frame.
         content.SetActive(false);
-        return result;
+
+        return new Built
+        {
+            canvas = canvasGO,
+            content = content,
+            panel = result,
+            recordsText = recordsText,
+        };
     }
 
-    private static SceneResultPanel.StarSlot[] CreateStars(Transform parent, float y)
+    private static SceneResultPanel.StarSlot[] CreateStars(Transform parent)
     {
         List<SceneResultPanel.StarSlot> stars = new List<SceneResultPanel.StarSlot>();
 
-        for (int i = 0; i < StarSlots.Length; i++)
+        for (int i = 0; i < StarPlaces.Length; i++)
         {
-            string slot = StarSlots[i];
-            bool middle = i == 1;
+            StarPlace place = StarPlaces[i];
+            Sprite earned = LoadSprite("star_gold_" + (i + 1));
+            Sprite empty = LoadSprite("star_grey_" + (i + 1));
 
-            Sprite earned = LoadSprite("star_gold_" + slot);
-            Sprite empty = LoadSprite("star_grey_" + slot);
-
-            GameObject go = new GameObject("Star_" + slot, typeof(RectTransform));
+            GameObject go = new GameObject("Star_" + (i + 1), typeof(RectTransform));
             go.transform.SetParent(parent, false);
             Image image = go.AddComponent<Image>();
-            image.sprite = earned;
+            // Starts unlit. The panel lights as many as were earned when it
+            // opens, so a scene that is replayed badly cannot leave a star on.
+            image.sprite = empty;
             image.preserveAspect = true;
             image.raycastTarget = false;
 
-            // Each star keeps its own proportions; the sheet's outer two are
-            // not the same shape as the middle, so one size would squash them.
-            float width = middle ? StarWidthMid : StarWidthSide;
-            float height = width;
-            if (earned != null && earned.rect.width > 0f)
-                height = width * (earned.rect.height / earned.rect.width);
-
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(width, height);
-            rect.anchoredPosition = new Vector2((i - 1) * StarSpacing,
-                                                y + (middle ? StarMidLift : 0f));
+            rect.sizeDelta = new Vector2(place.w, place.h);
+            rect.anchoredPosition = new Vector2(place.x, place.y);
 
             stars.Add(new SceneResultPanel.StarSlot
             {

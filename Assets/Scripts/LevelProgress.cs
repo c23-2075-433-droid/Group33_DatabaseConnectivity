@@ -43,6 +43,48 @@ public static class LevelProgress
 
     public static bool IsStepUnlocked(int stepIndex) => stepIndex <= HighestUnlockedStep;
 
+    // How well each scene has been done, keyed by scene name. Kept apart from
+    // the step count on purpose: progress is one number about the journey,
+    // while this is a verdict on each scene, and a child who goes back and
+    // does better should keep the better one without the journey moving.
+    private const string StarsKeyPrefix = "SALINLAHI_Stars_";
+
+    /// <summary>The best a scene can be done. The summary panel rates out of this.</summary>
+    public const int MaxStars = 5;
+
+    /// <summary>Best rating a scene has been finished with, 0..MaxStars, 0 if never.</summary>
+    public static int StarsFor(string sceneName) =>
+        string.IsNullOrEmpty(sceneName) ? 0 : PlayerPrefs.GetInt(StarsKeyPrefix + sceneName, 0);
+
+    /// <summary>
+    /// The same rating in however many stars a screen has room for.
+    ///
+    /// The summary panel rates out of five; the level select's tiles have
+    /// three printed under them. Rounding up keeps the two agreeing about the
+    /// only thing that matters at tile size - a scene that earned something
+    /// never shows empty, and only a perfect run fills all three.
+    /// </summary>
+    public static int StarsScaledTo(string sceneName, int slots)
+    {
+        int stars = StarsFor(sceneName);
+        if (stars <= 0 || slots <= 0) return 0;
+        return Mathf.Min(slots, Mathf.CeilToInt(stars * slots / (float)MaxStars));
+    }
+
+    /// <summary>
+    /// Remembers how a scene went, keeping the best run rather than the last.
+    /// Replaying a scene the child has already three-starred, and stumbling
+    /// this time, should not take the stars off the level select.
+    /// </summary>
+    public static void RecordStars(string sceneName, int stars)
+    {
+        if (string.IsNullOrEmpty(sceneName)) return;
+        stars = Mathf.Clamp(stars, 0, MaxStars);
+        if (stars <= StarsFor(sceneName)) return;
+        PlayerPrefs.SetInt(StarsKeyPrefix + sceneName, stars);
+        PlayerPrefs.Save();
+    }
+
     /// <summary>True once every step of this level has been passed.</summary>
     public static bool IsLevelComplete(int levelIndex)
     {
@@ -67,21 +109,53 @@ public static class LevelProgress
                              "so finishing it unlocks nothing. Add it to JourneyMap.Steps.");
             return;
         }
-        if (index + 1 > HighestUnlockedStep) HighestUnlockedStep = index + 1;
+        Open(JourneyMap.StepAfter(index));
     }
 
     /// <summary>
     /// Older call, kept so the scenes already wired to it keep working: a
     /// level being finished means everything up to its last step is passed.
+    ///
+    /// This has to step over the unenterable just as MarkSceneComplete does.
+    /// A level's last step is followed by the next level's marker, so opening
+    /// the step straight after it would open a marker and leave that level's
+    /// first scene locked - the same dam, reached by the other door. It went
+    /// unnoticed because the only caller runs MarkSceneComplete four lines
+    /// later and progress never falls, so the right answer arrived anyway.
     /// </summary>
     public static void MarkComplete(int levelIndex)
     {
         int last = LastStepOfLevel(levelIndex);
-        if (last >= 0 && last + 1 > HighestUnlockedStep) HighestUnlockedStep = last + 1;
+        if (last < 0) return;
+        Open(JourneyMap.StepAfter(last));
     }
 
+    /// <summary>Moves progress forward to this step, never back.</summary>
+    private static void Open(int stepIndex)
+    {
+        if (stepIndex > HighestUnlockedStep) HighestUnlockedStep = stepIndex;
+    }
+
+    /// <summary>
+    /// The level's first SCENE, not its marker.
+    ///
+    /// Every level begins with a marker, which is not a place the player can
+    /// go. Returning that left a fresh install sitting on step 0 with the
+    /// first scene one step beyond it, so the whole game read as locked on
+    /// any device that had never been played before - which is every device
+    /// but the one it was developed on.
+    /// </summary>
     private static int FirstStepOfLevel(int levelIndex)
     {
+        for (int i = 0; i < JourneyMap.Steps.Length; i++)
+        {
+            JourneyMap.Step step = JourneyMap.Steps[i];
+            if (step.levelIndex == levelIndex && step.kind == JourneyMap.StepKind.Scene)
+                return i;
+        }
+
+        // A level with no scenes at all - Palengke, so far. Its marker is as
+        // far as anyone can get.
         for (int i = 0; i < JourneyMap.Steps.Length; i++)
             if (JourneyMap.Steps[i].levelIndex == levelIndex) return i;
         return 0;

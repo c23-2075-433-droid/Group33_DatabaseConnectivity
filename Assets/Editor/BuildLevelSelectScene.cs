@@ -2,32 +2,36 @@
 //
 // One-click builder for the level select screen.
 //
-// This used to be a winding journey map with the house, the school and the
-// market drawn as landmarks along a road. It is now a plain grid: one row per
-// level, the level's name beside it, and a numbered wooden tile for each of
-// its scenes. Nothing to read but the numbers.
+// A page per place, flipped through with the arrows: Bahay, Paaralan, Parke,
+// Palengke, four pages and four dots. It used to be all sixteen scenes at
+// once, numbered straight through to 16. Paging them lets the tiles be big
+// enough for a small finger and lets the numbers restart inside each place,
+// which is how a child would say them - Bahay one to six, not nine to
+// fourteen.
 //
 // The order still comes from JourneyMap.Steps, which LevelProgress also counts
 // along, so the screen and the save file cannot disagree about what comes
-// next. Adding a scene there adds a tile here; nothing in this file needs
-// changing.
+// next. Adding a scene there adds a tile here; nothing in this file changes.
 //
-// The tiles are numbered straight through the whole journey rather than
-// restarting inside each level: Bahay is 1 to 6, Paaralan carries on at 7, and
-// so on to 16. The sheet only prints 1 to 7, so the numbers are drawn by Unity
-// onto a blank tile that slice_level_buttons.py makes by painting the printed
-// number off one.
+// A tile can be entered once the player has reached it AND the scene behind it
+// has been built. Anything else wears the padlock rather than a dimmed number:
+// with the numbering restarted per place there is no longer a run of sixteen
+// to read off the screen, so hiding an unreachable number costs nothing.
 //
-// A tile is enterable only when the player has reached it AND the scene has
-// actually been built. Anything else is dimmed, keeping its number: the sheet's
-// padlock tile would hide the number, and a numbering that runs 1 to 16 is only
-// worth having if all of it can be read.
+// Positions were measured off the composed mockup, kept beside the pieces as
+// Art/levelselect_layout_reference.png (2000x1125), and scaled by 0.96 to the
+// 1920x1080 canvas.
 //
-// Sprites expected in Assets/Sprites/:
-//   btn_level_blank, btn_level_blank_leaf, ui_select_levels
-//     - cut by Tools/slice_level_buttons.py
-//   levelselect_bg - made by Tools/make_levelselect_bg.py
-//   btn_back
+// Sprites expected in Assets/Sprites/, all cut by
+// Tools/import_level_select_art.py:
+//   ui_level_board, ui_select_levels, btn_page_left, btn_page_right,
+//   btn_step_1..6, btn_step_locked, ui_step_star_on, ui_step_star_off,
+//   ui_page_dot_on, ui_page_dot_off
+// plus btn_back, and menu_room_bg from the main menu.
+//
+// There is no backdrop sprite of its own. The mockup's dimmed classroom is
+// menu_room_bg under a brown wash, so that colour is laid over the menu's own
+// background rather than shipping a second copy of the same room.
 //
 // Run via: Tools > SALINLAHI > Build Level Select Scene
 
@@ -45,25 +49,38 @@ public class BuildLevelSelectScene
     private const string LevelSelectScenePath = "Assets/Scenes/LevelSelect.unity";
     private const string FirstLevelPath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";
 
-    // The sheet's own backdrop, lifted a little so the tiles' dark wood frames
-    // still read against it.
-    private static readonly Color Backdrop = new Color(0.106f, 0.122f, 0.071f);
+    // Fitted against the mockup's backdrop: alpha 0.81 over this colour turns
+    // menu_room_bg into the dimmed room it shows, within 6/255 a channel.
+    private static readonly Color Wash = new Color(0.286f, 0.157f, 0.106f, 0.81f);
 
-    // Sized for a child's finger on a tablet rather than for fitting the most
-    // tiles on screen: six across a row is the worst case and still leaves a
-    // margin either side.
-    private const float TileWidth = 196f;      // tile heights follow their art
-    private const float TilePitch = 224f;
+    private static readonly Vector2 BoardPos = new Vector2(0f, -50f);
+    private static readonly Vector2 BoardSize = new Vector2(1340f, 898f);
+    private static readonly Vector2 TitlePos = new Vector2(0f, 362f);
+    private static readonly Vector2 TitleSize = new Vector2(791f, 273f);
+    private static readonly Vector2 BackPos = new Vector2(-859f, 434f);
+    private static readonly Vector2 BackSize = new Vector2(114f, 108f);
+    private static readonly Vector2 ArrowSize = new Vector2(175f, 164f);
+    private const float ArrowX = 648f;
+    private const float ArrowY = -38f;
 
-    private const float FirstRowY = 60f;       // bottom edge of the top row
-    private const float RowPitch = 230f;
+    private const int Columns = 4;
+    private const float TilePitch = 247f;
+    private const float TopRowY = 107f;        // y of a tile's centre, top row
+    private const float RowPitch = 266f;
+    private const float OneRowY = -26f;        // a place short enough for one row
+    private static readonly Vector2 TileSize = new Vector2(163f, 153f);
 
-    private const string BlankTile = "btn_level_blank";
-    private const string BlankLeafTile = "btn_level_blank_leaf";
+    private const float StarDrop = 108f;       // below the tile's centre
+    private const float StarPitch = 58f;
+    private static readonly Vector2 StarSize = new Vector2(48f, 47f);
 
-    // Every fourth tile sprouts a leaf. One picture repeated sixteen times
-    // reads as a spreadsheet; this is the variety the sheet itself has.
-    private const int LeafEvery = 4;
+    private const float DotsY = -354f;
+    private const float DotPitch = 72f;
+    private static readonly Vector2 DotSize = new Vector2(34f, 34f);
+
+    // The sheet prints tiles 1..6, which covers the longest place. A place
+    // with more scenes than this would ask for a tile that does not exist.
+    private const int HighestPrintedTile = 6;
 
     [MenuItem("Tools/SALINLAHI/Build Level Select Scene")]
     public static void BuildScene()
@@ -74,6 +91,18 @@ public class BuildLevelSelectScene
             return;
         }
 
+        // An Image handed a null sprite draws a white box, with nothing but a
+        // console warning to say why. Make the art loadable first.
+        SpriteImportFixer.Verify(new[]
+        {
+            "menu_room_bg", "ui_level_board", "ui_select_levels", "btn_back",
+            "btn_page_left", "btn_page_right", "btn_step_locked",
+            "ui_step_star_on", "ui_step_star_off",
+            "ui_page_dot_on", "ui_page_dot_off",
+            "btn_step_1", "btn_step_2", "btn_step_3",
+            "btn_step_4", "btn_step_5", "btn_step_6",
+        }, "Level Select Scene");
+
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
         GameObject camGO = new GameObject("Main Camera");
@@ -82,7 +111,7 @@ public class BuildLevelSelectScene
         cam.orthographicSize = 5.4f;
         cam.transform.position = new Vector3(0, 0, -10);
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = Backdrop;
+        cam.backgroundColor = new Color(Wash.r, Wash.g, Wash.b, 1f);
         camGO.tag = "MainCamera";
         camGO.AddComponent<AudioListener>();
 
@@ -101,78 +130,108 @@ public class BuildLevelSelectScene
 
         Transform canvasT = canvasGO.transform;
 
-        // A flat panel rather than a picture: the camera's clear colour does
-        // not reach a Screen Space Overlay canvas, so the backdrop has to be
-        // drawn as the first thing on the canvas itself.
-        GameObject backdrop = new GameObject("Backdrop", typeof(RectTransform));
-        backdrop.transform.SetParent(canvasT, false);
-        Image backdropImage = backdrop.AddComponent<Image>();
-        backdropImage.color = Backdrop;
-        backdropImage.raycastTarget = false;
-        Stretch(backdrop.GetComponent<RectTransform>());
+        // --- The room, the wash over it, then the board ---
+        GameObject background = CreateImage(canvasT, "Background", "menu_room_bg",
+                                            Vector2.zero, new Vector2(1920f, 1080f), false);
+        RectTransform backgroundRect = background.GetComponent<RectTransform>();
+        backgroundRect.anchorMin = backgroundRect.anchorMax = new Vector2(0.5f, 0.5f);
+        AspectRatioFitter fitter = background.AddComponent<AspectRatioFitter>();
+        fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        fitter.aspectRatio = 2000f / 1125f;
+        background.GetComponent<Image>().raycastTarget = false;
 
-        // On top of the flat colour, not instead of it: an Image with no sprite
-        // draws a white rectangle, so a missing file would white out the screen
-        // rather than fall back to something sensible.
-        Sprite backgroundSprite = LoadSprite("levelselect_bg");
-        if (backgroundSprite != null)
-        {
-            GameObject background = new GameObject("Background", typeof(RectTransform));
-            background.transform.SetParent(canvasT, false);
-            Image backgroundImage = background.AddComponent<Image>();
-            backgroundImage.sprite = backgroundSprite;
-            backgroundImage.raycastTarget = false;
-            Stretch(background.GetComponent<RectTransform>());
-        }
+        GameObject wash = new GameObject("Wash", typeof(RectTransform));
+        wash.transform.SetParent(canvasT, false);
+        Image washImage = wash.AddComponent<Image>();
+        washImage.color = Wash;
+        washImage.raycastTarget = false;
+        Stretch(wash.GetComponent<RectTransform>());
 
-        GameObject title = CreateImage(canvasT, "Title", "ui_select_levels",
-                                       new Vector2(0f, 380f), new Vector2(820f, 124f), true);
+        GameObject board = CreateImage(canvasT, "Board", "ui_level_board", BoardPos, BoardSize, true);
+        board.GetComponent<Image>().raycastTarget = false;
+
+        GameObject title = CreateImage(canvasT, "Title", "ui_select_levels", TitlePos, TitleSize, true);
         title.GetComponent<Image>().raycastTarget = false;
 
-        // --- One row per level, one tile per scene ---
-        List<LevelSelectController.StepNode> built = new List<LevelSelectController.StepNode>();
-        int row = 0;
-        int skipped = 0;
-        int number = 1;            // runs straight through every level
+        GameObject back = CreateSpriteButton(canvasT, "Button_Back", "btn_back", BackPos, BackSize);
+        GameObject pageLeft = CreateSpriteButton(canvasT, "Button_PageLeft", "btn_page_left",
+                                                 new Vector2(-ArrowX, ArrowY), ArrowSize);
+        GameObject pageRight = CreateSpriteButton(canvasT, "Button_PageRight", "btn_page_right",
+                                                  new Vector2(ArrowX, ArrowY), ArrowSize);
+
+        // --- A page per place ---
+        List<LevelSelectController.StepNode> nodes = new List<LevelSelectController.StepNode>();
+        List<LevelSelectController.Page> pages = new List<LevelSelectController.Page>();
+        Sprite lockedSprite = LoadSprite("btn_step_locked");
+        int overflowing = 0;
 
         foreach (int levelIndex in LevelsInOrder())
         {
             List<int> sceneSteps = SceneStepsOf(levelIndex);
+            string placeName = PlaceName(levelIndex);
+
+            GameObject pageRoot = new GameObject("Page_" + pages.Count + "_" + placeName,
+                                                 typeof(RectTransform));
+            pageRoot.transform.SetParent(canvasT, false);
+            Stretch(pageRoot.GetComponent<RectTransform>());
+
             if (sceneSteps.Count == 0)
             {
-                // A level with nothing behind it would be an empty row. Give it
-                // scenes in JourneyMap and it appears.
-                skipped++;
-                continue;
+                // A place with nothing built yet still gets its page, so the
+                // dots count the journey rather than what happens to be
+                // finished. One padlock says what the empty board would not.
+                nodes.Add(CreateTile(pageRoot.transform, FirstStepOf(levelIndex),
+                                     "", 0, lockedSprite, new Vector2(0f, OneRowY)));
             }
-
-            float baseline = FirstRowY - row * RowPitch;
-
-            // Rows hold different numbers of scenes, so each is centred on its
-            // own. Starting them all at one x would leave the short rows
-            // hanging off to the left.
-            float firstX = -(sceneSteps.Count - 1) * TilePitch * 0.5f;
-
-            for (int i = 0; i < sceneSteps.Count; i++)
+            else
             {
-                int stepIndex = sceneSteps[i];
-                float x = firstX + i * TilePitch;
-                built.Add(CreateTile(canvasT, stepIndex, JourneyMap.Steps[stepIndex],
-                                     number, x, baseline));
-                number++;
+                if (sceneSteps.Count > HighestPrintedTile) overflowing++;
+                for (int i = 0; i < sceneSteps.Count; i++)
+                {
+                    int stepIndex = sceneSteps[i];
+                    nodes.Add(CreateTile(pageRoot.transform, stepIndex,
+                                         JourneyMap.Steps[stepIndex].sceneName, i + 1,
+                                         lockedSprite, SlotPosition(i, sceneSteps.Count)));
+                }
             }
 
-            row++;
+            // Switched off here rather than left for Start, so the saved scene
+            // holds one readable page instead of four stacked on top of each
+            // other, and nothing flashes on the first frame.
+            pageRoot.SetActive(pages.Count == 0);
+
+            pages.Add(new LevelSelectController.Page
+            {
+                root = pageRoot,
+                label = placeName,
+                firstStep = FirstStepOf(levelIndex),
+            });
         }
 
-        GameObject back = CreateSpriteButton(canvasT, "Button_Back", "btn_back",
-                                             new Vector2(-860f, 430f), new Vector2(120f, 120f));
+        // --- The dots, one per page, under the board ---
+        GameObject dots = new GameObject("Dots", typeof(RectTransform));
+        dots.transform.SetParent(canvasT, false);
+        Stretch(dots.GetComponent<RectTransform>());
+        float firstDotX = -(pages.Count - 1) * DotPitch * 0.5f;
+        for (int i = 0; i < pages.Count; i++)
+        {
+            GameObject dot = CreateImage(dots.transform, "Dot_" + i, "ui_page_dot_off",
+                                         new Vector2(firstDotX + i * DotPitch, DotsY), DotSize, true);
+            dot.GetComponent<Image>().raycastTarget = false;
+            pages[i].dot = dot.GetComponent<Image>();
+        }
 
         LevelSelectController controller = canvasGO.AddComponent<LevelSelectController>();
         controller.mainMenuSceneName = "MainMenu";
         controller.backButton = back.GetComponent<Button>();
-        controller.nodes = built.ToArray();
-        controller.playerMarker = null;   // no map to walk along any more
+        controller.previousPageButton = pageLeft.GetComponent<Button>();
+        controller.nextPageButton = pageRight.GetComponent<Button>();
+        controller.nodes = nodes.ToArray();
+        controller.pages = pages.ToArray();
+        controller.starOnSprite = LoadSprite("ui_step_star_on");
+        controller.starOffSprite = LoadSprite("ui_step_star_off");
+        controller.dotOnSprite = LoadSprite("ui_page_dot_on");
+        controller.dotOffSprite = LoadSprite("ui_page_dot_off");
 
         SceneFaderBuilder.Build();
 
@@ -181,16 +240,109 @@ public class BuildLevelSelectScene
         SetBuildOrder();
 
         int playable = 0;
-        foreach (LevelSelectController.StepNode n in built)
+        foreach (LevelSelectController.StepNode n in nodes)
             if (!string.IsNullOrEmpty(n.sceneName)) playable++;
 
         Debug.Log("[SALINLAHI] Level select built and saved to " + LevelSelectScenePath +
-                  ". " + row + " level rows, " + built.Count + " tiles numbered 1-" +
-                  (number - 1) + ", " + playable +
-                  " of them with a scene behind them. " +
-                  (skipped > 0
-                      ? skipped + " level(s) have no scenes in JourneyMap yet and were left out."
-                      : "Every level has scenes."));
+                  ". " + pages.Count + " pages, " + nodes.Count + " tiles, " + playable +
+                  " of them with a scene behind them." +
+                  (overflowing > 0
+                      ? " " + overflowing + " place(s) have more than " + HighestPrintedTile +
+                        " scenes, which is more than the sheet prints - cut the missing tiles " +
+                        "in Tools/import_level_select_art.py."
+                      : ""));
+    }
+
+    /// <summary>
+    /// Where the i-th of n tiles sits. Four to a row; a place short enough for
+    /// one row gets it centred on the board instead of hanging along the top.
+    /// Each row is centred on its own, so a row of two sits in the middle
+    /// rather than tucked to the left under the row above.
+    /// </summary>
+    private static Vector2 SlotPosition(int i, int count)
+    {
+        if (count <= Columns)
+            return new Vector2((i - (count - 1) * 0.5f) * TilePitch, OneRowY);
+
+        int row = i / Columns;
+        int inRow = i % Columns;
+        int rowCount = Mathf.Min(Columns, count - row * Columns);
+        return new Vector2((inRow - (rowCount - 1) * 0.5f) * TilePitch, TopRowY - row * RowPitch);
+    }
+
+    private static LevelSelectController.StepNode CreateTile(
+        Transform parent, int stepIndex, string sceneName, int number,
+        Sprite lockedSprite, Vector2 position)
+    {
+        // number 0 stands for a place with no scenes yet: there is no tile to
+        // print, so the padlock is the whole face.
+        Sprite unlockedSprite = number > 0 ? LoadSprite("btn_step_" + number) : lockedSprite;
+
+        string name = "Tile_" + (number > 0 ? number.ToString() : "Locked");
+        GameObject go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+
+        Image image = go.AddComponent<Image>();
+        image.sprite = unlockedSprite;
+        image.preserveAspect = true;
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchoredPosition = position;
+        rect.sizeDelta = TileSize;
+
+        Button button = go.AddComponent<Button>();
+        button.targetGraphic = image;
+        button.colors = TileColors();
+
+        // Siblings of the tile rather than children of it, so the button's
+        // press tint stays on the wood and does not wash over the stars.
+        Image[] stars = new Image[3];
+        for (int i = 0; i < stars.Length; i++)
+        {
+            Vector2 at = position + new Vector2((i - 1) * StarPitch, -StarDrop);
+            GameObject star = CreateImage(parent, name + "_Star_" + i, "ui_step_star_off",
+                                          at, StarSize, true);
+            star.GetComponent<Image>().raycastTarget = false;
+            stars[i] = star.GetComponent<Image>();
+        }
+
+        return new LevelSelectController.StepNode
+        {
+            button = button,
+            icon = image,
+            unlockedSprite = unlockedSprite,
+            lockedSprite = lockedSprite,
+            stars = stars,
+            stepIndex = stepIndex,
+            sceneName = sceneName,
+        };
+    }
+
+    private static ColorBlock TileColors()
+    {
+        ColorBlock colors = ColorBlock.defaultColorBlock;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
+        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
+        colors.disabledColor = new Color(0.46f, 0.43f, 0.4f, 1f);
+        colors.fadeDuration = 0.08f;
+        return colors;
+    }
+
+    /// <summary>The place's name, taken from its marker on the journey.</summary>
+    private static string PlaceName(int levelIndex)
+    {
+        foreach (JourneyMap.Step s in JourneyMap.Steps)
+            if (s.levelIndex == levelIndex && s.kind == JourneyMap.StepKind.Level)
+                return s.label;
+        return "Level" + levelIndex;
+    }
+
+    /// <summary>First step of a place, marker included. Where its page begins.</summary>
+    private static int FirstStepOf(int levelIndex)
+    {
+        for (int i = 0; i < JourneyMap.Steps.Length; i++)
+            if (JourneyMap.Steps[i].levelIndex == levelIndex) return i;
+        return 0;
     }
 
     /// <summary>Level numbers in the order JourneyMap lists them, without repeats.</summary>
@@ -224,115 +376,6 @@ public class BuildLevelSelectScene
         rect.offsetMax = Vector2.zero;
     }
 
-    private static LevelSelectController.StepNode CreateTile(
-        Transform parent, int stepIndex, JourneyMap.Step step, int number,
-        float x, float baseline)
-    {
-        bool leafed = number % LeafEvery == 1;
-        string unlocked = leafed ? BlankLeafTile : BlankTile;
-        Sprite unlockedSprite = LoadSprite(unlocked);
-
-        // Each tile keeps its own proportions. The leafed one is taller than
-        // the bare one, and forcing them into one box would squash exactly it.
-        float height = TileWidth;
-        if (unlockedSprite != null && unlockedSprite.rect.width > 0f)
-            height = TileWidth * (unlockedSprite.rect.height / unlockedSprite.rect.width);
-
-        string name = "Tile_" + number + "_L" + step.levelIndex + "_S" + step.label;
-        GameObject go = CreateSpriteButton(parent, name, unlocked,
-                                           new Vector2(x, baseline), new Vector2(TileWidth, height));
-
-        // Sitting the tiles on a shared baseline keeps the numbers in a line
-        // whether or not a tile has a leaf on its head.
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.pivot = new Vector2(0.5f, 0f);
-        rect.anchoredPosition = new Vector2(x, baseline);
-
-        GameObject numberGO = CreateNumber(go.transform, number, leafed);
-
-        return new LevelSelectController.StepNode
-        {
-            button = go.GetComponent<Button>(),
-            icon = go.GetComponent<Image>(),
-            unlockedSprite = unlockedSprite,
-            // The same tile either way. The padlock tile would cover the number,
-            // and the numbering is only useful if the whole journey can be read
-            // off the screen, so a tile that cannot be entered is dimmed instead.
-            lockedSprite = unlockedSprite,
-            lockOverlay = null,
-            numberLabel = numberGO,
-            stepIndex = stepIndex,
-            sceneName = step.sceneName,
-        };
-    }
-
-    /// <summary>The number painted on a blank tile, sitting on the panel.</summary>
-    private static GameObject CreateNumber(Transform tile, int number, bool leafed)
-    {
-        GameObject go = new GameObject("Number", typeof(RectTransform));
-        go.transform.SetParent(tile, false);
-
-        Text text = go.AddComponent<Text>();
-        text.text = number.ToString();
-        text.font = UIFont.Get();
-        text.fontSize = 86;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = TextAnchor.MiddleCenter;
-        // Best-fit so 16 sits on the panel as comfortably as 1 does, rather
-        // than two digits running into the frame.
-        text.resizeTextForBestFit = true;
-        text.resizeTextMinSize = 28;
-        text.resizeTextMaxSize = 86;
-        text.color = new Color(0.99f, 0.95f, 0.85f);
-        text.raycastTarget = false;
-
-        Outline outline = go.AddComponent<Outline>();
-        outline.effectColor = new Color(0.36f, 0.21f, 0.09f, 0.85f);
-        outline.effectDistance = new Vector2(2f, -2f);
-
-        RectTransform rect = go.GetComponent<RectTransform>();
-        Stretch(rect);
-        // The panel is inset inside the wooden frame, and on a leafed tile the
-        // leaf takes a slice off the top, so the number has to come down with
-        // it or it sits on the frame instead of the panel.
-        float inset = TileWidth * 0.17f;
-        float leafPad = leafed ? LeafAllowance() : 0f;
-        rect.offsetMin = new Vector2(inset, inset * 0.9f);
-        rect.offsetMax = new Vector2(-inset, -(inset * 0.9f + leafPad));
-
-        return go;
-    }
-
-    /// <summary>How much taller the leafed tile is, in layout units.</summary>
-    private static float LeafAllowance()
-    {
-        Sprite plain = LoadSprite(BlankTile);
-        Sprite leaf = LoadSprite(BlankLeafTile);
-        if (plain == null || leaf == null || plain.rect.width <= 0f || leaf.rect.width <= 0f)
-            return 0f;
-
-        float plainRatio = plain.rect.height / plain.rect.width;
-        float leafRatio = leaf.rect.height / leaf.rect.width;
-        return TileWidth * (leafRatio - plainRatio);
-    }
-
-    private static void SetBuildOrder()
-    {
-        var scenes = new List<EditorBuildSettingsScene>();
-        if (System.IO.File.Exists(MainMenuScenePath))
-            scenes.Add(new EditorBuildSettingsScene(MainMenuScenePath, true));
-        scenes.Add(new EditorBuildSettingsScene(LevelSelectScenePath, true));
-        if (System.IO.File.Exists(FirstLevelPath))
-            scenes.Add(new EditorBuildSettingsScene(FirstLevelPath, true));
-
-        foreach (var s in EditorBuildSettings.scenes)
-        {
-            if (s.path == MainMenuScenePath || s.path == LevelSelectScenePath || s.path == FirstLevelPath) continue;
-            scenes.Add(s);
-        }
-        EditorBuildSettings.scenes = scenes.ToArray();
-    }
-
     private static GameObject CreateImage(Transform parent, string name, string spriteFile,
         Vector2 anchoredPos, Vector2 size, bool preserveAspect)
     {
@@ -347,22 +390,33 @@ public class BuildLevelSelectScene
         return go;
     }
 
+    /// <summary>A button whose whole look is its sprite. Darkens when pressed.</summary>
     private static GameObject CreateSpriteButton(Transform parent, string name, string spriteFile,
         Vector2 anchoredPos, Vector2 size)
     {
         GameObject go = CreateImage(parent, name, spriteFile, anchoredPos, size, true);
         Button button = go.AddComponent<Button>();
         button.targetGraphic = go.GetComponent<Image>();
-        ColorBlock colors = button.colors;
-        colors.normalColor = Color.white;
-        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
-        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
-        // Carries the whole locked/unlocked signal now that no padlock does, so
-        // it has to be darker than a normal greyed-out control.
-        colors.disabledColor = new Color(0.46f, 0.43f, 0.40f, 1f);
-        colors.fadeDuration = 0.08f;
-        button.colors = colors;
+        button.colors = TileColors();
         return go;
+    }
+
+    private static void SetBuildOrder()
+    {
+        var scenes = new List<EditorBuildSettingsScene>();
+        if (System.IO.File.Exists(MainMenuScenePath))
+            scenes.Add(new EditorBuildSettingsScene(MainMenuScenePath, true));
+        scenes.Add(new EditorBuildSettingsScene(LevelSelectScenePath, true));
+        if (System.IO.File.Exists(FirstLevelPath))
+            scenes.Add(new EditorBuildSettingsScene(FirstLevelPath, true));
+
+        foreach (var s in EditorBuildSettings.scenes)
+        {
+            if (s.path == MainMenuScenePath || s.path == LevelSelectScenePath ||
+                s.path == FirstLevelPath) continue;
+            scenes.Add(s);
+        }
+        EditorBuildSettings.scenes = scenes.ToArray();
     }
 
     private static Sprite LoadSprite(string spriteFile)

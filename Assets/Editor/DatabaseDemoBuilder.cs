@@ -46,25 +46,19 @@ public static class DatabaseDemoBuilder
             return false;
         }
 
-        GameObject panel = LevelCompleteUIBuilder.BuildPanel("LEVEL COMPLETE", badgeSpriteFile);
-        Transform panelRoot = panel.transform.Find("Panel");
-        // Paths follow the summary layout: the board carries the statistics,
-        // the container around it carries the records strip and the buttons.
-        Text scoreText = FindText(panelRoot, "Board/Plaque/ScoreText");
-        Text recordsText = FindText(panelRoot, "RecordsText");
+        // The same summary every other scene ends on, so a level's last scene
+        // does not look like a different game. LevelCompleteUIBuilder and its
+        // ui_summary_* artwork are left in the project but no longer called.
+        SceneResultPanelBuilder.Built summary = SceneResultPanelBuilder.Build(
+            controller, voiceCommand, "", levelEnd: true);
+        GameObject panel = summary.canvas;
 
-        // "Next Level" is the button that leaves for whatever scene this one
-        // should return to - usually the journey map. Replay and Main Menu
-        // already know where they go and are left alone.
-        Transform next = panelRoot != null ? panelRoot.Find("NextButton") : null;
-        if (next != null)
-        {
-            LoadSceneOnClick loader = next.GetComponent<LoadSceneOnClick>();
-            if (loader != null) loader.sceneName = returnSceneName;
-        }
+        // Next has nowhere further to go at the end of a level, so it returns
+        // here - the journey map, usually.
+        summary.panel.levelSelectSceneName = returnSceneName;
 
         ExitDoorTrigger exitTrigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
-        if (exitTrigger != null) exitTrigger.levelCompleteUI = panel;
+        if (exitTrigger != null) exitTrigger.levelCompleteUI = summary.content;
 
         GameObject host = GameObject.Find(HostName);
         if (host == null) host = new GameObject(HostName);
@@ -77,28 +71,21 @@ public static class DatabaseDemoBuilder
         if (tracker == null) tracker = host.AddComponent<SessionScoreTracker>();
         tracker.objectiveController = controller;
         tracker.supabaseClient = client;
-        tracker.levelCompletePanel = panel;
-        tracker.scoreText = scoreText;
-        tracker.recordsText = recordsText;
+        // The summary opens itself once it is handed the level's totals, so the
+        // tracker is given no panel of its own to show - otherwise both would,
+        // and the tracker's would appear instantly, skipping the beat the
+        // summary leaves for the last word to land.
+        tracker.levelCompletePanel = null;
+        tracker.resultPanel = summary.panel;
+        tracker.scoreText = null;          // the summary writes its own score line
+        tracker.recordsText = summary.recordsText;
         tracker.levelName = levelName;
         tracker.levelIndex = levelIndex;
 
-        // The three statistic rows and the star rating, built by
-        // LevelCompleteUIBuilder. Found by the names it gives them rather than
-        // assigned by hand, so a rebuilt panel re-wires itself.
-        tracker.wordsValueText = FindText(panelRoot, "Board/StatWords/WordsValue");
-        tracker.triesValueText = FindText(panelRoot, "Board/StatTries/TriesValue");
-        tracker.learnedValueText = FindText(panelRoot, "Board/StatLearned/LearnedValue");
-        tracker.starOnSprite = LoadSprite("ui_summary_star_on");
-        tracker.starOffSprite = LoadSprite("ui_summary_star_off");
-
-        List<Image> stars = new List<Image>();
-        for (int i = 1; i <= 3; i++)
-        {
-            Transform star = panelRoot != null ? panelRoot.Find("Board/StarRow/Star" + i) : null;
-            if (star != null) stars.Add(star.GetComponent<Image>());
-        }
-        tracker.stars = stars.ToArray();
+        // The three statistic rows and the tracker's own star handling belong
+        // to LevelCompleteUIBuilder's board, which this no longer builds. The
+        // summary rates its own stars, and every one of these fields is guarded
+        // against being empty.
 
         // Counting lives here, not on the tracker, so every scene of a level
         // adds to the same running total (RunScore). This is a later scene of
@@ -130,22 +117,6 @@ public static class DatabaseDemoBuilder
         foreach (GameObject go in FindAllInScene("LevelComplete_Canvas")) { Object.DestroyImmediate(go); removed++; }
         foreach (GameObject go in FindAllInScene(HostName)) { Object.DestroyImmediate(go); removed++; }
         Debug.Log("[SALINLAHI] Removed " + removed + " database-demo object(s) from the open scene.");
-    }
-
-    private static Text FindText(Transform parent, string name)
-    {
-        if (parent == null) return null;
-        Transform t = parent.Find(name);
-        return t != null ? t.GetComponent<Text>() : null;
-    }
-
-    /// <summary>
-    /// Star art for the rating row. Missing art is not fatal: the panel keeps
-    /// whatever sprite it was built with, so the stars simply never light.
-    /// </summary>
-    private static Sprite LoadSprite(string spriteFile)
-    {
-        return AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/" + spriteFile + ".png");
     }
 
     private static List<GameObject> FindAllInScene(string name)

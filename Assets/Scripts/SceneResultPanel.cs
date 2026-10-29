@@ -33,15 +33,27 @@ public class SceneResultPanel : MonoBehaviour
     [Tooltip("Switched on when the scene is finished. Starts off.")]
     public GameObject panelRoot;
 
-    public Text titleText;
+    [Tooltip("The banner across the top of the board.")]
+    public Image titleImage;
 
-    [Tooltip("This scene's result, e.g. \"5 / 6 correct\".")]
+    [Tooltip("Shown on any rating above the lowest.")]
+    public Sprite completeSprite;
+
+    [Tooltip("Shown on the lowest rating. The scene is still finished and the " +
+             "next one still opens - this is a nudge to go again, not a loss.")]
+    public Sprite tryAgainSprite;
+
+    [Tooltip("This scene's result, e.g. \"5 / 6\". The board prints the " +
+             "SCORE: label itself, so only the figures go here.")]
     public Text scoreText;
 
+    [Tooltip("How long the scene took, e.g. \"1:48\". The board prints TIME:.")]
+    public Text timeText;
+
     /// <summary>
-    /// One of the three stars. Each carries its own pair of sprites because
-    /// the trio is a drawn arrangement, not one star repeated - the outer two
-    /// are smaller and lean away from the middle, so they cannot share art.
+    /// One of the five stars. Each carries its own pair of sprites because the
+    /// row is a drawn arrangement, not one star repeated - it swells towards
+    /// the middle, so no two slots can share art.
     /// </summary>
     [System.Serializable]
     public class StarSlot
@@ -52,13 +64,16 @@ public class SceneResultPanel : MonoBehaviour
     }
 
     [Header("Stars")]
-    [Tooltip("Three slots, left to right.")]
+    [Tooltip("Five slots, left to right.")]
     public StarSlot[] stars;
 
     [Header("Buttons")]
     public Button nextButton;
     public Button replayButton;
-    public Button homeButton;
+
+    [Tooltip("The cross in the corner. Closing a scene that is already " +
+             "finished means going back to the map, so it goes where Home did.")]
+    public Button closeButton;
 
     [Header("Where the buttons go")]
     [Tooltip("Scene the Next button loads. Empty means this scene ends the " +
@@ -68,12 +83,22 @@ public class SceneResultPanel : MonoBehaviour
     public string levelSelectSceneName = "LevelSelect";
 
     [Header("Rating")]
-    [Tooltip("Share of attempts that must be correct for three stars.")]
-    [Range(0f, 1f)] public float threeStarAccuracy = 0.9f;
+    [Tooltip("Share of attempts that must be correct for the 2nd star, then " +
+             "the 3rd, 4th and 5th. Finishing the scene at all earns the " +
+             "first, which is the floor: the child did get to the end, so it " +
+             "is never worth none.")]
+    public float[] starAccuracy = { 0.5f, 0.7f, 0.85f, 0.95f };
 
-    [Tooltip("...and for two. Below this earns one, which is the floor: the " +
-             "scene was finished, so it is never worth none.")]
-    [Range(0f, 1f)] public float twoStarAccuracy = 0.7f;
+    [Header("Level endings")]
+    [Tooltip("Tick in a scene that ends a level. The panel then shows nothing " +
+             "on its own and waits for SessionScoreTracker to hand it the " +
+             "whole level's totals, which are the ones worth showing there.")]
+    public bool waitForExternalTotals = false;
+
+    [Tooltip("Tick when something other than the last objective decides the " +
+             "scene is over - Level 1's door. The panel then waits to be told " +
+             "with Show() rather than opening itself.")]
+    public bool waitForCue = false;
 
     [Header("Timing")]
     [Tooltip("Beat between the last word landing and the panel arriving, so " +
@@ -83,9 +108,15 @@ public class SceneResultPanel : MonoBehaviour
     private int correct;
     private int attempts;
     private bool shown;
+    private float startedAt;
 
     void Awake()
     {
+        // The clock starts when the scene does. This component lives on the
+        // panel's canvas, which is never switched off - only its content is -
+        // so Awake here is the scene opening.
+        startedAt = Time.time;
+
         if (voiceCommand == null) voiceCommand = FindFirstObjectByType<VoiceCommand>();
         if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
         // Never the object this component is on. A deactivated GameObject runs
@@ -127,6 +158,30 @@ public class SceneResultPanel : MonoBehaviour
 
     private void HandleSceneComplete()
     {
+        // A level's last scene shows the level's totals, not this scene's, and
+        // only SessionScoreTracker has them - so there, this does nothing and
+        // ShowWithTotals is what opens the panel.
+        if (waitForExternalTotals) return;
+
+        // And in a scene whose ending is not its last objective, something
+        // else says when. Level 1 is the one: its objectives are Bangon,
+        // Tayo and Lakad, all of them done while the child still has to walk
+        // out of the room, so opening here would hand them a summary with the
+        // door still ahead of them.
+        if (waitForCue) return;
+
+        Show();
+    }
+
+    /// <summary>
+    /// Opens the panel on the tally it has kept itself.
+    ///
+    /// For a scene that ends somewhere other than its last objective - Level
+    /// 1 ends when the child reaches the door, which ExitDoorTrigger knows
+    /// about and the objectives do not.
+    /// </summary>
+    public void Show()
+    {
         // The objective sequence can re-fire if a scene replays its last step;
         // the panel should not stack up or restart its delay.
         if (shown) return;
@@ -134,30 +189,81 @@ public class SceneResultPanel : MonoBehaviour
         StartCoroutine(ShowAfterBeat());
     }
 
+    /// <summary>
+    /// Opens the panel on figures worked out elsewhere - the whole level's,
+    /// gathered across all of its scenes.
+    ///
+    /// They have to be handed in rather than read from RunScore here, because
+    /// SessionScoreTracker clears RunScore as soon as it has saved the record,
+    /// which happens before this panel's opening beat has finished. Reading it
+    /// afterwards would show nothing but zeros.
+    /// </summary>
+    public void ShowWithTotals(int levelCorrect, int levelAttempts)
+    {
+        if (shown) return;
+        shown = true;
+        correct = levelCorrect;
+        attempts = levelAttempts;
+        StartCoroutine(ShowAfterBeat());
+    }
+
     private IEnumerator ShowAfterBeat()
     {
         if (showDelay > 0f) yield return new WaitForSeconds(showDelay);
 
-        if (titleText != null && string.IsNullOrEmpty(titleText.text))
-            titleText.text = "WELL DONE!";
+        int earned = EarnedStars();
+
+        // The lowest rating swaps the banner for TRY AGAIN!. Nothing else
+        // changes: the scene is finished, the next one opens, and REPLAY is
+        // there for a child who wants another go at it.
+        if (titleImage != null)
+        {
+            Sprite banner = earned <= 1 && tryAgainSprite != null ? tryAgainSprite : completeSprite;
+            if (banner != null) titleImage.sprite = banner;
+        }
 
         if (scoreText != null)
-            scoreText.text = correct + " / " + Mathf.Max(attempts, correct) + " correct";
+            scoreText.text = correct + " / " + Mathf.Max(attempts, correct);
 
-        ShowStars(EarnedStars());
+        if (timeText != null) timeText.text = Elapsed();
+
+        // The level select reads these back, so the rating has to outlive the
+        // panel. On a level's last scene the figures are the whole level's
+        // rather than this scene's, and the rating is saved against the scene
+        // the child is standing in either way - that is the tile it appears on.
+        LevelProgress.RecordStars(SceneManager.GetActiveScene().name, earned);
+
+        ShowStars(earned);
         WireButtons();
 
         if (panelRoot != null) panelRoot.SetActive(true);
     }
 
-    /// <summary>How many of the three stars this scene earned. Never zero.</summary>
+    /// <summary>How many of the stars this scene earned. Never zero.</summary>
     public int EarnedStars()
     {
-        if (attempts <= 0) return 3;        // finished without a single miss counted
+        if (attempts <= 0) return LevelProgress.MaxStars;   // finished without a miss counted
         float accuracy = correct / (float)attempts;
-        if (accuracy >= threeStarAccuracy) return 3;
-        if (accuracy >= twoStarAccuracy) return 2;
-        return 1;
+
+        int earned = 1;
+        if (starAccuracy != null)
+            foreach (float needed in starAccuracy)
+                if (accuracy >= needed) earned++;
+        return Mathf.Clamp(earned, 1, LevelProgress.MaxStars);
+    }
+
+    /// <summary>
+    /// How long this scene took, as m:ss.
+    ///
+    /// Timed from the scene loading rather than from the first word, because
+    /// a child who sits and looks around for a while did spend that time in
+    /// the scene. On a level's last scene this is still that scene's time and
+    /// not the level's, the same way its stars are.
+    /// </summary>
+    private string Elapsed()
+    {
+        int seconds = Mathf.Max(0, Mathf.RoundToInt(Time.time - startedAt));
+        return (seconds / 60) + ":" + (seconds % 60).ToString("00");
     }
 
     private void ShowStars(int earned)
@@ -193,10 +299,10 @@ public class SceneResultPanel : MonoBehaviour
             replayButton.onClick.AddListener(() => Go(SceneManager.GetActiveScene().name));
         }
 
-        if (homeButton != null)
+        if (closeButton != null)
         {
-            homeButton.onClick.RemoveAllListeners();
-            homeButton.onClick.AddListener(() => Go(levelSelectSceneName));
+            closeButton.onClick.RemoveAllListeners();
+            closeButton.onClick.AddListener(() => Go(levelSelectSceneName));
         }
     }
 
