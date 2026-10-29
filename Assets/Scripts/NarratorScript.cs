@@ -51,6 +51,25 @@ public static class NarratorScript
     }
 
     /// <summary>
+    /// What a vocabulary word means in English - "Bangon" -> "Get up" - read
+    /// from the English Gloss column of Docs/VoiceOverScript.csv by way of the
+    /// voice bank.
+    ///
+    /// Empty rather than null when the bank has not been generated yet, or the
+    /// word has no gloss: the panel that shows this simply leaves the meaning
+    /// line out, which is the right answer for a word nobody has glossed.
+    /// </summary>
+    public static string GlossFor(string word)
+    {
+        string id = WordId(word);
+        if (string.IsNullOrEmpty(id)) return "";
+
+        NarratorVoiceBank bank = NarratorVoiceBank.Load();
+        NarratorLine line = bank != null ? bank.Find(id) : null;
+        return line != null && !string.IsNullOrEmpty(line.gloss) ? line.gloss : "";
+    }
+
+    /// <summary>
     /// The id of a scene's intro or outro line, worked out from the scene
     /// name: Chapter2_Level3_Aralin -> rachel_l2_s3_intro. The game's
     /// "Chapter" is the VoiceOverScript's "Level", and its "Level" is that
