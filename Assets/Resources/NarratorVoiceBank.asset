@@ -1,0 +1,436 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7f30f51b8ce4acb88ac528f35c4f85d, type: 3}
+  m_Name: NarratorVoiceBank
+  m_EditorClassIdentifier: 
+  captionFont: {fileID: 12800000, guid: 2c4d93be511cf4720910a1b57c26f54f, type: 3}
+  lines:
+  - id: 'rachel_l1_s1_intro'
+    text: 'Good morning! Kylo needs to get ready for school. Help him get out of bed and start his morning!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s1_outro'
+    text: 'Great job! Now help Kylo get to the bathroom.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s2_intro'
+    text: 'Kylo needs to get ready before school. Help him find the bathroom and get ready for his morning bath!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s2_outro'
+    text: 'Nice! Kylo is ready for his bath.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s3_intro'
+    text: 'Kylo needs to get clean before going to school. Help him finish his morning routine!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s3_outro'
+    text: 'Wonderful! Kylo is all clean and ready to get dressed.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s4_intro'
+    text: 'It''s almost time for school! Help Kylo put on his uniform and prepare his things.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s4_outro'
+    text: 'Perfect! Kylo is dressed and ready. But first, he needs breakfast!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s5_intro'
+    text: 'Before going to school, Kylo needs a good breakfast. Help him eat and drink!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s5_bonus'
+    text: 'Can you find the kanin and itlog?'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s5_outro'
+    text: 'Yummy! Kylo has finished his breakfast.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s6_intro'
+    text: 'It''s time for school! Help Kylo get to the door and say goodbye to Nanay.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_s6_outro'
+    text: 'Great job! Kylo is ready for school. Let''s go!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_complete_summary'
+    text: 'You helped Kylo finish his morning routine!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l1_complete_badge'
+    text: 'Bahay Badge Unlocked!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s1_intro'
+    text: 'Kylo has arrived at school! Help him enter the school and get to class before the bell rings.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s1_outro'
+    text: 'You made it! Now let''s go to the classroom.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s2_intro'
+    text: 'Class is about to begin. Help Kylo get ready for his lesson.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s2_outro'
+    text: 'Everyone is ready. It''s time to learn!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s3_intro'
+    text: 'Now it''s Kylo''s turn to learn some new Filipino words. Help him participate in class!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s3_outro'
+    text: 'Excellent! Kylo is learning new words.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s4_intro'
+    text: 'It''s recess! Help Kylo enjoy his break and make some friends.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s4_outro'
+    text: 'That was fun! But recess is over. Let''s go back to class.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_s5_intro'
+    text: 'The school day is almost over. Help Kylo clean up and prepare to go home.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_complete_summary'
+    text: 'Great job! Kylo finished his school day!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l2_complete_badge'
+    text: 'Paaralan Badge Unlocked!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s1_intro'
+    text: 'Kylo wants to relax at the park after school. Help him get there safely!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s2_intro'
+    text: 'The playground is waiting! Help Kylo enjoy the different activities.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s2_outro'
+    text: 'Wow! Kylo is having so much fun!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s3_intro'
+    text: 'Look! Kylo met some new friends. Help him introduce himself and play with them.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s4_intro'
+    text: 'After playing, Kylo and his new friends are hungry. Help them enjoy their snack together.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s4_outro'
+    text: 'Sharing makes snack time even better!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_s5_intro'
+    text: 'The day is almost over. Help Kylo say goodbye to his friends and head home.'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_complete_summary'
+    text: 'Amazing! Kylo had a wonderful day!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_l3_complete_badge'
+    text: 'Parke Badge Unlocked!'
+    gloss: ''
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_correct_1'
+    text: 'Tama!'
+    gloss: 'Correct!'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_correct_2'
+    text: 'Magaling!'
+    gloss: 'Well done!'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_correct_3'
+    text: 'Ang galing mo!'
+    gloss: 'Great job!'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_incorrect_1'
+    text: 'Hindi pa tama. Subukan mo ulit.'
+    gloss: 'Not quite. Try again.'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_incorrect_2'
+    text: 'Malapit na! Ulitin mo.'
+    gloss: 'Almost! Say it again.'
+    clip: {fileID: 0}
+  - id: 'rachel_frame_sabihin'
+    text: 'Sabihin mo:'
+    gloss: 'Say:'
+    clip: {fileID: 0}
+  - id: 'rachel_frame_ngayon'
+    text: 'Ngayon naman, sabihin mo:'
+    gloss: 'Now, say:'
+    clip: {fileID: 0}
+  - id: 'rachel_frame_ulitin'
+    text: 'Pakinggan mo ulit:'
+    gloss: 'Listen again:'
+    clip: {fileID: 0}
+  - id: 'rachel_cue_listening'
+    text: 'Nakikinig ako.'
+    gloss: 'I am listening.'
+    clip: {fileID: 0}
+  - id: 'rachel_hint_pakinggan'
+    text: 'Pakinggan mong mabuti.'
+    gloss: 'Listen carefully.'
+    clip: {fileID: 0}
+  - id: 'rachel_hint_replay'
+    text: 'Pindutin ang asul na buton para marinig ulit.'
+    gloss: 'Press the blue button to hear it again.'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_nothear_1'
+    text: 'Hindi kita narinig. Pakiulit.'
+    gloss: 'I did not hear you. Please repeat.'
+    clip: {fileID: 0}
+  - id: 'rachel_feedback_nothear_2'
+    text: 'Pakilakasan mo ang boses mo.'
+    gloss: 'Please speak a bit louder.'
+    clip: {fileID: 0}
+  - id: 'rachel_nudge_idle'
+    text: 'Sabihin mo na. Kaya mo yan!'
+    gloss: 'Go on, say it. You can do it!'
+    clip: {fileID: 0}
+  - id: 'rachel_mic_blocked'
+    text: 'Pindutin ang mikropono para magsalita.'
+    gloss: 'Press the microphone to speak.'
+    clip: {fileID: 0}
+  - id: 'word_bangon'
+    text: 'Bangon'
+    gloss: 'Get up'
+    clip: {fileID: 0}
+  - id: 'word_tayo'
+    text: 'Tayo'
+    gloss: 'Stand up'
+    clip: {fileID: 0}
+  - id: 'word_lakad'
+    text: 'Lakad'
+    gloss: 'Walk'
+    clip: {fileID: 0}
+  - id: 'word_kaliwa'
+    text: 'Kaliwa'
+    gloss: 'Left'
+    clip: {fileID: 0}
+  - id: 'word_kanan'
+    text: 'Kanan'
+    gloss: 'Right'
+    clip: {fileID: 0}
+  - id: 'word_bukas'
+    text: 'Bukas'
+    gloss: 'Open'
+    clip: {fileID: 0}
+  - id: 'word_ilaw'
+    text: 'Ilaw'
+    gloss: 'Light (turn on)'
+    clip: {fileID: 0}
+  - id: 'word_tabo'
+    text: 'Tabo'
+    gloss: 'Dipper'
+    clip: {fileID: 0}
+  - id: 'word_maligo'
+    text: 'Maligo'
+    gloss: 'Take a bath'
+    clip: {fileID: 0}
+  - id: 'word_sabon'
+    text: 'Sabon'
+    gloss: 'Soap'
+    clip: {fileID: 0}
+  - id: 'word_suklay'
+    text: 'Suklay'
+    gloss: 'Comb'
+    clip: {fileID: 0}
+  - id: 'word_sipilyo'
+    text: 'Sipilyo'
+    gloss: 'Toothbrush'
+    clip: {fileID: 0}
+  - id: 'word_tuwalya'
+    text: 'Tuwalya'
+    gloss: 'Towel'
+    clip: {fileID: 0}
+  - id: 'word_damit'
+    text: 'Damit'
+    gloss: 'Clothes / uniform'
+    clip: {fileID: 0}
+  - id: 'word_medyas'
+    text: 'Medyas'
+    gloss: 'Socks'
+    clip: {fileID: 0}
+  - id: 'word_sapatos'
+    text: 'Sapatos'
+    gloss: 'Shoes'
+    clip: {fileID: 0}
+  - id: 'word_salamin'
+    text: 'Salamin'
+    gloss: 'Mirror'
+    clip: {fileID: 0}
+  - id: 'word_kunin'
+    text: 'Kunin'
+    gloss: 'Take / get'
+    clip: {fileID: 0}
+  - id: 'word_bag'
+    text: 'Bag'
+    gloss: 'Bag'
+    clip: {fileID: 0}
+  - id: 'word_upo'
+    text: 'Upo'
+    gloss: 'Sit down'
+    clip: {fileID: 0}
+  - id: 'word_kain'
+    text: 'Kain'
+    gloss: 'Eat'
+    clip: {fileID: 0}
+  - id: 'word_inom'
+    text: 'Inom'
+    gloss: 'Drink'
+    clip: {fileID: 0}
+  - id: 'word_kanin'
+    text: 'Kanin'
+    gloss: 'Rice'
+    clip: {fileID: 0}
+  - id: 'word_itlog'
+    text: 'Itlog'
+    gloss: 'Egg'
+    clip: {fileID: 0}
+  - id: 'word_alis'
+    text: 'Alis'
+    gloss: 'Leave / go'
+    clip: {fileID: 0}
+  - id: 'word_paalam'
+    text: 'Paalam'
+    gloss: 'Goodbye'
+    clip: {fileID: 0}
+  - id: 'word_tara'
+    text: 'Tara'
+    gloss: 'Let''s go'
+    clip: {fileID: 0}
+  - id: 'word_kumusta'
+    text: 'Kumusta'
+    gloss: 'Hello / how are you'
+    clip: {fileID: 0}
+  - id: 'word_pasok'
+    text: 'Pasok'
+    gloss: 'Enter'
+    clip: {fileID: 0}
+  - id: 'word_takbo'
+    text: 'Takbo'
+    gloss: 'Run'
+    clip: {fileID: 0}
+  - id: 'word_kuha'
+    text: 'Kuha'
+    gloss: 'Get / take'
+    clip: {fileID: 0}
+  - id: 'word_lapis'
+    text: 'Lapis'
+    gloss: 'Pencil'
+    clip: {fileID: 0}
+  - id: 'word_aklat'
+    text: 'Aklat'
+    gloss: 'Book'
+    clip: {fileID: 0}
+  - id: 'word_basa'
+    text: 'Basa'
+    gloss: 'Read'
+    clip: {fileID: 0}
+  - id: 'word_sulat'
+    text: 'Sulat'
+    gloss: 'Write'
+    clip: {fileID: 0}
+  - id: 'word_tanong'
+    text: 'Tanong'
+    gloss: 'Ask / question'
+    clip: {fileID: 0}
+  - id: 'word_sagot'
+    text: 'Sagot'
+    gloss: 'Answer'
+    clip: {fileID: 0}
+  - id: 'word_labas'
+    text: 'Labas'
+    gloss: 'Go outside'
+    clip: {fileID: 0}
+  - id: 'word_laro'
+    text: 'Laro'
+    gloss: 'Play'
+    clip: {fileID: 0}
+  - id: 'word_tawa'
+    text: 'Tawa'
+    gloss: 'Laugh'
+    clip: {fileID: 0}
+  - id: 'word_tulong'
+    text: 'Tulong'
+    gloss: 'Help'
+    clip: {fileID: 0}
+  - id: 'word_linis'
+    text: 'Linis'
+    gloss: 'Clean up'
+    clip: {fileID: 0}
+  - id: 'word_tingin'
+    text: 'Tingin'
+    gloss: 'Look'
+    clip: {fileID: 0}
+  - id: 'word_tuwa'
+    text: 'Tuwa'
+    gloss: 'Joy / delight'
+    clip: {fileID: 0}
+  - id: 'word_akyat'
+    text: 'Akyat'
+    gloss: 'Climb'
+    clip: {fileID: 0}
+  - id: 'word_dausdos'
+    text: 'Dausdos'
+    gloss: 'Slide'
+    clip: {fileID: 0}
+  - id: 'word_sakay'
+    text: 'Sakay'
+    gloss: 'Ride'
+    clip: {fileID: 0}
+  - id: 'word_tulak'
+    text: 'Tulak'
+    gloss: 'Push'
+    clip: {fileID: 0}
+  - id: 'word_talon'
+    text: 'Talon'
+    gloss: 'Jump'
+    clip: {fileID: 0}
+  - id: 'word_ngiti'
+    text: 'Ngiti'
+    gloss: 'Smile'
+    clip: {fileID: 0}
+  - id: 'word_bati'
+    text: 'Bati'
+    gloss: 'Greet'
+    clip: {fileID: 0}
+  - id: 'word_ibahagi'
+    text: 'Ibahagi'
+    gloss: 'Share'
+    clip: {fileID: 0}
+  - id: 'word_salamat'
+    text: 'Salamat'
+    gloss: 'Thank you'
+    clip: {fileID: 0}
+  - id: 'word_pagod'
+    text: 'Pagod'
+    gloss: 'Tired'
+    clip: {fileID: 0}
+  - id: 'word_uwi'
+    text: 'Uwi'
+    gloss: 'Go home'
+    clip: {fileID: 0}
