@@ -131,17 +131,24 @@ public static class GameplayHUDLayout
 
     private static void BuildNarration(Parts p, Transform parent, UITheme theme, Font body)
     {
-        GameObject panel = Piece(parent, "NarrationPanel", theme != null ? theme.narrationPanel : null,
-            new Vector2(0.5f, 1f), new Vector2(NarrationShiftX, NarrationTop), NarrationSize);
+        // A bare container, not the plaque itself. Rachel has to be drawn
+        // BEHIND the branch so the twigs cross in front of her, and a child
+        // always draws over its parent's own Image - so the plaque cannot be
+        // the parent. Portrait first, plaque over it, words over that.
+        GameObject panel = Rect(parent, "NarrationPanel",
+            new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+        RectTransform panelRect = panel.GetComponent<RectTransform>();
+        panelRect.anchoredPosition = new Vector2(NarrationShiftX, NarrationTop);
+        panelRect.sizeDelta = NarrationSize;
+
         p.narrationPanel = panel;
         p.narrationFade = panel.AddComponent<CanvasGroup>();
         p.narrationFade.alpha = 0f;
         p.narrationFade.blocksRaycasts = false;
         p.narrationFade.interactable = false;
 
-        // Rachel goes BEHIND the branch, in the hole it frames, so the twigs
-        // overlap her the way they do in the design. Her circle is measured off
-        // the art itself - see UITheme's Ring constants.
+        // Her circle is measured off the art itself by
+        // Tools/cut_rachel_portrait.py - see UITheme's Ring constants.
         float ring = UITheme.RingDiameter * NarrationSize.x;
         GameObject face = Rect(panel.transform, "RachelPortrait",
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
@@ -156,7 +163,15 @@ public static class GameplayHUDLayout
         faceRect.anchoredPosition = new Vector2(
             (UITheme.RingCentreX - 0.5f) * NarrationSize.x,
             (0.5f - UITheme.RingCentreY) * NarrationSize.y);
-        face.transform.SetAsFirstSibling();
+
+        GameObject plaque = Rect(panel.transform, "Plaque",
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+        Image plaqueImage = plaque.AddComponent<Image>();
+        plaqueImage.sprite = theme != null ? theme.narrationPanel : null;
+        plaqueImage.preserveAspect = true;
+        plaqueImage.raycastTarget = false;
+        if (plaqueImage.sprite == null) plaqueImage.color = new Color(0.36f, 0.21f, 0.09f, 0.92f);
+        plaque.GetComponent<RectTransform>().sizeDelta = NarrationSize;
 
         p.narrationText = Label(panel.transform, "NarrationText", "", body, 34,
             FontStyle.Bold, TextAnchor.MiddleLeft, Cream);
