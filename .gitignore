@@ -64,3 +64,7 @@ Thumbs.db
 
 # A Claude installer that landed in the project folder; never part of the game.
 Claude Setup*.exe
+
+# Python bytecode from the Tools/ scripts
+__pycache__/
+*.pyc
