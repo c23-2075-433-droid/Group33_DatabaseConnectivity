@@ -38,14 +38,13 @@ public class MainMenuController : MonoBehaviour
     [Header("Settings")]
     [Tooltip("Optional master volume slider inside the Settings panel.")]
     public Slider volumeSlider;
-    private const string VolumePrefsKey = "SALINLAHI_MasterVolume";
 
     [Tooltip("Name of the scene to load when Play is pressed (the journey map).")]
     public string levelSelectSceneName = "LevelSelect";
 
-    private const string MutedPrefsKey = "SALINLAHI_Muted";
-    private bool isMuted = false;
-    private float volumeBeforeMute = 1f;
+    // Volume and mute live in VolumeSettings now, because the in-game settings
+    // panel changes the same two values and the keys cannot be private to this
+    // screen any more.
 
     void Start()
     {
@@ -68,37 +67,37 @@ public class MainMenuController : MonoBehaviour
         // it as a submit when Enter was actually pressed.
         if (nicknameInput != null) nicknameInput.onEndEdit.AddListener(OnNicknameEndEdit);
 
+        VolumeSettings.Apply();
+
         if (volumeSlider != null)
         {
-            volumeSlider.value = PlayerPrefs.GetFloat(VolumePrefsKey, 1f);
+            volumeSlider.SetValueWithoutNotify(VolumeSettings.Master);
             volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-            AudioListener.volume = volumeSlider.value;
         }
 
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
         if (nicknamePanel != null) nicknamePanel.SetActive(false);
 
-        isMuted = PlayerPrefs.GetInt(MutedPrefsKey, 0) == 1;
-        volumeBeforeMute = AudioListener.volume > 0f ? AudioListener.volume : 1f;
-        if (isMuted) AudioListener.volume = 0f;
         if (muteButton != null) muteButton.onClick.AddListener(OnMutePressed);
     }
 
+    /// <summary>
+    /// Mute no longer has to stash the volume before silencing it: muting and
+    /// the master level are two separate saved values now, so unmuting simply
+    /// stops forcing silence and the level is still whatever it was.
+    /// </summary>
     private void OnMutePressed()
     {
-        isMuted = !isMuted;
-        if (isMuted)
-        {
-            volumeBeforeMute = AudioListener.volume > 0f ? AudioListener.volume : volumeBeforeMute;
-            AudioListener.volume = 0f;
-        }
-        else
-        {
-            AudioListener.volume = volumeBeforeMute;
-        }
-        if (volumeSlider != null) volumeSlider.value = AudioListener.volume;
-        PlayerPrefs.SetInt(MutedPrefsKey, isMuted ? 1 : 0);
+        VolumeSettings.Muted = !VolumeSettings.Muted;
+        RefreshVolumeSlider();
+    }
+
+    /// <summary>Shows the saved level without re-triggering OnVolumeChanged.</summary>
+    private void RefreshVolumeSlider()
+    {
+        if (volumeSlider == null) return;
+        volumeSlider.SetValueWithoutNotify(VolumeSettings.Muted ? 0f : VolumeSettings.Master);
     }
 
     /// <summary>
@@ -181,9 +180,14 @@ public class MainMenuController : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
+    /// <summary>
+    /// Moving the slider also lifts mute - reaching for the volume while the
+    /// game is silenced means "I want to hear it", and leaving mute on would
+    /// make the slider look broken.
+    /// </summary>
     private void OnVolumeChanged(float value)
     {
-        AudioListener.volume = value;
-        PlayerPrefs.SetFloat(VolumePrefsKey, value);
+        if (VolumeSettings.Muted) VolumeSettings.Muted = false;
+        VolumeSettings.Master = value;
     }
 }

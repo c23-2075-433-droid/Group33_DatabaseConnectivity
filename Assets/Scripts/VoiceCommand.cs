@@ -57,6 +57,37 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     /// </summary>
     public event Action<string, bool> OnAnswerChecked;
 
+    /// <summary>
+    /// Raised when the player clearly SAID something and the recognizer could
+    /// not make it out. Deliberately separate from OnAnswerChecked(.., false):
+    /// saying the WRONG word and saying something unintelligible need
+    /// different things from the child, so the narrator answers them
+    /// differently. This raises no answer and is never scored.
+    ///
+    /// Pure silence does NOT raise this. The recognizer times out every few
+    /// seconds while nobody is talking, and a game that said "I didn't hear
+    /// you" every five seconds at a child who is still thinking would be
+    /// unbearable - that case belongs to the narrator's idle nudge instead.
+    /// </summary>
+    public event Action OnNothingHeard;
+
+    /// <summary>
+    /// Raised when speech recognition cannot be used at all - permission was
+    /// denied, or the device has no recognizer. The narrator points the player
+    /// at the microphone button.
+    /// </summary>
+    public event Action OnMicrophoneUnavailable;
+
+    /// <summary>
+    /// Raised the moment the recognizer notices the player has started
+    /// talking, before it knows what they said. The gap between this and
+    /// OnAnswerChecked is the only window in which the game is genuinely
+    /// working something out, which is what the status panel shows as
+    /// "PROCESSING...". It is a notification only - nothing here decides
+    /// anything or is scored.
+    /// </summary>
+    public event Action OnSpeechBegan;
+
     // --- Microphone button listening indicator (see VoiceInteractionUI) ---
     // True while the device's speech recognizer is actively listening for the
     // player to speak (between OnReadyForSpeech and the next result). The mic
@@ -78,6 +109,41 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     // scene, mid-recognition). Touching anything on a destroyed MonoBehaviour
     // then throws MissingReferenceException, so every callback checks this first.
     private bool isShuttingDown = false;
+
+    // Set while the narrator is talking. On a phone speaker the recognizer
+    // hears Rachel saying "Sabihin mo: Lakad" perfectly well and scores it as
+    // the player's own attempt, so listening stops for as long as she speaks.
+    private bool isSuspended = false;
+
+    /// <summary>
+    /// Stops listening until ResumeListening. Called by VoiceNarrator around
+    /// every spoken line.
+    /// </summary>
+    public void SuspendListening()
+    {
+        if (isShuttingDown) return;
+        isSuspended = true;
+
+        CancelInvoke(nameof(StartListening));   // drop any queued restart
+        SetListening(false);
+
+        try
+        {
+            if (isInitialized && SpeechToText.IsBusy()) SpeechToText.Cancel();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("VoiceCommand: couldn't pause speech recognition: " + e.Message);
+        }
+    }
+
+    /// <summary>Starts listening again after SuspendListening.</summary>
+    public void ResumeListening()
+    {
+        if (isShuttingDown || !isSuspended) return;
+        isSuspended = false;
+        StartListening();
+    }
 
     void OnDestroy()
     {
@@ -184,6 +250,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         if (!isInitialized)
         {
             SetStatusText("Speech recognition unavailable on this device.");
+            if (OnMicrophoneUnavailable != null) OnMicrophoneUnavailable();
             return;
         }
 
@@ -201,6 +268,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             {
                 SetStatusText("Microphone permission denied. Voice commands won't work.");
                 SetListening(false);
+                if (OnMicrophoneUnavailable != null) OnMicrophoneUnavailable();
             }
         });
     }
@@ -209,11 +277,13 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     {
         if (isShuttingDown || this == null) return;
         if (!isInitialized) return;
+        if (isSuspended) return;
 
         // Don't try to start a new session if one's already running.
         if (SpeechToText.IsBusy()) return;
 
         SetStatusText("Listening...");
+        speechStartedThisSession = false;
         SpeechToText.Start(this, preferOfflineRecognition: false);
     }
 
@@ -227,7 +297,16 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         SetListening(true);
     }
 
-    void ISpeechToTextListener.OnBeginningOfSpeech() { }
+    // Someone started talking. Remembered so a failed recognition can tell
+    // "said something I couldn't make out" apart from "said nothing at all".
+    private bool speechStartedThisSession = false;
+
+    void ISpeechToTextListener.OnBeginningOfSpeech()
+    {
+        if (isShuttingDown || this == null) return;
+        speechStartedThisSession = true;
+        OnSpeechBegan?.Invoke();
+    }
 
     void ISpeechToTextListener.OnVoiceLevelChanged(float normalizedVoiceLevel) { }
 
@@ -246,6 +325,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // rather than touching a dead object.
         if (isShuttingDown || this == null) return;
 
+        // Cancel() delivers a result of its own, so a result arriving while
+        // the narrator is talking is our own interruption, not the player.
+        if (isSuspended)
+        {
+            SetListening(false);
+            return;
+        }
+
         // A result just came in, so the recognizer has stopped actively
         // listening for this cycle - stop the mic button's pulse. If
         // listenContinuously is on, OnReadyForSpeech() will turn it back on
@@ -257,13 +344,16 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             // Recognition failed for this attempt (e.g. no speech detected, no
             // internet, etc.) — handle gracefully, never crash.
             SetStatusText("Recognition error (code " + errorCode.Value + "). Try again.");
+
+            // Only when the player actually spoke - see OnNothingHeard.
+            if (speechStartedThisSession && OnNothingHeard != null) OnNothingHeard();
         }
         else
         {
             ProcessRecognizedText(spokenText);
         }
 
-        if (listenContinuously)
+        if (listenContinuously && !isSuspended)
         {
             Invoke(nameof(StartListening), restartDelay);
         }
