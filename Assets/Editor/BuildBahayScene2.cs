@@ -40,7 +40,14 @@ public class BuildBahayScene2
     // background is scaled up to fill exactly one screen with no gaps.
     private const float BgScale = 10.8f / 8.64f;      // 1.25
     private const float ScreenWidth = 19.2f;          // 15.36 * 1.25
-    private const float FloorY = -2.98f;              // top of the floor planks
+    // Where Kylo's feet go. -2.98 is the wall/floor junction in the painting,
+    // measured as the darkest row of the shadow at the base of the panelling,
+    // and standing him there pins him flat against the back wall with no floor
+    // behind his heels - which reads as pasted on rather than stood up. The
+    // hallway floor runs from there down to -5.4, so putting him a little
+    // forward onto the boards is what makes him look planted. -3.30 lands on a
+    // floorboard seam and matches Scene 4, which already uses -3.32.
+    private const float FloorY = -3.30f;              // on the floor planks, not at the wall
 
     // The character art imports at 120 pixels per unit (not the usual 100 -
     // check the .meta before changing any of these numbers), so the 745px
