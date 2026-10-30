@@ -14,423 +14,1739 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   captionFont: {fileID: 12800000, guid: 2c4d93be511cf4720910a1b57c26f54f, type: 3}
   lines:
-  - id: 'rachel_l1_s1_intro'
-    text: 'Good morning! Kylo needs to get ready for school. Help him get out of bed and start his morning!'
-    gloss: ''
+  - id: rachel_l1_s1_intro
+    text: The sun is up over Kylo's house, and a brand new school day is starting.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s1_outro'
-    text: 'Great job! Now help Kylo get to the bathroom.'
-    gloss: ''
+  - id: rachel_l1_s1_bangon_story
+    text: Good morning! Kylo is still sleeping. It is time to wake up and start his day!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s2_intro'
-    text: 'Kylo needs to get ready before school. Help him find the bathroom and get ready for his morning bath!'
-    gloss: ''
+  - id: rachel_l1_s1_bangon_ask
+    text: Let's help Kylo out of bed! Say {word} to wake him up!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s2_outro'
-    text: 'Nice! Kylo is ready for his bath.'
-    gloss: ''
+  - id: rachel_l1_s1_bangon_done
+    text: Great job! Kylo is finally awake.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s3_intro'
-    text: 'Kylo needs to get clean before going to school. Help him finish his morning routine!'
-    gloss: ''
+  - id: rachel_l1_s1_tayo_story
+    text: Kylo is awake, but he is still sitting on his bed. He needs to stand up first.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s3_outro'
-    text: 'Wonderful! Kylo is all clean and ready to get dressed.'
-    gloss: ''
+  - id: rachel_l1_s1_tayo_ask
+    text: "Help Kylo onto his feet \u2014 say {word}!"
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s4_intro'
-    text: 'It''s almost time for school! Help Kylo put on his uniform and prepare his things.'
-    gloss: ''
+  - id: rachel_l1_s1_tayo_done
+    text: Well done! Kylo is standing beside his bed now.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s4_outro'
-    text: 'Perfect! Kylo is dressed and ready. But first, he needs breakfast!'
-    gloss: ''
+  - id: rachel_l1_s1_lakad_story
+    text: Kylo is standing, and the bedroom door is waiting across the room.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s5_intro'
-    text: 'Before going to school, Kylo needs a good breakfast. Help him eat and drink!'
-    gloss: ''
+  - id: rachel_l1_s1_lakad_ask
+    text: Send him on his way with {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s5_bonus'
-    text: 'Can you find the kanin and itlog?'
-    gloss: ''
+  - id: rachel_l1_s1_lakad_done
+    text: Excellent! Kylo is walking towards the door.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s5_outro'
-    text: 'Yummy! Kylo has finished his breakfast.'
-    gloss: ''
+  - id: rachel_l1_s1_outro
+    text: Nice work! Kylo is out of bed. Now let's help him get to the bathroom.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s6_intro'
-    text: 'It''s time for school! Help Kylo get to the door and say goodbye to Nanay.'
-    gloss: ''
+  - id: rachel_l1_s2_intro
+    text: Kylo is out of his room, and the hallway stretches away in front of him.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_s6_outro'
-    text: 'Great job! Kylo is ready for school. Let''s go!'
-    gloss: ''
+  - id: rachel_l1_s2_lakad_story
+    text: The hallway is long and quiet, and the bathroom is at the far end.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_complete_summary'
-    text: 'You helped Kylo finish his morning routine!'
-    gloss: ''
+  - id: rachel_l1_s2_lakad_ask
+    text: Start him moving with {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l1_complete_badge'
-    text: 'Bahay Badge Unlocked!'
-    gloss: ''
+  - id: rachel_l1_s2_lakad_done
+    text: Good! Kylo is walking down the hallway.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s1_intro'
-    text: 'Kylo has arrived at school! Help him enter the school and get to class before the bell rings.'
-    gloss: ''
+  - id: rachel_l1_s2_kaliwa_story
+    text: Kylo has stopped. There are doors on both sides, and he is not sure which way.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s1_outro'
-    text: 'You made it! Now let''s go to the classroom.'
-    gloss: ''
+  - id: rachel_l1_s2_kaliwa_ask
+    text: "Point him to the left \u2014 say {word}!"
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s2_intro'
-    text: 'Class is about to begin. Help Kylo get ready for his lesson.'
-    gloss: ''
+  - id: rachel_l1_s2_kaliwa_done
+    text: That's it! Kylo is looking to his left.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s2_outro'
-    text: 'Everyone is ready. It''s time to learn!'
-    gloss: ''
+  - id: rachel_l1_s2_kanan_story
+    text: Nothing on the left but Nanay's room. The other side is worth a look.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s3_intro'
-    text: 'Now it''s Kylo''s turn to learn some new Filipino words. Help him participate in class!'
-    gloss: ''
+  - id: rachel_l1_s2_kanan_ask
+    text: Turn him the other way with {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s3_outro'
-    text: 'Excellent! Kylo is learning new words.'
-    gloss: ''
+  - id: rachel_l1_s2_kanan_done
+    text: Good eye! The bathroom door is on his right.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s4_intro'
-    text: 'It''s recess! Help Kylo enjoy his break and make some friends.'
-    gloss: ''
+  - id: rachel_l1_s2_bukas_story
+    text: Kylo has found the bathroom door, but it is shut tight.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s4_outro'
-    text: 'That was fun! But recess is over. Let''s go back to class.'
-    gloss: ''
+  - id: rachel_l1_s2_bukas_ask
+    text: Let's get that door open! Say {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_s5_intro'
-    text: 'The school day is almost over. Help Kylo clean up and prepare to go home.'
-    gloss: ''
+  - id: rachel_l1_s2_bukas_done
+    text: Wonderful! The door swings open for Kylo.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_complete_summary'
-    text: 'Great job! Kylo finished his school day!'
-    gloss: ''
+  - id: rachel_l1_s2_ilaw_story
+    text: Inside the bathroom it is still dark, and Kylo cannot see a thing.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l2_complete_badge'
-    text: 'Paaralan Badge Unlocked!'
-    gloss: ''
+  - id: rachel_l1_s2_ilaw_ask
+    text: "Brighten the room for him \u2014 say {word}!"
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s1_intro'
-    text: 'Kylo wants to relax at the park after school. Help him get there safely!'
-    gloss: ''
+  - id: rachel_l1_s2_ilaw_done
+    text: Perfect! The bathroom is bright and warm now.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s2_intro'
-    text: 'The playground is waiting! Help Kylo enjoy the different activities.'
-    gloss: ''
+  - id: rachel_l1_s2_tabo_story
+    text: Kylo can see the water jar now, with a blue dipper resting on top.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s2_outro'
-    text: 'Wow! Kylo is having so much fun!'
-    gloss: ''
+  - id: rachel_l1_s2_tabo_ask
+    text: Help him lift it down! Say {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s3_intro'
-    text: 'Look! Kylo met some new friends. Help him introduce himself and play with them.'
-    gloss: ''
+  - id: rachel_l1_s2_tabo_done
+    text: Nice! Kylo is holding the tabo in his hands.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s4_intro'
-    text: 'After playing, Kylo and his new friends are hungry. Help them enjoy their snack together.'
-    gloss: ''
+  - id: rachel_l1_s2_sabon_story
+    text: Water alone will not get Kylo clean. He needs something that makes bubbles.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s4_outro'
-    text: 'Sharing makes snack time even better!'
-    gloss: ''
+  - id: rachel_l1_s2_sabon_ask
+    text: "Help him reach for it \u2014 say {word}!"
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_s5_intro'
-    text: 'The day is almost over. Help Kylo say goodbye to his friends and head home.'
-    gloss: ''
+  - id: rachel_l1_s2_sabon_done
+    text: Great! Kylo has the soap ready for his bath.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_complete_summary'
-    text: 'Amazing! Kylo had a wonderful day!'
-    gloss: ''
+  - id: rachel_l1_s2_sipilyo_story
+    text: Kylo's teeth need cleaning too, before breakfast and before school.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_l3_complete_badge'
-    text: 'Parke Badge Unlocked!'
-    gloss: ''
+  - id: rachel_l1_s2_sipilyo_ask
+    text: Hand him the right one by saying {word}!
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_correct_1'
-    text: 'Tama!'
-    gloss: 'Correct!'
+  - id: rachel_l1_s2_sipilyo_done
+    text: Well done! Kylo is brushing his teeth.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_correct_2'
-    text: 'Magaling!'
-    gloss: 'Well done!'
+  - id: rachel_l1_s2_tuwalya_story
+    text: When Kylo finishes washing, he will be soaking wet from head to toe.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_correct_3'
-    text: 'Ang galing mo!'
-    gloss: 'Great job!'
+  - id: rachel_l1_s2_tuwalya_ask
+    text: "Get him something to dry with \u2014 say {word}!"
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_incorrect_1'
-    text: 'Hindi pa tama. Subukan mo ulit.'
-    gloss: 'Not quite. Try again.'
+  - id: rachel_l1_s2_tuwalya_done
+    text: Excellent! Kylo has everything he needs now.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_incorrect_2'
-    text: 'Malapit na! Ulitin mo.'
-    gloss: 'Almost! Say it again.'
+  - id: rachel_l1_s2_outro
+    text: Everything is ready. Now Kylo can take his bath.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_frame_sabihin'
+  - id: rachel_l1_s3_intro
+    text: The bathroom is ready, and so is Kylo.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_kaliwa_story
+    text: Kylo is by the door. The water jar is on the other side of the room.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_kaliwa_ask
+    text: Send him that way with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_kaliwa_done
+    text: Good! Kylo has moved over to the water jar.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_maligo_story
+    text: The water is cool and the soap is ready. This is Kylo's favourite part.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_maligo_ask
+    text: Let's get him washing! Say {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_maligo_done
+    text: Wonderful! Kylo is clean from head to toe.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_suklay_story
+    text: Kylo is clean, but his hair is sticking up in every direction.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_suklay_ask
+    text: "Tidy it up for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_suklay_done
+    text: Very nice! Kylo's hair is neat and smooth.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_outro
+    text: All clean! Now Kylo needs to get dressed for school.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_intro
+    text: Kylo is back in his bedroom, dripping wet and wrapped in his towel.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_damit_story
+    text: Kylo cannot go to school in his towel. His uniform is folded on the bed.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_damit_ask
+    text: "Help him put them on \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_damit_done
+    text: Wonderful! Kylo is dressed in his school uniform.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_medyas_story
+    text: Kylo's feet are still bare, and the bedroom floor is cold.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_medyas_ask
+    text: Warm them up for him! Say {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_medyas_done
+    text: Nice! Kylo has his socks on.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_sapatos_story
+    text: Socks alone will not do for the long walk to school.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_sapatos_ask
+    text: Finish his feet off with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_sapatos_done
+    text: Great job! Kylo is ready to walk anywhere.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_bag_story
+    text: Kylo's books are packed and waiting on the chair by the door.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_bag_ask
+    text: "Point him at it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_bag_done
+    text: Good! Kylo has spotted his school bag.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_kunin_story
+    text: The bag is right there, but it will not carry itself.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_kunin_ask
+    text: Help him pick it up by saying {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_kunin_done
+    text: Excellent! Kylo has his bag over his shoulder.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s4_outro
+    text: Kylo is dressed and packed. But first, he needs his breakfast!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_intro
+    text: Nanay has made breakfast, and the whole kitchen smells wonderful.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_upo_story
+    text: Breakfast is on the table, and Kylo's chair is empty and waiting.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_upo_ask
+    text: "Get him settled \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_upo_done
+    text: Good! Kylo is sitting at the table.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kanin_story
+    text: There is a warm white heap on Kylo's plate. Filipino families eat it daily.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kanin_ask
+    text: "Name it for Kylo \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kanin_done
+    text: That's right! Kylo's plate is full of rice.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_itlog_story
+    text: Beside the rice is something round, with a sunny yellow middle.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_itlog_ask
+    text: "Tell Kylo what it is \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_itlog_done
+    text: Well done! The egg is Kylo's favourite part.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kain_story
+    text: Everything is on the plate now, and Kylo's tummy is rumbling.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kain_ask
+    text: Let him start his breakfast! Say {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_kain_done
+    text: Yummy! Kylo is enjoying every bite.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_inom_story
+    text: All that rice has made Kylo thirsty. There is a glass beside his plate.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_inom_ask
+    text: Help him finish it off with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_inom_done
+    text: Wonderful! Kylo's breakfast is all done.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_outro
+    text: Breakfast is finished. It is time for Kylo to head off to school!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_intro
+    text: Here is Kylo's school! The gate is open and the yard is full of children.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_kumusta_story
+    text: The guard at the gate smiles at Kylo every single morning.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_kumusta_ask
+    text: "Greet him back \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_kumusta_done
+    text: Lovely manners! The guard waves Kylo through.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_pasok_story
+    text: The gate is open, and the school building is just across the yard.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_pasok_ask
+    text: Take him inside with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_pasok_done
+    text: Good! Kylo is through the gate.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_takbo_story
+    text: The bell is about to ring, and walking will not be fast enough.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_takbo_ask
+    text: "Hurry him along \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_takbo_done
+    text: Excellent! Kylo made it before the bell.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_outro
+    text: You made it in time! Now let's find Kylo's classroom.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_intro
+    text: Kylo is outside his classroom, and Teacher Rachel is already inside.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_bukas_story
+    text: The classroom door is closed, and the lesson is about to begin.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_bukas_ask
+    text: "Let him in \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_bukas_done
+    text: Good! The classroom door is open.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kumusta_story
+    text: Teacher Rachel looks up from her desk and smiles at Kylo.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kumusta_ask
+    text: "Greet Teacher Rachel back \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kumusta_done
+    text: Very polite! Teacher Rachel smiles back at him.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_upo_story
+    text: Kylo's desk is near the window, and his classmates are already seated.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_upo_ask
+    text: "Get him into his chair \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_upo_done
+    text: Good! Kylo is in his seat, ready to learn.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kuha_story
+    text: The lesson is starting, and Kylo's desk is completely empty.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kuha_ask
+    text: "Reach into the bag for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kuha_done
+    text: Nice! Kylo is reaching into his school bag.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_lapis_story
+    text: There is one thing Kylo needs before he can write anything down.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_lapis_ask
+    text: "Name it for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_lapis_done
+    text: Well done! Kylo has his pencil on the desk.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_outro
+    text: Everyone is ready. It is time for the lesson to begin!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_intro
+    text: Teacher Rachel is at the board, and today's lesson is about to start.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_aklat_story
+    text: Teacher Rachel asks the class to take something out of their bags.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_aklat_ask
+    text: "Help Kylo find it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_aklat_done
+    text: Good! Kylo's book is open on his desk.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_basa_story
+    text: The page is open, and the whole class is following along out loud.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_basa_ask
+    text: "Let Kylo join in \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_basa_done
+    text: Wonderful! Kylo is reading with the class.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sulat_story
+    text: Teacher Rachel writes a new word on the board for everyone to copy.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sulat_ask
+    text: Get his pencil moving with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sulat_done
+    text: Excellent! Kylo is writing the word down.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_tanong_story
+    text: Kylo does not understand one part, and his hand goes half way up.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_tanong_ask
+    text: "Give him the courage \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_tanong_done
+    text: Brave boy! Kylo has asked his question.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sagot_story
+    text: Teacher Rachel turns to Kylo and waits for him to reply.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sagot_ask
+    text: Help him speak up by saying {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_sagot_done
+    text: Well done! Kylo gave the right answer.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s3_outro
+    text: Excellent work! Kylo is learning so many new words.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_intro
+    text: The recess bell has rung, and the classroom is emptying fast.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_labas_story
+    text: Kylo's classmates are already streaming out into the sunshine.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_labas_ask
+    text: "Let him out into the sun \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_labas_done
+    text: Good! Kylo is out in the school yard.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_kain_story
+    text: Nanay packed Kylo a snack, and it is still sitting in his bag.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_kain_ask
+    text: "Let him start his snack \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_kain_done
+    text: Yummy! Kylo has finished his snack.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_laro_story
+    text: Kylo's classmates are chasing each other across the yard.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_laro_ask
+    text: Send him over to join them! Say {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_laro_done
+    text: Wonderful! Kylo is playing with his classmates.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tawa_story
+    text: One of Kylo's friends makes the silliest face in the whole school.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tawa_ask
+    text: "Let it out of him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tawa_done
+    text: What a happy sound! Kylo is laughing.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tulong_story
+    text: A smaller child has tripped and dropped everything on the ground.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tulong_ask
+    text: Send Kylo over with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_tulong_done
+    text: So kind! Kylo helped the little one up.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s4_outro
+    text: That was fun, but recess is over. Back to class!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_intro
+    text: Recess is over. There is one more lesson before home time.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_pasok_story
+    text: The classroom door is open, and the afternoon lesson is waiting.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_pasok_ask
+    text: "Take him back inside \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_pasok_done
+    text: Good! Kylo is back in the classroom.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_upo_story
+    text: Kylo's desk is just where he left it before recess.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_upo_ask
+    text: Settle him down with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_upo_done
+    text: Good! Kylo is sitting at his desk again.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_linis_story
+    text: The lesson is over, and there are papers and crayons all over the desk.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_linis_ask
+    text: "Tidy it up with him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_linis_done
+    text: Spotless! Kylo's desk is neat again.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_bag_story
+    text: Kylo's things are tidy, but they still need somewhere to go.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_bag_ask
+    text: "Point him at it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_bag_done
+    text: Good! Everything is packed away safely.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_alis_story
+    text: The last bell has rung, and Nanay is waiting outside the gate.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_alis_ask
+    text: "Set him off for home \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_alis_done
+    text: Great job! Kylo's school day is finished.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s5_outro
+    text: Well done! Kylo has finished his whole school day.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_intro
+    text: School is over, and the park is just down the road.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_lakad_story
+    text: It is a sunny afternoon, and Kylo has nowhere else he needs to be.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_lakad_ask
+    text: "Start him off \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_lakad_done
+    text: Good! Kylo is on his way to the park.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_takbo_story
+    text: Kylo can see the park gate ahead, and he cannot wait any longer.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_takbo_ask
+    text: Speed him up with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_takbo_done
+    text: Wonderful! Kylo is almost at the park.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tingin_story
+    text: Something bright and colourful is moving behind the park fence.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tingin_ask
+    text: "Turn his head that way \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tingin_done
+    text: There it is! Kylo has spotted the playground.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tuwa_story
+    text: "Swings, a slide and a seesaw \u2014 exactly what Kylo was hoping for."
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tuwa_ask
+    text: Let him show it! Say {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_tuwa_done
+    text: Look at that smile! Kylo is full of joy.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_pasok_story
+    text: The park gate is open, and the grass looks soft and green.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_pasok_ask
+    text: "Take him in \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_pasok_done
+    text: Here we are! Kylo is inside the park.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s1_outro
+    text: Kylo is at the park at last. Let's go and play!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_intro
+    text: The playground is busy and the sun is still high.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_akyat_story
+    text: The slide is tall, and its ladder goes all the way up to the top.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_akyat_ask
+    text: "Start him up the ladder \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_akyat_done
+    text: Up he goes! Kylo is at the top of the slide.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_dausdos_story
+    text: Kylo is at the top now, looking down the long shiny slide.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_dausdos_ask
+    text: Send him down with {word}!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_dausdos_done
+    text: Wheee! Kylo slid all the way to the bottom.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_sakay_story
+    text: An empty swing is rocking gently, waiting for somebody to use it.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_sakay_ask
+    text: "Get him on board \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_sakay_done
+    text: Nice! Kylo is sitting on the swing.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_tulak_story
+    text: Kylo is on the swing, but a swing cannot start by itself.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_tulak_ask
+    text: "Give it a shove \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_tulak_done
+    text: Higher and higher! Kylo is swinging.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_talon_story
+    text: The swing is slowing down, and Kylo wants to land in the sand.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_talon_ask
+    text: "Launch him off \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_talon_done
+    text: What a landing! Kylo is safe in the sand.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s2_outro
+    text: Wow! Kylo is having so much fun today.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_intro
+    text: Two children Kylo has never met are playing over by the swings.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_kumusta_story
+    text: The two children look over at Kylo and wave at him.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_kumusta_ask
+    text: "Break the ice for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_kumusta_done
+    text: Lovely! Kylo has said hello to them.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_ngiti_story
+    text: Kylo is a little shy, and his face has gone very serious.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_ngiti_ask
+    text: "Soften his face \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_ngiti_done
+    text: Much better! Kylo's smile makes them smile too.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_tanong_story
+    text: Kylo would like to know their names, but the words are stuck.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_tanong_ask
+    text: "Help him speak up \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_tanong_done
+    text: Well done! Kylo asked them their names.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_laro_story
+    text: His new friends are starting a game of tag, and they want Kylo in it.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_laro_ask
+    text: "Send him over \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_laro_done
+    text: Wonderful! Kylo is playing with his new friends.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_bati_story
+    text: A third child arrives and stands quietly at the edge of the game.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_bati_ask
+    text: "Make him welcome \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_bati_done
+    text: So friendly! Kylo welcomed him into the game.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s3_outro
+    text: New friends already! Playing is hungry work, though.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_intro
+    text: Someone has spread a mat under the big tree, with food in the middle.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_upo_story
+    text: Everyone is finding a place to sit, and there is a gap beside his friends.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_upo_ask
+    text: "Find him a spot \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_upo_done
+    text: Good! Kylo is sitting on the picnic mat.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_kain_story
+    text: There are sandwiches and sliced fruit laid out on the mat.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_kain_ask
+    text: "Let him dig in \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_kain_done
+    text: Yummy! Kylo is enjoying the picnic.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_ibahagi_story
+    text: Kylo has more food than he can finish, and his friends have none.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_ibahagi_ask
+    text: "Be generous for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_ibahagi_done
+    text: How kind! Everyone has something to eat now.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_inom_story
+    text: All that running has made the whole group very thirsty.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_inom_ask
+    text: "Pass him the juice \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_inom_done
+    text: Refreshing! Kylo is not thirsty any more.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_salamat_story
+    text: Kylo's new friends shared their own snacks with him too.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_salamat_ask
+    text: "Mind his manners \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_salamat_done
+    text: Beautiful manners! Kylo thanked his friends.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s4_outro
+    text: Sharing makes snack time even better.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_intro
+    text: The sky is turning orange, and the day at the park is nearly over.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_paalam_story
+    text: Kylo's new friends are picking up their things. It is time to part.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_paalam_ask
+    text: "Send them off kindly \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_paalam_done
+    text: Sweet! Kylo waved his friends goodbye.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_lakad_story
+    text: The park gate is behind Kylo now, and home is down the road.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_lakad_ask
+    text: "Start him homeward \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_lakad_done
+    text: Good! Kylo is walking home.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_tingin_story
+    text: Something is glowing warmly at the far end of the street.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_tingin_ask
+    text: "Turn his head \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_tingin_done
+    text: There it is! Kylo can see his own house.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_pagod_story
+    text: It has been a very long day, and Kylo's legs are getting heavy.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_pagod_ask
+    text: "Let him admit it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_pagod_done
+    text: What a day! Kylo is ready for a rest.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_uwi_story
+    text: Nanay has left the lamp on, and the front door is just ahead.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_uwi_ask
+    text: "Bring him home \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_uwi_done
+    text: Home at last! Kylo had a wonderful day.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_s5_outro
+    text: What a day! Kylo is home safe and happy.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_complete_summary
+    text: You helped Kylo finish his whole morning routine!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_complete_badge
+    text: Bahay Badge Unlocked!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_complete_summary
+    text: Great job! Kylo finished his school day!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_complete_badge
+    text: Paaralan Badge Unlocked!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_complete_summary
+    text: Amazing! Kylo had a wonderful day!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l3_complete_badge
+    text: Parke Badge Unlocked!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_word_bangon_teach
+    text: In Filipino, 'Bangon' means to get up, or to rise from bed.
+    gloss: Get up
+    clip: {fileID: 0}
+  - id: rachel_word_bangon_recall
+    text: Remember, 'Bangon' means to get up.
+    gloss: Get up
+    clip: {fileID: 0}
+  - id: rachel_word_tayo_teach
+    text: The Filipino word 'Tayo' means to stand up.
+    gloss: Stand up
+    clip: {fileID: 0}
+  - id: rachel_word_tayo_recall
+    text: Remember, 'Tayo' means to stand up.
+    gloss: Stand up
+    clip: {fileID: 0}
+  - id: rachel_word_lakad_teach
+    text: In Filipino, 'Lakad' means to walk.
+    gloss: Walk
+    clip: {fileID: 0}
+  - id: rachel_word_lakad_recall
+    text: Remember, 'Lakad' means to walk.
+    gloss: Walk
+    clip: {fileID: 0}
+  - id: rachel_word_kaliwa_teach
+    text: '''Kaliwa'' is the Filipino word for left, the side of your left hand.'
+    gloss: Left
+    clip: {fileID: 0}
+  - id: rachel_word_kaliwa_recall
+    text: Remember, 'Kaliwa' means left.
+    gloss: Left
+    clip: {fileID: 0}
+  - id: rachel_word_kanan_teach
+    text: '''Kanan'' is the Filipino word for right, the other side from kaliwa.'
+    gloss: Right
+    clip: {fileID: 0}
+  - id: rachel_word_kanan_recall
+    text: Remember, 'Kanan' means right.
+    gloss: Right
+    clip: {fileID: 0}
+  - id: rachel_word_bukas_teach
+    text: In Filipino, 'Bukas' means open.
+    gloss: Open
+    clip: {fileID: 0}
+  - id: rachel_word_bukas_recall
+    text: Remember, 'Bukas' means open.
+    gloss: Open
+    clip: {fileID: 0}
+  - id: rachel_word_ilaw_teach
+    text: '''Ilaw'' is the Filipino word for light, the one you switch on.'
+    gloss: Light (turn on)
+    clip: {fileID: 0}
+  - id: rachel_word_ilaw_recall
+    text: Remember, 'Ilaw' means the light.
+    gloss: Light (turn on)
+    clip: {fileID: 0}
+  - id: rachel_word_tabo_teach
+    text: A 'Tabo' is a dipper, the little cup for scooping water at bath time.
+    gloss: Dipper
+    clip: {fileID: 0}
+  - id: rachel_word_tabo_recall
+    text: Remember, a 'Tabo' is the water dipper.
+    gloss: Dipper
+    clip: {fileID: 0}
+  - id: rachel_word_maligo_teach
+    text: In Filipino, 'Maligo' means to take a bath.
+    gloss: Take a bath
+    clip: {fileID: 0}
+  - id: rachel_word_maligo_recall
+    text: Remember, 'Maligo' means to take a bath.
+    gloss: Take a bath
+    clip: {fileID: 0}
+  - id: rachel_word_sabon_teach
+    text: '''Sabon'' is the Filipino word for soap.'
+    gloss: Soap
+    clip: {fileID: 0}
+  - id: rachel_word_sabon_recall
+    text: Remember, 'Sabon' means soap.
+    gloss: Soap
+    clip: {fileID: 0}
+  - id: rachel_word_suklay_teach
+    text: A 'Suklay' is a comb, for making tangled hair neat again.
+    gloss: Comb
+    clip: {fileID: 0}
+  - id: rachel_word_suklay_recall
+    text: Remember, a 'Suklay' is a comb.
+    gloss: Comb
+    clip: {fileID: 0}
+  - id: rachel_word_sipilyo_teach
+    text: '''Sipilyo'' is the Filipino word for a toothbrush.'
+    gloss: Toothbrush
+    clip: {fileID: 0}
+  - id: rachel_word_sipilyo_recall
+    text: Remember, 'Sipilyo' means toothbrush.
+    gloss: Toothbrush
+    clip: {fileID: 0}
+  - id: rachel_word_tuwalya_teach
+    text: A 'Tuwalya' is a towel, the soft cloth you dry yourself with.
+    gloss: Towel
+    clip: {fileID: 0}
+  - id: rachel_word_tuwalya_recall
+    text: Remember, a 'Tuwalya' is a towel.
+    gloss: Towel
+    clip: {fileID: 0}
+  - id: rachel_word_damit_teach
+    text: '''Damit'' is the Filipino word for clothes, like Kylo''s school uniform.'
+    gloss: Clothes / uniform
+    clip: {fileID: 0}
+  - id: rachel_word_damit_recall
+    text: Remember, 'Damit' means clothes.
+    gloss: Clothes / uniform
+    clip: {fileID: 0}
+  - id: rachel_word_medyas_teach
+    text: '''Medyas'' is the Filipino word for socks.'
+    gloss: Socks
+    clip: {fileID: 0}
+  - id: rachel_word_medyas_recall
+    text: Remember, 'Medyas' means socks.
+    gloss: Socks
+    clip: {fileID: 0}
+  - id: rachel_word_sapatos_teach
+    text: '''Sapatos'' is the Filipino word for shoes.'
+    gloss: Shoes
+    clip: {fileID: 0}
+  - id: rachel_word_sapatos_recall
+    text: Remember, 'Sapatos' means shoes.
+    gloss: Shoes
+    clip: {fileID: 0}
+  - id: rachel_word_bag_teach
+    text: '''Bag'' means the same in Filipino as in English: something you carry things in.'
+    gloss: Bag
+    clip: {fileID: 0}
+  - id: rachel_word_bag_recall
+    text: Remember, 'Bag' means bag.
+    gloss: Bag
+    clip: {fileID: 0}
+  - id: rachel_word_kunin_teach
+    text: In Filipino, 'Kunin' means to take something, or to go and get it.
+    gloss: Take / get
+    clip: {fileID: 0}
+  - id: rachel_word_kunin_recall
+    text: Remember, 'Kunin' means to take it.
+    gloss: Take / get
+    clip: {fileID: 0}
+  - id: rachel_word_upo_teach
+    text: In Filipino, 'Upo' means to sit down.
+    gloss: Sit down
+    clip: {fileID: 0}
+  - id: rachel_word_upo_recall
+    text: Remember, 'Upo' means to sit down.
+    gloss: Sit down
+    clip: {fileID: 0}
+  - id: rachel_word_kanin_teach
+    text: '''Kanin'' is the Filipino word for cooked rice.'
+    gloss: Rice
+    clip: {fileID: 0}
+  - id: rachel_word_kanin_recall
+    text: Remember, 'Kanin' means rice.
+    gloss: Rice
+    clip: {fileID: 0}
+  - id: rachel_word_itlog_teach
+    text: '''Itlog'' is the Filipino word for an egg.'
+    gloss: Egg
+    clip: {fileID: 0}
+  - id: rachel_word_itlog_recall
+    text: Remember, 'Itlog' means egg.
+    gloss: Egg
+    clip: {fileID: 0}
+  - id: rachel_word_kain_teach
+    text: In Filipino, 'Kain' means to eat.
+    gloss: Eat
+    clip: {fileID: 0}
+  - id: rachel_word_kain_recall
+    text: Remember, 'Kain' means to eat.
+    gloss: Eat
+    clip: {fileID: 0}
+  - id: rachel_word_inom_teach
+    text: In Filipino, 'Inom' means to drink.
+    gloss: Drink
+    clip: {fileID: 0}
+  - id: rachel_word_inom_recall
+    text: Remember, 'Inom' means to drink.
+    gloss: Drink
+    clip: {fileID: 0}
+  - id: rachel_word_kumusta_teach
+    text: '''Kumusta'' is how you say hello in Filipino, and ask how someone is.'
+    gloss: Hello / how are you
+    clip: {fileID: 0}
+  - id: rachel_word_kumusta_recall
+    text: Remember, 'Kumusta' means hello.
+    gloss: Hello / how are you
+    clip: {fileID: 0}
+  - id: rachel_word_pasok_teach
+    text: In Filipino, 'Pasok' means to go in, or to enter.
+    gloss: Enter
+    clip: {fileID: 0}
+  - id: rachel_word_pasok_recall
+    text: Remember, 'Pasok' means to go in.
+    gloss: Enter
+    clip: {fileID: 0}
+  - id: rachel_word_takbo_teach
+    text: In Filipino, 'Takbo' means to run.
+    gloss: Run
+    clip: {fileID: 0}
+  - id: rachel_word_takbo_recall
+    text: Remember, 'Takbo' means to run.
+    gloss: Run
+    clip: {fileID: 0}
+  - id: rachel_word_kuha_teach
+    text: In Filipino, 'Kuha' means to get something, or to fetch it.
+    gloss: Get / take
+    clip: {fileID: 0}
+  - id: rachel_word_kuha_recall
+    text: Remember, 'Kuha' means to get it.
+    gloss: Get / take
+    clip: {fileID: 0}
+  - id: rachel_word_lapis_teach
+    text: '''Lapis'' is the Filipino word for a pencil.'
+    gloss: Pencil
+    clip: {fileID: 0}
+  - id: rachel_word_lapis_recall
+    text: Remember, 'Lapis' means pencil.
+    gloss: Pencil
+    clip: {fileID: 0}
+  - id: rachel_word_aklat_teach
+    text: '''Aklat'' is the Filipino word for a book.'
+    gloss: Book
+    clip: {fileID: 0}
+  - id: rachel_word_aklat_recall
+    text: Remember, 'Aklat' means book.
+    gloss: Book
+    clip: {fileID: 0}
+  - id: rachel_word_basa_teach
+    text: In Filipino, 'Basa' means to read.
+    gloss: Read
+    clip: {fileID: 0}
+  - id: rachel_word_basa_recall
+    text: Remember, 'Basa' means to read.
+    gloss: Read
+    clip: {fileID: 0}
+  - id: rachel_word_sulat_teach
+    text: In Filipino, 'Sulat' means to write.
+    gloss: Write
+    clip: {fileID: 0}
+  - id: rachel_word_sulat_recall
+    text: Remember, 'Sulat' means to write.
+    gloss: Write
+    clip: {fileID: 0}
+  - id: rachel_word_tanong_teach
+    text: '''Tanong'' is the Filipino word for a question, or to ask one.'
+    gloss: Ask / question
+    clip: {fileID: 0}
+  - id: rachel_word_tanong_recall
+    text: Remember, 'Tanong' means to ask.
+    gloss: Ask / question
+    clip: {fileID: 0}
+  - id: rachel_word_sagot_teach
+    text: '''Sagot'' is the Filipino word for an answer, or to answer.'
+    gloss: Answer
+    clip: {fileID: 0}
+  - id: rachel_word_sagot_recall
+    text: Remember, 'Sagot' means to answer.
+    gloss: Answer
+    clip: {fileID: 0}
+  - id: rachel_word_labas_teach
+    text: In Filipino, 'Labas' means to go outside.
+    gloss: Go outside
+    clip: {fileID: 0}
+  - id: rachel_word_labas_recall
+    text: Remember, 'Labas' means to go outside.
+    gloss: Go outside
+    clip: {fileID: 0}
+  - id: rachel_word_laro_teach
+    text: In Filipino, 'Laro' means to play.
+    gloss: Play
+    clip: {fileID: 0}
+  - id: rachel_word_laro_recall
+    text: Remember, 'Laro' means to play.
+    gloss: Play
+    clip: {fileID: 0}
+  - id: rachel_word_tawa_teach
+    text: In Filipino, 'Tawa' means to laugh.
+    gloss: Laugh
+    clip: {fileID: 0}
+  - id: rachel_word_tawa_recall
+    text: Remember, 'Tawa' means to laugh.
+    gloss: Laugh
+    clip: {fileID: 0}
+  - id: rachel_word_tulong_teach
+    text: '''Tulong'' is the Filipino word for help, or to help someone.'
+    gloss: Help
+    clip: {fileID: 0}
+  - id: rachel_word_tulong_recall
+    text: Remember, 'Tulong' means help.
+    gloss: Help
+    clip: {fileID: 0}
+  - id: rachel_word_linis_teach
+    text: In Filipino, 'Linis' means to clean up, or to tidy.
+    gloss: Clean up
+    clip: {fileID: 0}
+  - id: rachel_word_linis_recall
+    text: Remember, 'Linis' means to clean up.
+    gloss: Clean up
+    clip: {fileID: 0}
+  - id: rachel_word_alis_teach
+    text: In Filipino, 'Alis' means to leave, or to go away from a place.
+    gloss: Leave / go
+    clip: {fileID: 0}
+  - id: rachel_word_alis_recall
+    text: Remember, 'Alis' means to leave.
+    gloss: Leave / go
+    clip: {fileID: 0}
+  - id: rachel_word_paalam_teach
+    text: '''Paalam'' is the Filipino word for goodbye.'
+    gloss: Goodbye
+    clip: {fileID: 0}
+  - id: rachel_word_paalam_recall
+    text: Remember, 'Paalam' means goodbye.
+    gloss: Goodbye
+    clip: {fileID: 0}
+  - id: rachel_word_tingin_teach
+    text: In Filipino, 'Tingin' means to look at something.
+    gloss: Look
+    clip: {fileID: 0}
+  - id: rachel_word_tingin_recall
+    text: Remember, 'Tingin' means to look.
+    gloss: Look
+    clip: {fileID: 0}
+  - id: rachel_word_tuwa_teach
+    text: '''Tuwa'' is the Filipino word for joy, the happy feeling inside you.'
+    gloss: Joy / delight
+    clip: {fileID: 0}
+  - id: rachel_word_tuwa_recall
+    text: Remember, 'Tuwa' means joy.
+    gloss: Joy / delight
+    clip: {fileID: 0}
+  - id: rachel_word_akyat_teach
+    text: In Filipino, 'Akyat' means to climb up.
+    gloss: Climb
+    clip: {fileID: 0}
+  - id: rachel_word_akyat_recall
+    text: Remember, 'Akyat' means to climb.
+    gloss: Climb
+    clip: {fileID: 0}
+  - id: rachel_word_dausdos_teach
+    text: In Filipino, 'Dausdos' means to slide down.
+    gloss: Slide
+    clip: {fileID: 0}
+  - id: rachel_word_dausdos_recall
+    text: Remember, 'Dausdos' means to slide.
+    gloss: Slide
+    clip: {fileID: 0}
+  - id: rachel_word_sakay_teach
+    text: In Filipino, 'Sakay' means to ride, or to get on something.
+    gloss: Ride
+    clip: {fileID: 0}
+  - id: rachel_word_sakay_recall
+    text: Remember, 'Sakay' means to ride.
+    gloss: Ride
+    clip: {fileID: 0}
+  - id: rachel_word_tulak_teach
+    text: In Filipino, 'Tulak' means to push.
+    gloss: Push
+    clip: {fileID: 0}
+  - id: rachel_word_tulak_recall
+    text: Remember, 'Tulak' means to push.
+    gloss: Push
+    clip: {fileID: 0}
+  - id: rachel_word_talon_teach
+    text: In Filipino, 'Talon' means to jump.
+    gloss: Jump
+    clip: {fileID: 0}
+  - id: rachel_word_talon_recall
+    text: Remember, 'Talon' means to jump.
+    gloss: Jump
+    clip: {fileID: 0}
+  - id: rachel_word_ngiti_teach
+    text: In Filipino, 'Ngiti' means to smile.
+    gloss: Smile
+    clip: {fileID: 0}
+  - id: rachel_word_ngiti_recall
+    text: Remember, 'Ngiti' means to smile.
+    gloss: Smile
+    clip: {fileID: 0}
+  - id: rachel_word_bati_teach
+    text: In Filipino, 'Bati' means to greet someone kindly.
+    gloss: Greet
+    clip: {fileID: 0}
+  - id: rachel_word_bati_recall
+    text: Remember, 'Bati' means to greet.
+    gloss: Greet
+    clip: {fileID: 0}
+  - id: rachel_word_ibahagi_teach
+    text: In Filipino, 'Ibahagi' means to share what you have.
+    gloss: Share
+    clip: {fileID: 0}
+  - id: rachel_word_ibahagi_recall
+    text: Remember, 'Ibahagi' means to share.
+    gloss: Share
+    clip: {fileID: 0}
+  - id: rachel_word_salamat_teach
+    text: '''Salamat'' is the Filipino word for thank you.'
+    gloss: Thank you
+    clip: {fileID: 0}
+  - id: rachel_word_salamat_recall
+    text: Remember, 'Salamat' means thank you.
+    gloss: Thank you
+    clip: {fileID: 0}
+  - id: rachel_word_pagod_teach
+    text: In Filipino, 'Pagod' means tired, the way you feel after a long day.
+    gloss: Tired
+    clip: {fileID: 0}
+  - id: rachel_word_pagod_recall
+    text: Remember, 'Pagod' means tired.
+    gloss: Tired
+    clip: {fileID: 0}
+  - id: rachel_word_uwi_teach
+    text: In Filipino, 'Uwi' means to go home.
+    gloss: Go home
+    clip: {fileID: 0}
+  - id: rachel_word_uwi_recall
+    text: Remember, 'Uwi' means to go home.
+    gloss: Go home
+    clip: {fileID: 0}
+  - id: rachel_frame_sabihin
     text: 'Sabihin mo:'
     gloss: 'Say:'
     clip: {fileID: 0}
-  - id: 'rachel_frame_ngayon'
+  - id: rachel_frame_ngayon
     text: 'Ngayon naman, sabihin mo:'
     gloss: 'Now, say:'
     clip: {fileID: 0}
-  - id: 'rachel_frame_ulitin'
+  - id: rachel_frame_ulitin
     text: 'Pakinggan mo ulit:'
     gloss: 'Listen again:'
     clip: {fileID: 0}
-  - id: 'rachel_cue_listening'
-    text: 'Nakikinig ako.'
-    gloss: 'I am listening.'
+  - id: rachel_cue_listening
+    text: Nakikinig ako. I am listening!
+    gloss: I am listening.
     clip: {fileID: 0}
-  - id: 'rachel_hint_pakinggan'
-    text: 'Pakinggan mong mabuti.'
-    gloss: 'Listen carefully.'
+  - id: rachel_hint_pakinggan
+    text: Pakinggan mong mabuti. Listen carefully.
+    gloss: Listen carefully.
     clip: {fileID: 0}
-  - id: 'rachel_hint_replay'
-    text: 'Pindutin ang asul na buton para marinig ulit.'
-    gloss: 'Press the blue button to hear it again.'
+  - id: rachel_hint_replay
+    text: Press the blue button to hear the word again.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_feedback_nothear_1'
-    text: 'Hindi kita narinig. Pakiulit.'
-    gloss: 'I did not hear you. Please repeat.'
+  - id: rachel_nudge_idle
+    text: Kaya mo 'yan! Go on, you can do it.
+    gloss: You can do it!
     clip: {fileID: 0}
-  - id: 'rachel_feedback_nothear_2'
-    text: 'Pakilakasan mo ang boses mo.'
-    gloss: 'Please speak a bit louder.'
+  - id: rachel_mic_blocked
+    text: Press the microphone button so Kylo can hear you.
+    gloss: 
     clip: {fileID: 0}
-  - id: 'rachel_nudge_idle'
-    text: 'Sabihin mo na. Kaya mo yan!'
-    gloss: 'Go on, say it. You can do it!'
+  - id: rachel_feedback_correct_1
+    text: Tama! That's right!
+    gloss: Correct!
     clip: {fileID: 0}
-  - id: 'rachel_mic_blocked'
-    text: 'Pindutin ang mikropono para magsalita.'
-    gloss: 'Press the microphone to speak.'
+  - id: rachel_feedback_correct_2
+    text: Magaling! Well done!
+    gloss: Well done!
     clip: {fileID: 0}
-  - id: 'word_bangon'
-    text: 'Bangon'
-    gloss: 'Get up'
+  - id: rachel_feedback_correct_3
+    text: Ang galing mo! You did it!
+    gloss: Great job!
     clip: {fileID: 0}
-  - id: 'word_tayo'
-    text: 'Tayo'
-    gloss: 'Stand up'
+  - id: rachel_feedback_incorrect_1
+    text: Hindi pa tama. Let's try that one again.
+    gloss: Not quite. Try again.
     clip: {fileID: 0}
-  - id: 'word_lakad'
-    text: 'Lakad'
-    gloss: 'Walk'
+  - id: rachel_feedback_incorrect_2
+    text: Malapit na! You are very close. One more try.
+    gloss: Almost! Say it again.
     clip: {fileID: 0}
-  - id: 'word_kaliwa'
-    text: 'Kaliwa'
-    gloss: 'Left'
+  - id: rachel_feedback_nothear_1
+    text: Hindi kita narinig. I did not hear you - try once more.
+    gloss: I did not hear you.
     clip: {fileID: 0}
-  - id: 'word_kanan'
-    text: 'Kanan'
-    gloss: 'Right'
+  - id: rachel_feedback_nothear_2
+    text: Pakilakasan mo ang boses mo. A little louder, please!
+    gloss: Speak a bit louder.
     clip: {fileID: 0}
-  - id: 'word_bukas'
-    text: 'Bukas'
-    gloss: 'Open'
+  - id: word_bangon
+    text: Bangon
+    gloss: Get up
     clip: {fileID: 0}
-  - id: 'word_ilaw'
-    text: 'Ilaw'
-    gloss: 'Light (turn on)'
+  - id: word_tayo
+    text: Tayo
+    gloss: Stand up
     clip: {fileID: 0}
-  - id: 'word_tabo'
-    text: 'Tabo'
-    gloss: 'Dipper'
+  - id: word_lakad
+    text: Lakad
+    gloss: Walk
     clip: {fileID: 0}
-  - id: 'word_maligo'
-    text: 'Maligo'
-    gloss: 'Take a bath'
+  - id: word_kaliwa
+    text: Kaliwa
+    gloss: Left
     clip: {fileID: 0}
-  - id: 'word_sabon'
-    text: 'Sabon'
-    gloss: 'Soap'
+  - id: word_kanan
+    text: Kanan
+    gloss: Right
     clip: {fileID: 0}
-  - id: 'word_suklay'
-    text: 'Suklay'
-    gloss: 'Comb'
+  - id: word_bukas
+    text: Bukas
+    gloss: Open
     clip: {fileID: 0}
-  - id: 'word_sipilyo'
-    text: 'Sipilyo'
-    gloss: 'Toothbrush'
+  - id: word_ilaw
+    text: Ilaw
+    gloss: Light (turn on)
     clip: {fileID: 0}
-  - id: 'word_tuwalya'
-    text: 'Tuwalya'
-    gloss: 'Towel'
+  - id: word_tabo
+    text: Tabo
+    gloss: Dipper
     clip: {fileID: 0}
-  - id: 'word_damit'
-    text: 'Damit'
-    gloss: 'Clothes / uniform'
+  - id: word_maligo
+    text: Maligo
+    gloss: Take a bath
     clip: {fileID: 0}
-  - id: 'word_medyas'
-    text: 'Medyas'
-    gloss: 'Socks'
+  - id: word_sabon
+    text: Sabon
+    gloss: Soap
     clip: {fileID: 0}
-  - id: 'word_sapatos'
-    text: 'Sapatos'
-    gloss: 'Shoes'
+  - id: word_suklay
+    text: Suklay
+    gloss: Comb
     clip: {fileID: 0}
-  - id: 'word_salamin'
-    text: 'Salamin'
-    gloss: 'Mirror'
+  - id: word_sipilyo
+    text: Sipilyo
+    gloss: Toothbrush
     clip: {fileID: 0}
-  - id: 'word_kunin'
-    text: 'Kunin'
-    gloss: 'Take / get'
+  - id: word_tuwalya
+    text: Tuwalya
+    gloss: Towel
     clip: {fileID: 0}
-  - id: 'word_bag'
-    text: 'Bag'
-    gloss: 'Bag'
+  - id: word_damit
+    text: Damit
+    gloss: Clothes / uniform
     clip: {fileID: 0}
-  - id: 'word_upo'
-    text: 'Upo'
-    gloss: 'Sit down'
+  - id: word_medyas
+    text: Medyas
+    gloss: Socks
     clip: {fileID: 0}
-  - id: 'word_kain'
-    text: 'Kain'
-    gloss: 'Eat'
+  - id: word_sapatos
+    text: Sapatos
+    gloss: Shoes
     clip: {fileID: 0}
-  - id: 'word_inom'
-    text: 'Inom'
-    gloss: 'Drink'
+  - id: word_bag
+    text: Bag
+    gloss: Bag
     clip: {fileID: 0}
-  - id: 'word_kanin'
-    text: 'Kanin'
-    gloss: 'Rice'
+  - id: word_kunin
+    text: Kunin
+    gloss: Take / get
     clip: {fileID: 0}
-  - id: 'word_itlog'
-    text: 'Itlog'
-    gloss: 'Egg'
+  - id: word_upo
+    text: Upo
+    gloss: Sit down
     clip: {fileID: 0}
-  - id: 'word_alis'
-    text: 'Alis'
-    gloss: 'Leave / go'
+  - id: word_kanin
+    text: Kanin
+    gloss: Rice
     clip: {fileID: 0}
-  - id: 'word_paalam'
-    text: 'Paalam'
-    gloss: 'Goodbye'
+  - id: word_itlog
+    text: Itlog
+    gloss: Egg
     clip: {fileID: 0}
-  - id: 'word_tara'
-    text: 'Tara'
-    gloss: 'Let''s go'
+  - id: word_kain
+    text: Kain
+    gloss: Eat
     clip: {fileID: 0}
-  - id: 'word_kumusta'
-    text: 'Kumusta'
-    gloss: 'Hello / how are you'
+  - id: word_inom
+    text: Inom
+    gloss: Drink
     clip: {fileID: 0}
-  - id: 'word_pasok'
-    text: 'Pasok'
-    gloss: 'Enter'
+  - id: word_kumusta
+    text: Kumusta
+    gloss: Hello / how are you
     clip: {fileID: 0}
-  - id: 'word_takbo'
-    text: 'Takbo'
-    gloss: 'Run'
+  - id: word_pasok
+    text: Pasok
+    gloss: Enter
     clip: {fileID: 0}
-  - id: 'word_kuha'
-    text: 'Kuha'
-    gloss: 'Get / take'
+  - id: word_takbo
+    text: Takbo
+    gloss: Run
     clip: {fileID: 0}
-  - id: 'word_lapis'
-    text: 'Lapis'
-    gloss: 'Pencil'
+  - id: word_kuha
+    text: Kuha
+    gloss: Get / take
     clip: {fileID: 0}
-  - id: 'word_aklat'
-    text: 'Aklat'
-    gloss: 'Book'
+  - id: word_lapis
+    text: Lapis
+    gloss: Pencil
     clip: {fileID: 0}
-  - id: 'word_basa'
-    text: 'Basa'
-    gloss: 'Read'
+  - id: word_aklat
+    text: Aklat
+    gloss: Book
     clip: {fileID: 0}
-  - id: 'word_sulat'
-    text: 'Sulat'
-    gloss: 'Write'
+  - id: word_basa
+    text: Basa
+    gloss: Read
     clip: {fileID: 0}
-  - id: 'word_tanong'
-    text: 'Tanong'
-    gloss: 'Ask / question'
+  - id: word_sulat
+    text: Sulat
+    gloss: Write
     clip: {fileID: 0}
-  - id: 'word_sagot'
-    text: 'Sagot'
-    gloss: 'Answer'
+  - id: word_tanong
+    text: Tanong
+    gloss: Ask / question
     clip: {fileID: 0}
-  - id: 'word_labas'
-    text: 'Labas'
-    gloss: 'Go outside'
+  - id: word_sagot
+    text: Sagot
+    gloss: Answer
     clip: {fileID: 0}
-  - id: 'word_laro'
-    text: 'Laro'
-    gloss: 'Play'
+  - id: word_labas
+    text: Labas
+    gloss: Go outside
     clip: {fileID: 0}
-  - id: 'word_tawa'
-    text: 'Tawa'
-    gloss: 'Laugh'
+  - id: word_laro
+    text: Laro
+    gloss: Play
     clip: {fileID: 0}
-  - id: 'word_tulong'
-    text: 'Tulong'
-    gloss: 'Help'
+  - id: word_tawa
+    text: Tawa
+    gloss: Laugh
     clip: {fileID: 0}
-  - id: 'word_linis'
-    text: 'Linis'
-    gloss: 'Clean up'
+  - id: word_tulong
+    text: Tulong
+    gloss: Help
     clip: {fileID: 0}
-  - id: 'word_tingin'
-    text: 'Tingin'
-    gloss: 'Look'
+  - id: word_linis
+    text: Linis
+    gloss: Clean up
     clip: {fileID: 0}
-  - id: 'word_tuwa'
-    text: 'Tuwa'
-    gloss: 'Joy / delight'
+  - id: word_alis
+    text: Alis
+    gloss: Leave / go
     clip: {fileID: 0}
-  - id: 'word_akyat'
-    text: 'Akyat'
-    gloss: 'Climb'
+  - id: word_paalam
+    text: Paalam
+    gloss: Goodbye
     clip: {fileID: 0}
-  - id: 'word_dausdos'
-    text: 'Dausdos'
-    gloss: 'Slide'
+  - id: word_tingin
+    text: Tingin
+    gloss: Look
     clip: {fileID: 0}
-  - id: 'word_sakay'
-    text: 'Sakay'
-    gloss: 'Ride'
+  - id: word_tuwa
+    text: Tuwa
+    gloss: Joy / delight
     clip: {fileID: 0}
-  - id: 'word_tulak'
-    text: 'Tulak'
-    gloss: 'Push'
+  - id: word_akyat
+    text: Akyat
+    gloss: Climb
     clip: {fileID: 0}
-  - id: 'word_talon'
-    text: 'Talon'
-    gloss: 'Jump'
+  - id: word_dausdos
+    text: Dausdos
+    gloss: Slide
     clip: {fileID: 0}
-  - id: 'word_ngiti'
-    text: 'Ngiti'
-    gloss: 'Smile'
+  - id: word_sakay
+    text: Sakay
+    gloss: Ride
     clip: {fileID: 0}
-  - id: 'word_bati'
-    text: 'Bati'
-    gloss: 'Greet'
+  - id: word_tulak
+    text: Tulak
+    gloss: Push
     clip: {fileID: 0}
-  - id: 'word_ibahagi'
-    text: 'Ibahagi'
-    gloss: 'Share'
+  - id: word_talon
+    text: Talon
+    gloss: Jump
     clip: {fileID: 0}
-  - id: 'word_salamat'
-    text: 'Salamat'
-    gloss: 'Thank you'
+  - id: word_ngiti
+    text: Ngiti
+    gloss: Smile
     clip: {fileID: 0}
-  - id: 'word_pagod'
-    text: 'Pagod'
-    gloss: 'Tired'
+  - id: word_bati
+    text: Bati
+    gloss: Greet
     clip: {fileID: 0}
-  - id: 'word_uwi'
-    text: 'Uwi'
-    gloss: 'Go home'
+  - id: word_ibahagi
+    text: Ibahagi
+    gloss: Share
+    clip: {fileID: 0}
+  - id: word_salamat
+    text: Salamat
+    gloss: Thank you
+    clip: {fileID: 0}
+  - id: word_pagod
+    text: Pagod
+    gloss: Tired
+    clip: {fileID: 0}
+  - id: word_uwi
+    text: Uwi
+    gloss: Go home
+    clip: {fileID: 0}
+  - id: rachel_l1_s6_intro
+    text: It's time for school! Help Kylo get to the door and say goodbye to Nanay.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s6_outro
+    text: Great job! Kylo is ready for school. Let's go!
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_bonus
+    text: Can you find the kanin and itlog?
+    gloss: 
+    clip: {fileID: 0}
+  - id: word_tara
+    text: Tara
+    gloss: Let's go
+    clip: {fileID: 0}
+  - id: word_salamin
+    text: Salamin
+    gloss: Mirror
     clip: {fileID: 0}
