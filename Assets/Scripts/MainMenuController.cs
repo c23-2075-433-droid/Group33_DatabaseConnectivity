@@ -165,6 +165,12 @@ public class MainMenuController : MonoBehaviour
         // Blank input is fine - NicknameManager falls back to a default name.
         string nickname = nicknameInput != null ? nicknameInput.text : "";
         NicknameManager.SetNickname(nickname);
+
+        // A fresh run teaches every word from scratch. Without this, someone
+        // who played a level, came back to the menu and started again would
+        // only ever get the short reminders.
+        VocabularyMemory.Reset();
+
         SceneManager.LoadScene(levelSelectSceneName);
     }
 

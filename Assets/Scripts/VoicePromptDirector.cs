@@ -4,6 +4,12 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Decides WHAT Rachel says and WHEN. VoiceNarrator only says it.
 ///
+/// Each word is a beat of Kylo's story rather than an item on a word list:
+/// Rachel says what is happening, what the Filipino word means in English,
+/// then what to say - and once the child says it, what it did and what comes
+/// next. Those are separate lines on purpose, so each becomes its own
+/// subtitle card instead of one paragraph flashing past.
+///
 /// Everything here hangs off events the scene already raises - an objective
 /// going live, an answer being checked, the sequence being paused - so the
 /// rule from the design holds by construction: Rachel speaks at a state
@@ -34,6 +40,11 @@ public class VoicePromptDirector : MonoBehaviour
     [Header("Scene lines")]
     [Tooltip("Play the scene's intro and outro lines (rachel_lX_sY_intro/_outro) when they exist in the voice bank.")]
     public bool speakSceneLines = true;
+
+    [Tooltip("Introduce each word as part of Kylo's story - what is happening, what the word " +
+             "means in English, then what to say - instead of the bare \"Sabihin mo: LAKAD\" " +
+             "frame. Turn this off to hear the original drill-style prompting.")]
+    public bool tellTheStory = true;
 
     [Tooltip("Say \"Nakikinig ako\" before the first word of a scene only. After that the pulsing mic says it without words.")]
     public bool cueListeningOnFirstWord = false;
@@ -100,6 +111,22 @@ public class VoicePromptDirector : MonoBehaviour
 
     // ---- A word goes live -------------------------------------------------
 
+    /// <summary>
+    /// A word has gone up, so Rachel tells its story before asking for it:
+    ///
+    ///   A  what is happening      "Kylo is still sleeping. Time to wake up!"
+    ///   B  what the word means    "In Filipino, 'Bangon' means to get up."
+    ///   C  what to say            "Let's help him up! Say BANGON!"
+    ///
+    /// Three separate lines, so each gets its own subtitle card rather than
+    /// arriving as one paragraph. Nothing is matched until the last of them
+    /// finishes - SceneObjectiveController holds the badge faint and the word
+    /// unset for as long as the narrator is speaking.
+    ///
+    /// B is the full explanation the first time a word comes up and a one-line
+    /// reminder every time after, so meeting Lakad for the fourth time does
+    /// not stop the game to define it again.
+    /// </summary>
     private void HandleObjectiveShown(SceneObjectiveController.SceneObjective objective)
     {
         currentObjective = objective;
@@ -112,7 +139,30 @@ public class VoicePromptDirector : MonoBehaviour
         if (promptsThisScene == 0 && cueListeningOnFirstWord)
             narrator.SpeakLine(NarratorScript.CueListening);
 
-        narrator.SpeakPrompt(objective.word, objective.instructionClip, promptsThisScene > 0);
+        string scene = SceneManager.GetActiveScene().name;
+
+        if (tellTheStory)
+        {
+            narrator.SpeakLine(NarratorScript.StoryId(scene, objective.word));
+            narrator.SpeakLine(VocabularyMemory.HasBeenTaught(objective.word)
+                ? NarratorScript.RecallId(objective.word)
+                : NarratorScript.TeachId(objective.word));
+
+            // Noted now rather than when the word is first said correctly: the
+            // explanation has been played either way, and a child who needed
+            // six tries has heard it six times over.
+            VocabularyMemory.MarkTaught(objective.word);
+
+            // Falls back to the plain "Sabihin mo:" frame on its own when the
+            // script has no instruction written for this word yet.
+            narrator.SpeakAsk(NarratorScript.AskId(scene, objective.word),
+                              objective.word, objective.instructionClip);
+        }
+        else
+        {
+            narrator.SpeakPrompt(objective.word, objective.instructionClip, promptsThisScene > 0);
+        }
+
         promptsThisScene++;
     }
 
@@ -129,9 +179,17 @@ public class VoicePromptDirector : MonoBehaviour
     {
         currentObjective = null;
         ResetSilence();
+        if (narrator == null) return;
 
         // Short on purpose: this plays over Kylo starting to move.
-        if (narrator != null) narrator.SpeakCorrect();
+        narrator.SpeakCorrect();
+
+        // Then what the word actually did, in the story: "Great job! Kylo is
+        // finally awake." Queued here rather than anywhere later because the
+        // controller raises this BEFORE it moves on, so the praise is always
+        // ahead of the next word's story line.
+        if (tellTheStory)
+            narrator.SpeakLine(NarratorScript.DoneId(SceneManager.GetActiveScene().name, word));
     }
 
     private void HandleAnswerChecked(string spokenText, bool wasCorrect)
