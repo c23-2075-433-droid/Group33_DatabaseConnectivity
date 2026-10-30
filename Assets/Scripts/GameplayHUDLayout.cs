@@ -32,6 +32,7 @@ public static class GameplayHUDLayout
         public CanvasGroup narrationFade;
         public Text narrationText;
         public Image rachelPortrait;
+        public RachelPortraitAnimator rachelMouth;
 
         public GameObject wordSign;
         public CanvasGroup wordFade;
@@ -163,6 +164,18 @@ public static class GameplayHUDLayout
         faceRect.anchoredPosition = new Vector2(
             (UITheme.RingCentreX - 0.5f) * NarrationSize.x,
             (0.5f - UITheme.RingCentreY) * NarrationSize.y);
+
+        // Her mouth. The frames are optional in the same way the portrait is -
+        // with none loaded this is a still face, not a missing one. GameplayHUD
+        // hands it the narrator and the panel's fade once it has both.
+        p.rachelMouth = face.AddComponent<RachelPortraitAnimator>();
+        p.rachelMouth.portrait = p.rachelPortrait;
+        p.rachelMouth.idle   = theme != null ? theme.rachelPortrait : null;
+        p.rachelMouth.talk1  = theme != null ? theme.rachelTalk1 : null;
+        p.rachelMouth.talk2  = theme != null ? theme.rachelTalk2 : null;
+        p.rachelMouth.talk3  = theme != null ? theme.rachelTalk3 : null;
+        p.rachelMouth.blink  = theme != null ? theme.rachelBlink : null;
+        p.rachelMouth.visibility = p.narrationFade;
 
         GameObject plaque = Rect(panel.transform, "Plaque",
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));

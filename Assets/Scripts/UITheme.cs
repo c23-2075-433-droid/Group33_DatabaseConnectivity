@@ -60,6 +60,18 @@ public class UITheme : ScriptableObject
              "Optional: with none, the ring frames the room behind it and the panel still reads.")]
     public Sprite rachelPortrait;
 
+    [Tooltip("Her mouth slightly open. Optional: without the three talking frames she simply does not move while she speaks.")]
+    public Sprite rachelTalk1;
+
+    [Tooltip("Her mouth moderately open.")]
+    public Sprite rachelTalk2;
+
+    [Tooltip("Her mouth wide open.")]
+    public Sprite rachelTalk3;
+
+    [Tooltip("Her eyes gently closed. Optional: without it she never blinks between lines.")]
+    public Sprite rachelBlink;
+
     // Where Rachel's face goes inside narrationPanel, as fractions of that
     // sprite. Measured off the art by Tools/cut_hud_assets.py, which prints
     // these three numbers every time it runs - re-cut a redrawn plaque and
