@@ -56,6 +56,12 @@ public class VoiceNarrator : MonoBehaviour
     [Tooltip("Caption text size at the 1920x1080 reference size.")]
     public int captionFontSize = 34;
 
+    [Tooltip("Longest caption put on screen at once. A longer line is broken at sentence ends " +
+             "and shown a sentence at a time, so Rachel's panel never has to shrink the text " +
+             "away or cut its tail off. The script keeps lines under this anyway; this is the " +
+             "safety net for one that slips through.")]
+    public int maxCaptionChars = 110;
+
     /// <summary>
     /// Where captions are drawn. Set by GameplayHUD so Rachel's lines appear in
     /// her own wooden panel; left null the narrator draws its own plain bar
@@ -141,6 +147,13 @@ public class VoiceNarrator : MonoBehaviour
     }
 
     // ---------------------------------------------------------------------
+
+    /// <summary>
+    /// Where a word falls inside an instruction, e.g. "Say {word} to make him
+    /// put on his clothes!". Matches the convention Docs/VoiceOverScript.csv
+    /// uses in its _ask rows.
+    /// </summary>
+    private const string Placeholder = "{word}";
 
     /// <summary>One piece of a line: a clip, its caption text, or both.</summary>
     private struct Part
@@ -257,6 +270,110 @@ public class VoiceNarrator : MonoBehaviour
         AddLine(u, laterInScene ? NarratorScript.FrameSayAgain : NarratorScript.FrameSay);
         AddWord(u, word);
         Enqueue(u);
+    }
+
+    /// <summary>
+    /// The story-based instruction, e.g. "Let's help Kylo get dressed!" +
+    /// "DAMIT" + "to make him put on his clothes!" - one line, three parts,
+    /// one caption.
+    ///
+    /// The line's text carries a {word} placeholder saying where the word
+    /// falls, so an instruction can lead into the word or carry on past it;
+    /// the word itself is still spoken from its own word_&lt;word&gt;.wav, so the
+    /// child hears the Filipino pronounced by the same recording everywhere.
+    ///
+    /// Falls back to the plain "Sabihin mo:" frame when the script has no
+    /// instruction for this word yet, so a half-written CSV still prompts.
+    /// </summary>
+    public void SpeakAsk(string askLineId, string word, AudioClip overrideClip = null)
+    {
+        NarratorLine line = bank != null ? bank.Find(askLineId) : null;
+        AudioClip asked = line != null ? line.clip : null;
+        string text = line != null && !string.IsNullOrEmpty(line.text)
+            ? line.text
+            : NarratorScript.DefaultText(askLineId);
+
+        if (asked == null && string.IsNullOrEmpty(text))
+        {
+            SpeakPrompt(word, overrideClip);
+            return;
+        }
+
+        // The word is always shown in capitals - it is the thing the child has
+        // to read and repeat, so it looks the same here as on the badge.
+        string spelled = string.IsNullOrEmpty(word) ? "" : word.Trim().ToUpperInvariant();
+        string caption = string.IsNullOrEmpty(text) ? spelled : text.Replace(Placeholder, spelled);
+
+        // Recorded, the instruction says the word itself, so it plays whole
+        // rather than being joined to a second copy of the word.
+        if (asked != null)
+        {
+            Utterance whole = new Utterance();
+            whole.parts.Add(MakePart(asked, caption));
+            Enqueue(whole);
+            return;
+        }
+
+        Utterance u = new Utterance();
+        int at = text.IndexOf(Placeholder, System.StringComparison.Ordinal);
+        if (at < 0)
+        {
+            // No placeholder written: the word goes on the end, exactly as the
+            // old "Sabihin mo:" frame did.
+            u.parts.Add(MakePart(null, text));
+            AddAskedWord(u, word, overrideClip, "");
+        }
+        else
+        {
+            string before = text.Substring(0, at).TrimEnd();
+            string after = text.Substring(at + Placeholder.Length).TrimStart();
+
+            // Punctuation straight after the word belongs to the word:
+            // "say TAYO!", not "say TAYO !" with a second of silence for the
+            // exclamation mark.
+            int punctuation = 0;
+            while (punctuation < after.Length && IsTrailingPunctuation(after[punctuation]))
+                punctuation++;
+            string tail = after.Substring(0, punctuation);
+            after = after.Substring(punctuation).TrimStart();
+
+            if (before.Length > 0) u.parts.Add(MakePart(null, before));
+            AddAskedWord(u, word, overrideClip, tail);
+            if (after.Length > 0) u.parts.Add(MakePart(null, after));
+        }
+        Enqueue(u);
+    }
+
+    private static bool IsTrailingPunctuation(char c)
+    {
+        return c == '!' || c == '.' || c == '?' || c == ',' || c == ';' || c == ':';
+    }
+
+    /// <summary>
+    /// The word part of an instruction: the clip the scene baked in if it has
+    /// one, otherwise whatever the bank knows, captioned in capitals with any
+    /// punctuation that followed it in the written line.
+    /// </summary>
+    private void AddAskedWord(Utterance u, string word, AudioClip overrideClip, string suffix)
+    {
+        string spelled = string.IsNullOrEmpty(word) ? "" : word.Trim().ToUpperInvariant();
+        AudioClip clip = overrideClip;
+
+        if (clip == null)
+        {
+            NarratorLine line = bank != null ? bank.Find(NarratorScript.WordId(word)) : null;
+            if (line != null)
+            {
+                clip = line.clip;
+                if (spelled.Length == 0 && !string.IsNullOrEmpty(line.text))
+                    spelled = line.text.Trim().ToUpperInvariant();
+            }
+        }
+
+        if (spelled.Length == 0 && clip != null) spelled = clip.name;
+        if (spelled.Length == 0 && clip == null) return;   // nothing to say
+
+        u.parts.Add(MakePart(clip, spelled + suffix));
     }
 
     /// <summary>
@@ -441,11 +558,21 @@ public class VoiceNarrator : MonoBehaviour
     {
         bool caption = captionMode == CaptionMode.Always ||
                        (captionMode == CaptionMode.WhenNoAudio && !u.IsFullyRecorded);
-        ShowCaption(caption ? u.Caption : null);
+
+        // Normally the whole line sits on screen for as long as it takes to
+        // say - a prompt reads as one sentence, so it should look like one.
+        // Only when that would be too much text at once does the caption
+        // follow the line part by part, and sentence by sentence inside a
+        // part. The panel shrinks text to fit and then truncates it, so a
+        // caption that is too long loses its ending silently.
+        bool perPart = caption && u.Caption.Length > maxCaptionChars;
+        if (!caption) ShowCaption(null);
+        else if (!perPart) ShowCaption(u.Caption);
 
         for (int i = 0; i < u.parts.Count; i++)
         {
             Part part = u.parts[i];
+            float duration;
 
             if (part.clip != null)
             {
@@ -456,14 +583,20 @@ public class VoiceNarrator : MonoBehaviour
                 // Timed rather than polled: a clip can report itself finished
                 // a frame early, and its length is what the pacing was
                 // designed around either way.
-                yield return new WaitForSeconds(part.clip.length / Mathf.Max(0.1f, part.pitch));
-
-                audioSource.Stop();
-                audioSource.pitch = 1f;
+                duration = part.clip.length / Mathf.Max(0.1f, part.pitch);
             }
             else
             {
-                yield return new WaitForSeconds(SilentDuration(part.text));
+                duration = SilentDuration(part.text);
+            }
+
+            if (perPart) yield return HoldCaption(part.text, duration);
+            else yield return new WaitForSeconds(duration);
+
+            if (part.clip != null)
+            {
+                audioSource.Stop();
+                audioSource.pitch = 1f;
             }
 
             if (i < u.parts.Count - 1 && gapBetweenParts > 0f)
@@ -471,6 +604,90 @@ public class VoiceNarrator : MonoBehaviour
         }
 
         ShowCaption(null);
+    }
+
+    /// <summary>
+    /// Shows a part's text for its whole duration, split into sentence-sized
+    /// cards if it is too long for one. Each card gets a share of the time in
+    /// proportion to its length, so the captions stay with the voice.
+    /// </summary>
+    private IEnumerator HoldCaption(string text, float duration)
+    {
+        List<string> cards = SplitCaption(text);
+        if (cards.Count == 0)
+        {
+            ShowCaption(null);
+            yield return new WaitForSeconds(duration);
+            yield break;
+        }
+
+        int total = 0;
+        foreach (string card in cards) total += card.Length;
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            ShowCaption(cards[i]);
+
+            // The last card takes whatever is left, so rounding can never add
+            // up to more than the part's own duration.
+            float share = i == cards.Count - 1
+                ? duration
+                : duration * cards[i].Length / Mathf.Max(1, total);
+            duration -= share;
+
+            yield return new WaitForSeconds(Mathf.Max(0f, share));
+        }
+    }
+
+    /// <summary>
+    /// Breaks a line at sentence ends into pieces that each fit a caption. A
+    /// single sentence longer than the limit is broken at a space rather than
+    /// mid-word.
+    /// </summary>
+    private List<string> SplitCaption(string text)
+    {
+        List<string> cards = new List<string>();
+        if (string.IsNullOrEmpty(text)) return cards;
+
+        string rest = text.Trim();
+        while (rest.Length > maxCaptionChars)
+        {
+            // A card that stops on a full stop reads as a complete thought,
+            // which is the whole point of splitting at all. Failing that,
+            // break on a space rather than through the middle of a word.
+            int cut = LastSentenceEnd(rest, maxCaptionChars);
+            if (cut <= 0) cut = LastSpace(rest, maxCaptionChars);
+            if (cut <= 0) cut = maxCaptionChars;
+
+            string card = rest.Substring(0, cut).Trim();
+            if (card.Length > 0) cards.Add(card);
+            rest = rest.Substring(cut).TrimStart();
+        }
+
+        if (rest.Length > 0) cards.Add(rest);
+        return cards;
+    }
+
+    /// <summary>Index just past the last sentence end at or before limit, or 0 for none.</summary>
+    private static int LastSentenceEnd(string text, int limit)
+    {
+        int max = Mathf.Min(limit, text.Length);
+        for (int i = max - 1; i >= 0; i--)
+        {
+            char c = text[i];
+            if (c != '.' && c != '!' && c != '?') continue;
+            if (i + 1 < text.Length && text[i + 1] != ' ') continue;   // "3.5", not a stop
+            return i + 1;
+        }
+        return 0;
+    }
+
+    /// <summary>Index of the last space at or before limit, or 0 for none.</summary>
+    private static int LastSpace(string text, int limit)
+    {
+        int max = Mathf.Min(limit, text.Length);
+        for (int i = max - 1; i > 0; i--) if (text[i] == ' ') return i;
+        return 0;
     }
 
     /// <summary>How long an unrecorded line is held for - roughly how long it would take to say.</summary>
