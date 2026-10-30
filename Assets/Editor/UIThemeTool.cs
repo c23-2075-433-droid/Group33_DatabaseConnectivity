@@ -66,6 +66,13 @@ public static class UIThemeTool
         // missing portrait is a plainer panel, not a broken one.
         theme.rachelPortrait = Load("char_rachel_portrait");
 
+        // Her talking mouths, and the blink. Load, not Need: the panel is
+        // supposed to survive without them, as a still portrait.
+        theme.rachelTalk1 = Load("char_rachel_talk1");
+        theme.rachelTalk2 = Load("char_rachel_talk2");
+        theme.rachelTalk3 = Load("char_rachel_talk3");
+        theme.rachelBlink = Load("char_rachel_blink");
+
         theme.displayFont = FindFont("Bold");
         theme.bodyFont    = FindFont("Medium") ?? theme.displayFont;
 
@@ -81,6 +88,7 @@ public static class UIThemeTool
                   (theme.rachelPortrait != null
                       ? theme.rachelPortrait.name
                       : "none yet - the ring will frame the room behind it") +
+                  "\n  Her talking frames: " + Mouths(theme) +
                   (missing.Count > 0
                       ? "\n  MISSING: " + string.Join(", ", missing) +
                         "\n  Those panels will draw as plain tinted rectangles. Run " +
@@ -88,6 +96,23 @@ public static class UIThemeTool
                       : "\n  All panel and button art found."));
 
         Selection.activeObject = theme;
+    }
+
+    /// <summary>
+    /// How much of her mouth animation is actually here. Worth printing: a
+    /// still Rachel is a legitimate state, so nothing else would ever say
+    /// that a frame failed to import.
+    /// </summary>
+    private static string Mouths(UITheme theme)
+    {
+        int found = 0;
+        if (theme.rachelTalk1 != null) found++;
+        if (theme.rachelTalk2 != null) found++;
+        if (theme.rachelTalk3 != null) found++;
+
+        if (found == 0) return "none - she will not move while she speaks";
+        return found + " of 3" +
+               (theme.rachelBlink != null ? ", and the blink" : ", no blink");
     }
 
     private static Sprite Need(string file, List<string> missing)
