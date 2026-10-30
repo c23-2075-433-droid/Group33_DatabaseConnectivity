@@ -1,106 +1,435 @@
-File Name,Category,Level,Scene,Speaker,Script / Word,English Gloss,Notes
-rachel_l1_s1_intro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Good morning! Kylo needs to get ready for school. Help him get out of bed and start his morning!",-,Scene intro
-rachel_l1_s1_outro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Great job! Now help Kylo get to the bathroom.",-,Scene transition
-rachel_l1_s2_intro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo needs to get ready before school. Help him find the bathroom and get ready for his morning bath!",-,Scene intro
-rachel_l1_s2_outro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Nice! Kylo is ready for his bath.",-,Scene transition
-rachel_l1_s3_intro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"Kylo needs to get clean before going to school. Help him finish his morning routine!",-,Scene intro
-rachel_l1_s3_outro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"Wonderful! Kylo is all clean and ready to get dressed.",-,Scene transition
-rachel_l1_s4_intro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"It's almost time for school! Help Kylo put on his uniform and prepare his things.",-,Scene intro
-rachel_l1_s4_outro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Perfect! Kylo is dressed and ready. But first, he needs breakfast!",-,Scene transition
-rachel_l1_s5_intro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Before going to school, Kylo needs a good breakfast. Help him eat and drink!",-,Scene intro
-rachel_l1_s5_bonus.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Can you find the kanin and itlog?",-,Bonus tap-vocabulary prompt
-rachel_l1_s5_outro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Yummy! Kylo has finished his breakfast.",-,Scene transition
-rachel_l1_s6_intro.wav,Rachel Line,Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,"It's time for school! Help Kylo get to the door and say goodbye to Nanay.",-,Scene intro
-rachel_l1_s6_outro.wav,Rachel Line,Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,"Great job! Kylo is ready for school. Let's go!",-,Scene transition
-rachel_l1_complete_summary.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,"You helped Kylo finish his morning routine!",-,Level complete
-rachel_l1_complete_badge.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,"Bahay Badge Unlocked!",-,Badge unlock stinger
-rachel_l2_s1_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"Kylo has arrived at school! Help him enter the school and get to class before the bell rings.",-,Scene intro
-rachel_l2_s1_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"You made it! Now let's go to the classroom.",-,Scene transition
-rachel_l2_s2_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Class is about to begin. Help Kylo get ready for his lesson.",-,Scene intro
-rachel_l2_s2_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Everyone is ready. It's time to learn!",-,Scene transition
-rachel_l2_s3_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Now it's Kylo's turn to learn some new Filipino words. Help him participate in class!",-,Scene intro
-rachel_l2_s3_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Excellent! Kylo is learning new words.",-,Scene transition
-rachel_l2_s4_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"It's recess! Help Kylo enjoy his break and make some friends.",-,Scene intro
-rachel_l2_s4_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"That was fun! But recess is over. Let's go back to class.",-,Scene transition
-rachel_l2_s5_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"The school day is almost over. Help Kylo clean up and prepare to go home.",-,Scene intro
-rachel_l2_complete_summary.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,"Great job! Kylo finished his school day!",-,Level complete
-rachel_l2_complete_badge.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,"Paaralan Badge Unlocked!",-,Badge unlock stinger
-rachel_l3_s1_intro.wav,Rachel Line,Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"Kylo wants to relax at the park after school. Help him get there safely!",-,Scene intro
-rachel_l3_s2_intro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"The playground is waiting! Help Kylo enjoy the different activities.",-,Scene intro
-rachel_l3_s2_outro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"Wow! Kylo is having so much fun!",-,Scene transition
-rachel_l3_s3_intro.wav,Rachel Line,Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"Look! Kylo met some new friends. Help him introduce himself and play with them.",-,Scene intro
-rachel_l3_s4_intro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"After playing, Kylo and his new friends are hungry. Help them enjoy their snack together.",-,Scene intro
-rachel_l3_s4_outro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"Sharing makes snack time even better!",-,Scene transition
-rachel_l3_s5_intro.wav,Rachel Line,Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"The day is almost over. Help Kylo say goodbye to his friends and head home.",-,Scene intro
-rachel_l3_complete_summary.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,"Amazing! Kylo had a wonderful day!",-,Level complete
-rachel_l3_complete_badge.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,"Parke Badge Unlocked!",-,Badge unlock stinger
-rachel_feedback_correct_1.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Tama!",Correct!,"Not in original script - needed so every one of the 53 words gets a right-answer cue without recording one per word. Reused everywhere."
-rachel_feedback_correct_2.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Magaling!",Well done!,Reused everywhere - rotate between the 3 correct variants for variety
-rachel_feedback_correct_3.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Ang galing mo!",Great job!,Reused everywhere
-rachel_feedback_incorrect_1.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Hindi pa tama. Subukan mo ulit.","Not quite. Try again.","Wrong-answer cue, 1st miss. Reworded from ""Mali, subukan muli."" - see Docs/VoicePromptingDesign.md 3.4; a bare ""Mali"" is heard often and lands hard on a five-year-old."
-rachel_feedback_incorrect_2.wav,Rachel Line (NEW - recommended),All Levels,Generic Feedback,Teacher Rachel,"Malapit na! Ulitin mo.","Almost! Say it again.","Wrong-answer cue, 3rd miss and after. Reused everywhere - rotate with incorrect_1."
-rachel_frame_sabihin.wav,Rachel Line (NEW - prompting),All Levels,Word Prompt Frame,Teacher Rachel,"Sabihin mo:",Say:,"Played immediately before word_<word>.wav - heard as one sentence (""Sabihin mo: LAKAD""). Default frame, ~80% of prompts. Rising/unfinished intonation so it joins cleanly."
-rachel_frame_ngayon.wav,Rachel Line (NEW - prompting),All Levels,Word Prompt Frame,Teacher Rachel,"Ngayon naman, sabihin mo:","Now, say:","Same join as above. Used for the 2nd and later words in a scene, for variety."
-rachel_frame_ulitin.wav,Rachel Line (NEW - prompting),All Levels,Word Prompt Frame,Teacher Rachel,"Pakinggan mo ulit:",Listen again:,"Same join as above. Used by the replay button and the automatic 2-miss hint."
-rachel_cue_listening.wav,Rachel Line (NEW - prompting),All Levels,Listening State,Teacher Rachel,"Nakikinig ako.",I am listening.,"Optional - first objective of a scene only. After that the pulsing mic icon says it without words."
-rachel_hint_pakinggan.wav,Rachel Line (NEW - prompting),All Levels,Hint,Teacher Rachel,"Pakinggan mong mabuti.",Listen carefully.,"Prefixes the automatic hint after the 2nd miss on the same word."
-rachel_hint_replay.wav,Rachel Line (NEW - prompting),All Levels,Hint,Teacher Rachel,"Pindutin ang asul na buton para marinig ulit.",Press the blue button to hear it again.,"After the 4th miss - points the child at the existing replay button."
-rachel_feedback_nothear_1.wav,Rachel Line (NEW - prompting),All Levels,Recognition Failure,Teacher Rachel,"Hindi kita narinig. Pakiulit.",I did not hear you. Please repeat.,"Nothing recognised (error code or empty result) - distinct from a wrong word, which gets incorrect_1/2."
-rachel_feedback_nothear_2.wav,Rachel Line (NEW - prompting),All Levels,Recognition Failure,Teacher Rachel,"Pakilakasan mo ang boses mo.",Please speak a bit louder.,"Two no-hears in a row."
-rachel_nudge_idle.wav,Rachel Line (NEW - prompting),All Levels,Idle Nudge,Teacher Rachel,"Sabihin mo na. Kaya mo yan!","Go on, say it. You can do it!","After 10 s of silence, once. Then the prompt is replayed every 20 s instead."
-rachel_mic_blocked.wav,Rachel Line (NEW - prompting),All Levels,Microphone State,Teacher Rachel,"Pindutin ang mikropono para magsalita.",Press the microphone to speak.,"Permission denied or recognition unavailable."
-word_bangon.wav,Word,Level 1 - Bahay,Scene 1,-,Bangon,Get up,First taught here
-word_tayo.wav,Word,Level 1 - Bahay,Scene 1,-,Tayo,Stand up,First taught here
-word_lakad.wav,Word,Level 1 - Bahay,Scene 1,-,Lakad,Walk,"First taught here. Reused: L1 S2 & S6, L2 S1, L3 S1 & S5"
-word_kaliwa.wav,Word,Level 1 - Bahay,Scene 2,-,Kaliwa,Left,First taught here
-word_kanan.wav,Word,Level 1 - Bahay,Scene 2,-,Kanan,Right,First taught here
-word_bukas.wav,Word,Level 1 - Bahay,Scene 2,-,Bukas,Open,"First taught here. Reused: L1 S6, L2 S1 & S2"
-word_ilaw.wav,Word,Level 1 - Bahay,Scene 2,-,Ilaw,Light (turn on),First taught here
-word_tabo.wav,Word,Level 1 - Bahay,Scene 2,-,Tabo,Dipper,"First taught here. The blue dipper on the water jar - takes it off the jar when said."
-word_maligo.wav,Word,Level 1 - Bahay,Scene 3,-,Maligo,Take a bath,First taught here
-word_sabon.wav,Word,Level 1 - Bahay,Scene 2,-,Sabon,Soap,"First taught here. Reused: L1 S3"
-word_suklay.wav,Word,Level 1 - Bahay,Scene 3,-,Suklay,Comb,First taught here
-word_sipilyo.wav,Word,Level 1 - Bahay,Scene 2,-,Sipilyo,Toothbrush,"First taught here. Reused: L1 S3"
-word_tuwalya.wav,Word,Level 1 - Bahay,Scene 2,-,Tuwalya,Towel,"First taught here. Reused: L1 S3"
-word_damit.wav,Word,Level 1 - Bahay,Scene 4,-,Damit,Clothes / uniform,First taught here
-word_medyas.wav,Word,Level 1 - Bahay,Scene 4,-,Medyas,Socks,First taught here
-word_sapatos.wav,Word,Level 1 - Bahay,Scene 4,-,Sapatos,Shoes,First taught here
-word_salamin.wav,Word,Level 1 - Bahay,Not placed,-,Salamin,Mirror,"Dropped from Scene 4. The mirror stays in the bedroom as scenery; re-place this word in a later scene if wanted."
-word_kunin.wav,Word,Level 1 - Bahay,Scene 4,-,Kunin,Take / get,"First taught here. Picks the school bag up off the chair; swaps Kylo's art for the set drawn with the bag. Reused: L2 S5"
-word_bag.wav,Word,Level 1 - Bahay,Scene 4,-,Bag,Bag,"First taught here. Reused: L2 S5"
-word_upo.wav,Word,Level 1 - Bahay,Scene 5,-,Upo,Sit down,"First taught here. Reused: L2 S2 & S5, L3 S4"
-word_kain.wav,Word,Level 1 - Bahay,Scene 5,-,Kain,Eat,"First taught here. Reused: L2 S4, L3 S4"
-word_inom.wav,Word,Level 1 - Bahay,Scene 5,-,Inom,Drink,"First taught here. Reused: L3 S4"
-word_kanin.wav,Word (tap target),Level 1 - Bahay,Scene 5 (bonus),-,Kanin,Rice,"Tap-to-select bonus vocabulary, not a spoken command"
-word_itlog.wav,Word (tap target),Level 1 - Bahay,Scene 5 (bonus),-,Itlog,Egg,"Tap-to-select bonus vocabulary, not a spoken command"
-word_alis.wav,Word,Level 1 - Bahay,Scene 6,-,Alis,Leave / go,"First taught here. Reused: L2 S5"
-word_paalam.wav,Word,Level 1 - Bahay,Scene 6,-,Paalam,Goodbye,"First taught here. Reused: L3 S5"
-word_tara.wav,Word,Level 1 - Bahay,Scene 6,-,Tara,Let's go,First taught here
-word_kumusta.wav,Word,Level 2 - Paaralan,Scene 1,-,Kumusta,Hello / how are you,"First taught here. Reused: L2 S2, L3 S3"
-word_pasok.wav,Word,Level 2 - Paaralan,Scene 1,-,Pasok,Enter,"First taught here. Reused: L2 S5, L3 S1"
-word_takbo.wav,Word,Level 2 - Paaralan,Scene 1,-,Takbo,Run,"First taught here. Reused: L3 S1"
-word_kuha.wav,Word,Level 2 - Paaralan,Scene 2,-,Kuha,Get / take,First taught here
-word_lapis.wav,Word,Level 2 - Paaralan,Scene 2,-,Lapis,Pencil,First taught here
-word_aklat.wav,Word,Level 2 - Paaralan,Scene 3,-,Aklat,Book,First taught here
-word_basa.wav,Word,Level 2 - Paaralan,Scene 3,-,Basa,Read,First taught here
-word_sulat.wav,Word,Level 2 - Paaralan,Scene 3,-,Sulat,Write,First taught here
-word_tanong.wav,Word,Level 2 - Paaralan,Scene 3,-,Tanong,Ask / question,"First taught here. Reused: L3 S3"
-word_sagot.wav,Word,Level 2 - Paaralan,Scene 3,-,Sagot,Answer,First taught here
-word_labas.wav,Word,Level 2 - Paaralan,Scene 4,-,Labas,Go outside,First taught here
-word_laro.wav,Word,Level 2 - Paaralan,Scene 4,-,Laro,Play,"First taught here. Reused: L3 S3"
-word_tawa.wav,Word,Level 2 - Paaralan,Scene 4,-,Tawa,Laugh,First taught here
-word_tulong.wav,Word,Level 2 - Paaralan,Scene 4,-,Tulong,Help,First taught here
-word_linis.wav,Word,Level 2 - Paaralan,Scene 5,-,Linis,Clean up,First taught here
-word_tingin.wav,Word,Level 3 - Parke,Scene 1,-,Tingin,Look,"First taught here. Reused: L3 S5"
-word_tuwa.wav,Word,Level 3 - Parke,Scene 1,-,Tuwa,Joy / delight,First taught here
-word_akyat.wav,Word,Level 3 - Parke,Scene 2,-,Akyat,Climb,First taught here
-word_dausdos.wav,Word,Level 3 - Parke,Scene 2,-,Dausdos,Slide,First taught here
-word_sakay.wav,Word,Level 3 - Parke,Scene 2,-,Sakay,Ride,First taught here
-word_tulak.wav,Word,Level 3 - Parke,Scene 2,-,Tulak,Push,First taught here
-word_talon.wav,Word,Level 3 - Parke,Scene 2,-,Talon,Jump,First taught here
-word_ngiti.wav,Word,Level 3 - Parke,Scene 3,-,Ngiti,Smile,First taught here
-word_bati.wav,Word,Level 3 - Parke,Scene 3,-,Bati,Greet,First taught here
-word_ibahagi.wav,Word,Level 3 - Parke,Scene 4,-,Ibahagi,Share,First taught here
-word_salamat.wav,Word,Level 3 - Parke,Scene 4,-,Salamat,Thank you,First taught here
-word_pagod.wav,Word,Level 3 - Parke,Scene 5,-,Pagod,Tired,First taught here
-word_uwi.wav,Word,Level 3 - Parke,Scene 5,-,Uwi,Go home,First taught here
+File Name,Category,Level,Scene,Speaker,Script / Word,English Gloss,Notes,Target Word,Segment,Order
+rachel_l1_s1_intro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"The sun is up over Kylo's house, and a brand new school day is starting.",-,Scene intro,,SceneIntro,0
+rachel_l1_s1_bangon_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Good morning! Kylo is still sleeping. It is time to wake up and start his day!,-,A - what is happening in the story,Bangon,Story,1
+rachel_l1_s1_bangon_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Let's help Kylo out of bed! Say {word} to wake him up!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bangon.wav.",Bangon,Prompt,1
+rachel_l1_s1_bangon_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Great job! Kylo is finally awake.,-,D - praise once the word is recognised,Bangon,Praise,1
+rachel_l1_s1_tayo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Kylo is awake, but he is still sitting on his bed. He needs to stand up first.",-,A - what is happening in the story,Tayo,Story,2
+rachel_l1_s1_tayo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Help Kylo onto his feet — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tayo.wav.",Tayo,Prompt,2
+rachel_l1_s1_tayo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Well done! Kylo is standing beside his bed now.,-,D - praise once the word is recognised,Tayo,Praise,2
+rachel_l1_s1_lakad_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,"Kylo is standing, and the bedroom door is waiting across the room.",-,A - what is happening in the story,Lakad,Story,3
+rachel_l1_s1_lakad_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Send him on his way with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_lakad.wav.",Lakad,Prompt,3
+rachel_l1_s1_lakad_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Excellent! Kylo is walking towards the door.,-,D - praise once the word is recognised,Lakad,Praise,3
+rachel_l1_s1_outro.wav,Rachel Line,Level 1 - Bahay,Scene 1 - Waking Up,Teacher Rachel,Nice work! Kylo is out of bed. Now let's help him get to the bathroom.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l1_s2_intro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo is out of his room, and the hallway stretches away in front of him.",-,Scene intro,,SceneIntro,0
+rachel_l1_s2_lakad_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"The hallway is long and quiet, and the bathroom is at the far end.",-,A - what is happening in the story,Lakad,Story,1
+rachel_l1_s2_lakad_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Start him moving with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_lakad.wav.",Lakad,Prompt,1
+rachel_l1_s2_lakad_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Good! Kylo is walking down the hallway.,-,D - praise once the word is recognised,Lakad,Praise,1
+rachel_l1_s2_kaliwa_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo has stopped. There are doors on both sides, and he is not sure which way.",-,A - what is happening in the story,Kaliwa,Story,2
+rachel_l1_s2_kaliwa_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Point him to the left — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kaliwa.wav.",Kaliwa,Prompt,2
+rachel_l1_s2_kaliwa_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,That's it! Kylo is looking to his left.,-,D - praise once the word is recognised,Kaliwa,Praise,2
+rachel_l1_s2_kanan_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Nothing on the left but Nanay's room. The other side is worth a look.,-,A - what is happening in the story,Kanan,Story,3
+rachel_l1_s2_kanan_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Turn him the other way with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kanan.wav.",Kanan,Prompt,3
+rachel_l1_s2_kanan_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Good eye! The bathroom door is on his right.,-,D - praise once the word is recognised,Kanan,Praise,3
+rachel_l1_s2_bukas_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo has found the bathroom door, but it is shut tight.",-,A - what is happening in the story,Bukas,Story,4
+rachel_l1_s2_bukas_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Let's get that door open! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bukas.wav.",Bukas,Prompt,4
+rachel_l1_s2_bukas_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Wonderful! The door swings open for Kylo.,-,D - praise once the word is recognised,Bukas,Praise,4
+rachel_l1_s2_ilaw_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Inside the bathroom it is still dark, and Kylo cannot see a thing.",-,A - what is happening in the story,Ilaw,Story,5
+rachel_l1_s2_ilaw_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Brighten the room for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_ilaw.wav.",Ilaw,Prompt,5
+rachel_l1_s2_ilaw_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Perfect! The bathroom is bright and warm now.,-,D - praise once the word is recognised,Ilaw,Praise,5
+rachel_l1_s2_tabo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo can see the water jar now, with a blue dipper resting on top.",-,A - what is happening in the story,Tabo,Story,6
+rachel_l1_s2_tabo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Help him lift it down! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tabo.wav.",Tabo,Prompt,6
+rachel_l1_s2_tabo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Nice! Kylo is holding the tabo in his hands.,-,D - praise once the word is recognised,Tabo,Praise,6
+rachel_l1_s2_sabon_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Water alone will not get Kylo clean. He needs something that makes bubbles.,-,A - what is happening in the story,Sabon,Story,7
+rachel_l1_s2_sabon_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Help him reach for it — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sabon.wav.",Sabon,Prompt,7
+rachel_l1_s2_sabon_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Great! Kylo has the soap ready for his bath.,-,D - praise once the word is recognised,Sabon,Praise,7
+rachel_l1_s2_sipilyo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"Kylo's teeth need cleaning too, before breakfast and before school.",-,A - what is happening in the story,Sipilyo,Story,8
+rachel_l1_s2_sipilyo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Hand him the right one by saying {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sipilyo.wav.",Sipilyo,Prompt,8
+rachel_l1_s2_sipilyo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Well done! Kylo is brushing his teeth.,-,D - praise once the word is recognised,Sipilyo,Praise,8
+rachel_l1_s2_tuwalya_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,"When Kylo finishes washing, he will be soaking wet from head to toe.",-,A - what is happening in the story,Tuwalya,Story,9
+rachel_l1_s2_tuwalya_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Get him something to dry with — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tuwalya.wav.",Tuwalya,Prompt,9
+rachel_l1_s2_tuwalya_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Excellent! Kylo has everything he needs now.,-,D - praise once the word is recognised,Tuwalya,Praise,9
+rachel_l1_s2_outro.wav,Rachel Line,Level 1 - Bahay,Scene 2 - Walking to the Bathroom,Teacher Rachel,Everything is ready. Now Kylo can take his bath.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l1_s3_intro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"The bathroom is ready, and so is Kylo.",-,Scene intro,,SceneIntro,0
+rachel_l1_s3_kaliwa_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Kylo is by the door. The water jar is on the other side of the room.,-,A - what is happening in the story,Kaliwa,Story,1
+rachel_l1_s3_kaliwa_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Send him that way with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kaliwa.wav.",Kaliwa,Prompt,1
+rachel_l1_s3_kaliwa_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Good! Kylo has moved over to the water jar.,-,D - praise once the word is recognised,Kaliwa,Praise,1
+rachel_l1_s3_maligo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,The water is cool and the soap is ready. This is Kylo's favourite part.,-,A - what is happening in the story,Maligo,Story,2
+rachel_l1_s3_maligo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Let's get him washing! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_maligo.wav.",Maligo,Prompt,2
+rachel_l1_s3_maligo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Wonderful! Kylo is clean from head to toe.,-,D - praise once the word is recognised,Maligo,Praise,2
+rachel_l1_s3_suklay_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,"Kylo is clean, but his hair is sticking up in every direction.",-,A - what is happening in the story,Suklay,Story,3
+rachel_l1_s3_suklay_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Tidy it up for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_suklay.wav.",Suklay,Prompt,3
+rachel_l1_s3_suklay_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,Very nice! Kylo's hair is neat and smooth.,-,D - praise once the word is recognised,Suklay,Praise,3
+rachel_l1_s3_outro.wav,Rachel Line,Level 1 - Bahay,Scene 3 - Taking a Bath,Teacher Rachel,All clean! Now Kylo needs to get dressed for school.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l1_s4_intro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Kylo is back in his bedroom, dripping wet and wrapped in his towel.",-,Scene intro,,SceneIntro,0
+rachel_l1_s4_damit_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Kylo cannot go to school in his towel. His uniform is folded on the bed.,-,A - what is happening in the story,Damit,Story,1
+rachel_l1_s4_damit_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Help him put them on — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_damit.wav.",Damit,Prompt,1
+rachel_l1_s4_damit_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Wonderful! Kylo is dressed in his school uniform.,-,D - praise once the word is recognised,Damit,Praise,1
+rachel_l1_s4_medyas_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Kylo's feet are still bare, and the bedroom floor is cold.",-,A - what is happening in the story,Medyas,Story,2
+rachel_l1_s4_medyas_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Warm them up for him! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_medyas.wav.",Medyas,Prompt,2
+rachel_l1_s4_medyas_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Nice! Kylo has his socks on.,-,D - praise once the word is recognised,Medyas,Praise,2
+rachel_l1_s4_sapatos_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Socks alone will not do for the long walk to school.,-,A - what is happening in the story,Sapatos,Story,3
+rachel_l1_s4_sapatos_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Finish his feet off with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sapatos.wav.",Sapatos,Prompt,3
+rachel_l1_s4_sapatos_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Great job! Kylo is ready to walk anywhere.,-,D - praise once the word is recognised,Sapatos,Praise,3
+rachel_l1_s4_bag_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Kylo's books are packed and waiting on the chair by the door.,-,A - what is happening in the story,Bag,Story,4
+rachel_l1_s4_bag_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Point him at it — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bag.wav.",Bag,Prompt,4
+rachel_l1_s4_bag_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Good! Kylo has spotted his school bag.,-,D - praise once the word is recognised,Bag,Praise,4
+rachel_l1_s4_kunin_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"The bag is right there, but it will not carry itself.",-,A - what is happening in the story,Kunin,Story,5
+rachel_l1_s4_kunin_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Help him pick it up by saying {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kunin.wav.",Kunin,Prompt,5
+rachel_l1_s4_kunin_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Excellent! Kylo has his bag over his shoulder.,-,D - praise once the word is recognised,Kunin,Praise,5
+rachel_l1_s4_outro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Kylo is dressed and packed. But first, he needs his breakfast!",-,E - transition into the next scene,,SceneOutro,99
+rachel_l1_s5_intro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Nanay has made breakfast, and the whole kitchen smells wonderful.",-,Scene intro,,SceneIntro,0
+rachel_l1_s5_upo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Breakfast is on the table, and Kylo's chair is empty and waiting.",-,A - what is happening in the story,Upo,Story,1
+rachel_l1_s5_upo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Get him settled — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_upo.wav.",Upo,Prompt,1
+rachel_l1_s5_upo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Good! Kylo is sitting at the table.,-,D - praise once the word is recognised,Upo,Praise,1
+rachel_l1_s5_kanin_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,There is a warm white heap on Kylo's plate. Filipino families eat it daily.,-,A - what is happening in the story,Kanin,Story,2
+rachel_l1_s5_kanin_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Name it for Kylo — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kanin.wav.",Kanin,Prompt,2
+rachel_l1_s5_kanin_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,That's right! Kylo's plate is full of rice.,-,D - praise once the word is recognised,Kanin,Praise,2
+rachel_l1_s5_itlog_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Beside the rice is something round, with a sunny yellow middle.",-,A - what is happening in the story,Itlog,Story,3
+rachel_l1_s5_itlog_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Tell Kylo what it is — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_itlog.wav.",Itlog,Prompt,3
+rachel_l1_s5_itlog_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Well done! The egg is Kylo's favourite part.,-,D - praise once the word is recognised,Itlog,Praise,3
+rachel_l1_s5_kain_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Everything is on the plate now, and Kylo's tummy is rumbling.",-,A - what is happening in the story,Kain,Story,4
+rachel_l1_s5_kain_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Let him start his breakfast! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kain.wav.",Kain,Prompt,4
+rachel_l1_s5_kain_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Yummy! Kylo is enjoying every bite.,-,D - praise once the word is recognised,Kain,Praise,4
+rachel_l1_s5_inom_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,All that rice has made Kylo thirsty. There is a glass beside his plate.,-,A - what is happening in the story,Inom,Story,5
+rachel_l1_s5_inom_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Help him finish it off with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_inom.wav.",Inom,Prompt,5
+rachel_l1_s5_inom_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Wonderful! Kylo's breakfast is all done.,-,D - praise once the word is recognised,Inom,Praise,5
+rachel_l1_s5_outro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Breakfast is finished. It is time for Kylo to head off to school!,-,E - transition into the next scene,,SceneOutro,99
+rachel_l2_s1_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Here is Kylo's school! The gate is open and the yard is full of children.,-,Scene intro,,SceneIntro,0
+rachel_l2_s1_kumusta_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,The guard at the gate smiles at Kylo every single morning.,-,A - what is happening in the story,Kumusta,Story,1
+rachel_l2_s1_kumusta_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Greet him back — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kumusta.wav.",Kumusta,Prompt,1
+rachel_l2_s1_kumusta_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Lovely manners! The guard waves Kylo through.,-,D - praise once the word is recognised,Kumusta,Praise,1
+rachel_l2_s1_pasok_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"The gate is open, and the school building is just across the yard.",-,A - what is happening in the story,Pasok,Story,2
+rachel_l2_s1_pasok_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Take him inside with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pasok.wav.",Pasok,Prompt,2
+rachel_l2_s1_pasok_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Good! Kylo is through the gate.,-,D - praise once the word is recognised,Pasok,Praise,2
+rachel_l2_s1_takbo_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"The bell is about to ring, and walking will not be fast enough.",-,A - what is happening in the story,Takbo,Story,3
+rachel_l2_s1_takbo_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Hurry him along — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_takbo.wav.",Takbo,Prompt,3
+rachel_l2_s1_takbo_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Excellent! Kylo made it before the bell.,-,D - praise once the word is recognised,Takbo,Praise,3
+rachel_l2_s1_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,You made it in time! Now let's find Kylo's classroom.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l2_s2_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Kylo is outside his classroom, and Teacher Rachel is already inside.",-,Scene intro,,SceneIntro,0
+rachel_l2_s2_bukas_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"The classroom door is closed, and the lesson is about to begin.",-,A - what is happening in the story,Bukas,Story,1
+rachel_l2_s2_bukas_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Let him in — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bukas.wav.",Bukas,Prompt,1
+rachel_l2_s2_bukas_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Good! The classroom door is open.,-,D - praise once the word is recognised,Bukas,Praise,1
+rachel_l2_s2_kumusta_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Teacher Rachel looks up from her desk and smiles at Kylo.,-,A - what is happening in the story,Kumusta,Story,2
+rachel_l2_s2_kumusta_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Greet Teacher Rachel back — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kumusta.wav.",Kumusta,Prompt,2
+rachel_l2_s2_kumusta_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Very polite! Teacher Rachel smiles back at him.,-,D - praise once the word is recognised,Kumusta,Praise,2
+rachel_l2_s2_upo_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Kylo's desk is near the window, and his classmates are already seated.",-,A - what is happening in the story,Upo,Story,3
+rachel_l2_s2_upo_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Get him into his chair — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_upo.wav.",Upo,Prompt,3
+rachel_l2_s2_upo_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"Good! Kylo is in his seat, ready to learn.",-,D - praise once the word is recognised,Upo,Praise,3
+rachel_l2_s2_kuha_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,"The lesson is starting, and Kylo's desk is completely empty.",-,A - what is happening in the story,Kuha,Story,4
+rachel_l2_s2_kuha_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Reach into the bag for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kuha.wav.",Kuha,Prompt,4
+rachel_l2_s2_kuha_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Nice! Kylo is reaching into his school bag.,-,D - praise once the word is recognised,Kuha,Praise,4
+rachel_l2_s2_lapis_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,There is one thing Kylo needs before he can write anything down.,-,A - what is happening in the story,Lapis,Story,5
+rachel_l2_s2_lapis_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Name it for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_lapis.wav.",Lapis,Prompt,5
+rachel_l2_s2_lapis_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Well done! Kylo has his pencil on the desk.,-,D - praise once the word is recognised,Lapis,Praise,5
+rachel_l2_s2_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 2 - Entering the Classroom,Teacher Rachel,Everyone is ready. It is time for the lesson to begin!,-,E - transition into the next scene,,SceneOutro,99
+rachel_l2_s3_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Teacher Rachel is at the board, and today's lesson is about to start.",-,Scene intro,,SceneIntro,0
+rachel_l2_s3_aklat_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Teacher Rachel asks the class to take something out of their bags.,-,A - what is happening in the story,Aklat,Story,1
+rachel_l2_s3_aklat_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Help Kylo find it — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_aklat.wav.",Aklat,Prompt,1
+rachel_l2_s3_aklat_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Good! Kylo's book is open on his desk.,-,D - praise once the word is recognised,Aklat,Praise,1
+rachel_l2_s3_basa_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"The page is open, and the whole class is following along out loud.",-,A - what is happening in the story,Basa,Story,2
+rachel_l2_s3_basa_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Let Kylo join in — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_basa.wav.",Basa,Prompt,2
+rachel_l2_s3_basa_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Wonderful! Kylo is reading with the class.,-,D - praise once the word is recognised,Basa,Praise,2
+rachel_l2_s3_sulat_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Teacher Rachel writes a new word on the board for everyone to copy.,-,A - what is happening in the story,Sulat,Story,3
+rachel_l2_s3_sulat_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Get his pencil moving with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sulat.wav.",Sulat,Prompt,3
+rachel_l2_s3_sulat_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Excellent! Kylo is writing the word down.,-,D - praise once the word is recognised,Sulat,Praise,3
+rachel_l2_s3_tanong_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,"Kylo does not understand one part, and his hand goes half way up.",-,A - what is happening in the story,Tanong,Story,4
+rachel_l2_s3_tanong_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Give him the courage — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tanong.wav.",Tanong,Prompt,4
+rachel_l2_s3_tanong_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Brave boy! Kylo has asked his question.,-,D - praise once the word is recognised,Tanong,Praise,4
+rachel_l2_s3_sagot_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Teacher Rachel turns to Kylo and waits for him to reply.,-,A - what is happening in the story,Sagot,Story,5
+rachel_l2_s3_sagot_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Help him speak up by saying {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sagot.wav.",Sagot,Prompt,5
+rachel_l2_s3_sagot_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Well done! Kylo gave the right answer.,-,D - praise once the word is recognised,Sagot,Praise,5
+rachel_l2_s3_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 3 - Vocabulary Lesson,Teacher Rachel,Excellent work! Kylo is learning so many new words.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l2_s4_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"The recess bell has rung, and the classroom is emptying fast.",-,Scene intro,,SceneIntro,0
+rachel_l2_s4_labas_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Kylo's classmates are already streaming out into the sunshine.,-,A - what is happening in the story,Labas,Story,1
+rachel_l2_s4_labas_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Let him out into the sun — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_labas.wav.",Labas,Prompt,1
+rachel_l2_s4_labas_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Good! Kylo is out in the school yard.,-,D - praise once the word is recognised,Labas,Praise,1
+rachel_l2_s4_kain_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"Nanay packed Kylo a snack, and it is still sitting in his bag.",-,A - what is happening in the story,Kain,Story,2
+rachel_l2_s4_kain_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Let him start his snack — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kain.wav.",Kain,Prompt,2
+rachel_l2_s4_kain_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Yummy! Kylo has finished his snack.,-,D - praise once the word is recognised,Kain,Praise,2
+rachel_l2_s4_laro_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Kylo's classmates are chasing each other across the yard.,-,A - what is happening in the story,Laro,Story,3
+rachel_l2_s4_laro_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Send him over to join them! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_laro.wav.",Laro,Prompt,3
+rachel_l2_s4_laro_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Wonderful! Kylo is playing with his classmates.,-,D - praise once the word is recognised,Laro,Praise,3
+rachel_l2_s4_tawa_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,One of Kylo's friends makes the silliest face in the whole school.,-,A - what is happening in the story,Tawa,Story,4
+rachel_l2_s4_tawa_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Let it out of him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tawa.wav.",Tawa,Prompt,4
+rachel_l2_s4_tawa_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,What a happy sound! Kylo is laughing.,-,D - praise once the word is recognised,Tawa,Praise,4
+rachel_l2_s4_tulong_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,A smaller child has tripped and dropped everything on the ground.,-,A - what is happening in the story,Tulong,Story,5
+rachel_l2_s4_tulong_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,Send Kylo over with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tulong.wav.",Tulong,Prompt,5
+rachel_l2_s4_tulong_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,So kind! Kylo helped the little one up.,-,D - praise once the word is recognised,Tulong,Praise,5
+rachel_l2_s4_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 4 - Recess,Teacher Rachel,"That was fun, but recess is over. Back to class!",-,E - transition into the next scene,,SceneOutro,99
+rachel_l2_s5_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Recess is over. There is one more lesson before home time.,-,Scene intro,,SceneIntro,0
+rachel_l2_s5_pasok_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"The classroom door is open, and the afternoon lesson is waiting.",-,A - what is happening in the story,Pasok,Story,1
+rachel_l2_s5_pasok_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Take him back inside — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pasok.wav.",Pasok,Prompt,1
+rachel_l2_s5_pasok_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Good! Kylo is back in the classroom.,-,D - praise once the word is recognised,Pasok,Praise,1
+rachel_l2_s5_upo_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Kylo's desk is just where he left it before recess.,-,A - what is happening in the story,Upo,Story,2
+rachel_l2_s5_upo_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Settle him down with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_upo.wav.",Upo,Prompt,2
+rachel_l2_s5_upo_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Good! Kylo is sitting at his desk again.,-,D - praise once the word is recognised,Upo,Praise,2
+rachel_l2_s5_linis_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"The lesson is over, and there are papers and crayons all over the desk.",-,A - what is happening in the story,Linis,Story,3
+rachel_l2_s5_linis_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Tidy it up with him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_linis.wav.",Linis,Prompt,3
+rachel_l2_s5_linis_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Spotless! Kylo's desk is neat again.,-,D - praise once the word is recognised,Linis,Praise,3
+rachel_l2_s5_bag_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"Kylo's things are tidy, but they still need somewhere to go.",-,A - what is happening in the story,Bag,Story,4
+rachel_l2_s5_bag_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Point him at it — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bag.wav.",Bag,Prompt,4
+rachel_l2_s5_bag_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Good! Everything is packed away safely.,-,D - praise once the word is recognised,Bag,Praise,4
+rachel_l2_s5_alis_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,"The last bell has rung, and Nanay is waiting outside the gate.",-,A - what is happening in the story,Alis,Story,5
+rachel_l2_s5_alis_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Set him off for home — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_alis.wav.",Alis,Prompt,5
+rachel_l2_s5_alis_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Great job! Kylo's school day is finished.,-,D - praise once the word is recognised,Alis,Praise,5
+rachel_l2_s5_outro.wav,Rachel Line,Level 2 - Paaralan,Scene 5 - Afternoon Class & Dismissal,Teacher Rachel,Well done! Kylo has finished his whole school day.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l3_s1_intro.wav,Rachel Line,Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"School is over, and the park is just down the road.",-,Scene intro,,SceneIntro,0
+rachel_l3_s1_lakad_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"It is a sunny afternoon, and Kylo has nowhere else he needs to be.",-,A - what is happening in the story,Lakad,Story,1
+rachel_l3_s1_lakad_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Start him off — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_lakad.wav.",Lakad,Prompt,1
+rachel_l3_s1_lakad_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Good! Kylo is on his way to the park.,-,D - praise once the word is recognised,Lakad,Praise,1
+rachel_l3_s1_takbo_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"Kylo can see the park gate ahead, and he cannot wait any longer.",-,A - what is happening in the story,Takbo,Story,2
+rachel_l3_s1_takbo_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Speed him up with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_takbo.wav.",Takbo,Prompt,2
+rachel_l3_s1_takbo_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Wonderful! Kylo is almost at the park.,-,D - praise once the word is recognised,Takbo,Praise,2
+rachel_l3_s1_tingin_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Something bright and colourful is moving behind the park fence.,-,A - what is happening in the story,Tingin,Story,3
+rachel_l3_s1_tingin_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Turn his head that way — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tingin.wav.",Tingin,Prompt,3
+rachel_l3_s1_tingin_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,There it is! Kylo has spotted the playground.,-,D - praise once the word is recognised,Tingin,Praise,3
+rachel_l3_s1_tuwa_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"Swings, a slide and a seesaw — exactly what Kylo was hoping for.",-,A - what is happening in the story,Tuwa,Story,4
+rachel_l3_s1_tuwa_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Let him show it! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tuwa.wav.",Tuwa,Prompt,4
+rachel_l3_s1_tuwa_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Look at that smile! Kylo is full of joy.,-,D - praise once the word is recognised,Tuwa,Praise,4
+rachel_l3_s1_pasok_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,"The park gate is open, and the grass looks soft and green.",-,A - what is happening in the story,Pasok,Story,5
+rachel_l3_s1_pasok_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Take him in — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pasok.wav.",Pasok,Prompt,5
+rachel_l3_s1_pasok_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Here we are! Kylo is inside the park.,-,D - praise once the word is recognised,Pasok,Praise,5
+rachel_l3_s1_outro.wav,Rachel Line,Level 3 - Parke,Scene 1 - Walking to the Park,Teacher Rachel,Kylo is at the park at last. Let's go and play!,-,E - transition into the next scene,,SceneOutro,99
+rachel_l3_s2_intro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,The playground is busy and the sun is still high.,-,Scene intro,,SceneIntro,0
+rachel_l3_s2_akyat_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"The slide is tall, and its ladder goes all the way up to the top.",-,A - what is happening in the story,Akyat,Story,1
+rachel_l3_s2_akyat_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Start him up the ladder — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_akyat.wav.",Akyat,Prompt,1
+rachel_l3_s2_akyat_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Up he goes! Kylo is at the top of the slide.,-,D - praise once the word is recognised,Akyat,Praise,1
+rachel_l3_s2_dausdos_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"Kylo is at the top now, looking down the long shiny slide.",-,A - what is happening in the story,Dausdos,Story,2
+rachel_l3_s2_dausdos_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Send him down with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_dausdos.wav.",Dausdos,Prompt,2
+rachel_l3_s2_dausdos_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Wheee! Kylo slid all the way to the bottom.,-,D - praise once the word is recognised,Dausdos,Praise,2
+rachel_l3_s2_sakay_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"An empty swing is rocking gently, waiting for somebody to use it.",-,A - what is happening in the story,Sakay,Story,3
+rachel_l3_s2_sakay_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Get him on board — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_sakay.wav.",Sakay,Prompt,3
+rachel_l3_s2_sakay_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Nice! Kylo is sitting on the swing.,-,D - praise once the word is recognised,Sakay,Praise,3
+rachel_l3_s2_tulak_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"Kylo is on the swing, but a swing cannot start by itself.",-,A - what is happening in the story,Tulak,Story,4
+rachel_l3_s2_tulak_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Give it a shove — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tulak.wav.",Tulak,Prompt,4
+rachel_l3_s2_tulak_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Higher and higher! Kylo is swinging.,-,D - praise once the word is recognised,Tulak,Praise,4
+rachel_l3_s2_talon_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,"The swing is slowing down, and Kylo wants to land in the sand.",-,A - what is happening in the story,Talon,Story,5
+rachel_l3_s2_talon_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Launch him off — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_talon.wav.",Talon,Prompt,5
+rachel_l3_s2_talon_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,What a landing! Kylo is safe in the sand.,-,D - praise once the word is recognised,Talon,Praise,5
+rachel_l3_s2_outro.wav,Rachel Line,Level 3 - Parke,Scene 2 - Playground,Teacher Rachel,Wow! Kylo is having so much fun today.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l3_s3_intro.wav,Rachel Line,Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Two children Kylo has never met are playing over by the swings.,-,Scene intro,,SceneIntro,0
+rachel_l3_s3_kumusta_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,The two children look over at Kylo and wave at him.,-,A - what is happening in the story,Kumusta,Story,1
+rachel_l3_s3_kumusta_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Break the ice for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kumusta.wav.",Kumusta,Prompt,1
+rachel_l3_s3_kumusta_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Lovely! Kylo has said hello to them.,-,D - praise once the word is recognised,Kumusta,Praise,1
+rachel_l3_s3_ngiti_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"Kylo is a little shy, and his face has gone very serious.",-,A - what is happening in the story,Ngiti,Story,2
+rachel_l3_s3_ngiti_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Soften his face — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_ngiti.wav.",Ngiti,Prompt,2
+rachel_l3_s3_ngiti_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Much better! Kylo's smile makes them smile too.,-,D - praise once the word is recognised,Ngiti,Praise,2
+rachel_l3_s3_tanong_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"Kylo would like to know their names, but the words are stuck.",-,A - what is happening in the story,Tanong,Story,3
+rachel_l3_s3_tanong_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Help him speak up — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tanong.wav.",Tanong,Prompt,3
+rachel_l3_s3_tanong_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Well done! Kylo asked them their names.,-,D - praise once the word is recognised,Tanong,Praise,3
+rachel_l3_s3_laro_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"His new friends are starting a game of tag, and they want Kylo in it.",-,A - what is happening in the story,Laro,Story,4
+rachel_l3_s3_laro_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Send him over — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_laro.wav.",Laro,Prompt,4
+rachel_l3_s3_laro_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Wonderful! Kylo is playing with his new friends.,-,D - praise once the word is recognised,Laro,Praise,4
+rachel_l3_s3_bati_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,A third child arrives and stands quietly at the edge of the game.,-,A - what is happening in the story,Bati,Story,5
+rachel_l3_s3_bati_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,Make him welcome — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bati.wav.",Bati,Prompt,5
+rachel_l3_s3_bati_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,So friendly! Kylo welcomed him into the game.,-,D - praise once the word is recognised,Bati,Praise,5
+rachel_l3_s3_outro.wav,Rachel Line,Level 3 - Parke,Scene 3 - Meeting New Friends,Teacher Rachel,"New friends already! Playing is hungry work, though.",-,E - transition into the next scene,,SceneOutro,99
+rachel_l3_s4_intro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"Someone has spread a mat under the big tree, with food in the middle.",-,Scene intro,,SceneIntro,0
+rachel_l3_s4_upo_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"Everyone is finding a place to sit, and there is a gap beside his friends.",-,A - what is happening in the story,Upo,Story,1
+rachel_l3_s4_upo_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Find him a spot — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_upo.wav.",Upo,Prompt,1
+rachel_l3_s4_upo_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Good! Kylo is sitting on the picnic mat.,-,D - praise once the word is recognised,Upo,Praise,1
+rachel_l3_s4_kain_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,There are sandwiches and sliced fruit laid out on the mat.,-,A - what is happening in the story,Kain,Story,2
+rachel_l3_s4_kain_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Let him dig in — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kain.wav.",Kain,Prompt,2
+rachel_l3_s4_kain_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Yummy! Kylo is enjoying the picnic.,-,D - praise once the word is recognised,Kain,Praise,2
+rachel_l3_s4_ibahagi_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,"Kylo has more food than he can finish, and his friends have none.",-,A - what is happening in the story,Ibahagi,Story,3
+rachel_l3_s4_ibahagi_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Be generous for him — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_ibahagi.wav.",Ibahagi,Prompt,3
+rachel_l3_s4_ibahagi_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,How kind! Everyone has something to eat now.,-,D - praise once the word is recognised,Ibahagi,Praise,3
+rachel_l3_s4_inom_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,All that running has made the whole group very thirsty.,-,A - what is happening in the story,Inom,Story,4
+rachel_l3_s4_inom_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Pass him the juice — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_inom.wav.",Inom,Prompt,4
+rachel_l3_s4_inom_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Refreshing! Kylo is not thirsty any more.,-,D - praise once the word is recognised,Inom,Praise,4
+rachel_l3_s4_salamat_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Kylo's new friends shared their own snacks with him too.,-,A - what is happening in the story,Salamat,Story,5
+rachel_l3_s4_salamat_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Mind his manners — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_salamat.wav.",Salamat,Prompt,5
+rachel_l3_s4_salamat_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Beautiful manners! Kylo thanked his friends.,-,D - praise once the word is recognised,Salamat,Praise,5
+rachel_l3_s4_outro.wav,Rachel Line,Level 3 - Parke,Scene 4 - Picnic,Teacher Rachel,Sharing makes snack time even better.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l3_s5_intro.wav,Rachel Line,Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"The sky is turning orange, and the day at the park is nearly over.",-,Scene intro,,SceneIntro,0
+rachel_l3_s5_paalam_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Kylo's new friends are picking up their things. It is time to part.,-,A - what is happening in the story,Paalam,Story,1
+rachel_l3_s5_paalam_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Send them off kindly — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_paalam.wav.",Paalam,Prompt,1
+rachel_l3_s5_paalam_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Sweet! Kylo waved his friends goodbye.,-,D - praise once the word is recognised,Paalam,Praise,1
+rachel_l3_s5_lakad_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"The park gate is behind Kylo now, and home is down the road.",-,A - what is happening in the story,Lakad,Story,2
+rachel_l3_s5_lakad_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Start him homeward — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_lakad.wav.",Lakad,Prompt,2
+rachel_l3_s5_lakad_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Good! Kylo is walking home.,-,D - praise once the word is recognised,Lakad,Praise,2
+rachel_l3_s5_tingin_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Something is glowing warmly at the far end of the street.,-,A - what is happening in the story,Tingin,Story,3
+rachel_l3_s5_tingin_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Turn his head — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_tingin.wav.",Tingin,Prompt,3
+rachel_l3_s5_tingin_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,There it is! Kylo can see his own house.,-,D - praise once the word is recognised,Tingin,Praise,3
+rachel_l3_s5_pagod_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"It has been a very long day, and Kylo's legs are getting heavy.",-,A - what is happening in the story,Pagod,Story,4
+rachel_l3_s5_pagod_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Let him admit it — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pagod.wav.",Pagod,Prompt,4
+rachel_l3_s5_pagod_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,What a day! Kylo is ready for a rest.,-,D - praise once the word is recognised,Pagod,Praise,4
+rachel_l3_s5_uwi_story.wav,Rachel Line (Story),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,"Nanay has left the lamp on, and the front door is just ahead.",-,A - what is happening in the story,Uwi,Story,5
+rachel_l3_s5_uwi_ask.wav,Rachel Line (Prompt),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Bring him home — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_uwi.wav.",Uwi,Prompt,5
+rachel_l3_s5_uwi_done.wav,Rachel Line (Praise),Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,Home at last! Kylo had a wonderful day.,-,D - praise once the word is recognised,Uwi,Praise,5
+rachel_l3_s5_outro.wav,Rachel Line,Level 3 - Parke,Scene 5 - Heading Home,Teacher Rachel,What a day! Kylo is home safe and happy.,-,E - transition into the next scene,,SceneOutro,99
+rachel_l1_complete_summary.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,You helped Kylo finish his whole morning routine!,-,Level complete,,LevelComplete,0
+rachel_l1_complete_badge.wav,Rachel Line,Level 1 - Bahay,Level Complete,Teacher Rachel,Bahay Badge Unlocked!,-,Badge unlock stinger,,LevelComplete,1
+rachel_l2_complete_summary.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,Great job! Kylo finished his school day!,-,Level complete,,LevelComplete,0
+rachel_l2_complete_badge.wav,Rachel Line,Level 2 - Paaralan,Level Complete,Teacher Rachel,Paaralan Badge Unlocked!,-,Badge unlock stinger,,LevelComplete,1
+rachel_l3_complete_summary.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,Amazing! Kylo had a wonderful day!,-,Level complete,,LevelComplete,0
+rachel_l3_complete_badge.wav,Rachel Line,Level 3 - Parke,Level Complete,Teacher Rachel,Parke Badge Unlocked!,-,Badge unlock stinger,,LevelComplete,1
+rachel_word_bangon_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Bangon' means to get up, or to rise from bed.",Get up,"B - full English meaning, played the first time this word comes up in a session.",Bangon,Teach,0
+rachel_word_bangon_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Bangon' means to get up.",Get up,"B - short reminder, played every time after the first.",Bangon,Recall,0
+rachel_word_tayo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,The Filipino word 'Tayo' means to stand up.,Stand up,"B - full English meaning, played the first time this word comes up in a session.",Tayo,Teach,0
+rachel_word_tayo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tayo' means to stand up.",Stand up,"B - short reminder, played every time after the first.",Tayo,Recall,0
+rachel_word_lakad_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Lakad' means to walk.",Walk,"B - full English meaning, played the first time this word comes up in a session.",Lakad,Teach,0
+rachel_word_lakad_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Lakad' means to walk.",Walk,"B - short reminder, played every time after the first.",Lakad,Recall,0
+rachel_word_kaliwa_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Kaliwa' is the Filipino word for left, the side of your left hand.",Left,"B - full English meaning, played the first time this word comes up in a session.",Kaliwa,Teach,0
+rachel_word_kaliwa_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kaliwa' means left.",Left,"B - short reminder, played every time after the first.",Kaliwa,Recall,0
+rachel_word_kanan_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Kanan' is the Filipino word for right, the other side from kaliwa.",Right,"B - full English meaning, played the first time this word comes up in a session.",Kanan,Teach,0
+rachel_word_kanan_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kanan' means right.",Right,"B - short reminder, played every time after the first.",Kanan,Recall,0
+rachel_word_bukas_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Bukas' means open.",Open,"B - full English meaning, played the first time this word comes up in a session.",Bukas,Teach,0
+rachel_word_bukas_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Bukas' means open.",Open,"B - short reminder, played every time after the first.",Bukas,Recall,0
+rachel_word_ilaw_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Ilaw' is the Filipino word for light, the one you switch on.",Light (turn on),"B - full English meaning, played the first time this word comes up in a session.",Ilaw,Teach,0
+rachel_word_ilaw_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Ilaw' means the light.",Light (turn on),"B - short reminder, played every time after the first.",Ilaw,Recall,0
+rachel_word_tabo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"A 'Tabo' is a dipper, the little cup for scooping water at bath time.",Dipper,"B - full English meaning, played the first time this word comes up in a session.",Tabo,Teach,0
+rachel_word_tabo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, a 'Tabo' is the water dipper.",Dipper,"B - short reminder, played every time after the first.",Tabo,Recall,0
+rachel_word_maligo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Maligo' means to take a bath.",Take a bath,"B - full English meaning, played the first time this word comes up in a session.",Maligo,Teach,0
+rachel_word_maligo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Maligo' means to take a bath.",Take a bath,"B - short reminder, played every time after the first.",Maligo,Recall,0
+rachel_word_sabon_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Sabon' is the Filipino word for soap.,Soap,"B - full English meaning, played the first time this word comes up in a session.",Sabon,Teach,0
+rachel_word_sabon_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sabon' means soap.",Soap,"B - short reminder, played every time after the first.",Sabon,Recall,0
+rachel_word_suklay_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"A 'Suklay' is a comb, for making tangled hair neat again.",Comb,"B - full English meaning, played the first time this word comes up in a session.",Suklay,Teach,0
+rachel_word_suklay_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, a 'Suklay' is a comb.",Comb,"B - short reminder, played every time after the first.",Suklay,Recall,0
+rachel_word_sipilyo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Sipilyo' is the Filipino word for a toothbrush.,Toothbrush,"B - full English meaning, played the first time this word comes up in a session.",Sipilyo,Teach,0
+rachel_word_sipilyo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sipilyo' means toothbrush.",Toothbrush,"B - short reminder, played every time after the first.",Sipilyo,Recall,0
+rachel_word_tuwalya_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"A 'Tuwalya' is a towel, the soft cloth you dry yourself with.",Towel,"B - full English meaning, played the first time this word comes up in a session.",Tuwalya,Teach,0
+rachel_word_tuwalya_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, a 'Tuwalya' is a towel.",Towel,"B - short reminder, played every time after the first.",Tuwalya,Recall,0
+rachel_word_damit_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Damit' is the Filipino word for clothes, like Kylo's school uniform.",Clothes / uniform,"B - full English meaning, played the first time this word comes up in a session.",Damit,Teach,0
+rachel_word_damit_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Damit' means clothes.",Clothes / uniform,"B - short reminder, played every time after the first.",Damit,Recall,0
+rachel_word_medyas_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Medyas' is the Filipino word for socks.,Socks,"B - full English meaning, played the first time this word comes up in a session.",Medyas,Teach,0
+rachel_word_medyas_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Medyas' means socks.",Socks,"B - short reminder, played every time after the first.",Medyas,Recall,0
+rachel_word_sapatos_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Sapatos' is the Filipino word for shoes.,Shoes,"B - full English meaning, played the first time this word comes up in a session.",Sapatos,Teach,0
+rachel_word_sapatos_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sapatos' means shoes.",Shoes,"B - short reminder, played every time after the first.",Sapatos,Recall,0
+rachel_word_bag_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Bag' means the same in Filipino as in English: something you carry things in.,Bag,"B - full English meaning, played the first time this word comes up in a session.",Bag,Teach,0
+rachel_word_bag_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Bag' means bag.",Bag,"B - short reminder, played every time after the first.",Bag,Recall,0
+rachel_word_kunin_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Kunin' means to take something, or to go and get it.",Take / get,"B - full English meaning, played the first time this word comes up in a session.",Kunin,Teach,0
+rachel_word_kunin_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kunin' means to take it.",Take / get,"B - short reminder, played every time after the first.",Kunin,Recall,0
+rachel_word_upo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Upo' means to sit down.",Sit down,"B - full English meaning, played the first time this word comes up in a session.",Upo,Teach,0
+rachel_word_upo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Upo' means to sit down.",Sit down,"B - short reminder, played every time after the first.",Upo,Recall,0
+rachel_word_kanin_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Kanin' is the Filipino word for cooked rice.,Rice,"B - full English meaning, played the first time this word comes up in a session.",Kanin,Teach,0
+rachel_word_kanin_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kanin' means rice.",Rice,"B - short reminder, played every time after the first.",Kanin,Recall,0
+rachel_word_itlog_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Itlog' is the Filipino word for an egg.,Egg,"B - full English meaning, played the first time this word comes up in a session.",Itlog,Teach,0
+rachel_word_itlog_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Itlog' means egg.",Egg,"B - short reminder, played every time after the first.",Itlog,Recall,0
+rachel_word_kain_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Kain' means to eat.",Eat,"B - full English meaning, played the first time this word comes up in a session.",Kain,Teach,0
+rachel_word_kain_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kain' means to eat.",Eat,"B - short reminder, played every time after the first.",Kain,Recall,0
+rachel_word_inom_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Inom' means to drink.",Drink,"B - full English meaning, played the first time this word comes up in a session.",Inom,Teach,0
+rachel_word_inom_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Inom' means to drink.",Drink,"B - short reminder, played every time after the first.",Inom,Recall,0
+rachel_word_kumusta_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Kumusta' is how you say hello in Filipino, and ask how someone is.",Hello / how are you,"B - full English meaning, played the first time this word comes up in a session.",Kumusta,Teach,0
+rachel_word_kumusta_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kumusta' means hello.",Hello / how are you,"B - short reminder, played every time after the first.",Kumusta,Recall,0
+rachel_word_pasok_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Pasok' means to go in, or to enter.",Enter,"B - full English meaning, played the first time this word comes up in a session.",Pasok,Teach,0
+rachel_word_pasok_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Pasok' means to go in.",Enter,"B - short reminder, played every time after the first.",Pasok,Recall,0
+rachel_word_takbo_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Takbo' means to run.",Run,"B - full English meaning, played the first time this word comes up in a session.",Takbo,Teach,0
+rachel_word_takbo_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Takbo' means to run.",Run,"B - short reminder, played every time after the first.",Takbo,Recall,0
+rachel_word_kuha_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Kuha' means to get something, or to fetch it.",Get / take,"B - full English meaning, played the first time this word comes up in a session.",Kuha,Teach,0
+rachel_word_kuha_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Kuha' means to get it.",Get / take,"B - short reminder, played every time after the first.",Kuha,Recall,0
+rachel_word_lapis_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Lapis' is the Filipino word for a pencil.,Pencil,"B - full English meaning, played the first time this word comes up in a session.",Lapis,Teach,0
+rachel_word_lapis_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Lapis' means pencil.",Pencil,"B - short reminder, played every time after the first.",Lapis,Recall,0
+rachel_word_aklat_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Aklat' is the Filipino word for a book.,Book,"B - full English meaning, played the first time this word comes up in a session.",Aklat,Teach,0
+rachel_word_aklat_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Aklat' means book.",Book,"B - short reminder, played every time after the first.",Aklat,Recall,0
+rachel_word_basa_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Basa' means to read.",Read,"B - full English meaning, played the first time this word comes up in a session.",Basa,Teach,0
+rachel_word_basa_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Basa' means to read.",Read,"B - short reminder, played every time after the first.",Basa,Recall,0
+rachel_word_sulat_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Sulat' means to write.",Write,"B - full English meaning, played the first time this word comes up in a session.",Sulat,Teach,0
+rachel_word_sulat_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sulat' means to write.",Write,"B - short reminder, played every time after the first.",Sulat,Recall,0
+rachel_word_tanong_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Tanong' is the Filipino word for a question, or to ask one.",Ask / question,"B - full English meaning, played the first time this word comes up in a session.",Tanong,Teach,0
+rachel_word_tanong_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tanong' means to ask.",Ask / question,"B - short reminder, played every time after the first.",Tanong,Recall,0
+rachel_word_sagot_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Sagot' is the Filipino word for an answer, or to answer.",Answer,"B - full English meaning, played the first time this word comes up in a session.",Sagot,Teach,0
+rachel_word_sagot_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sagot' means to answer.",Answer,"B - short reminder, played every time after the first.",Sagot,Recall,0
+rachel_word_labas_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Labas' means to go outside.",Go outside,"B - full English meaning, played the first time this word comes up in a session.",Labas,Teach,0
+rachel_word_labas_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Labas' means to go outside.",Go outside,"B - short reminder, played every time after the first.",Labas,Recall,0
+rachel_word_laro_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Laro' means to play.",Play,"B - full English meaning, played the first time this word comes up in a session.",Laro,Teach,0
+rachel_word_laro_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Laro' means to play.",Play,"B - short reminder, played every time after the first.",Laro,Recall,0
+rachel_word_tawa_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Tawa' means to laugh.",Laugh,"B - full English meaning, played the first time this word comes up in a session.",Tawa,Teach,0
+rachel_word_tawa_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tawa' means to laugh.",Laugh,"B - short reminder, played every time after the first.",Tawa,Recall,0
+rachel_word_tulong_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Tulong' is the Filipino word for help, or to help someone.",Help,"B - full English meaning, played the first time this word comes up in a session.",Tulong,Teach,0
+rachel_word_tulong_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tulong' means help.",Help,"B - short reminder, played every time after the first.",Tulong,Recall,0
+rachel_word_linis_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Linis' means to clean up, or to tidy.",Clean up,"B - full English meaning, played the first time this word comes up in a session.",Linis,Teach,0
+rachel_word_linis_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Linis' means to clean up.",Clean up,"B - short reminder, played every time after the first.",Linis,Recall,0
+rachel_word_alis_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Alis' means to leave, or to go away from a place.",Leave / go,"B - full English meaning, played the first time this word comes up in a session.",Alis,Teach,0
+rachel_word_alis_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Alis' means to leave.",Leave / go,"B - short reminder, played every time after the first.",Alis,Recall,0
+rachel_word_paalam_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Paalam' is the Filipino word for goodbye.,Goodbye,"B - full English meaning, played the first time this word comes up in a session.",Paalam,Teach,0
+rachel_word_paalam_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Paalam' means goodbye.",Goodbye,"B - short reminder, played every time after the first.",Paalam,Recall,0
+rachel_word_tingin_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Tingin' means to look at something.",Look,"B - full English meaning, played the first time this word comes up in a session.",Tingin,Teach,0
+rachel_word_tingin_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tingin' means to look.",Look,"B - short reminder, played every time after the first.",Tingin,Recall,0
+rachel_word_tuwa_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Tuwa' is the Filipino word for joy, the happy feeling inside you.",Joy / delight,"B - full English meaning, played the first time this word comes up in a session.",Tuwa,Teach,0
+rachel_word_tuwa_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tuwa' means joy.",Joy / delight,"B - short reminder, played every time after the first.",Tuwa,Recall,0
+rachel_word_akyat_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Akyat' means to climb up.",Climb,"B - full English meaning, played the first time this word comes up in a session.",Akyat,Teach,0
+rachel_word_akyat_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Akyat' means to climb.",Climb,"B - short reminder, played every time after the first.",Akyat,Recall,0
+rachel_word_dausdos_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Dausdos' means to slide down.",Slide,"B - full English meaning, played the first time this word comes up in a session.",Dausdos,Teach,0
+rachel_word_dausdos_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Dausdos' means to slide.",Slide,"B - short reminder, played every time after the first.",Dausdos,Recall,0
+rachel_word_sakay_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Sakay' means to ride, or to get on something.",Ride,"B - full English meaning, played the first time this word comes up in a session.",Sakay,Teach,0
+rachel_word_sakay_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Sakay' means to ride.",Ride,"B - short reminder, played every time after the first.",Sakay,Recall,0
+rachel_word_tulak_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Tulak' means to push.",Push,"B - full English meaning, played the first time this word comes up in a session.",Tulak,Teach,0
+rachel_word_tulak_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tulak' means to push.",Push,"B - short reminder, played every time after the first.",Tulak,Recall,0
+rachel_word_talon_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Talon' means to jump.",Jump,"B - full English meaning, played the first time this word comes up in a session.",Talon,Teach,0
+rachel_word_talon_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Talon' means to jump.",Jump,"B - short reminder, played every time after the first.",Talon,Recall,0
+rachel_word_ngiti_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Ngiti' means to smile.",Smile,"B - full English meaning, played the first time this word comes up in a session.",Ngiti,Teach,0
+rachel_word_ngiti_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Ngiti' means to smile.",Smile,"B - short reminder, played every time after the first.",Ngiti,Recall,0
+rachel_word_bati_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Bati' means to greet someone kindly.",Greet,"B - full English meaning, played the first time this word comes up in a session.",Bati,Teach,0
+rachel_word_bati_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Bati' means to greet.",Greet,"B - short reminder, played every time after the first.",Bati,Recall,0
+rachel_word_ibahagi_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Ibahagi' means to share what you have.",Share,"B - full English meaning, played the first time this word comes up in a session.",Ibahagi,Teach,0
+rachel_word_ibahagi_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Ibahagi' means to share.",Share,"B - short reminder, played every time after the first.",Ibahagi,Recall,0
+rachel_word_salamat_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Salamat' is the Filipino word for thank you.,Thank you,"B - full English meaning, played the first time this word comes up in a session.",Salamat,Teach,0
+rachel_word_salamat_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Salamat' means thank you.",Thank you,"B - short reminder, played every time after the first.",Salamat,Recall,0
+rachel_word_pagod_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Pagod' means tired, the way you feel after a long day.",Tired,"B - full English meaning, played the first time this word comes up in a session.",Pagod,Teach,0
+rachel_word_pagod_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Pagod' means tired.",Tired,"B - short reminder, played every time after the first.",Pagod,Recall,0
+rachel_word_uwi_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Uwi' means to go home.",Go home,"B - full English meaning, played the first time this word comes up in a session.",Uwi,Teach,0
+rachel_word_uwi_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Uwi' means to go home.",Go home,"B - short reminder, played every time after the first.",Uwi,Recall,0
+rachel_frame_sabihin.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Sabihin mo:,Say:,"Fallback frame, used only when a scene has no story-based _ask line. Joins straight onto word_<word>.wav.",,Cue,0
+rachel_frame_ngayon.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,"Ngayon naman, sabihin mo:","Now, say:",Fallback frame for the 2nd and later words of a scene. Same join as above.,,Cue,0
+rachel_frame_ulitin.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Pakinggan mo ulit:,Listen again:,Used by the replay button and the automatic 2-miss hint. Same join as above.,,Cue,0
+rachel_cue_listening.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Nakikinig ako. I am listening!,I am listening.,Optional - first objective of a scene only. After that the pulsing mic says it without words.,,Cue,0
+rachel_hint_pakinggan.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Pakinggan mong mabuti. Listen carefully.,Listen carefully.,Prefixes the automatic hint after the 2nd miss on the same word.,,Cue,0
+rachel_hint_replay.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Press the blue button to hear the word again.,-,After the 4th miss - points the child at the existing replay button.,,Cue,0
+rachel_nudge_idle.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,"Kaya mo 'yan! Go on, you can do it.",You can do it!,"After 10 s of silence, once. Then the prompt is replayed every 20 s instead.",,Cue,0
+rachel_mic_blocked.wav,Rachel Line (Prompting),All Levels,Prompting,Teacher Rachel,Press the microphone button so Kylo can hear you.,-,Permission denied or recognition unavailable.,,Cue,0
+rachel_feedback_correct_1.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Tama! That's right!,Correct!,"Right-answer cue. Rotated with the other two, then the scene's own _done line follows.",,Feedback,0
+rachel_feedback_correct_2.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Magaling! Well done!,Well done!,Right-answer cue. Rotated with correct_1 and correct_3.,,Feedback,0
+rachel_feedback_correct_3.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Ang galing mo! You did it!,Great job!,Right-answer cue. Rotated with correct_1 and correct_2.,,Feedback,0
+rachel_feedback_incorrect_1.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Hindi pa tama. Let's try that one again.,Not quite. Try again.,"Wrong-answer cue, 1st miss. A bare ""Mali"" lands hard on a five-year-old - see Docs/VoicePromptingDesign.md.",,Feedback,0
+rachel_feedback_incorrect_2.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Malapit na! You are very close. One more try.,Almost! Say it again.,"Wrong-answer cue, 3rd miss and after. Rotated with incorrect_1.",,Feedback,0
+rachel_feedback_nothear_1.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,Hindi kita narinig. I did not hear you - try once more.,I did not hear you.,"Nothing recognised at all - distinct from a wrong word, which gets incorrect_1/2.",,Feedback,0
+rachel_feedback_nothear_2.wav,Rachel Line (Feedback),All Levels,Generic Feedback,Teacher Rachel,"Pakilakasan mo ang boses mo. A little louder, please!",Speak a bit louder.,Two no-hears in a row.,,Feedback,0
+word_bangon.wav,Word,All Levels,Level 1 Scene 1,-,Bangon,Get up,First taught in Level 1 Scene 1.,Bangon,Word,0
+word_tayo.wav,Word,All Levels,Level 1 Scene 1,-,Tayo,Stand up,First taught in Level 1 Scene 1.,Tayo,Word,0
+word_lakad.wav,Word,All Levels,Level 1 Scene 1,-,Lakad,Walk,First taught in Level 1 Scene 1.,Lakad,Word,0
+word_kaliwa.wav,Word,All Levels,Level 1 Scene 2,-,Kaliwa,Left,First taught in Level 1 Scene 2.,Kaliwa,Word,0
+word_kanan.wav,Word,All Levels,Level 1 Scene 2,-,Kanan,Right,First taught in Level 1 Scene 2.,Kanan,Word,0
+word_bukas.wav,Word,All Levels,Level 1 Scene 2,-,Bukas,Open,First taught in Level 1 Scene 2.,Bukas,Word,0
+word_ilaw.wav,Word,All Levels,Level 1 Scene 2,-,Ilaw,Light (turn on),First taught in Level 1 Scene 2.,Ilaw,Word,0
+word_tabo.wav,Word,All Levels,Level 1 Scene 2,-,Tabo,Dipper,First taught in Level 1 Scene 2.,Tabo,Word,0
+word_maligo.wav,Word,All Levels,Level 1 Scene 3,-,Maligo,Take a bath,First taught in Level 1 Scene 3.,Maligo,Word,0
+word_sabon.wav,Word,All Levels,Level 1 Scene 2,-,Sabon,Soap,First taught in Level 1 Scene 2.,Sabon,Word,0
+word_suklay.wav,Word,All Levels,Level 1 Scene 3,-,Suklay,Comb,First taught in Level 1 Scene 3.,Suklay,Word,0
+word_sipilyo.wav,Word,All Levels,Level 1 Scene 2,-,Sipilyo,Toothbrush,First taught in Level 1 Scene 2.,Sipilyo,Word,0
+word_tuwalya.wav,Word,All Levels,Level 1 Scene 2,-,Tuwalya,Towel,First taught in Level 1 Scene 2.,Tuwalya,Word,0
+word_damit.wav,Word,All Levels,Level 1 Scene 4,-,Damit,Clothes / uniform,First taught in Level 1 Scene 4.,Damit,Word,0
+word_medyas.wav,Word,All Levels,Level 1 Scene 4,-,Medyas,Socks,First taught in Level 1 Scene 4.,Medyas,Word,0
+word_sapatos.wav,Word,All Levels,Level 1 Scene 4,-,Sapatos,Shoes,First taught in Level 1 Scene 4.,Sapatos,Word,0
+word_bag.wav,Word,All Levels,Level 1 Scene 4,-,Bag,Bag,First taught in Level 1 Scene 4.,Bag,Word,0
+word_kunin.wav,Word,All Levels,Level 1 Scene 4,-,Kunin,Take / get,First taught in Level 1 Scene 4.,Kunin,Word,0
+word_upo.wav,Word,All Levels,Level 1 Scene 5,-,Upo,Sit down,First taught in Level 1 Scene 5.,Upo,Word,0
+word_kanin.wav,Word,All Levels,Level 1 Scene 5,-,Kanin,Rice,First taught in Level 1 Scene 5.,Kanin,Word,0
+word_itlog.wav,Word,All Levels,Level 1 Scene 5,-,Itlog,Egg,First taught in Level 1 Scene 5.,Itlog,Word,0
+word_kain.wav,Word,All Levels,Level 1 Scene 5,-,Kain,Eat,First taught in Level 1 Scene 5.,Kain,Word,0
+word_inom.wav,Word,All Levels,Level 1 Scene 5,-,Inom,Drink,First taught in Level 1 Scene 5.,Inom,Word,0
+word_kumusta.wav,Word,All Levels,Level 2 Scene 1,-,Kumusta,Hello / how are you,First taught in Level 2 Scene 1.,Kumusta,Word,0
+word_pasok.wav,Word,All Levels,Level 2 Scene 1,-,Pasok,Enter,First taught in Level 2 Scene 1.,Pasok,Word,0
+word_takbo.wav,Word,All Levels,Level 2 Scene 1,-,Takbo,Run,First taught in Level 2 Scene 1.,Takbo,Word,0
+word_kuha.wav,Word,All Levels,Level 2 Scene 2,-,Kuha,Get / take,First taught in Level 2 Scene 2.,Kuha,Word,0
+word_lapis.wav,Word,All Levels,Level 2 Scene 2,-,Lapis,Pencil,First taught in Level 2 Scene 2.,Lapis,Word,0
+word_aklat.wav,Word,All Levels,Level 2 Scene 3,-,Aklat,Book,First taught in Level 2 Scene 3.,Aklat,Word,0
+word_basa.wav,Word,All Levels,Level 2 Scene 3,-,Basa,Read,First taught in Level 2 Scene 3.,Basa,Word,0
+word_sulat.wav,Word,All Levels,Level 2 Scene 3,-,Sulat,Write,First taught in Level 2 Scene 3.,Sulat,Word,0
+word_tanong.wav,Word,All Levels,Level 2 Scene 3,-,Tanong,Ask / question,First taught in Level 2 Scene 3.,Tanong,Word,0
+word_sagot.wav,Word,All Levels,Level 2 Scene 3,-,Sagot,Answer,First taught in Level 2 Scene 3.,Sagot,Word,0
+word_labas.wav,Word,All Levels,Level 2 Scene 4,-,Labas,Go outside,First taught in Level 2 Scene 4.,Labas,Word,0
+word_laro.wav,Word,All Levels,Level 2 Scene 4,-,Laro,Play,First taught in Level 2 Scene 4.,Laro,Word,0
+word_tawa.wav,Word,All Levels,Level 2 Scene 4,-,Tawa,Laugh,First taught in Level 2 Scene 4.,Tawa,Word,0
+word_tulong.wav,Word,All Levels,Level 2 Scene 4,-,Tulong,Help,First taught in Level 2 Scene 4.,Tulong,Word,0
+word_linis.wav,Word,All Levels,Level 2 Scene 5,-,Linis,Clean up,First taught in Level 2 Scene 5.,Linis,Word,0
+word_alis.wav,Word,All Levels,Level 2 Scene 5,-,Alis,Leave / go,First taught in Level 2 Scene 5.,Alis,Word,0
+word_paalam.wav,Word,All Levels,Level 3 Scene 5,-,Paalam,Goodbye,First taught in Level 3 Scene 5.,Paalam,Word,0
+word_tingin.wav,Word,All Levels,Level 3 Scene 1,-,Tingin,Look,First taught in Level 3 Scene 1.,Tingin,Word,0
+word_tuwa.wav,Word,All Levels,Level 3 Scene 1,-,Tuwa,Joy / delight,First taught in Level 3 Scene 1.,Tuwa,Word,0
+word_akyat.wav,Word,All Levels,Level 3 Scene 2,-,Akyat,Climb,First taught in Level 3 Scene 2.,Akyat,Word,0
+word_dausdos.wav,Word,All Levels,Level 3 Scene 2,-,Dausdos,Slide,First taught in Level 3 Scene 2.,Dausdos,Word,0
+word_sakay.wav,Word,All Levels,Level 3 Scene 2,-,Sakay,Ride,First taught in Level 3 Scene 2.,Sakay,Word,0
+word_tulak.wav,Word,All Levels,Level 3 Scene 2,-,Tulak,Push,First taught in Level 3 Scene 2.,Tulak,Word,0
+word_talon.wav,Word,All Levels,Level 3 Scene 2,-,Talon,Jump,First taught in Level 3 Scene 2.,Talon,Word,0
+word_ngiti.wav,Word,All Levels,Level 3 Scene 3,-,Ngiti,Smile,First taught in Level 3 Scene 3.,Ngiti,Word,0
+word_bati.wav,Word,All Levels,Level 3 Scene 3,-,Bati,Greet,First taught in Level 3 Scene 3.,Bati,Word,0
+word_ibahagi.wav,Word,All Levels,Level 3 Scene 4,-,Ibahagi,Share,First taught in Level 3 Scene 4.,Ibahagi,Word,0
+word_salamat.wav,Word,All Levels,Level 3 Scene 4,-,Salamat,Thank you,First taught in Level 3 Scene 4.,Salamat,Word,0
+word_pagod.wav,Word,All Levels,Level 3 Scene 5,-,Pagod,Tired,First taught in Level 3 Scene 5.,Pagod,Word,0
+word_uwi.wav,Word,All Levels,Level 3 Scene 5,-,Uwi,Go home,First taught in Level 3 Scene 5.,Uwi,Word,0
+rachel_l1_s6_intro.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,It's time for school! Help Kylo get to the door and say goodbye to Nanay.,-,UNUSED - Scene 6 was never built. Alis is used in Chapter2_Level5_Uwian instead.,,Unused,0
+rachel_l1_s6_outro.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,Great job! Kylo is ready for school. Let's go!,-,UNUSED - Scene 6 was never built.,,Unused,0
+rachel_l1_s5_bonus.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Can you find the kanin and itlog?,-,"UNUSED - Kanin and Itlog became spoken objectives in Chapter1_Level5_Almusal, not tap targets.",,Unused,0
+word_tara.wav,Word (Unused),-,Not placed,-,Tara,Let's go,UNUSED - scripted for the unbuilt Scene 6; no scene asks for it.,Tara,Unused,0
+word_salamin.wav,Word (Unused),-,Not placed,-,Salamin,Mirror,UNUSED - dropped from Scene 4. The mirror stays in the bedroom as scenery.,Salamin,Unused,0
