@@ -99,6 +99,10 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         theme = UITheme.Load();
         BuildCanvas();
 
+        // Rachel's mouth lip-syncs to the same narrator this HUD polls, handed
+        // over rather than looked up - see RachelPortraitAnimator.narrator.
+        if (ui.rachelMouth != null) ui.rachelMouth.narrator = narrator;
+
         status = new VoiceStatusMachine
         {
             feedbackHold = feedbackHold,

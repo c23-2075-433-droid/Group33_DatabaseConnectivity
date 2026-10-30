@@ -251,6 +251,48 @@ light is on: saying one takes that object off the shelf or wall, through
 the on-screen prompt carries them. Suklay and Baso stay as scenery — combing
 belongs with getting dressed in Scene 4.
 
+## Teacher Rachel's Portrait
+
+Rachel is the voice of the game, and the branch ring on the narration plaque
+is where the child sees her. The art in that ring is five drawings of one
+character - a resting face, three mouth shapes and a blink - generated in
+Canva from a single approved portrait, which every later frame was drawn
+against so that only her mouth changes between them.
+
+| Sprite | Frame |
+|---|---|
+| `char_rachel_portrait.png` | Mouth closed, eyes open. What she wears between lines. |
+| `char_rachel_talk1.png` | Mouth slightly open. |
+| `char_rachel_talk2.png` | Mouth moderately open. |
+| `char_rachel_talk3.png` | Mouth wide open. |
+| `char_rachel_blink.png` | Eyes gently closed. |
+
+The raw generations are kept in `Art/char_rachel_*_raw.png` exactly as they
+arrived. [`Tools/make_rachel_frames.py`](Tools/make_rachel_frames.py) turns
+them into the sprites: it cuts the flat background away, seats her in the
+ring using one placement measured off the resting frame, and then REGISTERS
+every other frame onto that one by matching silhouette area and centroid.
+That last step is the whole point of the script. Five separately generated
+images are five slightly different drawings, and at nine frames a second a
+head that wanders two pixels does not read as talking - it reads as a glitch.
+
+Like [`cut_rachel_portrait.py`](Tools/cut_rachel_portrait.py) before it, the
+script writes each frame on the RING'S OWN SQUARE rather than cropping to
+her, so `UITheme`'s `RingCentreX` / `RingCentreY` / `RingDiameter` place her
+with no further measuring, and stops the cut just inside the circle where the
+branch covers the seam.
+
+[`RachelPortraitAnimator`](Assets/Scripts/RachelPortraitAnimator.cs) plays
+them. It swaps the sprite in the ring on a cycle while `VoiceNarrator` reports
+`IsSpeaking`, and shows the resting frame the rest of the time - driven by the
+narrator's own state rather than a duration, so a line cut off by the back
+button stops her mouth with it. There is no Animator Controller: the HUD is
+built at run time, so there is no GameObject for one to live on.
+
+The frames are optional. With none of them loaded she is the still portrait
+she always was, which is why **Tools > SALINLAHI > Refresh UI Theme** loads
+them without reporting them missing - it prints how many it found instead.
+
 ## Security Notes
 
 - `Assets/Resources/SupabaseConfig.asset` is **git-ignored**; no keys are
