@@ -60,8 +60,10 @@ public class RachelPortraitAnimator : MonoBehaviour
     [Tooltip("How long one blink lasts.")]
     public float blinkSeconds = 0.09f;
 
-    [Tooltip("Shortest and longest wait between blinks, while she is listening rather than talking.")]
-    public Vector2 blinkEvery = new Vector2(3f, 6f);
+    [Tooltip("Shortest and longest wait between blinks, while she is listening rather than talking. " +
+             "Her panel is only on screen around her lines, and the quiet between two of them runs " +
+             "about two seconds - so a window much wider than this means she never blinks at all.")]
+    public Vector2 blinkEvery = new Vector2(1.5f, 4f);
 
     /// <summary>
     /// The voice she is lip-syncing to. Handed over by GameplayHUD, which
