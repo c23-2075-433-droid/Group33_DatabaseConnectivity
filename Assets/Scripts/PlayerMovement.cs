@@ -379,6 +379,12 @@ public class PlayerMovement : MonoBehaviour
         {
             walkFrameTimer -= frameDuration;
             currentWalkFrame++;
+
+            // A footfall every OTHER frame. The art is a four-frame cycle with
+            // two strides in it, so stepping on every frame gives a child who
+            // walks for 1.2 seconds about ten footsteps instead of five, and
+            // it reads as scurrying rather than walking.
+            if (currentWalkFrame % 2 == 0) SoundEffects.Footstep();
         }
 
         if (hasFullWalkCycle)
