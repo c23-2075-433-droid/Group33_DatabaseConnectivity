@@ -17,16 +17,25 @@ using UnityEngine;
 /// has an AudioSettings, and a second one in the global namespace would be
 /// ambiguous in every file that says "using UnityEngine".
 ///
-/// Two channels, because the game has two things that make sound: everything
-/// (the AudioListener) and Teacher Rachel. There is no music and no sound
-/// effects in the project yet; when there are, they want an AudioMixer with a
-/// group per category, and the sliders for them belong here beside these.
+/// Three channels now: everything (the AudioListener), Teacher Rachel, and
+/// the background music.
+///
+/// This file used to say that music, when it arrived, would want an
+/// AudioMixer with a group per category. It does not yet, and the reason is
+/// worth recording rather than quietly ignoring. Narration is applied
+/// straight to the narrator's own AudioSource, and music is applied the same
+/// way to MusicPlayer's - two sources, two multiplies, no routing. A mixer
+/// would mean re-routing VoiceNarrator for no gain today, and there is no
+/// mixer anywhere in the project to be consistent with. When sound effects
+/// arrive and there are four categories fighting over one output, that is the
+/// change to make.
 /// </summary>
 public static class VolumeSettings
 {
     private const string MasterKey    = "SALINLAHI_MasterVolume";
     private const string MutedKey     = "SALINLAHI_Muted";
     private const string NarrationKey = "SALINLAHI_NarrationVolume";
+    private const string MusicKey     = "SALINLAHI_MusicVolume";
 
     /// <summary>Everything the game plays. 0..1.</summary>
     public static float Master
@@ -47,6 +56,24 @@ public static class VolumeSettings
         set
         {
             PlayerPrefs.SetFloat(NarrationKey, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+            Apply();
+        }
+    }
+
+    /// <summary>
+    /// The background music, on top of Master. 0..1.
+    ///
+    /// Defaults to 0.6 rather than 1: music is a bed under Rachel and under a
+    /// child who is about to be listened to, and a soundtrack that arrives at
+    /// full volume on first run is one the player turns off rather than down.
+    /// </summary>
+    public static float Music
+    {
+        get => Mathf.Clamp01(PlayerPrefs.GetFloat(MusicKey, 0.6f));
+        set
+        {
+            PlayerPrefs.SetFloat(MusicKey, Mathf.Clamp01(value));
             PlayerPrefs.Save();
             Apply();
         }
@@ -78,5 +105,9 @@ public static class VolumeSettings
 
         VoiceNarrator narrator = Object.FindFirstObjectByType<VoiceNarrator>();
         if (narrator != null) narrator.ApplyNarrationVolume();
+
+        // Not FindFirstObjectByType: the music player outlives the scene, and
+        // its own static handle is both cheaper and correct across a load.
+        if (MusicPlayer.Instance != null) MusicPlayer.Instance.ApplyMusicVolume();
     }
 }
