@@ -17,8 +17,8 @@ using UnityEngine;
 /// has an AudioSettings, and a second one in the global namespace would be
 /// ambiguous in every file that says "using UnityEngine".
 ///
-/// Three channels now: everything (the AudioListener), Teacher Rachel, and
-/// the background music.
+/// Four channels now: everything (the AudioListener), Teacher Rachel, the
+/// background music, and the short effects.
 ///
 /// This file used to say that music, when it arrived, would want an
 /// AudioMixer with a group per category. It does not yet, and the reason is
@@ -36,6 +36,7 @@ public static class VolumeSettings
     private const string MutedKey     = "SALINLAHI_Muted";
     private const string NarrationKey = "SALINLAHI_NarrationVolume";
     private const string MusicKey     = "SALINLAHI_MusicVolume";
+    private const string EffectsKey   = "SALINLAHI_EffectsVolume";
 
     /// <summary>Everything the game plays. 0..1.</summary>
     public static float Master
@@ -74,6 +75,24 @@ public static class VolumeSettings
         set
         {
             PlayerPrefs.SetFloat(MusicKey, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+            Apply();
+        }
+    }
+
+    /// <summary>
+    /// Footsteps and cues, on top of Master. 0..1.
+    ///
+    /// Read by SoundEffects when it fires a shot rather than pushed onto a
+    /// source, because effects are one-shots: there is no sustained source to
+    /// set the volume of.
+    /// </summary>
+    public static float Effects
+    {
+        get => Mathf.Clamp01(PlayerPrefs.GetFloat(EffectsKey, 0.8f));
+        set
+        {
+            PlayerPrefs.SetFloat(EffectsKey, Mathf.Clamp01(value));
             PlayerPrefs.Save();
             Apply();
         }

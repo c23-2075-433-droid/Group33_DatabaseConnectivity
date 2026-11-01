@@ -286,6 +286,11 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         // controller raises BEFORE it moves on - so "CORRECT!" is always about
         // the word that was just answered, never the next one.
         if (!wasCorrect) status.NoteTryAgain();
+
+        // The cue fires here rather than with the praise line, because this is
+        // the earliest moment the word is known to be right. What the child
+        // is being rewarded for is saying it, not for watching Kylo move.
+        if (wasCorrect) SoundEffects.Play("cue_correct");
     }
 
     private void HandleSpeechBegan()
