@@ -48,6 +48,7 @@ public static class GameplayHUDLayout
         public Button settingsClose;
         public Slider masterSlider;
         public Slider narrationSlider;
+        public Slider musicSlider;
     }
 
     // ---- corners ----
@@ -305,13 +306,24 @@ public static class GameplayHUDLayout
 
         Text title = Label(panel.transform, "Title", "SETTINGS", display, 52,
             FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
-        Place(title.rectTransform, new Vector2(0f, h * 0.27f), new Vector2(W * 0.7f, h * 0.13f));
+        Place(title.rectTransform, new Vector2(0f, h * 0.31f), new Vector2(W * 0.7f, h * 0.11f));
         Shade(title);
 
+        // Three rows where there were two. A row is a slider with its caption
+        // above it, about 0.175h tall at full size, and three of those do not
+        // fit between the title and the microphone note - so the rows are
+        // built at 0.8 scale and the title moves up. The alternative was
+        // dropping the note, and the note is the one line in this panel that
+        // tells a child what the sliders cannot do.
+        const float RowScale = 0.80f;
+        float rowH = h * RowScale;
+
         p.masterSlider = SettingRow(panel.transform, theme, display,
-            "Master", "SOUND", new Vector2(0f, h * 0.06f), W, h);
+            "Master", "SOUND", new Vector2(0f, h * 0.145f), W, rowH);
         p.narrationSlider = SettingRow(panel.transform, theme, display,
-            "Narration", "TEACHER RACHEL", new Vector2(0f, -h * 0.12f), W, h);
+            "Narration", "TEACHER RACHEL", new Vector2(0f, 0f), W, rowH);
+        p.musicSlider = SettingRow(panel.transform, theme, display,
+            "Music", "MUSIC", new Vector2(0f, -h * 0.145f), W, rowH);
 
         Text note = Label(panel.transform, "MicNote",
             "These change what you hear, not the microphone.", display, 22,
