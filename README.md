@@ -254,44 +254,64 @@ belongs with getting dressed in Scene 4.
 ## Teacher Rachel's Portrait
 
 Rachel is the voice of the game, and the branch ring on the narration plaque
-is where the child sees her. The art in that ring is five drawings of one
-character - a resting face, three mouth shapes and a blink - generated in
-Canva from a single approved portrait, which every later frame was drawn
-against so that only her mouth changes between them.
+is where the child sees her. The art in that ring is nine drawings of one
+character, generated in Canva from a single approved front-facing portrait
+which every later frame was drawn against, so that only her mouth moves.
 
-| Sprite | Frame |
-|---|---|
-| `char_rachel_portrait.png` | Mouth closed, eyes open. What she wears between lines. |
-| `char_rachel_talk1.png` | Mouth slightly open. |
-| `char_rachel_talk2.png` | Mouth moderately open. |
-| `char_rachel_talk3.png` | Mouth wide open. |
-| `char_rachel_blink.png` | Eyes gently closed. |
+| Sprite | Shape | Sound |
+|---|---|---|
+| `char_rachel_idle.png` | Closed, gentle smile | between lines |
+| `char_rachel_ai.png` | Wide open | **a**, **i** |
+| `char_rachel_e.png` | Spread, upper teeth showing | **e** |
+| `char_rachel_o.png` | Round opening | **o** |
+| `char_rachel_u.png` | Small and pursed | **u** |
+| `char_rachel_mbp.png` | Lips shut, flat and neutral | **m**, **b**, **p** |
+| `char_rachel_fv.png` | Upper teeth on the lower lip | **f**, **v** |
+| `char_rachel_l.png` | Open, tongue tip raised | **l** |
+| `char_rachel_blink.png` | Eyes closed, mouth unchanged | — |
+
+They are a mouth set for lip-sync, not an animation. Nothing reads them per
+sound yet: until the voice-over is recorded, `UIThemeTool` wires three of
+them - `e`, `o`, `ai`, smallest opening first - into the existing talking
+cycle so she is not frozen under her own subtitle, and `u`, `mbp`, `fv` and
+`l` simply sit in the folder waiting.
 
 The raw generations are kept in `Art/char_rachel_*_raw.png` exactly as they
-arrived. [`Tools/make_rachel_frames.py`](Tools/make_rachel_frames.py) turns
+arrived. [`Tools/make_rachel_visemes.py`](Tools/make_rachel_visemes.py) turns
 them into the sprites: it cuts the flat background away, seats her in the
-ring using one placement measured off the resting frame, and then REGISTERS
-every other frame onto that one by matching silhouette area and centroid.
-That last step is the whole point of the script. Five separately generated
-images are five slightly different drawings, and at nine frames a second a
-head that wanders two pixels does not read as talking - it reads as a glitch.
+ring, and then REGISTERS every frame onto the idle one by matching silhouette
+area and centroid. That last step is the point of the script. Nine
+separately generated images are nine slightly different drawings, and a head
+that wanders two pixels between frames reads as a glitch rather than as
+talking. The finished set overlaps the idle frame at 99.8-100%.
 
-Like [`cut_rachel_portrait.py`](Tools/cut_rachel_portrait.py) before it, the
-script writes each frame on the RING'S OWN SQUARE rather than cropping to
-her, so `UITheme`'s `RingCentreX` / `RingCentreY` / `RingDiameter` place her
-with no further measuring, and stops the cut just inside the circle where the
-branch covers the seam.
+She is sized by HEIGHT, not width: crown just inside the top of the opening,
+chest running off the bottom. Width tells you nothing about whether a circle
+is filled; where her hair starts and whether her chest reaches the bottom
+tell you everything.
 
-[`RachelPortraitAnimator`](Assets/Scripts/RachelPortraitAnimator.cs) plays
-them. It swaps the sprite in the ring on a cycle while `VoiceNarrator` reports
-`IsSpeaking`, and shows the resting frame the rest of the time - driven by the
-narrator's own state rather than a duration, so a line cut off by the back
-button stops her mouth with it. There is no Animator Controller: the HUD is
-built at run time, so there is no GameObject for one to live on.
+### The ring is not a circle
 
-The frames are optional. With none of them loaded she is the still portrait
-she always was, which is why **Tools > SALINLAHI > Refresh UI Theme** loads
-them without reporting them missing - it prints how many it found instead.
+Worth knowing, because it wasted a long time. The portrait had always been
+drawn into the largest circle that fits inside the branch. But the opening
+the twigs leave is 326 x 352, and its middle sits lower than that circle's -
+so the portrait came out too small and about 25px too high, leaving a band of
+bare opening under her chin. It looks exactly like badly cropped art, and no
+amount of redrawing or zooming the portrait can fix it, because nothing is
+drawn in that band at all. `UITheme`'s Ring constants now cover the opening,
+measured by [`Tools/measure_narration_ring.py`](Tools/measure_narration_ring.py).
+Whatever of her falls outside the opening is hidden by the twigs, which she
+is drawn behind anyway.
+
+[`RachelPortraitAnimator`](Assets/Scripts/RachelPortraitAnimator.cs) plays the
+stand-in cycle off `VoiceNarrator.IsSpeaking` rather than a duration, so a
+line cut short by the back button stops her mouth with it. There is no
+Animator Controller: the HUD is built at run time, so there is no GameObject
+for one to live on.
+
+The frames are optional. With none loaded she is the still portrait, which is
+why **Tools > SALINLAHI > Refresh UI Theme** reports how many it found rather
+than treating them as missing art.
 
 ## Security Notes
 

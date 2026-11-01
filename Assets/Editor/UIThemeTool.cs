@@ -64,13 +64,15 @@ public static class UIThemeTool
 
         // Optional on purpose: the ring frames the room without her, so a
         // missing portrait is a plainer panel, not a broken one.
-        theme.rachelPortrait = Load("char_rachel_portrait");
+        theme.rachelPortrait = Load("char_rachel_idle");
 
-        // Her talking mouths, and the blink. Load, not Need: the panel is
-        // supposed to survive without them, as a still portrait.
-        theme.rachelTalk1 = Load("char_rachel_talk1");
-        theme.rachelTalk2 = Load("char_rachel_talk2");
-        theme.rachelTalk3 = Load("char_rachel_talk3");
+        // Three of the mouth shapes, smallest opening first, standing in as
+        // the talking cycle until the recordings arrive and real lip-sync
+        // picks the shape per sound. Load, not Need: the panel is supposed to
+        // survive without them, as a still portrait.
+        theme.rachelTalk1 = Load("char_rachel_e");
+        theme.rachelTalk2 = Load("char_rachel_o");
+        theme.rachelTalk3 = Load("char_rachel_ai");
         theme.rachelBlink = Load("char_rachel_blink");
 
         theme.displayFont = FindFont("Bold");

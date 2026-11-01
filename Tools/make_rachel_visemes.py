@@ -38,7 +38,7 @@ Writes:  Assets/Sprites/char_rachel_portrait.png   (the idle - REPLACES the old 
          Art/char_rachel_portrait_previous.png     (backup, first run only)
          Art/char_rachel_frames_sheet.png          (a look at all five, not imported)
 
-Run from the repository root:  python3 Tools/make_rachel_frames.py
+Run from the repository root:  python3 Tools/make_rachel_visemes.py
 
 Then run Tools > SALINLAHI > Refresh UI Theme in Unity, so the narration
 panel picks the frames up.
@@ -53,15 +53,19 @@ from PIL import Image, ImageFilter
 # name -> where it ends up. The idle keeps the existing sprite's path, and so
 # its .meta and its GUID, which is what UITheme.asset already points at.
 FRAMES = [
-    ("idle",  "Assets/Sprites/char_rachel_portrait.png"),
-    ("talk1", "Assets/Sprites/char_rachel_talk1.png"),
-    ("talk2", "Assets/Sprites/char_rachel_talk2.png"),
-    ("talk3", "Assets/Sprites/char_rachel_talk3.png"),
-    ("blink", "Assets/Sprites/char_rachel_blink.png"),
+    ("Idle", "Idle"),
+    ("AI",   "AI"),
+    ("E",    "E"),
+    ("O",    "O"),
+    ("U",    "U"),
+    ("MBP",  "MBP"),
+    ("FV",   "FV"),
+    ("L",    "L"),
+    ("Blink", "Blink"),
 ]
 
 RAW = "Art/char_rachel_%s_raw.png"
-BACKUP = "Art/char_rachel_portrait_previous.png"
+OUT = "Assets/Sprites"
 SHEET = "Art/char_rachel_frames_sheet.png"
 
 # The sprite's square.
@@ -81,12 +85,13 @@ SIZE = 256
 # short takes the last of the generated background's edge with it.
 CLIP = 0.95
 
-# How she is seated in the circle, as fractions of its diameter: how wide she
-# is drawn, and how far below the top of the circle her hair starts. Drawn
-# smaller than the hollow on purpose - scaled to fill it she is a head in a
-# hole, and the chest the brief asks for is all below the cut.
-SHOULDER_SPAN = 1.08
-HEAD_ROOM = 0.10
+# The sizes the fit is allowed to try, as multiples of the circle's diameter.
+CROWN_AT = 0.02      # top of her hair, just inside the circle's top arc
+BOTTOM_AT = 1.15     # her chest runs off the bottom, so nothing is left bare
+
+# How much of her above the middle of the circle may fall outside it. Not
+# zero: a few stray pixels of a soft hair edge are not a cut-off head.
+HEAD_ROOM = 0.005
 
 # How far the registration search is allowed to move a frame.
 SHIFT = 14          # pixels, in the sprite's own square
@@ -95,29 +100,26 @@ POLISH = 3          # pixels swept around the measured answer
 
 
 def main():
-    missing = [n for n, _ in FRAMES if not os.path.exists(RAW % n)]
+    missing = [n for n, _ in FRAMES if not os.path.exists(RAW % n.lower())]
     if missing:
-        sys.exit("Missing raw frames in Art/: " +
-                 ", ".join("char_rachel_%s_raw.png" % n for n in missing))
+        sys.exit("Missing raw frames: " + ", ".join(RAW % n.lower() for n in missing))
 
-    idle_path = FRAMES[0][1]
-    if os.path.exists(idle_path) and not os.path.exists(BACKUP):
-        shutil.copyfile(idle_path, BACKUP)
-        print("Kept the old portrait at %s" % BACKUP)
+    os.makedirs(OUT, exist_ok=True)
 
-    cut = {name: cutout(Image.open(RAW % name)) for name, _ in FRAMES}
+    cut = {name: cutout(Image.open(RAW % name.lower())) for name, _ in FRAMES}
 
     # The placement, measured once off the idle.
-    place = measure(cut["idle"])
+    place = measure(cut["Idle"])
     print("Idle seats at scale %.3f, offset (%d, %d)" % place)
 
-    idle_rgba = lay(cut["idle"], *place)
+    idle_rgba = lay(cut["Idle"], *place)
     idle_mask = np.asarray(idle_rgba)[:, :, 3] > 96
     idle_cut = np.asarray(clip(idle_rgba))[:, :, 3] > 96
 
     written = []
-    for name, dst in FRAMES:
-        if name == "idle":
+    for name, _label in FRAMES:
+        dst = os.path.join(OUT, "char_rachel_%s.png" % name.lower())
+        if name == "Idle":
             rgba, drift = idle_rgba, (0, 0, 1.0)
         else:
             rgba, drift = register(cut[name], place, idle_mask)
@@ -164,7 +166,7 @@ def cutout(im):
     corners = np.concatenate([rgb[:8, :8].reshape(-1, 3), rgb[:8, -8:].reshape(-1, 3),
                               rgb[-8:, :8].reshape(-1, 3), rgb[-8:, -8:].reshape(-1, 3)])
     key = np.median(corners, axis=0)
-    near = np.abs(rgb - key).sum(axis=2) < 130
+    near = np.abs(rgb - key).sum(axis=2) < 165
 
     out = flood_from_border(near)
 
@@ -172,7 +174,7 @@ def cutout(im):
     # where the key colour was blended into her outline is a halo that is
     # invisible on the colour it came from and obvious over a bedroom wall;
     # taking the blended pixels away is surer than trying to correct them.
-    out = grow(out, max(1, int(round(min(h, w) / 400.0))))
+    out = grow(out, max(2, int(round(min(h, w) / 220.0))))
 
     alpha = Image.fromarray(np.where(out, 0, 255).astype(np.uint8))
     alpha = alpha.filter(ImageFilter.GaussianBlur(0.7))
@@ -251,22 +253,26 @@ def unfringe(rgba, key):
 # ----------------------------------------------------------------------
 
 def measure(im):
-    """Scale and offset that seat the idle frame's silhouette in the circle."""
-    box = Image.fromarray((np.asarray(im)[:, :, 3] > 96).astype(np.uint8) * 255).getbbox()
-    if box is None:
+    """
+    Seats her in the ring the way the approved portrait was seated.
+
+    Sized by HEIGHT, not width. The circle is what she has to fill, and the
+    two things that decide whether she fills it are where the top of her hair
+    sits and whether her chest reaches the bottom - neither of which a width
+    tells you. So: crown a little inside the top arc, chest running off the
+    bottom, and the scale is whatever those two demand.
+    """
+    mask = np.asarray(im)[:, :, 3] > 96
+    if not mask.any():
         sys.exit("The idle frame is empty once its background is cut away.")
 
-    x0, y0, x1, y1 = box
-    scale = (SHOULDER_SPAN * SIZE) / float(x1 - x0)
+    ys, xs = np.nonzero(mask)
+    scale = ((BOTTOM_AT - CROWN_AT) * SIZE) / float(ys.max() - ys.min())
 
     # Centred on where she actually IS rather than on the middle of the box
-    # around her: a shoulder further out on one side than the other drags a
-    # box sideways, and the eye reads her as off-centre in the ring. The
-    # weight of the silhouette does not have that problem.
-    mid = centroid(np.asarray(im)[:, :, 3] > 96)[1]
-
-    dx = SIZE / 2.0 - mid * scale
-    dy = HEAD_ROOM * SIZE - y0 * scale
+    # around her: hair longer on one side drags a box sideways.
+    dx = SIZE / 2.0 - centroid(mask)[1] * scale
+    dy = CROWN_AT * SIZE - ys.min() * scale
     return scale, int(round(dx)), int(round(dy))
 
 
