@@ -281,9 +281,10 @@ public static class GameplayHUDLayout
     /// with the rest of the HUD - most plays never open it, and it is the one
     /// piece here heavy enough for that to be worth it.
     ///
-    /// Deliberately the same bamboo frame, slider and OKAY button the main
-    /// menu's Settings popup uses (Assets/Editor/SettingsAboutDialogBuilder.cs),
-    /// so the two read as one dialog in two places.
+    /// Deliberately the same drawn board, controls and close X the main menu's
+    /// Settings popup uses (Assets/Editor/SettingsAboutDialogBuilder.cs), so the
+    /// two read as one dialog in two places. The board carries its own rows,
+    /// icons and labels, so nothing here lays out text.
     /// </summary>
     public static void BuildSettings(Parts p, Transform parent, UITheme theme, Font display)
     {
