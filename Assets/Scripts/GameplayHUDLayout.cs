@@ -176,6 +176,13 @@ public static class GameplayHUDLayout
         p.rachelMouth.talk2  = theme != null ? theme.rachelTalk2 : null;
         p.rachelMouth.talk3  = theme != null ? theme.rachelTalk3 : null;
         p.rachelMouth.blink  = theme != null ? theme.rachelBlink : null;
+        p.rachelMouth.visemeAI  = theme != null ? theme.rachelAI  : null;
+        p.rachelMouth.visemeE   = theme != null ? theme.rachelE   : null;
+        p.rachelMouth.visemeO   = theme != null ? theme.rachelO   : null;
+        p.rachelMouth.visemeU   = theme != null ? theme.rachelU   : null;
+        p.rachelMouth.visemeMBP = theme != null ? theme.rachelMBP : null;
+        p.rachelMouth.visemeFV  = theme != null ? theme.rachelFV  : null;
+        p.rachelMouth.visemeL   = theme != null ? theme.rachelL   : null;
         p.rachelMouth.visibility = p.narrationFade;
 
         GameObject plaque = Rect(panel.transform, "Plaque",

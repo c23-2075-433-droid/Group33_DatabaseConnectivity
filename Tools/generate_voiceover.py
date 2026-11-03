@@ -31,6 +31,7 @@ Plain python3, not `python3 -I`: that flag drops the user site directory,
 where numpy lives.
 """
 import argparse
+import base64
 import csv
 import json
 import os
@@ -49,6 +50,28 @@ STAGE = os.path.join(ROOT, "Recordings", "vo")
 KEY_FILE = os.path.join(ROOT, "Tools", "elevenlabs.key")
 
 TTS = "https://api.elevenlabs.io/v1/text-to-speech/"
+TRACKS = os.path.join(ROOT, "Assets", "Resources", "VisemeTracks.json")
+
+# Which mouth each letter wants. The sprite set is Idle, AI, E, O, U, MBP, FV
+# and L - see Assets/Resources/Sfx and the README - so this maps sounds onto
+# the eight drawings that exist rather than onto a phoneme inventory.
+#
+# It reads CHARACTERS, not phonemes, which is crude: "th" gets two letters and
+# a silent "e" gets a mouth it should not have. At 178 px in a branch ring,
+# played at the speed of speech, what reads is the mouth OPENING AND CLOSING
+# in time with the voice. Getting every vowel exactly right matters far less
+# than never moving when she is silent, which is the actual complaint.
+VISEME = {
+    "a": "AI", "i": "AI", "y": "AI",
+    "e": "E",
+    "o": "O",
+    "u": "U", "w": "U",
+    "m": "MBP", "b": "MBP", "p": "MBP",
+    "f": "FV", "v": "FV",
+    "l": "L",
+}
+# Everything else that is voiced gets a small neutral opening.
+CONSONANT = "E"
 SUBSCRIPTION = "https://api.elevenlabs.io/v1/user/subscription"
 # eleven_v4 with language_code "fil", and both halves of that matter.
 #
@@ -83,6 +106,8 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--scene", help="scene token, e.g. l1_s1")
     ap.add_argument("--id", action="append", default=[], help="one id; repeatable")
+    ap.add_argument("--ids-from", help="file with one id per line; '#' comments allowed. "
+                                       "Use this rather than hundreds of --id flags.")
     ap.add_argument("--voice", action="append", default=[], help="voice id")
     ap.add_argument("--dry-run", action="store_true", help="print the bill; no key, nothing billed")
     ap.add_argument("--audition", action="store_true", help="two lines per voice, into Recordings/vo/audition")
@@ -93,7 +118,15 @@ def main():
     if args.audition:
         chosen = [r for r in rows if r["id"] in AUDITION]
     else:
-        chosen = select(rows, args.scene, args.id)
+        ids = list(args.id)
+        if args.ids_from:
+            if not os.path.exists(args.ids_from):
+                sys.exit("No such file: " + args.ids_from)
+            for line in open(args.ids_from, encoding="utf-8"):
+                line = line.split("#", 1)[0].strip()
+                if line:
+                    ids.append(line)
+        chosen = select(rows, args.scene, ids)
 
     if not chosen:
         sys.exit("Nothing selected. Use --scene l1_s1, --id <id>, or --audition.")
@@ -140,13 +173,36 @@ def main():
         tmp = os.path.join(STAGE, r["id"] + ".wav")
         print("\n%s" % r["id"])
         speak(key, voice, r["say"], tmp)
-        done.append((r["id"], tmp))
+        done.append((r["id"], tmp, getattr(speak, "track", [])))
 
-    for name, tmp in done:
+    for name, tmp, _ in done:
         os.replace(tmp, os.path.join(OUT, name + ".wav"))
+    save_tracks({name: track for name, _, track in done})
     print("\n%d clip(s) -> %s" % (len(done), os.path.relpath(OUT, ROOT)))
     print("Now run Tools > SALINLAHI > Refresh Narrator Voice Bank in Unity.")
     return 0
+
+
+def save_tracks(new):
+    """
+    Merges the new mouth tracks into Assets/Resources/VisemeTracks.json.
+
+    One file rather than one per clip: Unity loads it once as a TextAsset, and
+    434 tiny files in Resources would each carry a .meta and each be a separate
+    asset in the build.
+    """
+    tracks = {}
+    if os.path.exists(TRACKS):
+        try:
+            tracks = json.load(open(TRACKS, encoding="utf-8")).get("tracks", {})
+        except ValueError:
+            pass
+    tracks.update({k: v for k, v in new.items() if v})
+
+    os.makedirs(os.path.dirname(TRACKS), exist_ok=True)
+    with open(TRACKS, "w", encoding="utf-8") as f:
+        json.dump({"tracks": tracks}, f, separators=(",", ":"), sort_keys=True)
+    print("mouth tracks: %d line(s) in %s" % (len(tracks), os.path.relpath(TRACKS, ROOT)))
 
 
 def load():
@@ -214,6 +270,14 @@ def credits_left(key):
 
 
 def speak(key, voice, text, dst):
+    """
+    Fetches one line WITH its per-character timings.
+
+    The timestamped endpoint costs the same characters as the plain one and
+    returns the alignment alongside the audio, so there is no reason to use
+    the plain one: without this, Rachel's mouth can only be animated on a
+    timer, which is what made it move at random.
+    """
     body = json.dumps({
         "text": text,
         "model_id": MODEL,
@@ -222,17 +286,19 @@ def speak(key, voice, text, dst):
                            "style": 0.0, "use_speaker_boost": True},
     }).encode()
     req = urllib.request.Request(
-        TTS + voice + "?output_format=mp3_44100_128", data=body,
-        headers={"xi-api-key": key, "Content-Type": "application/json",
-                 "Accept": "audio/mpeg"})
+        TTS + voice + "/with-timestamps?output_format=mp3_44100_128", data=body,
+        headers={"xi-api-key": key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
-            audio = r.read()
+            payload = json.load(r)
     except urllib.error.HTTPError as e:
         sys.exit("  HTTP %d: %s" % (e.code, e.read().decode("utf-8", "replace")[:300]))
 
-    if not audio or audio[:1] == b"{":
+    audio = base64.b64decode(payload["audio_base64"])
+    if not audio:
         sys.exit("  The API did not return audio.")
+
+    speak.track = mouth_track(payload.get("alignment") or {})
 
     mp3 = dst + ".mp3"
     open(mp3, "wb").write(audio)
@@ -240,6 +306,56 @@ def speak(key, voice, text, dst):
                     mp3, dst], check=True, capture_output=True)
     os.remove(mp3)
     shape(dst)
+
+
+def mouth_track(alignment):
+    """
+    Turns per-character timings into a list of (time, viseme) changes.
+
+    Collapses runs of the same mouth, drops anything under 40 ms - faster than
+    that is a flicker rather than a shape - and closes the mouth on silence,
+    which is the part that makes it look like speech rather than chewing.
+    """
+    chars = alignment.get("characters") or []
+    starts = alignment.get("character_start_times_seconds") or []
+    ends = alignment.get("character_end_times_seconds") or []
+    if not chars:
+        return []
+
+    raw = []
+    for c, a, b in zip(chars, starts, ends):
+        low = c.lower()
+        if not low.strip() or low in ",.!?;:-\u2014\"'":
+            v = "Idle"
+        elif low in VISEME:
+            v = VISEME[low]
+        elif low.isalpha():
+            v = CONSONANT
+        else:
+            v = "Idle"
+        raw.append((round(float(a), 3), v, round(float(b), 3)))
+
+    track, last = [], None
+    for a, v, b in raw:
+        if v == last:
+            continue
+        if track and a - track[-1][0] < 0.04:
+            track[-1] = [round(a, 3), v]      # too brief to see; replace it
+        else:
+            track.append([round(a, 3), v])
+        last = v
+
+    if track and track[-1][1] != "Idle":
+        track.append([round(raw[-1][2], 3), "Idle"])
+
+    # Replacing a too-brief entry above can leave it equal to the one before,
+    # so the run is collapsed once more at the end rather than trusted.
+    clean = []
+    for t, v in track:
+        if clean and clean[-1][1] == v:
+            continue
+        clean.append([t, v])
+    return clean
 
 
 def shape(path):
@@ -250,8 +366,17 @@ def shape(path):
         x = np.frombuffer(w.readframes(n), dtype="<i2").astype(np.float32) / 32768.0
 
     loud = np.nonzero(np.abs(x) > FLOOR)[0]
+    cut = 0.0
     if len(loud):
-        x = x[max(0, loud[0] - int(0.010 * rate)):min(len(x), loud[-1] + int(0.030 * rate))]
+        head = max(0, loud[0] - int(0.010 * rate))
+        cut = head / float(rate)
+        x = x[head:min(len(x), loud[-1] + int(0.030 * rate))]
+
+    # The clip just lost `cut` seconds off its front. The track describes the
+    # UNTRIMMED audio, so without this every mouth shape fires late by exactly
+    # the silence that was removed.
+    if cut and getattr(speak, "track", None):
+        speak.track = [[max(0.0, round(t - cut, 3)), v] for t, v in speak.track]
 
     rms = float(np.sqrt(np.mean(np.square(x)))) or 1e-9
     gain = min((10.0 ** (TARGET_DBFS / 20.0)) / rms,
