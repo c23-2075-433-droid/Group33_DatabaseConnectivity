@@ -50,7 +50,23 @@ KEY_FILE = os.path.join(ROOT, "Tools", "elevenlabs.key")
 
 TTS = "https://api.elevenlabs.io/v1/text-to-speech/"
 SUBSCRIPTION = "https://api.elevenlabs.io/v1/user/subscription"
-MODEL = "eleven_multilingual_v2"          # the model that speaks Filipino
+# eleven_v4 with language_code "fil", and both halves of that matter.
+#
+# multilingual_v2 with no language set reads "Bangon" with English phonetics -
+# in a cloned Filipino voice, which sounds worse than a stranger getting it
+# wrong. The clone carries the voice; the MODEL decides pronunciation, and it
+# has to be told what language the word is.
+#
+# "fil" is set for every line, including Rachel's English narration, not just
+# the Filipino words. That is deliberate: her _ask lines are English sentences
+# with one Filipino word inside them, and a model that says the word correctly
+# alone can still anglicise it mid-sentence. Tested on the real line - "Let's
+# help Kylo out of bed! Say Bangon to wake him up!" - and it holds. It also
+# gives her English a Filipina teacher's accent, which is what she is.
+#
+# Phonetic respelling ("Ba-ngon") was tried and is WORSE. Don't.
+MODEL = "eleven_v4"
+LANGUAGE = "fil"
 
 # Speech, not music: louder, and mono as Assets/Audio/VO/README.txt requires.
 TARGET_DBFS = -20.0
@@ -201,6 +217,7 @@ def speak(key, voice, text, dst):
     body = json.dumps({
         "text": text,
         "model_id": MODEL,
+        "language_code": LANGUAGE,
         "voice_settings": {"stability": 0.5, "similarity_boost": 0.75,
                            "style": 0.0, "use_speaker_boost": True},
     }).encode()
