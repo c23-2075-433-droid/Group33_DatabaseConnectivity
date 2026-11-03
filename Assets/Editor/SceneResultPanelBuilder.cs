@@ -54,7 +54,6 @@ public static class SceneResultPanelBuilder
     private const float WordsFrac = 0.7508f;
     private const float RecordsFrac = 0.818f;
     private const float ButtonFrac = 0.875f;
-    private const float CloseFrac = 0.082f;
 
     // Fractions of the board, all checked against the mockup by compositing
     // the cut sprites at these numbers and diffing the result by eye.
