@@ -88,10 +88,17 @@ public class MainMenuController : MonoBehaviour
     /// Mute no longer has to stash the volume before silencing it: muting and
     /// the master level are two separate saved values now, so unmuting simply
     /// stops forcing silence and the level is still whatever it was.
+    ///
+    /// It does restore a very low Master, though. The panel this replaced had
+    /// a SOUND slider driving Master, so a quiet level can be saved with
+    /// nothing left on screen able to raise it - and SOUND on that showed no
+    /// effect would look broken. On means audible.
     /// </summary>
     private void OnSoundToggled()
     {
+        bool turningOn = VolumeSettings.Muted;
         VolumeSettings.Muted = !VolumeSettings.Muted;
+        if (turningOn && VolumeSettings.Master < 0.5f) VolumeSettings.Master = 1f;
         RefreshSettingsWidgets();
     }
 
@@ -185,6 +192,12 @@ public class MainMenuController : MonoBehaviour
         // Blank input is fine - NicknameManager falls back to a default name.
         string nickname = nicknameInput != null ? nicknameInput.text : "";
         NicknameManager.SetNickname(nickname);
+
+        // A fresh run teaches every word from scratch. Without this, someone
+        // who played a level, came back to the menu and started again would
+        // only ever get the short reminders.
+        VocabularyMemory.Reset();
+
         SceneManager.LoadScene(levelSelectSceneName);
     }
 

@@ -28,8 +28,15 @@ MonoBehaviour:
   sliderFill: {fileID: 21300000, guid: d32cd7f24054b4d7e8aab59860bce73b, type: 3}
   sliderKnob: {fileID: 21300000, guid: c2f077abbd00e4971a719e9aa0cb81bf, type: 3}
   micIcon: {fileID: 21300000, guid: 773a8c3b5892640d285343e03b4c04d1, type: 3}
-  rachelPortrait: {fileID: 21300000, guid: 2a8f7d267fbfe47d089f053230787534, type: 3}
-  rachelTalk1: {fileID: 21300000, guid: 21e424a672f2244e5bb321c9c29f3bcf, type: 3}
-  rachelTalk2: {fileID: 21300000, guid: 5d780cdf96f2f4fa99be8811c123acc9, type: 3}
-  rachelTalk3: {fileID: 21300000, guid: 68fcb90436cc94626a497fa68b05bc82, type: 3}
+  rachelPortrait: {fileID: 21300000, guid: 5ce10c65cd5b743d0b01fcb17f0232e9, type: 3}
+  rachelTalk1: {fileID: 21300000, guid: 6061e7500cf2c49468a26e5d366d5eeb, type: 3}
+  rachelTalk2: {fileID: 21300000, guid: dcd6a24eb33fa4b809a23060bc0c60ec, type: 3}
+  rachelTalk3: {fileID: 21300000, guid: eac3bcd7cefe640a39e44eab0a332e4b, type: 3}
   rachelBlink: {fileID: 21300000, guid: 7a868f89c13454cb6b71c0df0da8a962, type: 3}
+  rachelAI: {fileID: 21300000, guid: eac3bcd7cefe640a39e44eab0a332e4b, type: 3}
+  rachelE: {fileID: 21300000, guid: 6061e7500cf2c49468a26e5d366d5eeb, type: 3}
+  rachelO: {fileID: 21300000, guid: dcd6a24eb33fa4b809a23060bc0c60ec, type: 3}
+  rachelU: {fileID: 21300000, guid: 9081a40aa5af24289b45ac4f58cb7a0d, type: 3}
+  rachelMBP: {fileID: 21300000, guid: db35bd3c46fc345a0becf26bb5b6e75b, type: 3}
+  rachelFV: {fileID: 21300000, guid: 1f81a03fd33694e5395d26e3b5b7b231, type: 3}
+  rachelL: {fileID: 21300000, guid: 46a35d25247244070a73878d3f4aacd7, type: 3}

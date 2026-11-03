@@ -286,6 +286,11 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         // controller raises BEFORE it moves on - so "CORRECT!" is always about
         // the word that was just answered, never the next one.
         if (!wasCorrect) status.NoteTryAgain();
+
+        // The cue fires here rather than with the praise line, because this is
+        // the earliest moment the word is known to be right. What the child
+        // is being rewarded for is saying it, not for watching Kylo move.
+        if (wasCorrect) SoundEffects.Play("cue_correct");
     }
 
     private void HandleSpeechBegan()
@@ -480,9 +485,17 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         GameplayHUDLayout.SetToggle(ui.musicToggle, theme, VolumeSettings.MusicOn);
     }
 
+    /// <summary>
+    /// SOUND is a plate now, not a slider. The panel it replaced drove Master,
+    /// so a tester can have a quiet Master saved with nothing left on screen
+    /// able to raise it - turning SOUND on would then appear to do nothing.
+    /// On means audible, so it restores the level as well as lifting mute.
+    /// </summary>
     private void OnSoundToggled()
     {
+        bool turningOn = VolumeSettings.Muted;
         VolumeSettings.Muted = !VolumeSettings.Muted;
+        if (turningOn && VolumeSettings.Master < 0.5f) VolumeSettings.Master = 1f;
         RefreshToggles();
     }
 

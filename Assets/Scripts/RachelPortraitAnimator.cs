@@ -52,6 +52,29 @@ public class RachelPortraitAnimator : MonoBehaviour
     [Tooltip("Eyes gently closed, same expression otherwise. Optional: with none, she simply never blinks.")]
     public Sprite blink;
 
+    [Header("Lip-sync")]
+
+    [Tooltip("Mouth for the vowel in 'say' and 'I'.")]
+    public Sprite visemeAI;
+
+    [Tooltip("Mouth for the vowel in 'bed'. Also stands in for consonants with no mouth of their own.")]
+    public Sprite visemeE;
+
+    [Tooltip("Mouth for the vowel in 'go'.")]
+    public Sprite visemeO;
+
+    [Tooltip("Mouth for the vowel in 'you'.")]
+    public Sprite visemeU;
+
+    [Tooltip("Lips pressed shut, for m, b and p.")]
+    public Sprite visemeMBP;
+
+    [Tooltip("Upper teeth on the lower lip, for f and v.")]
+    public Sprite visemeFV;
+
+    [Tooltip("Tongue raised, for l.")]
+    public Sprite visemeL;
+
     [Header("Timing")]
 
     [Tooltip("Seconds each mouth frame is held. About a ninth of a second reads as speech; much faster and it flutters.")]
@@ -96,6 +119,14 @@ public class RachelPortraitAnimator : MonoBehaviour
     // this changes, so a held frame does not rebuild the canvas every tick.
     private Sprite shown;
 
+    // Whether this run of speech has played any audio yet. See Sync().
+    private bool sawClip;
+
+    // The line being lip-synced, and where we are in its track.
+    private AudioClip trackedClip;
+    private VisemeTracks.Change[] track;
+    private int trackAt;
+
     void OnEnable()
     {
         Reset();
@@ -121,6 +152,12 @@ public class RachelPortraitAnimator : MonoBehaviour
         }
 
         bool speaking = narrator != null && narrator.IsSpeaking;
+        if (!speaking) sawClip = false;
+
+        // Real lip-sync first: if the clip she is playing has a mouth track,
+        // follow it. This is the difference between a mouth that moves while
+        // she talks and a mouth that moves WITH what she is saying.
+        if (speaking && Sync()) return;
 
         if (speaking && cycle.Length > 1)
         {
@@ -146,6 +183,69 @@ public class RachelPortraitAnimator : MonoBehaviour
     }
 
     /// <summary>
+    /// Drives the mouth from the playing clip's own timings.
+    ///
+    /// Returns false when there is nothing to follow - no clip, or a clip with
+    /// no track - and the caller falls back to the cycle. That happens for
+    /// every line that has not been generated yet, and for the Filipino word
+    /// clips, which are recorded by a person and so have no alignment.
+    /// </summary>
+    private bool Sync()
+    {
+        AudioClip clip = narrator.CurrentClip;
+        if (clip == null)
+        {
+            // Silence inside a line that HAS a recording: the 0.12s between
+            // two parts, or the 0.2s tail. The pause is part of how the line
+            // is spoken, so she holds her mouth shut through it - the cycle
+            // would flutter three shapes into a third of a second and read as
+            // exactly the randomness the tracks are here to remove.
+            //
+            // sawClip is what tells the two silences apart. A line with no
+            // recording at all never sets it, so it still gets the cycle and
+            // mouths its caption, which is the whole point of the fallback.
+            if (!sawClip) return false;
+            Show(idle);
+            return true;
+        }
+        sawClip = true;
+
+        if (!ReferenceEquals(clip, trackedClip))
+        {
+            trackedClip = clip;
+            track = VisemeTracks.For(clip.name);
+            trackAt = 0;
+        }
+        if (track == null || track.Length == 0) return false;
+
+        float t = narrator.PlaybackTime;
+
+
+        // Scrub backwards if the clip restarted; otherwise walk forward. The
+        // track is in order, so this is a step per frame at most, not a search.
+        if (trackAt > 0 && track[trackAt - 1].time > t) trackAt = 0;
+        while (trackAt < track.Length && track[trackAt].time <= t) trackAt++;
+
+        Show(MouthNamed(trackAt > 0 ? track[trackAt - 1].mouth : "Idle"));
+        return true;
+    }
+
+    private Sprite MouthNamed(string mouth)
+    {
+        switch (mouth)
+        {
+            case "AI":  return visemeAI  != null ? visemeAI  : talk3;
+            case "E":   return visemeE   != null ? visemeE   : talk1;
+            case "O":   return visemeO   != null ? visemeO   : talk2;
+            case "U":   return visemeU   != null ? visemeU   : talk1;
+            case "MBP": return visemeMBP != null ? visemeMBP : idle;
+            case "FV":  return visemeFV  != null ? visemeFV  : talk1;
+            case "L":   return visemeL   != null ? visemeL   : talk2;
+            default:    return idle;
+        }
+    }
+
+    /// <summary>
     /// Shuts the mouth and starts the next cycle from the beginning, so she
     /// always opens on the same frame rather than resuming mid-vowel.
     /// </summary>
@@ -153,6 +253,9 @@ public class RachelPortraitAnimator : MonoBehaviour
     {
         frame = 0;
         timer = 0f;
+        trackedClip = null;
+        track = null;
+        trackAt = 0;
         blinkUntil = 0f;
         blinkAt = Time.time + Random.Range(blinkEvery.x, blinkEvery.y);
         Show(idle);

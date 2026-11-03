@@ -17,23 +17,26 @@ using UnityEngine;
 /// has an AudioSettings, and a second one in the global namespace would be
 /// ambiguous in every file that says "using UnityEngine".
 ///
-/// Two channels carry sound today: everything (the AudioListener) and Teacher
-/// Rachel. MusicOn and Effects are the other two the settings screen shows.
-/// They are remembered but route nothing, because the project still has no
-/// music track, no sound effects and no AudioMixer - when it does, they want a
-/// mixer group each, and this is where the wiring goes.
+/// Four channels now: everything (the AudioListener), Teacher Rachel, the
+/// background music, and the short effects.
 ///
-/// A setting that is saved and does nothing is honest; one that silently does
-/// the wrong thing is not. Effects deliberately does NOT drive Master: Master
-/// is the whole bus including Rachel, so binding the two would make the SOUND
-/// EFFECTS slider quietly fight the MS. RACHEL slider below it.
+/// This file used to say that music, when it arrived, would want an
+/// AudioMixer with a group per category. It does not yet, and the reason is
+/// worth recording rather than quietly ignoring. Narration is applied
+/// straight to the narrator's own AudioSource, and music is applied the same
+/// way to MusicPlayer's - two sources, two multiplies, no routing. A mixer
+/// would mean re-routing VoiceNarrator for no gain today, and there is no
+/// mixer anywhere in the project to be consistent with. When sound effects
+/// arrive and there are four categories fighting over one output, that is the
+/// change to make.
 /// </summary>
 public static class VolumeSettings
 {
     private const string MasterKey    = "SALINLAHI_MasterVolume";
     private const string MutedKey     = "SALINLAHI_Muted";
     private const string NarrationKey = "SALINLAHI_NarrationVolume";
-    private const string MusicKey     = "SALINLAHI_MusicOn";
+    private const string MusicKey     = "SALINLAHI_MusicVolume";
+    private const string MusicOnKey   = "SALINLAHI_MusicOn";
     private const string EffectsKey   = "SALINLAHI_EffectsVolume";
 
     /// <summary>Everything the game plays. 0..1.</summary>
@@ -61,27 +64,50 @@ public static class VolumeSettings
     }
 
     /// <summary>
-    /// Background music on or off. Remembered, but nothing plays music yet.
-    /// Defaults to on, so the setting does not start out looking broken.
+    /// Whether the music plays at all, kept apart from how loud it is - the
+    /// same split Muted and Master already use here. The settings board shows
+    /// MUSIC as an on/off plate rather than a slider, so turning it off must
+    /// not forget the level behind it.
     /// </summary>
     public static bool MusicOn
     {
-        get => PlayerPrefs.GetInt(MusicKey, 1) == 1;
+        get => PlayerPrefs.GetInt(MusicOnKey, 1) == 1;
         set
         {
-            PlayerPrefs.SetInt(MusicKey, value ? 1 : 0);
+            PlayerPrefs.SetInt(MusicOnKey, value ? 1 : 0);
             PlayerPrefs.Save();
             Apply();
         }
     }
 
     /// <summary>
-    /// Sound effects, on top of Master. 0..1. Remembered, but the game has no
-    /// sound effects to apply it to yet.
+    /// The background music, on top of Master. 0..1.
+    ///
+    /// Defaults to 0.6 rather than 1: music is a bed under Rachel and under a
+    /// child who is about to be listened to, and a soundtrack that arrives at
+    /// full volume on first run is one the player turns off rather than down.
+    /// </summary>
+    public static float Music
+    {
+        get => Mathf.Clamp01(PlayerPrefs.GetFloat(MusicKey, 0.6f));
+        set
+        {
+            PlayerPrefs.SetFloat(MusicKey, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+            Apply();
+        }
+    }
+
+    /// <summary>
+    /// Footsteps and cues, on top of Master. 0..1.
+    ///
+    /// Read by SoundEffects when it fires a shot rather than pushed onto a
+    /// source, because effects are one-shots: there is no sustained source to
+    /// set the volume of.
     /// </summary>
     public static float Effects
     {
-        get => Mathf.Clamp01(PlayerPrefs.GetFloat(EffectsKey, 1f));
+        get => Mathf.Clamp01(PlayerPrefs.GetFloat(EffectsKey, 0.8f));
         set
         {
             PlayerPrefs.SetFloat(EffectsKey, Mathf.Clamp01(value));
@@ -114,11 +140,11 @@ public static class VolumeSettings
     {
         AudioListener.volume = Muted ? 0f : Master;
 
-        // MusicOn and Effects have nothing to push onto yet. They are read back
-        // by the settings screens and will route through an AudioMixer when the
-        // music and effects exist.
-
         VoiceNarrator narrator = Object.FindFirstObjectByType<VoiceNarrator>();
         if (narrator != null) narrator.ApplyNarrationVolume();
+
+        // Not FindFirstObjectByType: the music player outlives the scene, and
+        // its own static handle is both cheaper and correct across a load.
+        if (MusicPlayer.Instance != null) MusicPlayer.Instance.ApplyMusicVolume();
     }
 }

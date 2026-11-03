@@ -179,6 +179,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // ENTER says whatever word the scene is currently asking for. This is
         // the one to use: it works in every scene, including ones built later,
         // without needing a new key per word.
+        //
+        // It deliberately does nothing while Rachel is still introducing a
+        // word. No word is being asked for until she finishes - the badge is
+        // faint and currentTargetWord is empty - so pressing ENTER over the
+        // narration logs the line below instead of answering. That is the
+        // same rule the child plays by, not a broken shortcut.
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
         {
             if (!string.IsNullOrEmpty(currentTargetWord)) SimulateSpeech(currentTargetWord);

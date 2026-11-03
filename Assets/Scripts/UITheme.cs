@@ -114,13 +114,37 @@ public class UITheme : ScriptableObject
     [Tooltip("Her eyes gently closed. Optional: without it she never blinks between lines.")]
     public Sprite rachelBlink;
 
+    [Tooltip("Mouth shapes for lip-sync, one per sound. Optional: without them she " +
+             "falls back to the three talking frames on a cycle.")]
+    public Sprite rachelAI;
+    public Sprite rachelE;
+    public Sprite rachelO;
+    public Sprite rachelU;
+    public Sprite rachelMBP;
+    public Sprite rachelFV;
+    public Sprite rachelL;
+
     // Where Rachel's face goes inside narrationPanel, as fractions of that
-    // sprite. Measured off the art by Tools/cut_hud_assets.py, which prints
-    // these three numbers every time it runs - re-cut a redrawn plaque and
-    // paste its numbers here rather than nudging the portrait by eye.
-    public const float RingCentreX = 0.1319f;
-    public const float RingCentreY = 0.4744f;
-    public const float RingDiameter = 0.1616f;
+    // sprite. Re-measure with Tools/measure_narration_ring.py rather than
+    // nudging the portrait by eye.
+    //
+    // These were the branch's inscribed CIRCLE. The opening the branch leaves
+    // is not a circle: it is 326x352 in the art, so a circle fitted inside it
+    // drew the portrait too small and - because the opening's middle sits
+    // lower than the circle's - about 25px too high, leaving a band of bare
+    // opening under her chin that no amount of redrawing her could fill.
+    // These numbers cover the opening instead. Anything of her that now falls
+    // outside it is hidden by the twigs, which she is drawn behind anyway.
+    //
+    // RingCentreX is the one number set by eye rather than measured. The
+    // opening's own centre comes out between 0.1301 and 0.1355 depending on
+    // whether you take its middle band, its bounding box or its inscribed
+    // circle - the twigs make it lopsided enough that the three disagree by
+    // ten pixels. At 0.1355 she still read as sitting left, so she is nudged
+    // right to here.
+    public const float RingCentreX = 0.1435f;
+    public const float RingCentreY = 0.5312f;
+    public const float RingDiameter = 0.1975f;
 
     // ------------------------------------------------------------------
 

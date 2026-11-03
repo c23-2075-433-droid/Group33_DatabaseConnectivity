@@ -16,6 +16,12 @@
 Assets/Resources/SupabaseConfig.asset
 Assets/Resources/SupabaseConfig.asset.meta
 
+# The ElevenLabs key, for Tools/generate_music.py and the voice-over.
+# It is a BILLING credential - leaked, someone else spends the plan.
+#   printf '%s\n' 'YOUR-KEY' > Tools/elevenlabs.key && chmod 600 Tools/elevenlabs.key
+# See Tools/elevenlabs.key.example.txt
+Tools/elevenlabs.key
+
 # Visual Studio / Rider / VS Code
 .vs/
 .vscode/
@@ -64,3 +70,7 @@ Thumbs.db
 
 # A Claude installer that landed in the project folder; never part of the game.
 Claude Setup*.exe
+
+# Python bytecode from the Tools/ scripts
+__pycache__/
+*.pyc
