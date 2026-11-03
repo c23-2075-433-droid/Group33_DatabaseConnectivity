@@ -41,4 +41,6 @@ Prompt frames and feedback (see Docs/VoicePromptingDesign.md)
   at the end of a frame is a stutter before every single prompt.
 
   rachel_feedback_*, rachel_hint_*, rachel_nudge_*, rachel_mic_blocked:
-  keep under 0.8 s. They play over the start of Kylo's action.
+  these play over the start of Kylo's action, so they were budgeted at under
+  0.8 s. The lines recorded on 3 Nov 2026 are bilingual and run 2-6 s, which
+  the game handles but which does change the pacing. Keep any re-record short.
