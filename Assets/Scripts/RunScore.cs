@@ -37,6 +37,36 @@ public static class RunScore
     /// </summary>
     public static float Accuracy => Attempts > 0 ? (float)Correct / Attempts : 0f;
 
+    /// <summary>
+    /// Points per word said correctly, and the most an accurate run can add on
+    /// top. Ten a word so the number grows visibly with effort; up to fifty for
+    /// getting them right first time, which is what the stars reward too - the
+    /// two rows on the summary should agree rather than tell a child different
+    /// stories about the same run.
+    /// </summary>
+    public const int PointsPerWord = 10;
+    public const int AccuracyBonus = 50;
+
+    /// <summary>
+    /// The score for a given tally. A pure function rather than a reading of
+    /// this class, because the summary panel counts its OWN scene while this
+    /// counts the whole level, and both want to show points.
+    /// </summary>
+    public static int PointsFor(int correct, int attempts)
+    {
+        if (correct <= 0) return 0;
+
+        // No attempts recorded but words completed: nothing was ever misheard,
+        // so the run was perfect rather than unmeasurable.
+        float accuracy = attempts > 0 ? (float)correct / attempts : 1f;
+        if (accuracy > 1f) accuracy = 1f;
+
+        return correct * PointsPerWord + (int)System.Math.Round(accuracy * AccuracyBonus);
+    }
+
+    /// <summary>The whole run's score so far.</summary>
+    public static int Points => PointsFor(Correct, Attempts);
+
     /// <summary>Records one voice attempt.</summary>
     public static void Add(bool wasCorrect)
     {
