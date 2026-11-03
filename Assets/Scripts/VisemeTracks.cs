@@ -70,9 +70,19 @@ public static class VisemeTracks
         int at = text.IndexOf("\"tracks\"");
         if (at < 0) return;
 
+        // Past the opening brace of the tracks object, so the first quote
+        // found below is the first line id and not part of the word "tracks".
+        at = text.IndexOf('{', at);
+        if (at < 0) return;
+
+        // Each pass reads one "id": [ ... ] pair and resumes immediately after
+        // that pair's closing bracket. Resuming there is the whole trick: the
+        // only characters between two pairs are a comma and the next id's
+        // quotes, while the mouth names ("AI", "MBP") sit INSIDE the brackets
+        // we have just stepped over - so the next quote found is always a key.
         while (true)
         {
-            int keyStart = text.IndexOf('"', at + 8);
+            int keyStart = text.IndexOf('"', at);
             if (keyStart < 0) break;
             int keyEnd = text.IndexOf('"', keyStart + 1);
             if (keyEnd < 0) break;
@@ -85,10 +95,7 @@ public static class VisemeTracks
             if (listEnd < 0) break;
 
             tracks[id] = ParseChanges(text, listStart, listEnd);
-            at = listEnd;
-
-            int next = text.IndexOf(',', listEnd);
-            if (next < 0 || text.IndexOf('"', listEnd) < 0) break;
+            at = listEnd + 1;
         }
     }
 
