@@ -17,16 +17,24 @@ using UnityEngine;
 /// has an AudioSettings, and a second one in the global namespace would be
 /// ambiguous in every file that says "using UnityEngine".
 ///
-/// Two channels, because the game has two things that make sound: everything
-/// (the AudioListener) and Teacher Rachel. There is no music and no sound
-/// effects in the project yet; when there are, they want an AudioMixer with a
-/// group per category, and the sliders for them belong here beside these.
+/// Two channels carry sound today: everything (the AudioListener) and Teacher
+/// Rachel. MusicOn and Effects are the other two the settings screen shows.
+/// They are remembered but route nothing, because the project still has no
+/// music track, no sound effects and no AudioMixer - when it does, they want a
+/// mixer group each, and this is where the wiring goes.
+///
+/// A setting that is saved and does nothing is honest; one that silently does
+/// the wrong thing is not. Effects deliberately does NOT drive Master: Master
+/// is the whole bus including Rachel, so binding the two would make the SOUND
+/// EFFECTS slider quietly fight the MS. RACHEL slider below it.
 /// </summary>
 public static class VolumeSettings
 {
     private const string MasterKey    = "SALINLAHI_MasterVolume";
     private const string MutedKey     = "SALINLAHI_Muted";
     private const string NarrationKey = "SALINLAHI_NarrationVolume";
+    private const string MusicKey     = "SALINLAHI_MusicOn";
+    private const string EffectsKey   = "SALINLAHI_EffectsVolume";
 
     /// <summary>Everything the game plays. 0..1.</summary>
     public static float Master
@@ -47,6 +55,36 @@ public static class VolumeSettings
         set
         {
             PlayerPrefs.SetFloat(NarrationKey, Mathf.Clamp01(value));
+            PlayerPrefs.Save();
+            Apply();
+        }
+    }
+
+    /// <summary>
+    /// Background music on or off. Remembered, but nothing plays music yet.
+    /// Defaults to on, so the setting does not start out looking broken.
+    /// </summary>
+    public static bool MusicOn
+    {
+        get => PlayerPrefs.GetInt(MusicKey, 1) == 1;
+        set
+        {
+            PlayerPrefs.SetInt(MusicKey, value ? 1 : 0);
+            PlayerPrefs.Save();
+            Apply();
+        }
+    }
+
+    /// <summary>
+    /// Sound effects, on top of Master. 0..1. Remembered, but the game has no
+    /// sound effects to apply it to yet.
+    /// </summary>
+    public static float Effects
+    {
+        get => Mathf.Clamp01(PlayerPrefs.GetFloat(EffectsKey, 1f));
+        set
+        {
+            PlayerPrefs.SetFloat(EffectsKey, Mathf.Clamp01(value));
             PlayerPrefs.Save();
             Apply();
         }
@@ -75,6 +113,10 @@ public static class VolumeSettings
     public static void Apply()
     {
         AudioListener.volume = Muted ? 0f : Master;
+
+        // MusicOn and Effects have nothing to push onto yet. They are read back
+        // by the settings screens and will route through an AudioMixer when the
+        // music and effects exist.
 
         VoiceNarrator narrator = Object.FindFirstObjectByType<VoiceNarrator>();
         if (narrator != null) narrator.ApplyNarrationVolume();

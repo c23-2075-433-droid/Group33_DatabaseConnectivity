@@ -421,11 +421,13 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
     {
         GameplayHUDLayout.BuildSettings(ui, ui.safeArea, theme, UITheme.Display());
 
-        if (ui.masterSlider != null)
+        // Remove-then-add on every open: the panel is built once and reopened
+        // many times, and a listener added twice fires twice.
+        if (ui.effectsSlider != null)
         {
-            ui.masterSlider.SetValueWithoutNotify(VolumeSettings.Master);
-            ui.masterSlider.onValueChanged.RemoveListener(OnMasterChanged);
-            ui.masterSlider.onValueChanged.AddListener(OnMasterChanged);
+            ui.effectsSlider.SetValueWithoutNotify(VolumeSettings.Effects);
+            ui.effectsSlider.onValueChanged.RemoveListener(OnEffectsChanged);
+            ui.effectsSlider.onValueChanged.AddListener(OnEffectsChanged);
         }
         if (ui.narrationSlider != null)
         {
@@ -433,11 +435,26 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
             ui.narrationSlider.onValueChanged.RemoveListener(OnNarrationChanged);
             ui.narrationSlider.onValueChanged.AddListener(OnNarrationChanged);
         }
+        if (ui.soundToggle != null)
+        {
+            ui.soundToggle.onClick.RemoveListener(OnSoundToggled);
+            ui.soundToggle.onClick.AddListener(OnSoundToggled);
+        }
+        if (ui.musicToggle != null)
+        {
+            ui.musicToggle.onClick.RemoveListener(OnMusicToggled);
+            ui.musicToggle.onClick.AddListener(OnMusicToggled);
+        }
         if (ui.settingsClose != null)
         {
             ui.settingsClose.onClick.RemoveListener(CloseSettings);
             ui.settingsClose.onClick.AddListener(CloseSettings);
         }
+
+        // The toggles carry no state of their own - the saved setting is the
+        // only truth, and the sprite is derived from it every time the panel
+        // opens. That is what keeps this panel and the main menu's agreeing.
+        RefreshToggles();
 
         settingsOpen = true;
         ui.settingsPanel.SetActive(true);
@@ -456,12 +473,36 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         if (controller != null) controller.SetPaused(false);
     }
 
-    private void OnMasterChanged(float value)
+    private void RefreshToggles()
     {
-        if (VolumeSettings.Muted) VolumeSettings.Muted = false;
-        VolumeSettings.Master = value;
+        // SOUND on is the absence of mute, so the sprite is the inverse.
+        GameplayHUDLayout.SetToggle(ui.soundToggle, theme, !VolumeSettings.Muted);
+        GameplayHUDLayout.SetToggle(ui.musicToggle, theme, VolumeSettings.MusicOn);
     }
 
+    private void OnSoundToggled()
+    {
+        VolumeSettings.Muted = !VolumeSettings.Muted;
+        RefreshToggles();
+    }
+
+    private void OnMusicToggled()
+    {
+        VolumeSettings.MusicOn = !VolumeSettings.MusicOn;
+        RefreshToggles();
+    }
+
+    private void OnEffectsChanged(float value)
+    {
+        VolumeSettings.Effects = value;
+    }
+
+    /// <summary>
+    /// Moving a slider no longer lifts mute, which the old master slider did.
+    /// With SOUND now a toggle the child can see, silently flipping it under
+    /// them is worse than letting the slider move while the sound stays off -
+    /// the reason it is quiet is on screen, one row up.
+    /// </summary>
     private void OnNarrationChanged(float value)
     {
         VolumeSettings.Narration = value;

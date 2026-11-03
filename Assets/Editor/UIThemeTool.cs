@@ -50,15 +50,29 @@ public static class UIThemeTool
         theme.narrationPanel = Need("ui_narration_panel", missing);
         theme.wordSignpost   = Need("ui_word_signpost",   missing);
         theme.statusPlank    = Need("ui_status_plank",    missing);
-        theme.settingsPanel  = Need("ui_results_panel",   missing);
+        // Repointed, not duplicated: this field's only reader is the settings
+        // panel, so it follows the redesign. The ui_results_panel PNG itself is
+        // untouched and still used by the summary screens.
+        theme.settingsPanel  = Need("ui_settings_panel",  missing);
 
-        theme.backButton = Need("btn_back",        missing);
-        theme.menuButton = Need("btn_menu_round",  missing);
-        theme.okayButton = Need("btn_okay",        missing);
+        theme.backButton    = Need("btn_back",            missing);
+        theme.menuButton    = Need("btn_menu_round",      missing);
+        theme.okayButton    = Need("btn_okay",            missing);
+        theme.settingsClose = Need("btn_settings_close",  missing);
 
-        theme.sliderTrack = Need("ui_slider_track", missing);
-        theme.sliderFill  = Need("ui_slider_fill",  missing);
-        theme.sliderKnob  = Need("ui_slider_knob",  missing);
+        theme.toggleOn  = Need("ui_settings_toggle_on",  missing);
+        theme.toggleOff = Need("ui_settings_toggle_off", missing);
+
+        // The settings redesign replaced these three. Nothing outside the two
+        // settings screens ever used them, so they are repointed rather than
+        // duplicated; ui_slider_track/fill/knob are now unreferenced.
+        theme.sliderTrack = Need("ui_settings_slider_track", missing);
+        theme.sliderFill  = Need("ui_settings_slider_fill",  missing);
+        theme.sliderKnob  = Need("ui_settings_slider_knob",  missing);
+
+        // The fill is the only 9-sliced sprite in the project. Its border has to
+        // live in the importer, and sliced rendering needs a full-rect mesh.
+        SliceBorder("ui_settings_slider_fill", new Vector4(14f, 0f, 14f, 0f));
 
         theme.micIcon = Need("mic_icon_wood", missing);
 
@@ -91,8 +105,9 @@ public static class UIThemeTool
                   "\n  Her talking frames: " + Mouths(theme) +
                   (missing.Count > 0
                       ? "\n  MISSING: " + string.Join(", ", missing) +
-                        "\n  Those panels will draw as plain tinted rectangles. Run " +
-                        "python3 Tools/cut_hud_assets.py ~/Downloads/Robo to cut them."
+                        "\n  Those panels will draw as plain tinted rectangles. Cut them with " +
+                        "python3 Tools/cut_hud_assets.py ~/Downloads/Robo, or, for anything " +
+                        "named ui_settings_* or btn_settings_*, python3 Tools/cut_settings_ui.py."
                       : "\n  All panel and button art found."));
 
         Selection.activeObject = theme;
@@ -113,6 +128,31 @@ public static class UIThemeTool
         if (found == 0) return "none - she will not move while she speaks";
         return found + " of 3" +
                (theme.rachelBlink != null ? ", and the blink" : ", no blink");
+    }
+
+    /// <summary>
+    /// Gives a sprite a 9-slice border, so its rounded ends survive being drawn
+    /// at a width the artwork was not cut at. Unity needs a full-rect mesh for
+    /// sliced rendering - the project's usual tight mesh silently refuses to
+    /// slice - and re-importing is slow, so nothing is written when it already
+    /// matches.
+    /// </summary>
+    private static void SliceBorder(string file, Vector4 border)
+    {
+        string path = SpriteFolder + file + ".png";
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (importer == null) return;
+
+        TextureImporterSettings settings = new TextureImporterSettings();
+        importer.ReadTextureSettings(settings);
+
+        if (settings.spriteBorder == border &&
+            settings.spriteMeshType == SpriteMeshType.FullRect) return;
+
+        settings.spriteBorder = border;
+        settings.spriteMeshType = SpriteMeshType.FullRect;
+        importer.SetTextureSettings(settings);
+        importer.SaveAndReimport();
     }
 
     private static Sprite Need(string file, List<string> missing)
