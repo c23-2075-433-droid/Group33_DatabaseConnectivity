@@ -49,6 +49,7 @@ public static class GameplayHUDLayout
         public Slider masterSlider;
         public Slider narrationSlider;
         public Slider musicSlider;
+        public Slider effectsSlider;
     }
 
     // ---- corners ----
@@ -316,21 +317,23 @@ public static class GameplayHUDLayout
         Place(title.rectTransform, new Vector2(0f, h * 0.31f), new Vector2(W * 0.7f, h * 0.11f));
         Shade(title);
 
-        // Three rows where there were two. A row is a slider with its caption
-        // above it, about 0.175h tall at full size, and three of those do not
-        // fit between the title and the microphone note - so the rows are
-        // built at 0.8 scale and the title moves up. The alternative was
-        // dropping the note, and the note is the one line in this panel that
-        // tells a child what the sliders cannot do.
-        const float RowScale = 0.80f;
+        // Four rows where there were two. A row is a slider with its caption
+        // above it - about 0.175h tall at full size - and four of those do not
+        // fit between the title and the microphone note, so they are built
+        // smaller and packed tighter. The note stays: it is the one line in
+        // this panel that tells a child what the sliders cannot do.
+        const float RowScale = 0.62f;
         float rowH = h * RowScale;
+        const float Gap = 0.115f;
 
         p.masterSlider = SettingRow(panel.transform, theme, display,
-            "Master", "SOUND", new Vector2(0f, h * 0.145f), W, rowH);
+            "Master", "SOUND", new Vector2(0f, h * Gap * 1.5f), W, rowH);
         p.narrationSlider = SettingRow(panel.transform, theme, display,
-            "Narration", "TEACHER RACHEL", new Vector2(0f, 0f), W, rowH);
+            "Narration", "TEACHER RACHEL", new Vector2(0f, h * Gap * 0.5f), W, rowH);
         p.musicSlider = SettingRow(panel.transform, theme, display,
-            "Music", "MUSIC", new Vector2(0f, -h * 0.145f), W, rowH);
+            "Music", "MUSIC", new Vector2(0f, -h * Gap * 0.5f), W, rowH);
+        p.effectsSlider = SettingRow(panel.transform, theme, display,
+            "Effects", "SOUND EFFECTS", new Vector2(0f, -h * Gap * 1.5f), W, rowH);
 
         Text note = Label(panel.transform, "MicNote",
             "These change what you hear, not the microphone.", display, 22,
