@@ -61,11 +61,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_intro
     text: Kylo is out of his room, and the hallway stretches away in front of him.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 68ce5e2d2b81947f0a7f928a7ed41728, type: 3}
   - id: rachel_l1_s2_lakad_story
     text: The hallway is long and quiet, and the bathroom is at the far end.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 87910f07c76ee4f98827d4f7688b62c6, type: 3}
   - id: rachel_l1_s2_lakad_ask
     text: Start him moving with {word}!
     gloss: 
@@ -73,11 +73,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_lakad_done
     text: Good! Kylo is walking down the hallway.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4b2f33ec968714a98b15d172b0fe1b44, type: 3}
   - id: rachel_l1_s2_kaliwa_story
     text: Kylo has stopped. There are doors on both sides, and he is not sure which way.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2d438447d35ee4d01b40d6526790e8cd, type: 3}
   - id: rachel_l1_s2_kaliwa_ask
     text: "Point him to the left \u2014 say {word}!"
     gloss: 
@@ -85,11 +85,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_kaliwa_done
     text: That's it! Kylo is looking to his left.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f9b9fbe870ebf47ef8d767a177b4e454, type: 3}
   - id: rachel_l1_s2_kanan_story
     text: Nothing on the left but Nanay's room. The other side is worth a look.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a98f67de618f649689d74c8716f7913e, type: 3}
   - id: rachel_l1_s2_kanan_ask
     text: Turn him the other way with {word}!
     gloss: 
@@ -97,11 +97,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_kanan_done
     text: Good eye! The bathroom door is on his right.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 27a8e0be4dd644f97b59a6f5615f741a, type: 3}
   - id: rachel_l1_s2_bukas_story
     text: Kylo has found the bathroom door, but it is shut tight.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6f826256a3bef4b47b98115d29188a41, type: 3}
   - id: rachel_l1_s2_bukas_ask
     text: Let's get that door open! Say {word}!
     gloss: 
@@ -109,11 +109,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_bukas_done
     text: Wonderful! The door swings open for Kylo.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a66bcdc47a56f4786b12f4bcfc74192f, type: 3}
   - id: rachel_l1_s2_ilaw_story
     text: Inside the bathroom it is still dark, and Kylo cannot see a thing.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 03c7bc238d8f349e5a6284f9c8cf5fed, type: 3}
   - id: rachel_l1_s2_ilaw_ask
     text: "Brighten the room for him \u2014 say {word}!"
     gloss: 
@@ -121,11 +121,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_ilaw_done
     text: Perfect! The bathroom is bright and warm now.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2e1dd346ec8034d0088272395c23d9e6, type: 3}
   - id: rachel_l1_s2_tabo_story
     text: Kylo can see the water jar now, with a blue dipper resting on top.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d34135bb06d1f4e0e9d023817dff81c5, type: 3}
   - id: rachel_l1_s2_tabo_ask
     text: Help him lift it down! Say {word}!
     gloss: 
@@ -137,7 +137,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_sabon_story
     text: Water alone will not get Kylo clean. He needs something that makes bubbles.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 70dd3de6028fa4183be92d08ca598c59, type: 3}
   - id: rachel_l1_s2_sabon_ask
     text: "Help him reach for it \u2014 say {word}!"
     gloss: 
@@ -145,11 +145,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_sabon_done
     text: Great! Kylo has the soap ready for his bath.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 01b002a69bf67431395c110c28c1b64c, type: 3}
   - id: rachel_l1_s2_sipilyo_story
     text: Kylo's teeth need cleaning too, before breakfast and before school.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5a6d56480716e47019e41c5bbddd4cd4, type: 3}
   - id: rachel_l1_s2_sipilyo_ask
     text: Hand him the right one by saying {word}!
     gloss: 
@@ -157,11 +157,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_sipilyo_done
     text: Well done! Kylo is brushing his teeth.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 306dfb27ee929452ab8e06829c838570, type: 3}
   - id: rachel_l1_s2_tuwalya_story
     text: When Kylo finishes washing, he will be soaking wet from head to toe.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 11b093294565e4e679103c3453bc21aa, type: 3}
   - id: rachel_l1_s2_tuwalya_ask
     text: "Get him something to dry with \u2014 say {word}!"
     gloss: 
@@ -169,19 +169,19 @@ MonoBehaviour:
   - id: rachel_l1_s2_tuwalya_done
     text: Excellent! Kylo has everything he needs now.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5715b0126e566482ebdb27d941aeeb3b, type: 3}
   - id: rachel_l1_s2_outro
     text: Everything is ready. Now Kylo can take his bath.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1408ff31217d7469db48084ba556c845, type: 3}
   - id: rachel_l1_s3_intro
     text: The bathroom is ready, and so is Kylo.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0347c1f766cad4b9bbdb0a4a5cb86476, type: 3}
   - id: rachel_l1_s3_kaliwa_story
     text: Kylo is by the door. The water jar is on the other side of the room.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 299dcba3a4f4c428585e733d0afd2e1c, type: 3}
   - id: rachel_l1_s3_kaliwa_ask
     text: Send him that way with {word}!
     gloss: 
@@ -189,11 +189,11 @@ MonoBehaviour:
   - id: rachel_l1_s3_kaliwa_done
     text: Good! Kylo has moved over to the water jar.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 9f44fcd0987d24bd19856268257ec6b1, type: 3}
   - id: rachel_l1_s3_maligo_story
     text: The water is cool and the soap is ready. This is Kylo's favourite part.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0bec2716c7bbf47479c5f688eea51cc8, type: 3}
   - id: rachel_l1_s3_maligo_ask
     text: Let's get him washing! Say {word}!
     gloss: 
@@ -201,11 +201,11 @@ MonoBehaviour:
   - id: rachel_l1_s3_maligo_done
     text: Wonderful! Kylo is clean from head to toe.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 134340ebf598242caaf172e5f3841950, type: 3}
   - id: rachel_l1_s3_suklay_story
     text: Kylo is clean, but his hair is sticking up in every direction.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3f37f9e04bcc24de6b167925d38e2ec3, type: 3}
   - id: rachel_l1_s3_suklay_ask
     text: "Tidy it up for him \u2014 say {word}!"
     gloss: 
@@ -213,19 +213,19 @@ MonoBehaviour:
   - id: rachel_l1_s3_suklay_done
     text: Very nice! Kylo's hair is neat and smooth.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
   - id: rachel_l1_s3_outro
     text: All clean! Now Kylo needs to get dressed for school.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 84d016a33cef54c8f8d659bef0f8e2e5, type: 3}
   - id: rachel_l1_s4_intro
     text: Kylo is back in his bedroom, dripping wet and wrapped in his towel.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 429c29b90d1914e67a27d1608da5fd3a, type: 3}
   - id: rachel_l1_s4_damit_story
     text: Kylo cannot go to school in his towel. His uniform is folded on the bed.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 48610cb6ebca4468d9bcf8595a9605e1, type: 3}
   - id: rachel_l1_s4_damit_ask
     text: "Help him put them on \u2014 say {word}!"
     gloss: 
@@ -233,11 +233,11 @@ MonoBehaviour:
   - id: rachel_l1_s4_damit_done
     text: Wonderful! Kylo is dressed in his school uniform.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d512f66d2d3cd4c57af70de206c7fa4e, type: 3}
   - id: rachel_l1_s4_medyas_story
     text: Kylo's feet are still bare, and the bedroom floor is cold.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 8b4eb572570e3400cb50eafe9bd27d4f, type: 3}
   - id: rachel_l1_s4_medyas_ask
     text: Warm them up for him! Say {word}!
     gloss: 
@@ -245,11 +245,11 @@ MonoBehaviour:
   - id: rachel_l1_s4_medyas_done
     text: Nice! Kylo has his socks on.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c94c142820d6a42bd82099aa739d4c6d, type: 3}
   - id: rachel_l1_s4_sapatos_story
     text: Socks alone will not do for the long walk to school.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c5e1df44d326045e8be4f83dcaedb111, type: 3}
   - id: rachel_l1_s4_sapatos_ask
     text: Finish his feet off with {word}!
     gloss: 
@@ -257,11 +257,11 @@ MonoBehaviour:
   - id: rachel_l1_s4_sapatos_done
     text: Great job! Kylo is ready to walk anywhere.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e7b98cae434e44eb981387b3072e973c, type: 3}
   - id: rachel_l1_s4_bag_story
     text: Kylo's books are packed and waiting on the chair by the door.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 59cdddfc86887480695100440bcf2b7a, type: 3}
   - id: rachel_l1_s4_bag_ask
     text: "Point him at it \u2014 say {word}!"
     gloss: 
@@ -285,15 +285,15 @@ MonoBehaviour:
   - id: rachel_l1_s4_outro
     text: Kylo is dressed and packed. But first, he needs his breakfast!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d622a774b56a9433a899e03a277724bd, type: 3}
   - id: rachel_l1_s5_intro
     text: Nanay has made breakfast, and the whole kitchen smells wonderful.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: fe6dd5eb5f03d4fa8addd49cb7b57078, type: 3}
   - id: rachel_l1_s5_upo_story
     text: Breakfast is on the table, and Kylo's chair is empty and waiting.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0cc4d6011b39e4366aa60ddf8145ece1, type: 3}
   - id: rachel_l1_s5_upo_ask
     text: "Get him settled \u2014 say {word}!"
     gloss: 
@@ -301,11 +301,11 @@ MonoBehaviour:
   - id: rachel_l1_s5_upo_done
     text: Good! Kylo is sitting at the table.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c3b84ab636adf48498239f9c9c8bc1d7, type: 3}
   - id: rachel_l1_s5_kanin_story
     text: There is a warm white heap on Kylo's plate. Filipino families eat it daily.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: dad401bf5afcd4e9da0e507f2c490d25, type: 3}
   - id: rachel_l1_s5_kanin_ask
     text: "Name it for Kylo \u2014 say {word}!"
     gloss: 
@@ -313,11 +313,11 @@ MonoBehaviour:
   - id: rachel_l1_s5_kanin_done
     text: That's right! Kylo's plate is full of rice.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cb5a1290605c6431095218e83d351528, type: 3}
   - id: rachel_l1_s5_itlog_story
     text: Beside the rice is something round, with a sunny yellow middle.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 03115179d54bd419ba25d7d273136fdf, type: 3}
   - id: rachel_l1_s5_itlog_ask
     text: "Tell Kylo what it is \u2014 say {word}!"
     gloss: 
@@ -325,11 +325,11 @@ MonoBehaviour:
   - id: rachel_l1_s5_itlog_done
     text: Well done! The egg is Kylo's favourite part.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 8125ccb555f454265a30a30bfe27022e, type: 3}
   - id: rachel_l1_s5_kain_story
     text: Everything is on the plate now, and Kylo's tummy is rumbling.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: eb9f36ea78e6f4570bf16651a8a4c42d, type: 3}
   - id: rachel_l1_s5_kain_ask
     text: Let him start his breakfast! Say {word}!
     gloss: 
@@ -337,11 +337,11 @@ MonoBehaviour:
   - id: rachel_l1_s5_kain_done
     text: Yummy! Kylo is enjoying every bite.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5bb43fe3a2a05452981e783c396c9c4e, type: 3}
   - id: rachel_l1_s5_inom_story
     text: All that rice has made Kylo thirsty. There is a glass beside his plate.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4851cd7b683d74375b492c40ec596204, type: 3}
   - id: rachel_l1_s5_inom_ask
     text: Help him finish it off with {word}!
     gloss: 
@@ -349,19 +349,19 @@ MonoBehaviour:
   - id: rachel_l1_s5_inom_done
     text: Wonderful! Kylo's breakfast is all done.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bd17b6a5a79bc493c8a5e8290daea5d1, type: 3}
   - id: rachel_l1_s5_outro
     text: Breakfast is finished. It is time for Kylo to head off to school!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cb1e7840367b240259306c0e49696611, type: 3}
   - id: rachel_l2_s1_intro
     text: Here is Kylo's school! The gate is open and the yard is full of children.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4c955351337324fec84b3e52908b6dd1, type: 3}
   - id: rachel_l2_s1_kumusta_story
     text: The guard at the gate smiles at Kylo every single morning.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3e3a0920e4a514e7bafb935eb538dd29, type: 3}
   - id: rachel_l2_s1_kumusta_ask
     text: "Greet him back \u2014 say {word}!"
     gloss: 
@@ -369,11 +369,11 @@ MonoBehaviour:
   - id: rachel_l2_s1_kumusta_done
     text: Lovely manners! The guard waves Kylo through.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 40300ba9607e449d080b95c612eb8278, type: 3}
   - id: rachel_l2_s1_pasok_story
     text: The gate is open, and the school building is just across the yard.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d7ee7591fb0224cdcb15b0311b20accb, type: 3}
   - id: rachel_l2_s1_pasok_ask
     text: Take him inside with {word}!
     gloss: 
@@ -381,11 +381,11 @@ MonoBehaviour:
   - id: rachel_l2_s1_pasok_done
     text: Good! Kylo is through the gate.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c6c173a0f51cc4c219059fb491fc94e1, type: 3}
   - id: rachel_l2_s1_takbo_story
     text: The bell is about to ring, and walking will not be fast enough.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 970412a12588d462dbfab61fa50155e9, type: 3}
   - id: rachel_l2_s1_takbo_ask
     text: "Hurry him along \u2014 say {word}!"
     gloss: 
@@ -393,19 +393,19 @@ MonoBehaviour:
   - id: rachel_l2_s1_takbo_done
     text: Excellent! Kylo made it before the bell.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 61bf7553b59e54ce2820cf18fd489f28, type: 3}
   - id: rachel_l2_s1_outro
     text: You made it in time! Now let's find Kylo's classroom.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d6e2a5347261a4aec918176f3b648ca9, type: 3}
   - id: rachel_l2_s2_intro
     text: Kylo is outside his classroom, and Teacher Rachel is already inside.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 72ada230a0857429d9dfa97ce5d49a3d, type: 3}
   - id: rachel_l2_s2_bukas_story
     text: The classroom door is closed, and the lesson is about to begin.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: ea6be6b19404148e7af9ec7d939714ff, type: 3}
   - id: rachel_l2_s2_bukas_ask
     text: "Let him in \u2014 say {word}!"
     gloss: 
@@ -413,11 +413,11 @@ MonoBehaviour:
   - id: rachel_l2_s2_bukas_done
     text: Good! The classroom door is open.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2323b8de0711646b5bc57a653174e4dd, type: 3}
   - id: rachel_l2_s2_kumusta_story
     text: Teacher Rachel looks up from her desk and smiles at Kylo.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f36757b9509bb46eea13fe51629a3919, type: 3}
   - id: rachel_l2_s2_kumusta_ask
     text: "Greet Teacher Rachel back \u2014 say {word}!"
     gloss: 
@@ -425,11 +425,11 @@ MonoBehaviour:
   - id: rachel_l2_s2_kumusta_done
     text: Very polite! Teacher Rachel smiles back at him.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c0b9d3dbac82c43f398bc9de0ba10153, type: 3}
   - id: rachel_l2_s2_upo_story
     text: Kylo's desk is near the window, and his classmates are already seated.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 244f2dfe7793d4c60943c26c146a9461, type: 3}
   - id: rachel_l2_s2_upo_ask
     text: "Get him into his chair \u2014 say {word}!"
     gloss: 
@@ -437,11 +437,11 @@ MonoBehaviour:
   - id: rachel_l2_s2_upo_done
     text: Good! Kylo is in his seat, ready to learn.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3653bbe6b655f4fccaf50359c1e9f359, type: 3}
   - id: rachel_l2_s2_kuha_story
     text: The lesson is starting, and Kylo's desk is completely empty.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1bd05e648d48e4088b7b35a913cb1669, type: 3}
   - id: rachel_l2_s2_kuha_ask
     text: "Reach into the bag for him \u2014 say {word}!"
     gloss: 
@@ -453,7 +453,7 @@ MonoBehaviour:
   - id: rachel_l2_s2_lapis_story
     text: There is one thing Kylo needs before he can write anything down.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 569015b7c8a204cde8a59e21358245fd, type: 3}
   - id: rachel_l2_s2_lapis_ask
     text: "Name it for him \u2014 say {word}!"
     gloss: 
@@ -461,19 +461,19 @@ MonoBehaviour:
   - id: rachel_l2_s2_lapis_done
     text: Well done! Kylo has his pencil on the desk.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: afd8362b61f2c4f90ab682622d1c7b5b, type: 3}
   - id: rachel_l2_s2_outro
     text: Everyone is ready. It is time for the lesson to begin!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2ee0cd3354cd844a5984619a31cf3ea7, type: 3}
   - id: rachel_l2_s3_intro
     text: Teacher Rachel is at the board, and today's lesson is about to start.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bb3ea56338e9c44298094638c25073cd, type: 3}
   - id: rachel_l2_s3_aklat_story
     text: Teacher Rachel asks the class to take something out of their bags.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: abf53342c065b47eca9454b3e54ab56a, type: 3}
   - id: rachel_l2_s3_aklat_ask
     text: "Help Kylo find it \u2014 say {word}!"
     gloss: 
@@ -481,11 +481,11 @@ MonoBehaviour:
   - id: rachel_l2_s3_aklat_done
     text: Good! Kylo's book is open on his desk.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e4d0ef07da49f4edf964b855f59e5a57, type: 3}
   - id: rachel_l2_s3_basa_story
     text: The page is open, and the whole class is following along out loud.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7a5d3c9936fe845cf9ce7c4004a1f3a9, type: 3}
   - id: rachel_l2_s3_basa_ask
     text: "Let Kylo join in \u2014 say {word}!"
     gloss: 
@@ -493,11 +493,11 @@ MonoBehaviour:
   - id: rachel_l2_s3_basa_done
     text: Wonderful! Kylo is reading with the class.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: aa7edd8d1d9934fafb8934479fd1057d, type: 3}
   - id: rachel_l2_s3_sulat_story
     text: Teacher Rachel writes a new word on the board for everyone to copy.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d48b3f8fdb46d4cc7963f673a7d070a5, type: 3}
   - id: rachel_l2_s3_sulat_ask
     text: Get his pencil moving with {word}!
     gloss: 
@@ -505,11 +505,11 @@ MonoBehaviour:
   - id: rachel_l2_s3_sulat_done
     text: Excellent! Kylo is writing the word down.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2e345301677ec4ebda21356295a3373a, type: 3}
   - id: rachel_l2_s3_tanong_story
     text: Kylo does not understand one part, and his hand goes half way up.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 681497335ddba49fcb65207005fd092b, type: 3}
   - id: rachel_l2_s3_tanong_ask
     text: "Give him the courage \u2014 say {word}!"
     gloss: 
@@ -517,11 +517,11 @@ MonoBehaviour:
   - id: rachel_l2_s3_tanong_done
     text: Brave boy! Kylo has asked his question.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bcbf9a232143b4b839479b935289956c, type: 3}
   - id: rachel_l2_s3_sagot_story
     text: Teacher Rachel turns to Kylo and waits for him to reply.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d9bbf42994c754604a02e2beb23c8c2e, type: 3}
   - id: rachel_l2_s3_sagot_ask
     text: Help him speak up by saying {word}!
     gloss: 
@@ -529,19 +529,19 @@ MonoBehaviour:
   - id: rachel_l2_s3_sagot_done
     text: Well done! Kylo gave the right answer.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2094c3342a66b4c27a4339e5501febc0, type: 3}
   - id: rachel_l2_s3_outro
     text: Excellent work! Kylo is learning so many new words.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 442f490db94ac4bc286bd4eb7d3070d6, type: 3}
   - id: rachel_l2_s4_intro
     text: The recess bell has rung, and the classroom is emptying fast.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: aaa170ad75041483a85926ec29c67427, type: 3}
   - id: rachel_l2_s4_labas_story
     text: Kylo's classmates are already streaming out into the sunshine.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1b79ed27b14bf4397abfc3fc39b2ea9d, type: 3}
   - id: rachel_l2_s4_labas_ask
     text: "Let him out into the sun \u2014 say {word}!"
     gloss: 
@@ -549,7 +549,7 @@ MonoBehaviour:
   - id: rachel_l2_s4_labas_done
     text: Good! Kylo is out in the school yard.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e3c57839a99ff4a2ab9a14de8977d8a8, type: 3}
   - id: rachel_l2_s4_kain_story
     text: Nanay packed Kylo a snack, and it is still sitting in his bag.
     gloss: 
@@ -561,11 +561,11 @@ MonoBehaviour:
   - id: rachel_l2_s4_kain_done
     text: Yummy! Kylo has finished his snack.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3fe6b08b19e4a436e9d61295cf0642b6, type: 3}
   - id: rachel_l2_s4_laro_story
     text: Kylo's classmates are chasing each other across the yard.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 360a0b7810b3f42a69b5d3427930347e, type: 3}
   - id: rachel_l2_s4_laro_ask
     text: Send him over to join them! Say {word}!
     gloss: 
@@ -573,11 +573,11 @@ MonoBehaviour:
   - id: rachel_l2_s4_laro_done
     text: Wonderful! Kylo is playing with his classmates.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e044f31b9722e4001aad4e258c00dc28, type: 3}
   - id: rachel_l2_s4_tawa_story
     text: One of Kylo's friends makes the silliest face in the whole school.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 593af02480f8b4076b7d12cbb29e45d0, type: 3}
   - id: rachel_l2_s4_tawa_ask
     text: "Let it out of him \u2014 say {word}!"
     gloss: 
@@ -585,11 +585,11 @@ MonoBehaviour:
   - id: rachel_l2_s4_tawa_done
     text: What a happy sound! Kylo is laughing.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2b0ae6f997618419bbf3f9353f0019f9, type: 3}
   - id: rachel_l2_s4_tulong_story
     text: A smaller child has tripped and dropped everything on the ground.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: ccc40981d6d3243b4bb3d74ae811ce09, type: 3}
   - id: rachel_l2_s4_tulong_ask
     text: Send Kylo over with {word}!
     gloss: 
@@ -597,19 +597,19 @@ MonoBehaviour:
   - id: rachel_l2_s4_tulong_done
     text: So kind! Kylo helped the little one up.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 8046153bece1e4a189eaecb978ac1724, type: 3}
   - id: rachel_l2_s4_outro
     text: That was fun, but recess is over. Back to class!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d277e1e68f93c46779944fc034598818, type: 3}
   - id: rachel_l2_s5_intro
     text: Recess is over. There is one more lesson before home time.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f8f047b1351fc4674b6984fed16d3b6e, type: 3}
   - id: rachel_l2_s5_pasok_story
     text: The classroom door is open, and the afternoon lesson is waiting.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 361e5b8bf2a1b41aa83832cdebdfbd20, type: 3}
   - id: rachel_l2_s5_pasok_ask
     text: "Take him back inside \u2014 say {word}!"
     gloss: 
@@ -617,11 +617,11 @@ MonoBehaviour:
   - id: rachel_l2_s5_pasok_done
     text: Good! Kylo is back in the classroom.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 69aeae3adc78048a68cfb46cc49940b9, type: 3}
   - id: rachel_l2_s5_upo_story
     text: Kylo's desk is just where he left it before recess.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b9f1e6b87c61b4a508675dfa3391f61a, type: 3}
   - id: rachel_l2_s5_upo_ask
     text: Settle him down with {word}!
     gloss: 
@@ -629,11 +629,11 @@ MonoBehaviour:
   - id: rachel_l2_s5_upo_done
     text: Good! Kylo is sitting at his desk again.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cd4bf1dc25adb408c9542655fa0b5f11, type: 3}
   - id: rachel_l2_s5_linis_story
     text: The lesson is over, and there are papers and crayons all over the desk.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5f5f369ef33a241779478802ff3fbd7e, type: 3}
   - id: rachel_l2_s5_linis_ask
     text: "Tidy it up with him \u2014 say {word}!"
     gloss: 
@@ -641,11 +641,11 @@ MonoBehaviour:
   - id: rachel_l2_s5_linis_done
     text: Spotless! Kylo's desk is neat again.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1cb25b3fd27b8421cb00bbb032ee5ca7, type: 3}
   - id: rachel_l2_s5_bag_story
     text: Kylo's things are tidy, but they still need somewhere to go.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3df67ffb1065d4506bc8292690356791, type: 3}
   - id: rachel_l2_s5_bag_ask
     text: "Point him at it \u2014 say {word}!"
     gloss: 
@@ -653,11 +653,11 @@ MonoBehaviour:
   - id: rachel_l2_s5_bag_done
     text: Good! Everything is packed away safely.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e49096bd43d0a40a58e13c0275189097, type: 3}
   - id: rachel_l2_s5_alis_story
     text: The last bell has rung, and Nanay is waiting outside the gate.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7b39bcda6b6984eddb7f34919f0691c1, type: 3}
   - id: rachel_l2_s5_alis_ask
     text: "Set him off for home \u2014 say {word}!"
     gloss: 
@@ -665,19 +665,19 @@ MonoBehaviour:
   - id: rachel_l2_s5_alis_done
     text: Great job! Kylo's school day is finished.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1e36ea66417e249889799ed88e842187, type: 3}
   - id: rachel_l2_s5_outro
     text: Well done! Kylo has finished his whole school day.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 8300433a289c14716bc1eaf600dea4fb, type: 3}
   - id: rachel_l3_s1_intro
     text: School is over, and the park is just down the road.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3443f8661bb0c48489a36e0e998089cf, type: 3}
   - id: rachel_l3_s1_lakad_story
     text: It is a sunny afternoon, and Kylo has nowhere else he needs to be.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6baceb4be1afd492d89d0d08d6237fc6, type: 3}
   - id: rachel_l3_s1_lakad_ask
     text: "Start him off \u2014 say {word}!"
     gloss: 
@@ -685,11 +685,11 @@ MonoBehaviour:
   - id: rachel_l3_s1_lakad_done
     text: Good! Kylo is on his way to the park.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bf50ed3ad66354a1ab47aa6594ba9864, type: 3}
   - id: rachel_l3_s1_takbo_story
     text: Kylo can see the park gate ahead, and he cannot wait any longer.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3db607a6142c84a93b0c7e971f948f71, type: 3}
   - id: rachel_l3_s1_takbo_ask
     text: Speed him up with {word}!
     gloss: 
@@ -697,11 +697,11 @@ MonoBehaviour:
   - id: rachel_l3_s1_takbo_done
     text: Wonderful! Kylo is almost at the park.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2a0a8524665c14ef78fdbc73b774739c, type: 3}
   - id: rachel_l3_s1_tingin_story
     text: Something bright and colourful is moving behind the park fence.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 073f4409a2965436fbd0f5fd68449da9, type: 3}
   - id: rachel_l3_s1_tingin_ask
     text: "Turn his head that way \u2014 say {word}!"
     gloss: 
@@ -709,11 +709,11 @@ MonoBehaviour:
   - id: rachel_l3_s1_tingin_done
     text: There it is! Kylo has spotted the playground.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f169264d0d4b24a46aac9349356ab38c, type: 3}
   - id: rachel_l3_s1_tuwa_story
     text: "Swings, a slide and a seesaw \u2014 exactly what Kylo was hoping for."
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f4aae2218ae4946f4b8e0fed2afc8983, type: 3}
   - id: rachel_l3_s1_tuwa_ask
     text: Let him show it! Say {word}!
     gloss: 
@@ -721,11 +721,11 @@ MonoBehaviour:
   - id: rachel_l3_s1_tuwa_done
     text: Look at that smile! Kylo is full of joy.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c3be64cd70b9e4fe4a5e779d21e846d4, type: 3}
   - id: rachel_l3_s1_pasok_story
     text: The park gate is open, and the grass looks soft and green.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e1548002fb5b344918e47552f71b3acc, type: 3}
   - id: rachel_l3_s1_pasok_ask
     text: "Take him in \u2014 say {word}!"
     gloss: 
@@ -733,19 +733,19 @@ MonoBehaviour:
   - id: rachel_l3_s1_pasok_done
     text: Here we are! Kylo is inside the park.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 09fb110dbfee34c969aaa2ef1c299110, type: 3}
   - id: rachel_l3_s1_outro
     text: Kylo is at the park at last. Let's go and play!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: dcc1ca4daf4de455fb5a334238b0210c, type: 3}
   - id: rachel_l3_s2_intro
     text: The playground is busy and the sun is still high.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2e75f49ad689f42bbb4b088185f76cd1, type: 3}
   - id: rachel_l3_s2_akyat_story
     text: The slide is tall, and its ladder goes all the way up to the top.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: feea4d57628ef4368b15233e135eb1d1, type: 3}
   - id: rachel_l3_s2_akyat_ask
     text: "Start him up the ladder \u2014 say {word}!"
     gloss: 
@@ -753,11 +753,11 @@ MonoBehaviour:
   - id: rachel_l3_s2_akyat_done
     text: Up he goes! Kylo is at the top of the slide.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cfd10c6b44bda4e90a1a61828ee42c18, type: 3}
   - id: rachel_l3_s2_dausdos_story
     text: Kylo is at the top now, looking down the long shiny slide.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 08ae989851d9f42cd898667ce0e214cf, type: 3}
   - id: rachel_l3_s2_dausdos_ask
     text: Send him down with {word}!
     gloss: 
@@ -765,11 +765,11 @@ MonoBehaviour:
   - id: rachel_l3_s2_dausdos_done
     text: Wheee! Kylo slid all the way to the bottom.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 71d38a2a10e2b47a49b78633d0b4d389, type: 3}
   - id: rachel_l3_s2_sakay_story
     text: An empty swing is rocking gently, waiting for somebody to use it.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 60d42a9db57b841e3890f7771dc331f3, type: 3}
   - id: rachel_l3_s2_sakay_ask
     text: "Get him on board \u2014 say {word}!"
     gloss: 
@@ -777,11 +777,11 @@ MonoBehaviour:
   - id: rachel_l3_s2_sakay_done
     text: Nice! Kylo is sitting on the swing.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 900c15ae52d88470493b9ae52bb97872, type: 3}
   - id: rachel_l3_s2_tulak_story
     text: Kylo is on the swing, but a swing cannot start by itself.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3448002cbca154b2d8d45fa557dca29b, type: 3}
   - id: rachel_l3_s2_tulak_ask
     text: "Give it a shove \u2014 say {word}!"
     gloss: 
@@ -789,11 +789,11 @@ MonoBehaviour:
   - id: rachel_l3_s2_tulak_done
     text: Higher and higher! Kylo is swinging.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0f739e60e75714225a840fa43845927d, type: 3}
   - id: rachel_l3_s2_talon_story
     text: The swing is slowing down, and Kylo wants to land in the sand.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 6dc4d895bcc6a4d5ba3d31c5fad777cf, type: 3}
   - id: rachel_l3_s2_talon_ask
     text: "Launch him off \u2014 say {word}!"
     gloss: 
@@ -801,19 +801,19 @@ MonoBehaviour:
   - id: rachel_l3_s2_talon_done
     text: What a landing! Kylo is safe in the sand.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7615d1a6c709442ff8fcce0f8e0b02d4, type: 3}
   - id: rachel_l3_s2_outro
     text: Wow! Kylo is having so much fun today.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f3a67a23228344f189330d4fccceb18b, type: 3}
   - id: rachel_l3_s3_intro
     text: Two children Kylo has never met are playing over by the swings.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b2a5546fd9ca14d01acddb708ef4d234, type: 3}
   - id: rachel_l3_s3_kumusta_story
     text: The two children look over at Kylo and wave at him.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5bb988f0a4d384ac09d3e7e31c822c9f, type: 3}
   - id: rachel_l3_s3_kumusta_ask
     text: "Break the ice for him \u2014 say {word}!"
     gloss: 
@@ -821,11 +821,11 @@ MonoBehaviour:
   - id: rachel_l3_s3_kumusta_done
     text: Lovely! Kylo has said hello to them.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1d11cec8a4ca94397a870043c76be996, type: 3}
   - id: rachel_l3_s3_ngiti_story
     text: Kylo is a little shy, and his face has gone very serious.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3188538a8d5da4dc6af773736e11d9cf, type: 3}
   - id: rachel_l3_s3_ngiti_ask
     text: "Soften his face \u2014 say {word}!"
     gloss: 
@@ -833,11 +833,11 @@ MonoBehaviour:
   - id: rachel_l3_s3_ngiti_done
     text: Much better! Kylo's smile makes them smile too.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 212e29c0d2edc42f3bc85bbfaacdcb77, type: 3}
   - id: rachel_l3_s3_tanong_story
     text: Kylo would like to know their names, but the words are stuck.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4f6b60d60f9674f8b84ef73920b95af2, type: 3}
   - id: rachel_l3_s3_tanong_ask
     text: "Help him speak up \u2014 say {word}!"
     gloss: 
@@ -845,11 +845,11 @@ MonoBehaviour:
   - id: rachel_l3_s3_tanong_done
     text: Well done! Kylo asked them their names.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: fa8a8dbd9ac414e67ad963cdf3d2c6ab, type: 3}
   - id: rachel_l3_s3_laro_story
     text: His new friends are starting a game of tag, and they want Kylo in it.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f08e9dae5b20f4c2db4e659850a983bb, type: 3}
   - id: rachel_l3_s3_laro_ask
     text: "Send him over \u2014 say {word}!"
     gloss: 
@@ -857,11 +857,11 @@ MonoBehaviour:
   - id: rachel_l3_s3_laro_done
     text: Wonderful! Kylo is playing with his new friends.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 295a502acd9d24c5794b13f9a9719dbe, type: 3}
   - id: rachel_l3_s3_bati_story
     text: A third child arrives and stands quietly at the edge of the game.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: aa01e43a21be748098dfcbaf40deeb28, type: 3}
   - id: rachel_l3_s3_bati_ask
     text: "Make him welcome \u2014 say {word}!"
     gloss: 
@@ -869,19 +869,19 @@ MonoBehaviour:
   - id: rachel_l3_s3_bati_done
     text: So friendly! Kylo welcomed him into the game.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 448356697094440d7a3c040bc092be37, type: 3}
   - id: rachel_l3_s3_outro
     text: New friends already! Playing is hungry work, though.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b40874e0814c246c18fd5a32bd0ecd7a, type: 3}
   - id: rachel_l3_s4_intro
     text: Someone has spread a mat under the big tree, with food in the middle.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 22be095da37e4430d9cb0d0400d06043, type: 3}
   - id: rachel_l3_s4_upo_story
     text: Everyone is finding a place to sit, and there is a gap beside his friends.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a9940af2cd4ca4256b987ad6d01a0103, type: 3}
   - id: rachel_l3_s4_upo_ask
     text: "Find him a spot \u2014 say {word}!"
     gloss: 
@@ -889,11 +889,11 @@ MonoBehaviour:
   - id: rachel_l3_s4_upo_done
     text: Good! Kylo is sitting on the picnic mat.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 8a61c916cec2e474194df65eaa1a7799, type: 3}
   - id: rachel_l3_s4_kain_story
     text: There are sandwiches and sliced fruit laid out on the mat.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cffdb5bf88cd44244991792ee208f860, type: 3}
   - id: rachel_l3_s4_kain_ask
     text: "Let him dig in \u2014 say {word}!"
     gloss: 
@@ -901,11 +901,11 @@ MonoBehaviour:
   - id: rachel_l3_s4_kain_done
     text: Yummy! Kylo is enjoying the picnic.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4551b3c5e963f47d0999fddbb05645ba, type: 3}
   - id: rachel_l3_s4_ibahagi_story
     text: Kylo has more food than he can finish, and his friends have none.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2d8feeb1720394ef4986db0e8cadfce6, type: 3}
   - id: rachel_l3_s4_ibahagi_ask
     text: "Be generous for him \u2014 say {word}!"
     gloss: 
@@ -913,11 +913,11 @@ MonoBehaviour:
   - id: rachel_l3_s4_ibahagi_done
     text: How kind! Everyone has something to eat now.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 978daaa5a258b4c63bb11cb998f0b552, type: 3}
   - id: rachel_l3_s4_inom_story
     text: All that running has made the whole group very thirsty.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0d554ca8a65764a92aba260d2b443bd5, type: 3}
   - id: rachel_l3_s4_inom_ask
     text: "Pass him the juice \u2014 say {word}!"
     gloss: 
@@ -925,11 +925,11 @@ MonoBehaviour:
   - id: rachel_l3_s4_inom_done
     text: Refreshing! Kylo is not thirsty any more.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a43ab452000e544c6adc6b49ceb100c1, type: 3}
   - id: rachel_l3_s4_salamat_story
     text: Kylo's new friends shared their own snacks with him too.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b722f308477724807b4c069a7a51eb4a, type: 3}
   - id: rachel_l3_s4_salamat_ask
     text: "Mind his manners \u2014 say {word}!"
     gloss: 
@@ -937,19 +937,19 @@ MonoBehaviour:
   - id: rachel_l3_s4_salamat_done
     text: Beautiful manners! Kylo thanked his friends.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2ca8ac95c74c24af88d1c21a8183548a, type: 3}
   - id: rachel_l3_s4_outro
     text: Sharing makes snack time even better.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 58053a100559d427197105e0f1002da8, type: 3}
   - id: rachel_l3_s5_intro
     text: The sky is turning orange, and the day at the park is nearly over.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f446db66cd4f84d31886e7ccdbc3bb16, type: 3}
   - id: rachel_l3_s5_paalam_story
     text: Kylo's new friends are picking up their things. It is time to part.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5ee8bc408c8b143ce9346031996e4006, type: 3}
   - id: rachel_l3_s5_paalam_ask
     text: "Send them off kindly \u2014 say {word}!"
     gloss: 
@@ -957,11 +957,11 @@ MonoBehaviour:
   - id: rachel_l3_s5_paalam_done
     text: Sweet! Kylo waved his friends goodbye.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d1fd1d09bd920419b8d4c26ec8992593, type: 3}
   - id: rachel_l3_s5_lakad_story
     text: The park gate is behind Kylo now, and home is down the road.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 9a5a75430b6ba4f759def149b217b04f, type: 3}
   - id: rachel_l3_s5_lakad_ask
     text: "Start him homeward \u2014 say {word}!"
     gloss: 
@@ -969,11 +969,11 @@ MonoBehaviour:
   - id: rachel_l3_s5_lakad_done
     text: Good! Kylo is walking home.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3d28c7744621d44afbd9ff6d90aaa8c4, type: 3}
   - id: rachel_l3_s5_tingin_story
     text: Something is glowing warmly at the far end of the street.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: ae6c3416e2eaf4329a4436ee97acc8f7, type: 3}
   - id: rachel_l3_s5_tingin_ask
     text: "Turn his head \u2014 say {word}!"
     gloss: 
@@ -981,11 +981,11 @@ MonoBehaviour:
   - id: rachel_l3_s5_tingin_done
     text: There it is! Kylo can see his own house.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: afcc1097a7ba14be39226c6607719736, type: 3}
   - id: rachel_l3_s5_pagod_story
     text: It has been a very long day, and Kylo's legs are getting heavy.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 21fd2a27240f942e2affd117d0770ce8, type: 3}
   - id: rachel_l3_s5_pagod_ask
     text: "Let him admit it \u2014 say {word}!"
     gloss: 
@@ -993,11 +993,11 @@ MonoBehaviour:
   - id: rachel_l3_s5_pagod_done
     text: What a day! Kylo is ready for a rest.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d12b00039e4664090b1809e640354ed8, type: 3}
   - id: rachel_l3_s5_uwi_story
     text: Nanay has left the lamp on, and the front door is just ahead.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2f796c8aab9f442f19ab6e30539651e9, type: 3}
   - id: rachel_l3_s5_uwi_ask
     text: "Bring him home \u2014 say {word}!"
     gloss: 
@@ -1005,35 +1005,35 @@ MonoBehaviour:
   - id: rachel_l3_s5_uwi_done
     text: Home at last! Kylo had a wonderful day.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a028a528fdcc548ed921ff88fc195214, type: 3}
   - id: rachel_l3_s5_outro
     text: What a day! Kylo is home safe and happy.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f5b5a2cc70a9545cd88fb458871fa118, type: 3}
   - id: rachel_l1_complete_summary
     text: You helped Kylo finish his whole morning routine!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d823286f610c84a0ebf550fbc9ecb732, type: 3}
   - id: rachel_l1_complete_badge
     text: Bahay Badge Unlocked!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1babb57976f0144e796f377794b93836, type: 3}
   - id: rachel_l2_complete_summary
     text: Great job! Kylo finished his school day!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3b5ce2f48a0a946bab487c1bf1f70a9a, type: 3}
   - id: rachel_l2_complete_badge
     text: Paaralan Badge Unlocked!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0b2e6a5588dd842aebdf0068590b3964, type: 3}
   - id: rachel_l3_complete_summary
     text: Amazing! Kylo had a wonderful day!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7a8bc42c32a234b1784661e38d495fa5, type: 3}
   - id: rachel_l3_complete_badge
     text: Parke Badge Unlocked!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 319f7ecc52f664bf29ef0455b6fb18c6, type: 3}
   - id: rachel_word_bangon_teach
     text: In Filipino, 'Bangon' means to get up, or to rise from bed.
     gloss: Get up
