@@ -103,7 +103,11 @@ public static class WordsLearnedPanelBuilder
                                     new Vector2(PanelWidth * CloseX, FromTop(CloseFrac)),
                                     CloseSize);
 
-        WordsLearnedPanel panel = content.AddComponent<WordsLearnedPanel>();
+        // On the CANVAS, not on content. content is the thing switched off, and
+        // a component living there would run its own Awake the moment it was
+        // switched back on - see the guard in WordsLearnedPanel.Awake, and the
+        // identical one SceneResultPanel has carried since it was written.
+        WordsLearnedPanel panel = canvas.gameObject.AddComponent<WordsLearnedPanel>();
         panel.objectiveController = controller;
         panel.panelRoot = content;
         panel.rows = rows.ToArray();

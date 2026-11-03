@@ -66,6 +66,20 @@ public class WordsLearnedPanel : MonoBehaviour
     {
         if (objectiveController == null)
             objectiveController = FindFirstObjectByType<SceneObjectiveController>();
+
+        // The same trap SceneResultPanel guards against, and for the same
+        // reason. Pointed at its own GameObject, the line below would fire the
+        // moment Show() switched the panel on - Unity runs Awake during that
+        // SetActive - and turn it straight back off, leaving the summary hidden
+        // and nothing in its place.
+        if (panelRoot == gameObject)
+        {
+            Debug.LogError("[SALINLAHI] WordsLearnedPanel.panelRoot points at its own " +
+                           "GameObject. Switching the panel on would run this Awake and " +
+                           "switch it off again. Point it at a child instead.");
+            panelRoot = null;
+        }
+
         if (panelRoot != null) panelRoot.SetActive(false);
     }
 
