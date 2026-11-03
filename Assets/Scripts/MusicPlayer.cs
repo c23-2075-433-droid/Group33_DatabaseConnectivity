@@ -89,8 +89,13 @@ public class MusicPlayer : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        live = NewSource("Live");
-        fading = NewSource("Fading");
+        // Named A and B, not "Live" and "Fading". The two swap roles on every
+        // crossfade, so role names are wrong half the time - and an inspector
+        // showing "Live" with no clip and volume 0 reads as a broken music
+        // player rather than the idle half of a pair. It cost me a wrong
+        // diagnosis once; the names are neutral now.
+        live = NewSource("Music Source A");
+        fading = NewSource("Music Source B");
 
         SceneManager.sceneLoaded += OnSceneLoaded;
         Apply(SceneManager.GetActiveScene().name);
