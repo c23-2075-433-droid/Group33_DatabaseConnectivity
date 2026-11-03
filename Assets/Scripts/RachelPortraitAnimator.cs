@@ -119,6 +119,9 @@ public class RachelPortraitAnimator : MonoBehaviour
     // this changes, so a held frame does not rebuild the canvas every tick.
     private Sprite shown;
 
+    // TEMPORARY DIAGNOSTIC - remove with the Debug.Log calls below.
+    private bool warnedNoClip;
+
     // The line being lip-synced, and where we are in its track.
     private AudioClip trackedClip;
     private VisemeTracks.Change[] track;
@@ -189,17 +192,34 @@ public class RachelPortraitAnimator : MonoBehaviour
     private bool Sync()
     {
         AudioClip clip = narrator.CurrentClip;
-        if (clip == null) return false;
+        if (clip == null)
+        {
+            // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
+            if (!warnedNoClip)
+            {
+                warnedNoClip = true;
+                Debug.Log("[lipsync] she is speaking but no clip is playing: " +
+                          "either the line has no recording, or it is being spoken as a caption.");
+            }
+            return false;
+        }
+        warnedNoClip = false;
 
         if (!ReferenceEquals(clip, trackedClip))
         {
             trackedClip = clip;
             track = VisemeTracks.For(clip.name);
             trackAt = 0;
+
+            // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
+            Debug.Log("[lipsync] clip '" + clip.name + "' -> " +
+                      (track == null ? "NO TRACK" : track.Length + " changes") +
+                      ", sprites " + (visemeAI != null ? "wired" : "MISSING"));
         }
         if (track == null || track.Length == 0) return false;
 
         float t = narrator.PlaybackTime;
+
 
         // Scrub backwards if the clip restarted; otherwise walk forward. The
         // track is in order, so this is a step per frame at most, not a search.
