@@ -444,6 +444,12 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
             ui.musicSlider.onValueChanged.RemoveListener(OnMusicChanged);
             ui.musicSlider.onValueChanged.AddListener(OnMusicChanged);
         }
+        if (ui.effectsSlider != null)
+        {
+            ui.effectsSlider.SetValueWithoutNotify(VolumeSettings.Effects);
+            ui.effectsSlider.onValueChanged.RemoveListener(OnEffectsChanged);
+            ui.effectsSlider.onValueChanged.AddListener(OnEffectsChanged);
+        }
         if (ui.settingsClose != null)
         {
             ui.settingsClose.onClick.RemoveListener(CloseSettings);
@@ -481,6 +487,11 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
     private void OnMusicChanged(float value)
     {
         VolumeSettings.Music = value;
+    }
+
+    private void OnEffectsChanged(float value)
+    {
+        VolumeSettings.Effects = value;
     }
 
     // ------------------------------------------------------------------
