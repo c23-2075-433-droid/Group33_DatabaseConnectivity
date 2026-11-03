@@ -314,7 +314,7 @@ public static class GameplayHUDLayout
 
         Text title = Label(panel.transform, "Title", "SETTINGS", display, 52,
             FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
-        Place(title.rectTransform, new Vector2(0f, h * 0.31f), new Vector2(W * 0.7f, h * 0.11f));
+        Place(title.rectTransform, new Vector2(0f, h * 0.345f), new Vector2(W * 0.7f, h * 0.09f));
         Shade(title);
 
         // Four rows where there were two. A row is a slider with its caption
@@ -322,9 +322,15 @@ public static class GameplayHUDLayout
         // fit between the title and the microphone note, so they are built
         // smaller and packed tighter. The note stays: it is the one line in
         // this panel that tells a child what the sliders cannot do.
-        const float RowScale = 0.62f;
+        //
+        // These two numbers are in tension and were settled by eye in Play
+        // mode. A row's knob is taller than its bar, so it reaches up into the
+        // caption: too large a RowScale and the knob sits on the words, too
+        // small a Gap and it sits on the row above's words instead. The title
+        // and the note moved outwards to buy the four rows the room.
+        const float RowScale = 0.52f;
         float rowH = h * RowScale;
-        const float Gap = 0.115f;
+        const float Gap = 0.137f;
 
         p.masterSlider = SettingRow(panel.transform, theme, display,
             "Master", "SOUND", new Vector2(0f, h * Gap * 1.5f), W, rowH);
@@ -338,7 +344,7 @@ public static class GameplayHUDLayout
         Text note = Label(panel.transform, "MicNote",
             "These change what you hear, not the microphone.", display, 22,
             FontStyle.Normal, TextAnchor.MiddleCenter, Cream);
-        Place(note.rectTransform, new Vector2(0f, -h * 0.25f), new Vector2(W * 0.74f, h * 0.08f));
+        Place(note.rectTransform, new Vector2(0f, -h * 0.275f), new Vector2(W * 0.74f, h * 0.065f));
         note.resizeTextForBestFit = true;
         note.resizeTextMinSize = 14;
         note.resizeTextMaxSize = 22;
@@ -359,8 +365,8 @@ public static class GameplayHUDLayout
     {
         Text label = Label(panel, name + "Label", caption, display, 32,
             FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
-        Place(label.rectTransform, position + new Vector2(0f, h * 0.075f),
-            new Vector2(w * 0.7f, h * 0.09f));
+        Place(label.rectTransform, position + new Vector2(0f, h * 0.135f),
+            new Vector2(w * 0.7f, h * 0.085f));
         label.resizeTextForBestFit = true;
         label.resizeTextMinSize = 18;
         label.resizeTextMaxSize = 32;
@@ -405,7 +411,7 @@ public static class GameplayHUDLayout
         handleImage.sprite = theme != null ? theme.sliderKnob : null;
         if (handleImage.sprite == null) handleImage.color = new Color(0.62f, 0.40f, 0.18f);
         RectTransform handleRect = handle.GetComponent<RectTransform>();
-        handleRect.sizeDelta = new Vector2(size.y * 1.35f, size.y * 1.35f);
+        handleRect.sizeDelta = new Vector2(size.y * 1.25f, size.y * 1.25f);
 
         slider.fillRect = fillRect;
         slider.handleRect = handleRect;
