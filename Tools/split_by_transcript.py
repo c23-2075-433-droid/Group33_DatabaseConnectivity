@@ -60,6 +60,13 @@ PAD_TAIL = 0.12
 TRIM_REL = 0.06
 TARGET_DBFS = -20.0
 
+# A silence this long inside a clip ends it. The recogniser sometimes runs a
+# token all the way to the next word - "Dausdos" came back as 3.08 s, which
+# was the word, then a breath, then the first syllable of "Sakay". A stop
+# consonant inside a word is nowhere near this long, so cutting at the first
+# gap this size keeps the word and drops whatever followed it.
+GAP_STOP = 0.35
+
 # What the recogniser writes against how the script spells it. Filipino
 # orthography is not the recogniser's strong suit and these three come back
 # consistently misspelt rather than wrong.
@@ -67,6 +74,7 @@ ALIAS = {
     "kamusta": "kumusta",
     "akiyat": "akyat",
     "daosdos": "dausdos",
+    "ui": "uwi",
 }
 
 
@@ -118,6 +126,11 @@ def main():
         rate, n = w.getframerate(), w.getnframes()
         x = np.frombuffer(w.readframes(n), dtype="<i2").astype(np.float32) / 32768.0
 
+    # Where every token the recogniser found begins, so a window can be
+    # stopped before the next one starts.
+    starts = sorted(float(t["start"]) for t in payload.get("words", [])
+                    if t.get("type") == "word")
+
     found, missing = [], []
     for word in words:
         takes = heard.get(norm(word))
@@ -130,9 +143,13 @@ def main():
     written = 0
     for word, takes in found:
         t = takes[-1]                       # the last take is the one she meant
-        a = max(0, int((float(t["start"]) - PAD_HEAD) * rate))
-        b = min(len(x), int((float(t["end"]) + PAD_TAIL) * rate))
-        seg = level(trim(x[a:b]))
+        start, end = float(t["start"]), float(t["end"])
+        after = next((s for s in starts if s > start), None)
+        if after is not None:
+            end = min(end, after - PAD_HEAD)
+        a = max(0, int((start - PAD_HEAD) * rate))
+        b = min(len(x), int((end + PAD_TAIL) * rate))
+        seg = level(trim(x[a:b], rate))
         mark = "  (take %d)" % len(takes) if len(takes) > 1 else ""
         print("%-14s %5d  %6.2fs %6.2fs%s"
               % (word, len(takes), float(t["start"]), len(seg) / float(rate), mark))
@@ -168,16 +185,27 @@ def norm(s):
     return re.sub(r"[^a-z]", "", s.lower())
 
 
-def trim(seg):
-    """Cut to the sound, measured against this clip's own peak."""
+def trim(seg, rate=44100):
+    """
+    Cut to the sound, measured against this clip's own peak, and stop at the
+    first real silence - so a token that ran on past its word keeps only the
+    word.
+    """
     peak = float(np.max(np.abs(seg))) if len(seg) else 0.0
     if peak <= 0:
         return seg
     loud = np.nonzero(np.abs(seg) > peak * TRIM_REL)[0]
     if not len(loud):
         return seg
-    head = max(0, loud[0] - int(0.010 * 44100))
-    tail = min(len(seg), loud[-1] + int(0.040 * 44100))
+
+    end = loud[-1]
+    gap = int(GAP_STOP * rate)
+    breaks = np.nonzero(np.diff(loud) > gap)[0]
+    if len(breaks):
+        end = loud[breaks[0]]          # the end of the first group
+
+    head = max(0, loud[0] - int(0.010 * rate))
+    tail = min(len(seg), end + int(0.040 * rate))
     return seg[head:tail]
 
 
