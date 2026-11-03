@@ -72,6 +72,16 @@ public class UITheme : ScriptableObject
     [Tooltip("Her eyes gently closed. Optional: without it she never blinks between lines.")]
     public Sprite rachelBlink;
 
+    [Tooltip("Mouth shapes for lip-sync, one per sound. Optional: without them she " +
+             "falls back to the three talking frames on a cycle.")]
+    public Sprite rachelAI;
+    public Sprite rachelE;
+    public Sprite rachelO;
+    public Sprite rachelU;
+    public Sprite rachelMBP;
+    public Sprite rachelFV;
+    public Sprite rachelL;
+
     // Where Rachel's face goes inside narrationPanel, as fractions of that
     // sprite. Re-measure with Tools/measure_narration_ring.py rather than
     // nudging the portrait by eye.

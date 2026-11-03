@@ -75,6 +75,16 @@ public static class UIThemeTool
         theme.rachelTalk3 = Load("char_rachel_ai");
         theme.rachelBlink = Load("char_rachel_blink");
 
+        // The lip-sync set. Same files, now addressed by sound rather than by
+        // how far open the mouth is.
+        theme.rachelAI  = Load("char_rachel_ai");
+        theme.rachelE   = Load("char_rachel_e");
+        theme.rachelO   = Load("char_rachel_o");
+        theme.rachelU   = Load("char_rachel_u");
+        theme.rachelMBP = Load("char_rachel_mbp");
+        theme.rachelFV  = Load("char_rachel_fv");
+        theme.rachelL   = Load("char_rachel_l");
+
         theme.displayFont = FindFont("Bold");
         theme.bodyFont    = FindFont("Medium") ?? theme.displayFont;
 

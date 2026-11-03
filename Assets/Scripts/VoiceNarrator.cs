@@ -114,6 +114,26 @@ public class VoiceNarrator : MonoBehaviour
     /// <summary>True from the moment a line is queued until the last one has finished.</summary>
     public bool IsSpeaking { get; private set; }
 
+    /// <summary>
+    /// The clip being spoken right now, or null between parts.
+    ///
+    /// Here so Rachel's mouth can follow what she is actually SAYING rather
+    /// than a timer. RachelPortraitAnimator looks the clip's name up in
+    /// VisemeTracks.json and plays the shapes against PlaybackTime. Before
+    /// this existed the mouth moved at random, which is exactly what it
+    /// looked like.
+    /// </summary>
+    public AudioClip CurrentClip
+    {
+        get { return audioSource != null && audioSource.isPlaying ? audioSource.clip : null; }
+    }
+
+    /// <summary>How far into CurrentClip playback has reached, in seconds.</summary>
+    public float PlaybackTime
+    {
+        get { return audioSource != null ? audioSource.time : 0f; }
+    }
+
     /// <summary>Raised when the queue empties - the moment the player is expected to answer.</summary>
     public event System.Action OnFinishedSpeaking;
 
