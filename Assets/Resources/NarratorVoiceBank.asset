@@ -17,47 +17,47 @@ MonoBehaviour:
   - id: rachel_l1_s1_intro
     text: The sun is up over Kylo's house, and a brand new school day is starting.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d890acdc4646e4b68a056c733d8ef6e4, type: 3}
   - id: rachel_l1_s1_bangon_story
     text: Good morning! Kylo is still sleeping. It is time to wake up and start his day!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bda445b2f721e4890b6b8db9e7a94ff1, type: 3}
   - id: rachel_l1_s1_bangon_ask
     text: Let's help Kylo out of bed! Say {word} to wake him up!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 57c6071418a2445a986e67a4aa0bca3d, type: 3}
   - id: rachel_l1_s1_bangon_done
     text: Great job! Kylo is finally awake.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: ed05fbf97a11746be9d0bdfa22202a2a, type: 3}
   - id: rachel_l1_s1_tayo_story
     text: Kylo is awake, but he is still sitting on his bed. He needs to stand up first.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1e4342c170b7a433fb8210cf4beb4abc, type: 3}
   - id: rachel_l1_s1_tayo_ask
     text: "Help Kylo onto his feet \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7b2cdca9ce08a47569a3f560da121663, type: 3}
   - id: rachel_l1_s1_tayo_done
     text: Well done! Kylo is standing beside his bed now.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b1c10844acf04475bb90d631353f2b1c, type: 3}
   - id: rachel_l1_s1_lakad_story
     text: Kylo is standing, and the bedroom door is waiting across the room.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 01135f142b3d0477e9137c2f79e26fa7, type: 3}
   - id: rachel_l1_s1_lakad_ask
     text: Send him on his way with {word}!
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 95f528acb0d9c43278a1984118effe43, type: 3}
   - id: rachel_l1_s1_lakad_done
     text: Excellent! Kylo is walking towards the door.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4135be31e26a7441cbe797d92c62e596, type: 3}
   - id: rachel_l1_s1_outro
     text: Nice work! Kylo is out of bed. Now let's help him get to the bathroom.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 00cdcb2e6bc5b4e02b3d1f089a4e8641, type: 3}
   - id: rachel_l1_s2_intro
     text: Kylo is out of his room, and the hallway stretches away in front of him.
     gloss: 
@@ -1037,27 +1037,27 @@ MonoBehaviour:
   - id: rachel_word_bangon_teach
     text: In Filipino, 'Bangon' means to get up, or to rise from bed.
     gloss: Get up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: f25cce15f9d4945fb85d9ad76ddebc59, type: 3}
   - id: rachel_word_bangon_recall
     text: Remember, 'Bangon' means to get up.
     gloss: Get up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 70204496283354ed5a5a81cd2fcdcd66, type: 3}
   - id: rachel_word_tayo_teach
     text: The Filipino word 'Tayo' means to stand up.
     gloss: Stand up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: afb67f7cc702746bebe22c21f1eb98aa, type: 3}
   - id: rachel_word_tayo_recall
     text: Remember, 'Tayo' means to stand up.
     gloss: Stand up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c1c514fe6fca347769290a6aeede20df, type: 3}
   - id: rachel_word_lakad_teach
     text: In Filipino, 'Lakad' means to walk.
     gloss: Walk
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4eb0e454844f04f4f8f278d49707ddb4, type: 3}
   - id: rachel_word_lakad_recall
     text: Remember, 'Lakad' means to walk.
     gloss: Walk
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: c97b1b3982485429dbebef34378eb80b, type: 3}
   - id: rachel_word_kaliwa_teach
     text: '''Kaliwa'' is the Filipino word for left, the side of your left hand.'
     gloss: Left
@@ -1521,15 +1521,15 @@ MonoBehaviour:
   - id: word_bangon
     text: Bangon
     gloss: Get up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e55ce986937d843c98a40a70467c0dae, type: 3}
   - id: word_tayo
     text: Tayo
     gloss: Stand up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1bc097ca54da346c3a7efa9034ad2a04, type: 3}
   - id: word_lakad
     text: Lakad
     gloss: Walk
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4e16f6bb8b1674a449b23a22bbe27454, type: 3}
   - id: word_kaliwa
     text: Kaliwa
     gloss: Left
