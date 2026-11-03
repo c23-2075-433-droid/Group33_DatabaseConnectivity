@@ -119,8 +119,8 @@ public class RachelPortraitAnimator : MonoBehaviour
     // this changes, so a held frame does not rebuild the canvas every tick.
     private Sprite shown;
 
-    // TEMPORARY DIAGNOSTIC - remove with the Debug.Log calls below.
-    private bool warnedNoClip;
+    // Whether this run of speech has played any audio yet. See Sync().
+    private bool sawClip;
 
     // The line being lip-synced, and where we are in its track.
     private AudioClip trackedClip;
@@ -152,6 +152,7 @@ public class RachelPortraitAnimator : MonoBehaviour
         }
 
         bool speaking = narrator != null && narrator.IsSpeaking;
+        if (!speaking) sawClip = false;
 
         // Real lip-sync first: if the clip she is playing has a mouth track,
         // follow it. This is the difference between a mouth that moves while
@@ -194,27 +195,26 @@ public class RachelPortraitAnimator : MonoBehaviour
         AudioClip clip = narrator.CurrentClip;
         if (clip == null)
         {
-            // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
-            if (!warnedNoClip)
-            {
-                warnedNoClip = true;
-                Debug.Log("[lipsync] she is speaking but no clip is playing: " +
-                          "either the line has no recording, or it is being spoken as a caption.");
-            }
-            return false;
+            // Silence inside a line that HAS a recording: the 0.12s between
+            // two parts, or the 0.2s tail. The pause is part of how the line
+            // is spoken, so she holds her mouth shut through it - the cycle
+            // would flutter three shapes into a third of a second and read as
+            // exactly the randomness the tracks are here to remove.
+            //
+            // sawClip is what tells the two silences apart. A line with no
+            // recording at all never sets it, so it still gets the cycle and
+            // mouths its caption, which is the whole point of the fallback.
+            if (!sawClip) return false;
+            Show(idle);
+            return true;
         }
-        warnedNoClip = false;
+        sawClip = true;
 
         if (!ReferenceEquals(clip, trackedClip))
         {
             trackedClip = clip;
             track = VisemeTracks.For(clip.name);
             trackAt = 0;
-
-            // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
-            Debug.Log("[lipsync] clip '" + clip.name + "' -> " +
-                      (track == null ? "NO TRACK" : track.Length + " changes") +
-                      ", sprites " + (visemeAI != null ? "wired" : "MISSING"));
         }
         if (track == null || track.Length == 0) return false;
 
