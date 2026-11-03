@@ -60,7 +60,12 @@ public static class VisemeTracks
         tracks = new Dictionary<string, Change[]>();
 
         TextAsset asset = Resources.Load<TextAsset>(ResourcePath);
-        if (asset == null) return;
+        if (asset == null)
+        {
+            // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
+            Debug.Log("[lipsync] Resources/" + ResourcePath + " did not load at all.");
+            return;
+        }
 
         // Hand-parsed rather than JsonUtility, which cannot deserialise a
         // dictionary or a mixed [number, string] pair without a wrapper type
@@ -97,6 +102,9 @@ public static class VisemeTracks
             tracks[id] = ParseChanges(text, listStart, listEnd);
             at = listEnd + 1;
         }
+
+        // TEMPORARY DIAGNOSTIC - remove once the mouth is proven.
+        Debug.Log("[lipsync] loaded " + tracks.Count + " mouth tracks.");
     }
 
     private static int MatchingBracket(string s, int open)
