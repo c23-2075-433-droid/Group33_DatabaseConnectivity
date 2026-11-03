@@ -54,7 +54,14 @@ SUBSCRIPTION = "https://api.elevenlabs.io/v1/user/subscription"
 CREDITS_PER_MINUTE = 900        # ElevenLabs' own figure, confirm in the web UI
 
 # Crossfaded into the head of the track to make it loop without a seam.
-LOOP_TAIL = 2.0
+LOOP_TAIL = 3.0
+
+# Three minutes, not the ninety seconds this started as. A loop is heard
+# however long the child plays, and at ninety seconds a twenty-minute sitting
+# hears the same bar thirteen times. Length is the only real cure for that,
+# and on a plan with 600,000 credits a month the whole set costs about two
+# per cent of them - so there was never a reason to be short except a budget
+# that no longer applies.
 
 # Music sits well under the narration. VoiceNarrator does no normalisation of
 # its own - volume is the player's slider - so the levels have to be right in
@@ -69,19 +76,19 @@ STYLE = ("Soft, warm, unhurried instrumental music for a children's storybook ga
          "underneath a narrator and must never pull attention. ")
 
 TRACKS = [
-    ("music_bahay", 90, STYLE +
+    ("music_bahay", 180, STYLE +
      "The mood is a sunlit Filipino family home early in the morning: tender, "
      "domestic and sleepy, waking gently into the day."),
-    ("music_paaralan", 90, STYLE +
+    ("music_paaralan", 180, STYLE +
      "The mood is a bright, friendly primary school morning: curious and "
      "orderly, a little brisker than the home theme but still calm."),
-    ("music_parke", 90, STYLE +
+    ("music_parke", 180, STYLE +
      "The mood is a green neighbourhood park in the afternoon: open, breezy "
      "and playful, with a little more lift and air than the other themes."),
-    ("music_menu", 90, STYLE +
+    ("music_menu", 180, STYLE +
      "The mood is a welcoming title screen: the warmest and most melodic of "
      "the set, inviting a child to begin."),
-    ("music_journey", 90, STYLE +
+    ("music_journey", 180, STYLE +
      "The mood is a hand-drawn map of places still to visit: light, curious "
      "and anticipatory, gently looping while the child chooses."),
     ("music_complete", 10, STYLE +
@@ -136,10 +143,9 @@ def main():
     done = []
     for name, seconds, prompt in wanted:
         print("\n%s  (%d s)" % (name, seconds))
-        mp3 = os.path.join(STAGE, name + ".mp3")
-        compose(key, prompt, seconds, mp3)
-        wav = os.path.join(STAGE, name + ".wav")
-        decode(mp3, wav)
+        raw = compose(key, prompt, seconds, os.path.join(STAGE, name))
+        wav = os.path.join(STAGE, name + ".decoded.wav")
+        decode(raw, wav)
         loop = seconds > 20            # the sting must not be looped
         finish(wav, loop)
         done.append((name, wav))
@@ -233,30 +239,49 @@ def probe(key):
     return left
 
 
-def compose(key, prompt, seconds, dst):
+def compose(key, prompt, seconds, dst_stem):
+    """
+    Fetches one track, preferring uncompressed audio.
+
+    WAV and PCM at 44.1 kHz are a Pro-tier format; everything below refuses
+    them. Asking first and falling back costs one wasted request at most, and
+    on Pro it removes an entire generation of lossy encoding - the track is
+    crossfaded, re-levelled and re-encoded to Vorbis by Unity afterwards, and
+    mp3 in front of all of that is a loss taken for nothing.
+    """
     body = json.dumps({"prompt": prompt, "music_length_ms": int(seconds * 1000)}).encode()
-    req = urllib.request.Request(
-        API + "?output_format=mp3_44100_128",
-        data=body,
-        headers={"xi-api-key": key, "Content-Type": "application/json",
-                 "Accept": "audio/mpeg"})
-    try:
-        with urllib.request.urlopen(req, timeout=600) as r:
-            audio = r.read()
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", "replace")[:400]
-        sys.exit("  HTTP %d from the music API: %s" % (e.code, detail))
 
-    if not audio or audio[:1] == b"{":
-        sys.exit("  The API did not return audio.")
+    for fmt, ext, accept in (("wav_44100", ".wav", "audio/wav"),
+                             ("mp3_44100_128", ".mp3", "audio/mpeg")):
+        req = urllib.request.Request(
+            API + "?output_format=" + fmt,
+            data=body,
+            headers={"xi-api-key": key, "Content-Type": "application/json",
+                     "Accept": accept})
+        try:
+            with urllib.request.urlopen(req, timeout=900) as r:
+                audio = r.read()
+        except urllib.error.HTTPError as e:
+            detail = e.read().decode("utf-8", "replace")[:300]
+            if fmt.startswith("wav") and e.code in (401, 403, 422):
+                print("  %s not available on this plan, falling back to mp3" % fmt)
+                continue
+            sys.exit("  HTTP %d from the music API: %s" % (e.code, detail))
 
-    tmp = dst + ".part"
-    with open(tmp, "wb") as f:
-        f.write(audio)
-        f.flush()
-        os.fsync(f.fileno())
-    os.replace(tmp, dst)
-    print("  %.1f KB" % (len(audio) / 1024.0))
+        if not audio or audio[:1] == b"{":
+            sys.exit("  The API did not return audio.")
+
+        dst = dst_stem + ext
+        tmp = dst + ".part"
+        with open(tmp, "wb") as f:
+            f.write(audio)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, dst)
+        print("  %.1f KB as %s" % (len(audio) / 1024.0, fmt))
+        return dst
+
+    sys.exit("  Could not fetch the track in any format.")
 
 
 def decode(mp3, wav):
