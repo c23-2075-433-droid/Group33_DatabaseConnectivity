@@ -61,6 +61,23 @@ support language for the framing) and it is easy to defend in a panel. If your
 adviser wants full Filipino, only the intro/outro rows need rewriting — the
 system below does not care which language a clip is in.
 
+> **What was actually recorded (3 Nov 2026) — this reverses the split above.**
+> The take Kyla recorded says the prompting lines **bilingually**, Filipino then
+> English in one breath: *"Tama! That's right!"*, *"Hindi pa tama. Let's try that
+> one again."* Two of them, `rachel_hint_replay` and `rachel_mic_blocked`, are now
+> **English only**. `Docs/VoiceOverScript.csv` and `NarratorScript.Defaults` have
+> been updated to match, because the caption is what the child reads while the
+> line plays and the two must agree.
+>
+> The three `rachel_frame_*` prompt frames are unchanged and stay Filipino, so
+> the line a child hears most — *"Sabihin mo: **LAKAD**"* — is untouched.
+>
+> Two things to weigh before the defense. The table above argues the repeated
+> Filipino frames *are* the immersion the thesis claims; a panel reading it and
+> then hearing the build will notice. And the bilingual lines run 2-6 s against a
+> 0.8 s budget set because they play over Kylo's action. Reverting means
+> re-recording those 12 lines, not a code change.
+
 ---
 
 ## 2. Prompting flow
@@ -92,16 +109,16 @@ OBJECTIVE BECOMES ACTIVE  (SceneObjectiveController.ShowObjective)
      matched, mic resumes, mic icon starts pulsing            [READY TO LISTEN]
 
 PLAYER SPEAKS
-  ├─ CORRECT  → badge hides, [VOICE] "Tama!" (short), onCorrect action plays
+  ├─ CORRECT  → badge hides, [VOICE] "Tama! That's right!" (short), onCorrect action plays
   │             · silence until the action finishes (already handled)
   │             · then next objective, or scene outro
-  ├─ WRONG WORD → [VOICE] "Hindi pa tama. Subukan mo ulit."  (badge stays up)
+  ├─ WRONG WORD → [VOICE] "Hindi pa tama. Let's try that one again."  (badge stays up)
   │             · 2nd miss on the same word → auto-hint: "Pakinggan mo ulit:" + word, said slowly
-  │             · 4th miss → "Pindutin ang asul na buton para marinig ulit." (points at replay)
-  └─ NOT HEARD (error code / empty result) → [VOICE] "Hindi kita narinig. Pakiulit."
+  │             · 4th miss → "Press the blue button to hear the word again." (points at replay)
+  └─ NOT HEARD (error code / empty result) → [VOICE] "Hindi kita narinig. I did not hear you - try once more."
 
 NO SPEECH FOR 10 SECONDS
-  └─ [VOICE] idle nudge, once: "Sabihin mo na. Kaya mo 'yan!"
+  └─ [VOICE] idle nudge, once: "Kaya mo 'yan! Go on, you can do it."
      · then every 20 s, replay the prompt instead of nudging
      · nudges reset the moment any speech is heard, right or wrong
 
@@ -173,29 +190,32 @@ lines, in your own phrasing:
 
 ### 3.2 Listening state
 
-| File | Filipino | English gloss | When |
+| File | Recorded line | English gloss | When |
 |---|---|---|---|
-| `rachel_cue_listening.wav` | **"Nakikinig ako."** | "I'm listening." | Optional, first objective of a scene only — after that the pulsing mic says it without words |
+| `rachel_cue_listening.wav` | **"Nakikinig ako. I am listening!"** | "I'm listening." | Optional, first objective of a scene only — after that the pulsing mic says it without words |
 | *(no clip)* | on-screen: **"Nakikinig…"** | "Listening…" | Small label under the mic while `VoiceCommand.IsListening` is true |
 
 ### 3.3 Correct — already in your CSV, keep them
 
-| File | Filipino | English gloss |
+| File | Recorded line | English gloss |
 |---|---|---|
-| `rachel_feedback_correct_1.wav` | **"Tama!"** | "Correct!" |
-| `rachel_feedback_correct_2.wav` | **"Magaling!"** | "Well done!" |
-| `rachel_feedback_correct_3.wav` | **"Ang galing mo!"** | "You're great!" |
+| `rachel_feedback_correct_1.wav` | **"Tama! That's right!"** | "Correct!" |
+| `rachel_feedback_correct_2.wav` | **"Magaling! Well done!"** | "Well done!" |
+| `rachel_feedback_correct_3.wav` | **"Ang galing mo! You did it!"** | "You're great!" |
 
 Rotate in order, not at random, so the same one never lands twice in a row.
-Keep each under 0.8 s — it plays on top of Kylo starting to move.
+These were budgeted at under 0.8 s because they play on top of Kylo starting
+to move. The bilingual recordings run roughly 1.5-2.5 s, so the praise now
+outlasts the start of the action — see the recording note in section 1.
 
 ### 3.4 Wrong word
 
-| File | Filipino | English gloss | When |
+| File | Recorded line | English gloss | When |
 |---|---|---|---|
-| `rachel_feedback_incorrect_1.wav` | **"Hindi pa tama. Subukan mo ulit."** | "Not quite. Try again." | 1st miss |
-| `rachel_feedback_incorrect_2.wav` | **"Malapit na! Ulitin mo."** | "Almost! Say it again." | 3rd miss and after |
-| `rachel_hint_pakinggan.wav` | **"Pakinggan mong mabuti."** | "Listen carefully." | Prefixes the 2-miss auto-hint |
+| `rachel_feedback_incorrect_1.wav` | **"Hindi pa tama. Let's try that one again."** | "Not quite. Try again." | 1st miss |
+| `rachel_feedback_incorrect_2.wav` | **"Malapit na! You are very close. One more try."** | "Almost! Say it again." | 3rd miss and after |
+| `rachel_hint_pakinggan.wav` | **"Pakinggan mong mabuti. Listen carefully."** | "Listen carefully." | Prefixes the 2-miss auto-hint |
+| `rachel_hint_replay.wav` | **"Press the blue button to hear the word again."** | — | 4th miss — points the child at the replay button |
 
 > **Wording note — decided, keep.** The script originally had
 > `rachel_feedback_incorrect_1` as *"Mali, subukan muli."* A bare **"Mali!"**
@@ -216,15 +236,21 @@ Keep each under 0.8 s — it plays on top of Kylo starting to move.
 > `NarratorScript.Defaults` disagreed, and the game was already saying "Ang
 > galing mo!". Worth having the reasoning to hand if a panel asks why the
 > recording script does not match the written one.
+>
+> **Superseded 3 Nov 2026.** The "now" column above is the state *before* the
+> bilingual re-record. All three of these lines were then re-recorded with an
+> English half appended, and the CSV and `Defaults` updated to match — see the
+> recording note in section 1. The reasoning for "Hindi pa tama" over "Mali"
+> still stands; only the ending changed.
 
 ### 3.5 Nothing recognised
 
-| File | Filipino | English gloss | When |
+| File | Recorded line | English gloss | When |
 |---|---|---|---|
-| `rachel_feedback_nothear_1.wav` | **"Hindi kita narinig. Pakiulit."** | "I didn't hear you. Please repeat." | Recogniser returned an error or empty result |
-| `rachel_feedback_nothear_2.wav` | **"Pakilakasan mo ang boses mo."** | "Please speak a bit louder." | Two no-hears in a row |
-| `rachel_nudge_idle.wav` | **"Sabihin mo na. Kaya mo 'yan!"** | "Go on, say it. You can do it!" | 10 s of silence |
-| `rachel_mic_blocked.wav` | **"Pindutin ang mikropono para magsalita."** | "Press the microphone to speak." | Permission denied, or recognition unavailable |
+| `rachel_feedback_nothear_1.wav` | **"Hindi kita narinig. I did not hear you - try once more."** | "I didn't hear you. Please repeat." | Recogniser returned an error or empty result |
+| `rachel_feedback_nothear_2.wav` | **"Pakilakasan mo ang boses mo. A little louder, please!"** | "Please speak a bit louder." | Two no-hears in a row |
+| `rachel_nudge_idle.wav` | **"Kaya mo 'yan! Go on, you can do it."** | "Go on, say it. You can do it!" | 10 s of silence |
+| `rachel_mic_blocked.wav` | **"Press the microphone button so Kylo can hear you."** | "Press the microphone to speak." | Permission denied, or recognition unavailable |
 
 ### 3.6 Scene and level boundaries
 
@@ -244,10 +270,10 @@ animated), the word badge, and Rachel. No new screen, no new panel.
 | **Prompting** (Rachel speaking) | frame + word clip | still, no pulse | **visible but faint** (`dimmedPromptAlpha`, 0.45) | subtitle: "Sabihin mo: LAKAD" |
 | **Ready to listen** | *(silence; optional "Nakikinig ako" once per scene)* | **pulsing** — `VoiceInteractionUI.PulseRoutine`, already built | **brightens to full** | "Nakikinig…" |
 | **Heard something, checking** | — | pulse stops, icon held bright | visible | the partial text, as now (`OnPartialResultReceived`) |
-| **Correct** | "Tama!" / "Magaling!" / "Ang galing mo!" | still | **green flash, then hides** | subtitle: "Tama!" |
-| **Wrong word** | "Hindi pa tama. Subukan mo ulit." | still, then resumes pulsing | **shakes ~8 px, stays up, full brightness** | subtitle: the retry line |
-| **Not recognised** | "Hindi kita narinig. Pakiulit." | brief grey tint, then pulses | unchanged, stays up | subtitle: the not-heard line |
-| **Mic blocked / unavailable** | "Pindutin ang mikropono para magsalita." | **red tint, no pulse** | stays up | subtitle: "Pindutin ang mikropono…" |
+| **Correct** | "Tama! That's right!" / "Magaling! Well done!" / "Ang galing mo! You did it!" | still | **green flash, then hides** | subtitle: "Tama! That's right!" |
+| **Wrong word** | "Hindi pa tama. Let's try that one again." | still, then resumes pulsing | **shakes ~8 px, stays up, full brightness** | subtitle: the retry line |
+| **Not recognised** | "Hindi kita narinig. I did not hear you - try once more." | brief grey tint, then pulses | unchanged, stays up | subtitle: the not-heard line |
+| **Mic blocked / unavailable** | "Press the microphone button so Kylo can hear you." | **red tint, no pulse** | stays up | subtitle: "Press the microphone button…" |
 
 Every spoken line is subtitled across the top of the screen, recorded or not
 (`VoiceNarrator.captionMode = Always`). The subtitle is not a stand-in for the
@@ -382,8 +408,8 @@ In the Editor, the existing keyboard fallback drives the whole loop:
 - watch a new word appear faint while Rachel introduces it, then brighten —
   **Enter** during the faint window reports no active objective, which is the
   on-device behaviour too (the mic is suspended while she speaks)
-- **Enter** — say the word currently being asked (correct answer → *"Tama!"*)
-- **X** — a deliberately wrong answer (→ *"Hindi pa tama. Subukan mo ulit."*,
+- **Enter** — say the word currently being asked (correct answer → *"Tama! That's right!"*)
+- **X** — a deliberately wrong answer (→ *"Hindi pa tama. Let's try that one again."*,
   then the automatic slow repeat on the second miss)
 - wait 10 s — the idle nudge, then the prompt repeated every 20 s
 - the replay button — *"Pakinggan mo ulit: LAKAD"*

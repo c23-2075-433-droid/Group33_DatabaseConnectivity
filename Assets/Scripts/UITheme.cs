@@ -38,18 +38,60 @@ public class UITheme : ScriptableObject
     [Tooltip("ui_status_plank - used twice: the place/level label and the listening state.")]
     public Sprite statusPlank;
 
-    [Tooltip("ui_results_panel - the bamboo frame the settings popup is built in, the same one the main menu uses.")]
+    [Tooltip("ui_settings_panel - the settings board. Its four rows, their icons and " +
+             "their labels are painted into the art, so only the controls are built on top.")]
     public Sprite settingsPanel;
 
     [Header("Buttons")]
     public Sprite backButton;       // btn_back
     public Sprite menuButton;       // btn_menu_round
     public Sprite okayButton;       // btn_okay
+    public Sprite settingsClose;    // btn_settings_close
+
+    [Header("Toggles")]
+    [Tooltip("ui_settings_toggle_on / _off - the two halves of a two-state control. " +
+             "The ON and OFF lettering is part of the art, so the pair is swapped whole.")]
+    public Sprite toggleOn;
+    public Sprite toggleOff;
 
     [Header("Sliders")]
+    [Tooltip("The track is a fixed width, so it stretches whole. The fill is NOT: it is " +
+             "9-sliced, because it is the one piece whose width runs from nothing to full " +
+             "and a stretched cap collapses into a sliver at the low end.")]
     public Sprite sliderTrack;
     public Sprite sliderFill;
     public Sprite sliderKnob;
+
+    // The slider art's own proportions, measured off the Canva export by
+    // Tools/cut_settings_ui.py. Fractions of the whole widget box, which is as
+    // tall as the KNOB rather than as tall as the bar - the disc deliberately
+    // overhangs the capsule top and bottom.
+    //
+    // They live here, beside the ring constants, because BOTH settings screens
+    // build this same control - the menu popup in an Editor script and the HUD
+    // panel at run time - and a copy in each is a copy that drifts.
+    public const float BarCapsuleFraction = 0.764f;   // grey capsule, 97 of 127
+    public const float BarOrangeFraction = 0.213f;    // orange fill, 27 of 127
+    public const float BarKnobFraction = 0.984f;      // knob disc, 125 of 127
+    public const float BarGrooveInset = 0.0311f;      // 35 of the track's 1126 px:
+                                                      // 25 of grey rim plus 10 of groove
+
+    /// <summary>
+    /// The fill sprite's own height, in its own pixels. Unity draws a 9-slice
+    /// border at native sprite pixels, so a bar rendered shorter than the sprite
+    /// needs Image.pixelsPerUnitMultiplier set to this over the rendered height -
+    /// otherwise the caps come out several times too big.
+    /// </summary>
+    public const float BarFillSourceHeight = 27f;
+
+    /// <summary>
+    /// The bar is drawn thin because that is the design, but a thin bar is a
+    /// cruel tap target for a five-year-old - about 14 dp at this panel size,
+    /// against Android's 48 dp guideline. Both screens put an invisible pad
+    /// this tall over the row, which catches the misses without changing a
+    /// pixel of the art.
+    /// </summary>
+    public const float BarMinTouchHeight = 110f;
 
     [Header("Microphone")]
     [Tooltip("mic_icon_wood - swapped onto the mic the scene already has, so the HUD matches without any scene being rebuilt.")]

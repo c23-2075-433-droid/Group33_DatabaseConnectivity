@@ -105,22 +105,22 @@ public static class NarratorScript
         { FrameSayAgain, "Ngayon naman, sabihin mo:" },
         { FrameListen,   "Pakinggan mo ulit:" },
 
-        { CueListening,  "Nakikinig ako." },
-        { MicBlocked,    "Pindutin ang mikropono para magsalita." },
+        { CueListening,  "Nakikinig ako. I am listening!" },
+        { MicBlocked,    "Press the microphone button so Kylo can hear you." },
 
-        { Correct1,      "Tama!" },
-        { Correct2,      "Magaling!" },
-        { Correct3,      "Ang galing mo!" },
+        { Correct1,      "Tama! That's right!" },
+        { Correct2,      "Magaling! Well done!" },
+        { Correct3,      "Ang galing mo! You did it!" },
 
-        { Retry1,        "Hindi pa tama. Subukan mo ulit." },
-        { Retry2,        "Malapit na! Ulitin mo." },
+        { Retry1,        "Hindi pa tama. Let's try that one again." },
+        { Retry2,        "Malapit na! You are very close. One more try." },
 
-        { NotHeard1,     "Hindi kita narinig. Pakiulit." },
-        { NotHeard2,     "Pakilakasan mo ang boses mo." },
+        { NotHeard1,     "Hindi kita narinig. I did not hear you - try once more." },
+        { NotHeard2,     "Pakilakasan mo ang boses mo. A little louder, please!" },
 
-        { HintListen,    "Pakinggan mong mabuti." },
-        { HintReplay,    "Pindutin ang asul na buton para marinig ulit." },
-        { IdleNudge,     "Sabihin mo na. Kaya mo 'yan!" },
+        { HintListen,    "Pakinggan mong mabuti. Listen carefully." },
+        { HintReplay,    "Press the blue button to hear the word again." },
+        { IdleNudge,     "Kaya mo 'yan! Go on, you can do it." },
     };
 
     /// <summary>
