@@ -1,123 +1,274 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
 /// <summary>
 /// Decides whether what the player SAID matches the Tagalog word they were
-/// asked to say. This is the missing piece the vocabulary system needs:
-/// VoiceCommand.cs currently only checks for a handful of hardcoded command
-/// words (bangon/tayo/lakad/talon) with a simple "contains" check — there's
-/// no notion of "right" vs "wrong" for a word the player is being taught.
+/// asked to say. This is the right/wrong judgement the vocabulary system runs
+/// on: VoiceCommand hands it every recognizer result while an objective is
+/// live, and SceneObjectiveController advances on the answer.
 ///
 /// This is a plain C# utility (no MonoBehaviour, no scene wiring needed) so
 /// it can be called from anywhere: VoiceCommand's OnResultReceived,
-/// SceneObjectiveController, a future NarratorController, etc.
+/// SceneObjectiveController, the editor self-check tool, etc.
 ///
-/// Matching is deliberately forgiving, because on-device speech recognition
-/// for Tagalog is noisy (see the "Risks" section of the production plan):
-///   1. Normalize both strings (lowercase, trim, strip punctuation/extra spaces).
-///   2. Exact match after normalization -> correct.
-///   3. Otherwise check against any accepted alternate spellings/mishearings
-///      you supply for that word (e.g. "opo" vs "oho").
-///   4. Otherwise allow small edit-distance (Levenshtein) typos/mishearings,
-///      scaled to the word's length, so a 3-letter word needs a near-exact
-///      match but a longer word tolerates one or two garbled letters.
+/// WHY IT WORKS THE WAY IT DOES
+///
+/// The obvious approach - allow a small edit distance, scaled to the word's
+/// length - is what this used to do, and it was wrong for Filipino. Tagalog
+/// words are short and are told apart by single vowels, so "one edit of slack"
+/// on a 4-6 letter word accepts every possible vowel error:
+///
+///     "kaha"  for "Kuha"   - one substitution, was scored CORRECT
+///     "kanin" for "Kain"   - one insertion, and BOTH are taught in the
+///                            Almusal scene, so each was accepted for the other
+///     "tuwa"/"Tawa", "tabo"/"Takbo", "kanin"/"Kanan" - the same story
+///
+/// A game that teaches pronunciation cannot reward a wrong vowel. So instead of
+/// tolerating arbitrary edits, this canonicalizes both sides - folding ONLY the
+/// variation that is genuinely free in Filipino - and then requires an exact
+/// match:
+///
+///   1. e/i and o/u are folded together. These really do alternate
+///      (babae/babai, noon/nuon) and the recognizer returns either spelling.
+///      a/u never alternates, which is exactly why "kaha" now fails.
+///   2. Spanish-era spellings are mapped to their Filipino sounds (c/qu -> k,
+///      f -> p, v -> b, j -> h, z -> s, ll -> ly, x -> ks), since the
+///      recognizer may write a Filipino word the Spanish way.
+///   3. The uw/w glide is folded, so "tuwalya" and "twalya" are one word.
+///   4. Doubled letters are collapsed ("oppo" -> "upu" matches "Upo").
+///   5. Filler words the recognizer tacks on are dropped ("po", "mo", "na"...).
+///   6. Each word's known mistranscriptions are accepted outright - see
+///      WordVariants, which is the layer that actually buys accuracy on a real
+///      device, and which grows from the attempt log rather than from guesses.
+///
+/// Folding all 51 taught words this way leaves 51 DISTINCT canonical forms, so
+/// exact matching can never make two taught words ambiguous. The editor tool
+/// Tools > SALINLAHI > Check Pronunciation Matching proves that every time it
+/// runs, by testing all 51x50 cross pairs.
+///
+/// The one remaining piece of fuzziness is deliberate and narrow: on a word of
+/// 7+ canonical letters, ONE consonant may be garbled, as long as every vowel
+/// still lines up. That absorbs genuine recognizer noise on the long words
+/// (Ibahagi, Kumusta, Salamat, Sapatos, Sipilyo, Dausdos) while leaving a vowel
+/// error impossible to pass.
 /// </summary>
 public static class PronunciationChecker
 {
     /// <summary>
-    /// Returns true if spokenText is close enough to targetWord (or one of
-    /// acceptedVariants) to count as the player having said it correctly.
+    /// Shortest canonical word that may absorb one garbled consonant. Below
+    /// this length a single consonant IS the word, so no slack is given.
+    /// </summary>
+    private const int ConsonantSlipMinLength = 7;
+
+    /// <summary>
+    /// Words the recognizer sprinkles around a one-word answer. Dropped before
+    /// matching so "Kuha mo" and "ang lakad na" still count. Canonicalized on
+    /// startup, so this list is written the way people spell it.
+    /// </summary>
+    private static readonly string[] RawFillerWords =
+    {
+        "po", "mo", "na", "ang", "ay", "yung", "ano", "nga", "ba", "daw",
+        "eh", "oh", "ok", "okay", "uh", "um", "hmm", "si", "ni", "sa", "ko",
+    };
+
+    // Declared after RawFillerWords on purpose: static initializers run in
+    // declaration order, and this one canonicalizes that list.
+    private static readonly HashSet<string> FillerWords = BuildFillerWords();
+
+    /// <summary>
+    /// Returns true if spokenText is the player having said targetWord.
     /// </summary>
     /// <param name="spokenText">Raw text returned by SpeechToText.</param>
     /// <param name="targetWord">The Tagalog word the player was asked to say.</param>
     /// <param name="acceptedVariants">
-    /// Optional extra spellings/near-misses that should also count as correct
-    /// (e.g. common recognizer mistranscriptions for that specific word).
-    /// </param>
-    /// <param name="maxEditDistanceOverride">
-    /// Optional fixed tolerance. Leave -1 to auto-scale from word length
-    /// (short words need to be closer; longer words get more slack).
+    /// Extra mistranscriptions to accept for this word, from the objective's
+    /// Inspector field. WordVariants is consulted as well, so a scene built
+    /// before that table existed still gets its entries.
     /// </param>
     public static bool IsCorrect(
         string spokenText,
         string targetWord,
-        string[] acceptedVariants = null,
-        int maxEditDistanceOverride = -1)
+        string[] acceptedVariants = null)
     {
         if (string.IsNullOrWhiteSpace(spokenText) || string.IsNullOrWhiteSpace(targetWord))
             return false;
 
-        string spoken = Normalize(spokenText);
-        string target = Normalize(targetWord);
+        string[] allTokens, contentTokens;
+        Tokenize(spokenText, out allTokens, out contentTokens);
+        if (allTokens.Length == 0) return false;
 
-        // A phrase like "opo po" should still count if it CONTAINS the exact
-        // target word as a whole token, not just a fuzzy match on the whole phrase.
-        if (ContainsWholeWord(spoken, target))
+        if (MatchesForm(allTokens, contentTokens, Canonicalize(targetWord)))
             return true;
 
-        int tolerance = maxEditDistanceOverride >= 0
-            ? maxEditDistanceOverride
-            : AutoTolerance(target.Length);
+        // A variant is just another spelling that counts as the word, so it is
+        // matched exactly like the target itself.
+        if (MatchesAnyVariant(allTokens, contentTokens, acceptedVariants)) return true;
+        if (MatchesAnyVariant(allTokens, contentTokens, WordVariants.For(targetWord))) return true;
 
-        if (LevenshteinDistance(spoken, target) <= tolerance)
-            return true;
+        return false;
+    }
 
-        // Also try matching against each individual word in the spoken phrase,
-        // in case the recognizer picked up extra filler words around it.
-        foreach (string token in spoken.Split(' '))
+    /// <summary>
+    /// The canonical form of a word or phrase - what matching actually compares.
+    /// Public because the attempt log records it next to the raw recognizer
+    /// text: seeing "kaha" vs "kuha" side by side is how a mishearing gets
+    /// spotted and added to WordVariants.
+    /// </summary>
+    public static string Canonicalize(string text)
+    {
+        string[] allTokens, contentTokens;
+        Tokenize(text, out allTokens, out contentTokens);
+        return string.Join(" ", contentTokens);
+    }
+
+    private static bool MatchesAnyVariant(string[] allTokens, string[] contentTokens, string[] variants)
+    {
+        if (variants == null) return false;
+
+        foreach (string variant in variants)
         {
-            if (token.Length == 0) continue;
-            if (token == target) return true;
-            if (LevenshteinDistance(token, target) <= tolerance) return true;
+            if (string.IsNullOrWhiteSpace(variant)) continue;
+            if (MatchesForm(allTokens, contentTokens, Canonicalize(variant))) return true;
         }
+        return false;
+    }
 
-        if (acceptedVariants != null)
+    /// <summary>
+    /// Compares an already-tokenized utterance against one canonical form
+    /// (the target word, or one of its accepted variants).
+    /// </summary>
+    private static bool MatchesForm(string[] allTokens, string[] contentTokens, string canonicalForm)
+    {
+        if (string.IsNullOrEmpty(canonicalForm)) return false;
+
+        // The whole phrase, once the recognizer's filler words are gone.
+        if (string.Join(" ", contentTokens) == canonicalForm) return true;
+
+        // Any single word of it. The recognizer often returns a short sentence
+        // when the child said one word.
+        foreach (string token in contentTokens)
+            if (token == canonicalForm) return true;
+
+        // Everything run together, for when the recognizer splits one word in
+        // two ("u po" for "Upo"). Built from the UNFILTERED tokens, because the
+        // filler list would otherwise eat the "po" that is part of the word.
+        if (string.Concat(allTokens) == canonicalForm) return true;
+
+        // Long words only: one consonant garbled by the recognizer, with every
+        // vowel still in place. This is what keeps "kaha" out of "kuha" while
+        // still forgiving a smudged "Sapatos".
+        if (canonicalForm.Length >= ConsonantSlipMinLength)
         {
-            foreach (string variant in acceptedVariants)
-            {
-                if (string.IsNullOrWhiteSpace(variant)) continue;
-                string normVariant = Normalize(variant);
-                if (ContainsWholeWord(spoken, normVariant)) return true;
+            foreach (string token in contentTokens)
+                if (IsConsonantSlip(token, canonicalForm)) return true;
 
-                int variantTolerance = maxEditDistanceOverride >= 0
-                    ? maxEditDistanceOverride
-                    : AutoTolerance(normVariant.Length);
-                if (LevenshteinDistance(spoken, normVariant) <= variantTolerance) return true;
-            }
+            if (IsConsonantSlip(string.Concat(allTokens), canonicalForm)) return true;
         }
 
         return false;
     }
 
     /// <summary>
-    /// Lowercases, trims, collapses whitespace, and strips punctuation so
-    /// "Bahay!" ", bahay" and "  Bahay " all normalize the same way.
+    /// True when two canonical forms differ by at most one letter AND their
+    /// vowels are identical - i.e. the single difference is a consonant.
     /// </summary>
-    private static string Normalize(string text)
+    private static bool IsConsonantSlip(string spoken, string target)
     {
-        string lowered = text.ToLowerInvariant().Trim();
-        string noPunctuation = Regex.Replace(lowered, @"[^\p{L}\p{N}\s]", "");
-        string collapsed = Regex.Replace(noPunctuation, @"\s+", " ").Trim();
-        return collapsed;
-    }
-
-    private static bool ContainsWholeWord(string haystack, string word)
-    {
-        if (word.Length == 0) return false;
-        return Regex.IsMatch(haystack, $@"(?:^|\s){Regex.Escape(word)}(?:$|\s)");
+        if (spoken.Length == 0) return false;
+        if (VowelSkeleton(spoken) != VowelSkeleton(target)) return false;
+        return LevenshteinDistance(spoken, target) <= 1;
     }
 
     /// <summary>
-    /// Shorter words must be matched more strictly (a 1-letter slip on a
-    /// 3-letter word changes the word entirely); longer words can absorb a
-    /// couple of garbled letters from a noisy recognizer.
+    /// Just the vowels, in order. After canonicalization only a, i and u are
+    /// left, so this is the word's vowel pattern - the part the player has to
+    /// get right.
     /// </summary>
-    private static int AutoTolerance(int wordLength)
+    private static string VowelSkeleton(string canonical)
     {
-        if (wordLength <= 3) return 0;
-        if (wordLength <= 6) return 1;
-        return 2;
+        StringBuilder sb = new StringBuilder(canonical.Length);
+        foreach (char c in canonical)
+            if (c == 'a' || c == 'i' || c == 'u') sb.Append(c);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Splits an utterance into canonical tokens. allTokens keeps everything;
+    /// contentTokens has the recognizer's filler words removed.
+    /// </summary>
+    private static void Tokenize(string text, out string[] allTokens, out string[] contentTokens)
+    {
+        string canonical = CanonicalForm(text);
+        if (canonical.Length == 0)
+        {
+            allTokens = new string[0];
+            contentTokens = allTokens;
+            return;
+        }
+
+        allTokens = canonical.Split(' ');
+
+        List<string> content = new List<string>(allTokens.Length);
+        foreach (string token in allTokens)
+            if (token.Length > 0 && !FillerWords.Contains(token)) content.Add(token);
+
+        // If the player said nothing BUT filler, judge them on what they
+        // actually said rather than on an empty string - otherwise a target
+        // that happens to look like a filler word could never be answered.
+        contentTokens = content.Count > 0 ? content.ToArray() : allTokens;
+    }
+
+    /// <summary>
+    /// Folds away everything that varies freely in written Filipino, so that
+    /// two spellings of the same word come out identical and two different
+    /// words never do. See the class comment for why each rule is here.
+    /// </summary>
+    private static string CanonicalForm(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+
+        // Strip accents, so "ó" folds the same way as "o".
+        string decomposed = text.ToLowerInvariant().Trim().Normalize(NormalizationForm.FormD);
+        StringBuilder unaccented = new StringBuilder(decomposed.Length);
+        foreach (char c in decomposed)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark) continue;
+            unaccented.Append(c);
+        }
+
+        string s = Regex.Replace(unaccented.ToString(), @"[^\p{L}\p{N}\s]", "");
+
+        // Spanish-era spellings for sounds Filipino writes differently; the
+        // recognizer may emit either. Digraphs first, so "ll" doesn't lose its
+        // second letter to the c/z/f/v/j pass or the doubled-letter pass below.
+        s = s.Replace("qu", "k").Replace("ll", "ly").Replace("x", "ks");
+        s = s.Replace('c', 'k').Replace('z', 's').Replace('f', 'p').Replace('v', 'b').Replace('j', 'h');
+
+        // e/i and o/u genuinely alternate in Filipino and the recognizer picks
+        // either. a/u never does, which is why "kaha" fails for "kuha".
+        s = s.Replace('e', 'i').Replace('o', 'u');
+
+        // The uw/w glide: "tuwalya" and "twalya" are the same word.
+        s = s.Replace("uw", "w");
+
+        // Doubled letters, which the recognizer adds ("oppo" for "Upo").
+        s = Regex.Replace(s, @"(.)\1+", "$1");
+
+        return Regex.Replace(s, @"\s+", " ").Trim();
+    }
+
+    private static HashSet<string> BuildFillerWords()
+    {
+        HashSet<string> set = new HashSet<string>();
+        foreach (string filler in RawFillerWords)
+        {
+            string canonical = CanonicalForm(filler);
+            if (canonical.Length > 0) set.Add(canonical);
+        }
+        return set;
     }
 
     /// <summary>Standard Levenshtein (single-character insert/delete/substitute) edit distance.</summary>

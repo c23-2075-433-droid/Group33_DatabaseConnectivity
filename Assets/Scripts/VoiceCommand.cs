@@ -30,8 +30,8 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     [Tooltip("The word that triggers a jump. This is a general movement ability (not tied to a " +
              "specific lesson objective), so it's always checked - regardless of whatever " +
-             "SceneObjectiveController word is currently active. Matching is case-insensitive " +
-             "and checks if the recognized phrase CONTAINS this word (more forgiving than an exact match).")]
+             "SceneObjectiveController word is currently active. Matched by PronunciationChecker, " +
+             "the same way a lesson word is, so \"talong\" no longer makes the player jump.")]
     public string triggerWord = "talon";
 
     [Tooltip("If true, automatically starts listening again a moment after each result, so the player can keep speaking repeatedly without pressing anything.")]
@@ -39,6 +39,17 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     [Tooltip("Seconds to wait before restarting listening after a result, when Listen Continuously is on.")]
     public float restartDelay = 0.5f;
+
+    [Tooltip("Dictation language model (on) vs the device's search-focused one (off). Dictation is " +
+             "tuned for sentences and likes to 'correct' one spoken word into a phrase, while the search " +
+             "model tends to return shorter, more literal text for a one-word answer. Worth trying both " +
+             "on a real device and comparing the attempt log.")]
+    public bool useFreeFormLanguageModel = true;
+
+    [Tooltip("Write every attempt to a CSV - the target word, what the recognizer heard, and right/wrong - " +
+             "so the WordVariants table can be tuned from real playtests instead of guesses. " +
+             "See VoiceAttemptLog for where the file lands and how to pull it off a phone.")]
+    public bool logAttempts = true;
 
     [Header("Vocabulary Answer Checking")]
     [Tooltip("When set, incoming speech is checked against this Tagalog word - this is how EVERY " +
@@ -284,7 +295,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         SetStatusText("Listening...");
         speechStartedThisSession = false;
-        SpeechToText.Start(this, preferOfflineRecognition: false);
+        SpeechToText.Start(this, useFreeFormLanguageModel, preferOfflineRecognition: false);
     }
 
     // ---- ISpeechToTextListener callbacks ----
@@ -346,7 +357,15 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             SetStatusText("Recognition error (code " + errorCode.Value + "). Try again.");
 
             // Only when the player actually spoke - see OnNothingHeard.
-            if (speechStartedThisSession && OnNothingHeard != null) OnNothingHeard();
+            if (speechStartedThisSession)
+            {
+                // Worth recording: a word the recognizer never manages to
+                // transcribe needs a clearer prompt, not a new variant.
+                if (logAttempts && !string.IsNullOrEmpty(currentTargetWord))
+                    VoiceAttemptLog.RecordNothingHeard(currentTargetWord);
+
+                if (OnNothingHeard != null) OnNothingHeard();
+            }
         }
         else
         {
@@ -376,12 +395,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     {
         SetStatusText("Recognized:\n\"" + spokenText + "\"");
 
-        string spokenLower = string.IsNullOrEmpty(spokenText) ? "" : spokenText.ToLowerInvariant();
-
         // Talon -> Jump is a general movement ability, not tied to any
         // specific lesson objective, so it's always checked - independent
         // of whatever word SceneObjectiveController currently has set below.
-        if (spokenLower.Contains(triggerWord.ToLowerInvariant()) && player != null)
+        //
+        // Goes through PronunciationChecker rather than string.Contains: a
+        // substring check also fired on every word that merely CONTAINS the
+        // trigger, so "talong" jumped too.
+        if (player != null && PronunciationChecker.IsCorrect(spokenText, triggerWord))
         {
             player.Jump();
         }
@@ -399,6 +420,11 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
             SetStatusText((isCorrect ? "Correct! " : "Try again. ") +
                            "Heard: \"" + spokenText + "\" (target: \"" + currentTargetWord + "\")");
+
+            // Only while an objective is live. Listening restarts every few
+            // seconds whether or not anyone is talking, so logging outside a
+            // lesson would bury the real attempts in idle noise.
+            if (logAttempts) VoiceAttemptLog.Record(currentTargetWord, spokenText, isCorrect);
 
             OnAnswerChecked?.Invoke(spokenText, isCorrect);
         }
