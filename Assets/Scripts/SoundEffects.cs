@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// The game's short sounds: Kylo's footsteps, and the cue that says a word
-/// landed.
+/// The game's short sounds: Kylo's footsteps, the cue that says a word landed,
+/// and the click a button makes when it is pressed.
 ///
 /// Why this exists at all, rather than a PlayOneShot wherever a sound is
 /// wanted. Three reasons, in order of how much they matter:
@@ -32,12 +32,21 @@ public class SoundEffects : MonoBehaviour
     /// <summary>Where the clips live, under a Resources folder so a run-time object can load them.</summary>
     public const string Folder = "Sfx/";
 
+    /// <summary>The sound a button makes. Played by UIClickSound, not by the buttons themselves.</summary>
+    public const string ClickId = "ui_click";
+
     [Tooltip("How far the pitch of a repeated effect is allowed to wander, so five " +
              "footsteps in a row are not five copies of one sound.")]
     [Range(0f, 0.4f)]
     public float pitchVariation = 0.12f;
 
+    // Two sources, not one, and the reason is pitchVariation. It is set on the
+    // source per shot, and a source carries one pitch for everything already
+    // playing through it - so a click fired while Kylo is mid-stride would
+    // retune the footstep that is still sounding. The world's effects wander;
+    // the UI's never do; they get a source each.
     private AudioSource source;
+    private AudioSource uiSource;
 
     void Awake()
     {
@@ -50,10 +59,17 @@ public class SoundEffects : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        source = gameObject.AddComponent<AudioSource>();
-        source.playOnAwake = false;
-        source.loop = false;
-        source.spatialBlend = 0f;
+        source = NewSource();
+        uiSource = NewSource();
+    }
+
+    private AudioSource NewSource()
+    {
+        AudioSource s = gameObject.AddComponent<AudioSource>();
+        s.playOnAwake = false;
+        s.loop = false;
+        s.spatialBlend = 0f;
+        return s;
     }
 
     void OnDestroy()
@@ -71,6 +87,26 @@ public class SoundEffects : MonoBehaviour
     {
         if (Instance == null || string.IsNullOrEmpty(id)) return;
         Instance.PlayHere(id, volumeScale);
+    }
+
+    /// <summary>
+    /// The press of a button. Flat pitch, unlike everything else here: a
+    /// footstep that wanders sounds like a different foot, but a button that
+    /// wanders sounds like a different button, and the child presses LARO on
+    /// the menu and Continue on every results panel often enough to hear it.
+    ///
+    /// Quieter than full, too. This fires on every press in the game, Rachel
+    /// is usually about to talk, and a click at the same level as the cue that
+    /// says a word was right would be telling the child those matter equally.
+    /// </summary>
+    public static void Click()
+    {
+        if (Instance == null) return;
+
+        AudioClip clip = Resources.Load<AudioClip>(Folder + ClickId);
+        if (clip == null) return;
+
+        Instance.uiSource.PlayOneShot(clip, Mathf.Clamp01(VolumeSettings.Effects * 0.85f));
     }
 
     private void PlayHere(string id, float volumeScale)
