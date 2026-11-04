@@ -30,7 +30,7 @@ public static class SceneResultPanelBuilder
 {
     private const string CanvasName = "SceneResult_Canvas";
 
-    // ---- SPRITES, cut by Tools/import_result_panel_art.py ----
+    // ---- SPRITES, cut by Tools/cut_result_ui.py ----
     private const string PanelSprite = "ui_result_board";
     private const string TitleCompleteSprite = "ui_result_title_complete";
     private const string TitleTryAgainSprite = "ui_result_title_tryagain";
@@ -38,57 +38,63 @@ public static class SceneResultPanelBuilder
     private const string ReplaySprite = "btn_result_replay";
     private const string CloseSprite = "btn_result_close";
 
-    // ui_result_board is 712x1061; keeping the ratio stops the frame
-    // stretching. SCORE: and TIME: are printed into it, so this builder places
-    // only the figures that follow them.
-    private const float PanelWidth = 680f;
-    private const float PanelHeight = 1015f;
+    // ui_result_board is 793x941; keeping the ratio stops the frame
+    // stretching. TOTAL POINTS: and WORDS COMPLETED: are printed into it, so
+    // this builder places only the figures that follow them.
+    private const float PanelWidth = 740f;
+    private const float PanelHeight = 878f;
 
     // Everything below was measured off the composed mockup, kept beside the
-    // pieces as Art/result_layout_reference.png (2000x1125), and scaled by
-    // 0.96 to the 1920x1080 canvas.
-    private static readonly Vector2 TitlePos = new Vector2(0f, 244f);
-    private static readonly Vector2 TitleSize = new Vector2(680f, 235f);
-    private static readonly Vector2 ClosePos = new Vector2(252f, 378f);
-    private const float CloseSize = 106f;
+    // pieces as Art/result_layout_new_reference.png (2000x1125), as fractions
+    // of the board - so the whole panel can be resized by PanelWidth alone.
+    private const float TitleFrac = 0.062f;
+    private const float GreetingFrac = 0.4416f;
+    private const float PlaceFrac = 0.5005f;
+    private const float PointsFrac = 0.6307f;
+    private const float WordsFrac = 0.7508f;
+    private const float RecordsFrac = 0.818f;
+    private const float ButtonFrac = 0.875f;
 
-    // Where the figures sit: left-aligned in a column beside the two printed
-    // labels, whose right edges the mockup puts at -16 and -55.
-    private const float ValueLeft = 10f;
-    private const float ValueWidth = 290f;
-    private const float ScoreY = -77f;
-    private const float TimeY = -160f;
+    // Fractions of the board, all checked against the mockup by compositing
+    // the cut sprites at these numbers and diffing the result by eye.
+    private const float TitleWidthFrac = 0.63f;
+    private const float TitleXFrac = -0.015f;   // the banner sits a hair left of centre
+    private const float TitleAspect = 193f / 661f;
 
-    private const float ButtonWidth = 246f;   // height follows the plank's own ratio
-    private const float ButtonX = 130f;
-    private const float ButtonRowY = -290f;
+    private const float CloseXFrac = 0.395f;    // from the board's centre
+    private const float CloseFrac = 0.105f;
+    private const float CloseSizeFrac = 0.130f;
 
-    // A level's last scene also shows the saved scores, which needs the room
-    // between TIME: and the buttons - so the buttons drop towards the board's
-    // empty lower panel and the strip takes the space they leave.
-    private const float ButtonRowYLevelEnd = -370f;
-    private static readonly Vector2 RecordsPos = new Vector2(0f, -250f);
-    private static readonly Vector2 RecordsSize = new Vector2(560f, 150f);
+    // The figures are right-aligned near the plates' right edge, because the
+    // labels printed on the board are long - WORDS COMPLETED: reaches most of
+    // the way across its own plate - and what follows them is short.
+    private const float ValueRightFrac = 0.92f;
+    private const float ValueWidthFrac = 0.30f;
 
-    /// <summary>
-    /// Where each star sits and how big it is. The row is drawn rather than
-    /// tiled - it swells towards the middle and the outer pairs sit lower,
-    /// following the arc in the art - so no slot can be worked out from the
-    /// one beside it.
-    /// </summary>
-    private struct StarPlace
+    private const float ButtonWidthFrac = 0.26f;
+    private const float ButtonXFrac = 0.19f;
+
+    private static readonly Vector2 RecordsSize = new Vector2(580f, 86f);
+
+    // Where each star's own centre sits relative to the row's, in the art's
+    // own pixels, and how wide that row is there. The row is drawn rather
+    // than tiled - it swells towards the middle and the outer pairs sit
+    // lower - so no slot can be worked out from the one beside it.
+    //
+    // Only the centres are listed. Each star's SIZE is read from its sprite at
+    // build time, so re-cutting the row in Tools/cut_result_ui.py changes the
+    // panel without anyone editing a table here. They share a baseline,
+    // because the arc lives in the stars' top edges and not their bottoms.
+    private static readonly float[] StarCentres = { -336.5f, -198f, 2f, 199f, 335.5f };
+    private const float StarRowSourceWidth = 804f;
+    private const float StarRowWidth = 0.82f;
+    private const float StarBaselineFrac = 0.378f;
+
+    /// <summary>A fraction of the way down the board, as a Y from its centre.</summary>
+    private static float FromTop(float frac)
     {
-        public float x, y, w, h;
+        return (0.5f - frac) * PanelHeight;
     }
-
-    private static readonly StarPlace[] StarPlaces =
-    {
-        new StarPlace { x = -215f, y = 36f, w = 70f,  h = 72f  },
-        new StarPlace { x = -128f, y = 55f, w = 106f, h = 108f },
-        new StarPlace { x = 0f,    y = 82f, w = 158f, h = 163f },
-        new StarPlace { x = 127f,  y = 55f, w = 105f, h = 108f },
-        new StarPlace { x = 214f,  y = 36f, w = 70f,  h = 72f  },
-    };
 
     private static readonly Color Cream = new Color(0.99f, 0.96f, 0.89f);
 
@@ -192,20 +198,45 @@ public static class SceneResultPanelBuilder
         titleImage.preserveAspect = true;
         titleImage.raycastTarget = false;
         RectTransform titleRect = titleGO.GetComponent<RectTransform>();
-        titleRect.anchoredPosition = TitlePos;
-        titleRect.sizeDelta = TitleSize;
+        titleRect.anchoredPosition = new Vector2(PanelWidth * TitleXFrac, FromTop(TitleFrac));
+        titleRect.sizeDelta = new Vector2(PanelWidth * TitleWidthFrac,
+                                          PanelWidth * TitleWidthFrac * TitleAspect);
 
         SceneResultPanel.StarSlot[] stars = CreateStars(panel.transform);
 
-        // Left-aligned beside the labels printed on the board, so the two
-        // figures line up as a column however long they are.
-        Text scoreText = CreateText(panel.transform, "ScoreText", "",
-            new Vector2(ValueLeft + ValueWidth * 0.5f, ScoreY),
-            new Vector2(ValueWidth, 72f), 46, TextAnchor.MiddleLeft);
+        // The two lines the board speaks to the child with. Neither existed
+        // before: the panel knew the run but never the player.
+        Text greetingText = CreateText(panel.transform, "GreetingText", "",
+            new Vector2(0f, FromTop(GreetingFrac)),
+            new Vector2(PanelWidth * 0.82f, 62f), 44, TextAnchor.MiddleCenter);
 
-        Text timeText = CreateText(panel.transform, "TimeText", "",
-            new Vector2(ValueLeft + ValueWidth * 0.5f, TimeY),
-            new Vector2(ValueWidth, 72f), 46, TextAnchor.MiddleLeft);
+        Text placeText = CreateText(panel.transform, "PlaceText", "",
+            new Vector2(0f, FromTop(PlaceFrac)),
+            new Vector2(PanelWidth * 0.90f, 44f), 26, TextAnchor.MiddleCenter);
+        placeText.resizeTextForBestFit = true;
+        placeText.resizeTextMinSize = 16;
+        placeText.resizeTextMaxSize = 26;
+
+        // Right-aligned against the plates, because the labels printed on the
+        // board are long and the figures that follow them are short.
+        float valueWidth = PanelWidth * ValueWidthFrac;
+        float valueX = PanelWidth * (ValueRightFrac - 0.5f) - valueWidth * 0.5f;
+
+        Text pointsText = CreateText(panel.transform, "PointsText", "",
+            new Vector2(valueX, FromTop(PointsFrac)),
+            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+
+        Text wordsText = CreateText(panel.transform, "WordsText", "",
+            new Vector2(valueX, FromTop(WordsFrac)),
+            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+
+        // A four-figure score, or "12 / 15", must not grow into its label.
+        foreach (Text figure in new[] { pointsText, wordsText })
+        {
+            figure.resizeTextForBestFit = true;
+            figure.resizeTextMinSize = 20;
+            figure.resizeTextMaxSize = 34;
+        }
 
         // Only on a level's last scene: the scores read back out of the
         // database, which is the half of the Activity 5 requirement that has
@@ -214,18 +245,28 @@ public static class SceneResultPanelBuilder
         if (levelEnd)
         {
             recordsText = CreateText(panel.transform, "RecordsText", "",
-                RecordsPos, RecordsSize, 22, TextAnchor.UpperCenter);
-            recordsText.lineSpacing = 1.15f;
+                new Vector2(0f, FromTop(RecordsFrac)), RecordsSize, 18,
+                TextAnchor.UpperCenter);
+            recordsText.lineSpacing = 1.1f;
+            recordsText.resizeTextForBestFit = true;
+            recordsText.resizeTextMinSize = 12;
+            recordsText.resizeTextMaxSize = 18;
         }
 
-        float row = levelEnd ? ButtonRowYLevelEnd : ButtonRowY;
+        // One row whether or not the records strip is there - the new board
+        // has a place for both, so the buttons no longer move to make room.
+        float row = FromTop(ButtonFrac);
+
+        float buttonX = PanelWidth * ButtonXFrac;
+        float buttonWidth = PanelWidth * ButtonWidthFrac;
 
         Button replay = CreateButton(panel.transform, "ReplayButton", ReplaySprite,
-                                     new Vector2(-ButtonX, row), ButtonWidth);
+                                     new Vector2(-buttonX, row), buttonWidth);
         Button next = CreateButton(panel.transform, "NextButton", NextSprite,
-                                   new Vector2(ButtonX, row), ButtonWidth);
+                                   new Vector2(buttonX, row), buttonWidth);
         Button close = CreateButton(panel.transform, "CloseButton", CloseSprite,
-                                    ClosePos, CloseSize);
+                                    new Vector2(PanelWidth * CloseXFrac, FromTop(CloseFrac)),
+                                    PanelWidth * CloseSizeFrac);
 
         SceneResultPanel result = canvasGO.AddComponent<SceneResultPanel>();
         result.objectiveController = controller;
@@ -234,8 +275,11 @@ public static class SceneResultPanelBuilder
         result.titleImage = titleImage;
         result.completeSprite = LoadSprite(TitleCompleteSprite);
         result.tryAgainSprite = LoadSprite(TitleTryAgainSprite);
-        result.scoreText = scoreText;
-        result.timeText = timeText;
+        result.pointsText = pointsText;
+        result.wordsText = wordsText;
+        result.greetingText = greetingText;
+        result.placeText = placeText;
+        result.wordsLearned = WordsLearnedPanelBuilder.Build(canvasGO.transform, controller);
         result.stars = stars;
         result.nextButton = next;
         result.replayButton = replay;
@@ -260,9 +304,11 @@ public static class SceneResultPanelBuilder
     {
         List<SceneResultPanel.StarSlot> stars = new List<SceneResultPanel.StarSlot>();
 
-        for (int i = 0; i < StarPlaces.Length; i++)
+        float scale = PanelWidth * StarRowWidth / StarRowSourceWidth;
+        float baseline = FromTop(StarBaselineFrac);
+
+        for (int i = 0; i < StarCentres.Length; i++)
         {
-            StarPlace place = StarPlaces[i];
             Sprite earned = LoadSprite("star_gold_" + (i + 1));
             Sprite empty = LoadSprite("star_grey_" + (i + 1));
 
@@ -275,9 +321,16 @@ public static class SceneResultPanelBuilder
             image.preserveAspect = true;
             image.raycastTarget = false;
 
+            // Measured off the unlit art, which is the one always present: the
+            // two are drawn a touch different in size and a slot that changed
+            // size as it lit would make the row twitch.
+            Sprite measure = empty != null ? empty : earned;
+            float w = measure != null ? measure.rect.width * scale : 70f;
+            float h = measure != null ? measure.rect.height * scale : 72f;
+
             RectTransform rect = go.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(place.w, place.h);
-            rect.anchoredPosition = new Vector2(place.x, place.y);
+            rect.sizeDelta = new Vector2(w, h);
+            rect.anchoredPosition = new Vector2(StarCentres[i] * scale, baseline + h * 0.5f);
 
             stars.Add(new SceneResultPanel.StarSlot
             {

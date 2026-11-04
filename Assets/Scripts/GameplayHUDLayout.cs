@@ -46,7 +46,9 @@ public static class GameplayHUDLayout
 
         public GameObject settingsPanel;
         public Button settingsClose;
-        public Slider masterSlider;
+        public Button soundToggle;
+        public Button musicToggle;
+        public Slider effectsSlider;
         public Slider narrationSlider;
     }
 
@@ -175,6 +177,13 @@ public static class GameplayHUDLayout
         p.rachelMouth.talk2  = theme != null ? theme.rachelTalk2 : null;
         p.rachelMouth.talk3  = theme != null ? theme.rachelTalk3 : null;
         p.rachelMouth.blink  = theme != null ? theme.rachelBlink : null;
+        p.rachelMouth.visemeAI  = theme != null ? theme.rachelAI  : null;
+        p.rachelMouth.visemeE   = theme != null ? theme.rachelE   : null;
+        p.rachelMouth.visemeO   = theme != null ? theme.rachelO   : null;
+        p.rachelMouth.visemeU   = theme != null ? theme.rachelU   : null;
+        p.rachelMouth.visemeMBP = theme != null ? theme.rachelMBP : null;
+        p.rachelMouth.visemeFV  = theme != null ? theme.rachelFV  : null;
+        p.rachelMouth.visemeL   = theme != null ? theme.rachelL   : null;
         p.rachelMouth.visibility = p.narrationFade;
 
         GameObject plaque = Rect(panel.transform, "Plaque",
@@ -279,16 +288,18 @@ public static class GameplayHUDLayout
     /// with the rest of the HUD - most plays never open it, and it is the one
     /// piece here heavy enough for that to be worth it.
     ///
-    /// Deliberately the same bamboo frame, slider and OKAY button the main
-    /// menu's Settings popup uses (Assets/Editor/SettingsAboutDialogBuilder.cs),
-    /// so the two read as one dialog in two places.
+    /// Deliberately the same drawn board, controls and close X the main menu's
+    /// Settings popup uses (Assets/Editor/SettingsAboutDialogBuilder.cs), so the
+    /// two read as one dialog in two places. The board carries its own rows,
+    /// icons and labels, so nothing here lays out text.
     /// </summary>
     public static void BuildSettings(Parts p, Transform parent, UITheme theme, Font display)
     {
         if (p.settingsPanel != null) return;
 
-        const float W = 900f;
-        float h = W / (1014f / 793f);   // ui_results_panel is 1014x793
+        const float W = 980f;
+        float h = W / (1224f / 946f);   // ui_settings_panel is 1224x946
+        Vector2 board = new Vector2(W, h);
 
         // Full-screen, and raycast-blocking, so a child adjusting a slider
         // cannot also press the microphone behind it.
@@ -301,69 +312,103 @@ public static class GameplayHUDLayout
 
         GameObject panel = Piece(root.transform, "Panel",
             theme != null ? theme.settingsPanel : null,
-            new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(W, h));
+            new Vector2(0.5f, 0.5f), Vector2.zero, board);
 
-        Text title = Label(panel.transform, "Title", "SETTINGS", display, 52,
-            FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
-        Place(title.rectTransform, new Vector2(0f, h * 0.27f), new Vector2(W * 0.7f, h * 0.13f));
-        Shade(title);
+        // No title, no row labels, no note: the board carries all of its own
+        // lettering. Everything below is a thing a finger touches, placed by
+        // fractions measured off the artwork so it tracks any resize.
+        p.soundToggle = Toggle(panel.transform, theme, "SoundToggle", board,
+            0.6716f, 0.8529f, 0.2273f, 0.3288f);
+        p.musicToggle = Toggle(panel.transform, theme, "MusicToggle", board,
+            0.6724f, 0.8521f, 0.3816f, 0.4820f);
+        p.effectsSlider = SettingSlider(panel.transform, theme, "EffectsSlider", board,
+            0.5204f, 0.8644f, 0.5751f, 0.6237f);
+        p.narrationSlider = SettingSlider(panel.transform, theme, "NarrationSlider", board,
+            0.5212f, 0.8644f, 0.7347f, 0.7833f);
 
-        p.masterSlider = SettingRow(panel.transform, theme, display,
-            "Master", "SOUND", new Vector2(0f, h * 0.06f), W, h);
-        p.narrationSlider = SettingRow(panel.transform, theme, display,
-            "Narration", "TEACHER RACHEL", new Vector2(0f, -h * 0.12f), W, h);
-
-        Text note = Label(panel.transform, "MicNote",
-            "These change what you hear, not the microphone.", display, 22,
-            FontStyle.Normal, TextAnchor.MiddleCenter, Cream);
-        Place(note.rectTransform, new Vector2(0f, -h * 0.25f), new Vector2(W * 0.74f, h * 0.08f));
-        note.resizeTextForBestFit = true;
-        note.resizeTextMinSize = 14;
-        note.resizeTextMaxSize = 22;
-        Shade(note);
-
-        GameObject close = Piece(panel.transform, "CloseButton",
-            theme != null ? theme.okayButton : null,
-            new Vector2(0.5f, 0.5f), new Vector2(0f, -h * 0.37f),
-            new Vector2(W * 0.34f, W * 0.34f * 407f / 1733f));   // btn_okay is 1733x407
+        GameObject close = Rect(panel.transform, "CloseButton",
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+        Image closeImage = close.AddComponent<Image>();
+        closeImage.sprite = theme != null ? theme.settingsClose : null;
+        closeImage.preserveAspect = true;
+        if (closeImage.sprite == null) closeImage.color = new Color(0.36f, 0.21f, 0.09f, 0.92f);
+        FillFraction(close.GetComponent<RectTransform>(), board, 0.8766f, 0.9657f, 0.0772f, 0.1935f);
         p.settingsClose = Clickable(close);
 
         root.SetActive(false);
     }
 
-    /// <summary>A labelled bamboo slider, the same build as the main menu's.</summary>
-    private static Slider SettingRow(Transform panel, UITheme theme, Font display,
-        string name, string caption, Vector2 position, float w, float h)
+    /// <summary>
+    /// Shows a two-state control on or off. The ON and OFF lettering is painted
+    /// into the art, so the whole sprite swaps rather than a tick appearing.
+    /// </summary>
+    public static void SetToggle(Button toggle, UITheme theme, bool on)
     {
-        Text label = Label(panel, name + "Label", caption, display, 32,
-            FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
-        Place(label.rectTransform, position + new Vector2(0f, h * 0.075f),
-            new Vector2(w * 0.7f, h * 0.09f));
-        label.resizeTextForBestFit = true;
-        label.resizeTextMinSize = 18;
-        label.resizeTextMaxSize = 32;
-        Shade(label);
+        if (toggle == null || theme == null) return;
+        Image image = toggle.targetGraphic as Image;
+        if (image == null) return;
+        Sprite sprite = on ? theme.toggleOn : theme.toggleOff;
+        if (sprite != null) image.sprite = sprite;
+    }
 
-        Vector2 size = new Vector2(w * 0.62f, h * 0.11f);
-        GameObject go = Rect(panel, name + "Slider", new Vector2(0.5f, 0.5f),
+    /// <summary>
+    /// A two-state control. A Button with a swapped sprite rather than a
+    /// UnityEngine.UI.Toggle: the behaviour is the same for two states, and it
+    /// serialises into the main menu scene the same way it builds here, which a
+    /// Toggle's separate graphic hierarchy does less cleanly.
+    /// </summary>
+    private static Button Toggle(Transform panel, UITheme theme, string name, Vector2 board,
+        float left, float right, float top, float bottom)
+    {
+        GameObject go = Rect(panel, name, new Vector2(0.5f, 0.5f),
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+        Image image = go.AddComponent<Image>();
+        image.sprite = theme != null ? theme.toggleOff : null;
+        image.preserveAspect = true;
+        if (image.sprite == null) image.color = new Color(0.55f, 0.55f, 0.55f);
+        FillFraction(go.GetComponent<RectTransform>(), board, left, right, top, bottom);
+        return Clickable(go);
+    }
+
+    /// <summary>A slider built from the three settings-board pieces.</summary>
+    private static Slider SettingSlider(Transform panel, UITheme theme, string name, Vector2 board,
+        float left, float right, float top, float bottom)
+    {
+        GameObject go = Rect(panel, name, new Vector2(0.5f, 0.5f),
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
         RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchoredPosition = position;
-        rect.sizeDelta = size;
+        FillFraction(rect, board, left, right, top, bottom);
+        Vector2 size = rect.sizeDelta;
         Slider slider = go.AddComponent<Slider>();
 
+        // First child, so it sits behind the art. Transparent but raycastable:
+        // a press anywhere in the row reaches the Slider through it.
+        GameObject pad = Rect(go.transform, "TouchPad", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
+        Image padImage = pad.AddComponent<Image>();
+        padImage.color = new Color(0f, 0f, 0f, 0f);
+        padImage.raycastTarget = true;
+        RectTransform padRect = pad.GetComponent<RectTransform>();
+        float grow = Mathf.Max(0f, (UITheme.BarMinTouchHeight - size.y) * 0.5f);
+        padRect.offsetMin = new Vector2(0f, -grow);
+        padRect.offsetMax = new Vector2(0f, grow);
+
+        // The capsule is inset top and bottom, because the box is knob-tall.
         GameObject track = Rect(go.transform, "Background", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
         Image trackImage = track.AddComponent<Image>();
         trackImage.sprite = theme != null ? theme.sliderTrack : null;
         if (trackImage.sprite == null) trackImage.color = new Color(0.30f, 0.18f, 0.08f);
-        Stretch(track.GetComponent<RectTransform>());
+        RectTransform trackRect = track.GetComponent<RectTransform>();
+        float capsuleInset = size.y * (1f - UITheme.BarCapsuleFraction) * 0.5f;
+        trackRect.offsetMin = new Vector2(0f, capsuleInset);
+        trackRect.offsetMax = new Vector2(0f, -capsuleInset);
 
-        // The fill sits inside the bamboo groove so it does not spill over the
-        // rim at either end - the inset the main menu's slider uses.
+        // The orange rides in the groove, so it never spills over the rim.
         GameObject fillArea = Rect(go.transform, "Fill Area", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
         RectTransform fillAreaRect = fillArea.GetComponent<RectTransform>();
-        fillAreaRect.offsetMin = new Vector2(size.x * 0.07f, size.y * 0.26f);
-        fillAreaRect.offsetMax = new Vector2(-size.x * 0.07f, -size.y * 0.26f);
+        float sideInset = size.x * UITheme.BarGrooveInset;
+        float orangeInset = size.y * (1f - UITheme.BarOrangeFraction) * 0.5f;
+        fillAreaRect.offsetMin = new Vector2(sideInset, orangeInset);
+        fillAreaRect.offsetMax = new Vector2(-sideInset, -orangeInset);
 
         GameObject fill = Rect(fillArea.transform, "Fill", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
         Image fillImage = fill.AddComponent<Image>();
@@ -372,10 +417,23 @@ public static class GameplayHUDLayout
         RectTransform fillRect = fill.GetComponent<RectTransform>();
         fillRect.sizeDelta = Vector2.zero;
 
+        // The one 9-sliced image in the project. Stretched instead, its rounded
+        // end collapses into a sliver near zero, and the quiet end of a volume
+        // slider is exactly where a child leaves it. Unity measures the border
+        // in the sprite's OWN pixels, so without the multiplier a 14 px cap
+        // lands on a bar a few units tall and swallows the whole bar.
+        float orangeHeight = size.y * UITheme.BarOrangeFraction;
+        if (fillImage.sprite != null && orangeHeight > 0.01f)
+        {
+            fillImage.type = Image.Type.Sliced;
+            fillImage.pixelsPerUnitMultiplier = UITheme.BarFillSourceHeight / orangeHeight;
+        }
+
         GameObject handleArea = Rect(go.transform, "Handle Slide Area", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f));
         RectTransform handleAreaRect = handleArea.GetComponent<RectTransform>();
-        handleAreaRect.offsetMin = new Vector2(size.y * 0.5f, 0f);
-        handleAreaRect.offsetMax = new Vector2(-size.y * 0.5f, 0f);
+        float halfKnob = size.y * UITheme.BarKnobFraction * 0.5f;
+        handleAreaRect.offsetMin = new Vector2(halfKnob, 0f);
+        handleAreaRect.offsetMax = new Vector2(-halfKnob, 0f);
 
         GameObject handle = Rect(handleArea.transform, "Handle", new Vector2(0.5f, 0.5f),
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
@@ -383,7 +441,7 @@ public static class GameplayHUDLayout
         handleImage.sprite = theme != null ? theme.sliderKnob : null;
         if (handleImage.sprite == null) handleImage.color = new Color(0.62f, 0.40f, 0.18f);
         RectTransform handleRect = handle.GetComponent<RectTransform>();
-        handleRect.sizeDelta = new Vector2(size.y * 1.35f, size.y * 1.35f);
+        handleRect.sizeDelta = new Vector2(size.y * UITheme.BarKnobFraction, size.y * UITheme.BarKnobFraction);
 
         slider.fillRect = fillRect;
         slider.handleRect = handleRect;
@@ -439,6 +497,11 @@ public static class GameplayHUDLayout
         ColorBlock colors = button.colors;
         colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
         colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
+        // On a touch screen nothing ever clears the selection, so Unity's
+        // default dimmed selectedColor leaves the last thing tapped looking
+        // half-pressed. Harmless on a button you press once; on a toggle that
+        // stays on screen it reads as stuck.
+        colors.selectedColor = Color.white;
         colors.fadeDuration = 0.08f;
         button.colors = colors;
         return button;

@@ -24,8 +24,6 @@ public class MainMenuController : MonoBehaviour
     public Button playButton;
     public Button settingsButton;
     public Button aboutButton;
-    [Tooltip("Top-right speaker icon in the art - toggles mute on/off.")]
-    public Button muteButton;
 
     [Header("Panels")]
     [Tooltip("Shown when Settings is pressed, hidden otherwise.")]
@@ -36,8 +34,14 @@ public class MainMenuController : MonoBehaviour
     public Button aboutCloseButton;
 
     [Header("Settings")]
-    [Tooltip("Optional master volume slider inside the Settings panel.")]
-    public Slider volumeSlider;
+    [Tooltip("SOUND row - on means not muted. The plate art is swapped, not tinted.")]
+    public Button soundToggle;
+    [Tooltip("MUSIC row. Remembered, but nothing plays music yet.")]
+    public Button musicToggle;
+    [Tooltip("SOUND EFFECTS row. Remembered, but the game has no effects yet.")]
+    public Slider effectsSlider;
+    [Tooltip("MS. RACHEL row - the narrator's own volume.")]
+    public Slider narrationSlider;
 
     [Tooltip("Name of the scene to load when Play is pressed (the journey map).")]
     public string levelSelectSceneName = "LevelSelect";
@@ -69,35 +73,58 @@ public class MainMenuController : MonoBehaviour
 
         VolumeSettings.Apply();
 
-        if (volumeSlider != null)
-        {
-            volumeSlider.SetValueWithoutNotify(VolumeSettings.Master);
-            volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-        }
+        if (effectsSlider != null) effectsSlider.onValueChanged.AddListener(OnEffectsChanged);
+        if (narrationSlider != null) narrationSlider.onValueChanged.AddListener(OnNarrationChanged);
+        if (soundToggle != null) soundToggle.onClick.AddListener(OnSoundToggled);
+        if (musicToggle != null) musicToggle.onClick.AddListener(OnMusicToggled);
+        RefreshSettingsWidgets();
 
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
         if (nicknamePanel != null) nicknamePanel.SetActive(false);
-
-        if (muteButton != null) muteButton.onClick.AddListener(OnMutePressed);
     }
 
     /// <summary>
     /// Mute no longer has to stash the volume before silencing it: muting and
     /// the master level are two separate saved values now, so unmuting simply
     /// stops forcing silence and the level is still whatever it was.
+    ///
+    /// It does restore a very low Master, though. The panel this replaced had
+    /// a SOUND slider driving Master, so a quiet level can be saved with
+    /// nothing left on screen able to raise it - and SOUND on that showed no
+    /// effect would look broken. On means audible.
     /// </summary>
-    private void OnMutePressed()
+    private void OnSoundToggled()
     {
+        bool turningOn = VolumeSettings.Muted;
         VolumeSettings.Muted = !VolumeSettings.Muted;
-        RefreshVolumeSlider();
+        if (turningOn && VolumeSettings.Master < 0.5f) VolumeSettings.Master = 1f;
+        RefreshSettingsWidgets();
     }
 
-    /// <summary>Shows the saved level without re-triggering OnVolumeChanged.</summary>
-    private void RefreshVolumeSlider()
+    private void OnMusicToggled()
     {
-        if (volumeSlider == null) return;
-        volumeSlider.SetValueWithoutNotify(VolumeSettings.Muted ? 0f : VolumeSettings.Master);
+        VolumeSettings.MusicOn = !VolumeSettings.MusicOn;
+        RefreshSettingsWidgets();
+    }
+
+    /// <summary>
+    /// Pushes all four controls from the saved settings, without re-triggering
+    /// their own handlers. Called when the popup opens as well as on start,
+    /// because the in-game panel writes the same values - a volume changed
+    /// mid-game must show here when the player comes back to the menu.
+    ///
+    /// The toggles hold no state of their own: the saved setting is the only
+    /// truth and the plate is derived from it every time.
+    /// </summary>
+    private void RefreshSettingsWidgets()
+    {
+        if (effectsSlider != null) effectsSlider.SetValueWithoutNotify(VolumeSettings.Effects);
+        if (narrationSlider != null) narrationSlider.SetValueWithoutNotify(VolumeSettings.Narration);
+
+        UITheme theme = UITheme.Load();
+        GameplayHUDLayout.SetToggle(soundToggle, theme, !VolumeSettings.Muted);
+        GameplayHUDLayout.SetToggle(musicToggle, theme, VolumeSettings.MusicOn);
     }
 
     /// <summary>
@@ -165,11 +192,18 @@ public class MainMenuController : MonoBehaviour
         // Blank input is fine - NicknameManager falls back to a default name.
         string nickname = nicknameInput != null ? nicknameInput.text : "";
         NicknameManager.SetNickname(nickname);
+
+        // A fresh run teaches every word from scratch. Without this, someone
+        // who played a level, came back to the menu and started again would
+        // only ever get the short reminders.
+        VocabularyMemory.Reset();
+
         SceneManager.LoadScene(levelSelectSceneName);
     }
 
     private void OnSettingsPressed()
     {
+        RefreshSettingsWidgets();
         if (settingsPanel != null) settingsPanel.SetActive(true);
         if (aboutPanel != null) aboutPanel.SetActive(false);
     }
@@ -180,14 +214,18 @@ public class MainMenuController : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
-    /// <summary>
-    /// Moving the slider also lifts mute - reaching for the volume while the
-    /// game is silenced means "I want to hear it", and leaving mute on would
-    /// make the slider look broken.
-    /// </summary>
-    private void OnVolumeChanged(float value)
+    private void OnEffectsChanged(float value)
     {
-        if (VolumeSettings.Muted) VolumeSettings.Muted = false;
-        VolumeSettings.Master = value;
+        VolumeSettings.Effects = value;
+    }
+
+    /// <summary>
+    /// Moving a slider no longer lifts mute, which the old volume slider did.
+    /// SOUND is now a toggle the player can see one row up, so flipping it
+    /// under them would be the surprising thing, not the helpful one.
+    /// </summary>
+    private void OnNarrationChanged(float value)
+    {
+        VolumeSettings.Narration = value;
     }
 }

@@ -1,0 +1,28 @@
+SALINLAHI - sound effect credits
+================================
+
+Every effect in Assets/Resources/Sfx, where it came from, and its licence.
+Written by Tools/import_sfx.py; re-run the import rather than editing it.
+
+A CC-BY effect must also be credited in the game's own credits screen.
+
+step_wood_1  <- Different steps on wood, stone, leaves, gravel and mud (wood01)
+  by       kddekadenz
+  licence  CC0
+  source   https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
+
+step_wood_2  <- Different steps on wood, stone, leaves, gravel and mud (wood02)
+  by       kddekadenz
+  licence  CC0
+  source   https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
+
+step_wood_3  <- Different steps on wood, stone, leaves, gravel and mud (wood03)
+  by       kddekadenz
+  licence  CC0
+  source   https://opengameart.org/content/different-steps-on-wood-stone-leaves-gravel-and-mud
+
+cue_correct  <- Bell dings/chimes (bell_ding2)
+  by       Jute
+  licence  CC0
+  source   https://opengameart.org/content/bell-dingschimes
+

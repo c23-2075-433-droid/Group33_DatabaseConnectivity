@@ -111,7 +111,8 @@ public class BuildMainMenuScene
         //     real player name instead of NicknameManager's "Bata" fallback. ---
         NicknameDialogBuilder.Dialog nicknameDialog = NicknameDialogBuilder.Build(canvasT);
 
-        // --- Wire controller (no mute icon in this design) ---
+        // --- Wire controller (SOUND is a toggle in the settings board now,
+        //     so there is no separate mute icon on the menu itself) ---
         MainMenuController controller = canvasGO.AddComponent<MainMenuController>();
         controller.nicknamePanel = nicknameDialog.root;
         controller.nicknameInput = nicknameDialog.input;
@@ -127,7 +128,10 @@ public class BuildMainMenuScene
         controller.aboutPanel = aboutDialog.root;
         controller.settingsCloseButton = settingsDialog.close;
         controller.aboutCloseButton = aboutDialog.close;
-        controller.volumeSlider = settingsDialog.slider;
+        controller.soundToggle = settingsDialog.soundToggle;
+        controller.musicToggle = settingsDialog.musicToggle;
+        controller.effectsSlider = settingsDialog.effectsSlider;
+        controller.narrationSlider = settingsDialog.narrationSlider;
         controller.levelSelectSceneName = "LevelSelect";
 
         // --- Save + put MainMenu first in Build Settings ---

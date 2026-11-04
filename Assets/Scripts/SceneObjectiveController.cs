@@ -107,8 +107,13 @@ public class SceneObjectiveController : MonoBehaviour
     public float dimmedPromptAlpha = 0.45f;
 
     [Tooltip("Safety cap in seconds, so narration that never finishes cannot leave a word " +
-             "dimmed and unanswerable forever.")]
-    public float maxNarrationWait = 15f;
+             "dimmed and unanswerable forever. A word is introduced with three lines - the " +
+             "story, its English meaning, then the instruction - and the first word of a " +
+             "scene follows the scene intro as well. Unrecorded, those are paced by their " +
+             "captions: the longest run in the current script is just under 21 seconds, " +
+             "which is why 15 is not enough. This firing mid-sentence would hand the child " +
+             "a word while Rachel is still talking, so it is set well clear of that.")]
+    public float maxNarrationWait = 30f;
 
     private int currentIndex = -1;
     private bool objectiveLive = false;

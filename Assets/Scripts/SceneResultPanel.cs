@@ -43,12 +43,21 @@ public class SceneResultPanel : MonoBehaviour
              "next one still opens - this is a nudge to go again, not a loss.")]
     public Sprite tryAgainSprite;
 
-    [Tooltip("This scene's result, e.g. \"5 / 6\". The board prints the " +
-             "SCORE: label itself, so only the figures go here.")]
-    public Text scoreText;
+    [Tooltip("The score for this scene. The board prints the TOTAL POINTS: " +
+             "label itself, so only the figure goes here.")]
+    public Text pointsText;
 
-    [Tooltip("How long the scene took, e.g. \"1:48\". The board prints TIME:.")]
-    public Text timeText;
+    [Tooltip("This scene's words, e.g. \"5 / 6\". The board prints " +
+             "WORDS COMPLETED:.")]
+    public Text wordsText;
+
+    [Tooltip("\"GREAT JOB, KYLA!\" - the child's own name, which is the one " +
+             "thing on this board that is about them rather than the run.")]
+    public Text greetingText;
+
+    [Tooltip("\"YOU SUCCESSFULLY COMPLETED BAHAY: LEVEL 2!\". Hidden in a " +
+             "scene that is not on the journey, which has no place name.")]
+    public Text placeText;
 
     /// <summary>
     /// One of the five stars. Each carries its own pair of sprites because the
@@ -66,6 +75,11 @@ public class SceneResultPanel : MonoBehaviour
     [Header("Stars")]
     [Tooltip("Five slots, left to right.")]
     public StarSlot[] stars;
+
+    [Header("Words learned")]
+    [Tooltip("Opened by CONTINUE, before the next scene. Optional: without " +
+             "one, CONTINUE goes straight on as it always did.")]
+    public WordsLearnedPanel wordsLearned;
 
     [Header("Buttons")]
     public Button nextButton;
@@ -108,15 +122,9 @@ public class SceneResultPanel : MonoBehaviour
     private int correct;
     private int attempts;
     private bool shown;
-    private float startedAt;
 
     void Awake()
     {
-        // The clock starts when the scene does. This component lives on the
-        // panel's canvas, which is never switched off - only its content is -
-        // so Awake here is the scene opening.
-        startedAt = Time.time;
-
         if (voiceCommand == null) voiceCommand = FindFirstObjectByType<VoiceCommand>();
         if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
         // Never the object this component is on. A deactivated GameObject runs
@@ -222,10 +230,13 @@ public class SceneResultPanel : MonoBehaviour
             if (banner != null) titleImage.sprite = banner;
         }
 
-        if (scoreText != null)
-            scoreText.text = correct + " / " + Mathf.Max(attempts, correct);
+        if (pointsText != null)
+            pointsText.text = RunScore.PointsFor(correct, attempts).ToString();
 
-        if (timeText != null) timeText.text = Elapsed();
+        if (wordsText != null)
+            wordsText.text = correct + " / " + Mathf.Max(attempts, correct);
+
+        FillGreeting();
 
         // The level select reads these back, so the rating has to outlive the
         // panel. On a level's last scene the figures are the whole level's
@@ -253,17 +264,23 @@ public class SceneResultPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// How long this scene took, as m:ss.
-    ///
-    /// Timed from the scene loading rather than from the first word, because
-    /// a child who sits and looks around for a while did spend that time in
-    /// the scene. On a level's last scene this is still that scene's time and
-    /// not the level's, the same way its stars are.
+    /// The two lines the board addresses the child with. Both come from things
+    /// the game already knows and had never put on this screen: the name they
+    /// typed at the menu, and where they are on the journey.
     /// </summary>
-    private string Elapsed()
+    private void FillGreeting()
     {
-        int seconds = Mathf.Max(0, Mathf.RoundToInt(Time.time - startedAt));
-        return (seconds / 60) + ":" + (seconds % 60).ToString("00");
+        if (greetingText != null)
+            greetingText.text = "GREAT JOB, " + NicknameManager.Nickname.ToUpperInvariant() + "!";
+
+        if (placeText != null)
+        {
+            // Empty off the journey - the main menu has no place name. Hide the
+            // line rather than print a sentence with a hole in it.
+            string place = JourneyMap.PlaceLabel(SceneManager.GetActiveScene().name);
+            placeText.text = "YOU SUCCESSFULLY COMPLETED " + place + "!";
+            placeText.gameObject.SetActive(!string.IsNullOrEmpty(place));
+        }
     }
 
     private void ShowStars(int earned)
@@ -290,7 +307,7 @@ public class SceneResultPanel : MonoBehaviour
         {
             string target = string.IsNullOrEmpty(nextSceneName) ? levelSelectSceneName : nextSceneName;
             nextButton.onClick.RemoveAllListeners();
-            nextButton.onClick.AddListener(() => Go(target));
+            nextButton.onClick.AddListener(() => Continue(target));
         }
 
         if (replayButton != null)
@@ -304,6 +321,23 @@ public class SceneResultPanel : MonoBehaviour
             closeButton.onClick.RemoveAllListeners();
             closeButton.onClick.AddListener(() => Go(levelSelectSceneName));
         }
+    }
+
+    /// <summary>
+    /// CONTINUE shows the words this scene taught before moving on. REPLAY and
+    /// the cross do not: a child who is going round again or leaving has not
+    /// asked to be read a list.
+    /// </summary>
+    private void Continue(string target)
+    {
+        if (wordsLearned == null)
+        {
+            Go(target);
+            return;
+        }
+
+        if (panelRoot != null) panelRoot.SetActive(false);
+        wordsLearned.Show(() => Go(target), () => Go(levelSelectSceneName));
     }
 
     private void Go(string sceneName)

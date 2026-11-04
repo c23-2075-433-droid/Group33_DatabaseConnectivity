@@ -45,14 +45,19 @@ public class AddSettingsAboutToMainMenu
 
         controller.settingsPanel = settings.root;
         controller.settingsCloseButton = settings.close;
-        controller.volumeSlider = settings.slider;
+        controller.soundToggle = settings.soundToggle;
+        controller.musicToggle = settings.musicToggle;
+        controller.effectsSlider = settings.effectsSlider;
+        controller.narrationSlider = settings.narrationSlider;
         controller.aboutPanel = about.root;
         controller.aboutCloseButton = about.close;
 
         EditorSceneManager.SaveScene(scene);
 
-        Debug.Log("[SALINLAHI] Settings and About popups restyled in " + ScenePath +
-                   ". Both now use the bamboo panel, the OKAY button and the Fredoka UI font; " +
-                   "the volume slider uses the wooden track/fill/knob art.");
+        Debug.Log("[SALINLAHI] Settings and About popups rebuilt in " + ScenePath +
+                   ".\n  Settings: the drawn board, with SOUND and MUSIC toggles and the " +
+                   "SOUND EFFECTS and MS. RACHEL sliders. Its rows, icons and labels are " +
+                   "painted into the art, so the panel carries no text of its own." +
+                   "\n  About: unchanged - bamboo panel, OKAY button, Fredoka UI font.");
     }
 }
