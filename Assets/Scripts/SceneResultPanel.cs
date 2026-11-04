@@ -115,8 +115,20 @@ public class SceneResultPanel : MonoBehaviour
     public bool waitForCue = false;
 
     [Header("Timing")]
-    [Tooltip("Beat between the last word landing and the panel arriving, so " +
-             "the child sees the thing they just did finish happening.")]
+    [Tooltip("Hold the panel until Teacher Rachel has stopped talking. The " +
+             "scene is not over while she is still speaking: the last word " +
+             "earns its praise, the story line says what it did, and the " +
+             "scene has an outro - all queued the moment the scene finishes. " +
+             "Without this the board lands over the top of her and she goes " +
+             "on talking behind it.")]
+    public bool waitForNarration = true;
+
+    [Tooltip("Safety cap in seconds, so a line that never ends cannot keep " +
+             "the summary from ever arriving.")]
+    public float maxNarrationWait = 30f;
+
+    [Tooltip("Beat between Rachel finishing and the panel arriving, so the " +
+             "board does not land on the last syllable.")]
     public float showDelay = 0.9f;
 
     private int correct;
@@ -217,6 +229,16 @@ public class SceneResultPanel : MonoBehaviour
 
     private IEnumerator ShowAfterBeat()
     {
+        // One frame before asking whether she is speaking. Everything that
+        // listens for the scene finishing is called in the same breath as this
+        // panel, and Rachel's closing lines are queued by one of those
+        // listeners - VoicePromptDirector - which may be called after this
+        // one. Asking inside that breath would read a queue still being
+        // filled and find silence a moment before she starts.
+        yield return null;
+
+        if (waitForNarration) yield return WaitForRachelToFinish();
+
         if (showDelay > 0f) yield return new WaitForSeconds(showDelay);
 
         int earned = EarnedStars();
@@ -248,6 +270,29 @@ public class SceneResultPanel : MonoBehaviour
         WireButtons();
 
         if (panelRoot != null) panelRoot.SetActive(true);
+    }
+
+    /// <summary>
+    /// Holds until Teacher Rachel has finished - every line she has queued,
+    /// not just the one she is on. IsSpeaking stays true from the moment a
+    /// line is queued until the last of them has played out and its tail
+    /// pause has passed, so waiting on it waits for all of them.
+    ///
+    /// The cap means a line that never finishes - or a recording that fails to
+    /// play - cannot leave the child staring at a finished room with no board
+    /// and no way on. A narrator destroyed mid-line reads as null and ends the
+    /// wait the same way.
+    /// </summary>
+    private IEnumerator WaitForRachelToFinish()
+    {
+        float waited = 0f;
+        VoiceNarrator narrator = VoiceNarrator.Instance;
+
+        while (narrator != null && narrator.IsSpeaking && waited < maxNarrationWait)
+        {
+            waited += Time.deltaTime;
+            yield return null;
+        }
     }
 
     /// <summary>How many of the stars this scene earned. Never zero.</summary>
