@@ -85,8 +85,12 @@ public class BuildPaaralanScene2
     // The first build stood him at x 6.3, y -2.8. That is inside the
     // right-hand desk cluster, where the painting has a desk top and no floor,
     // so he appeared to be standing on the furniture.
-    private const float FloorY = -3.15f;
-    private const float StandX = -0.90f;
+    // Measured off klasrum_background: the corridor tiles he stands on when
+    // the scene opens, not the classroom floor seen through the doorway. The
+    // old -3.15 was fitted to menu_bg, the main menu's room, which stood in
+    // here until the classroom art existed.
+    private const float FloorY = -4.45f;
+    private const float StandX = -1.50f;              // in front of the open door
     private const float PlayerHeight = 2.85f;         // a 1.2 m child
 
     // Seated: at the front-left desk, which klasrum_desk_front draws over his
@@ -96,26 +100,51 @@ public class BuildPaaralanScene2
     // standing and seated spots that Bahay Scene 5 makes. 3.10 is a little
     // above life size; at a strictly correct 2.6 his head barely cleared the
     // desk and the pose was unreadable.
-    private const float SitX = -5.20f;
-    private const float SitFeetY = -4.52f;            // under the desk, never seen
-    private const float SeatedHeight = 3.10f;
+    // The near desk in klasrum_interior_background, measured off the art: its
+    // top surface is at y -1.67, the floor under it at -4.21. He sits at that
+    // desk once "Upo" has moved the view inside; the old -5.20 was fitted to
+    // menu_bg and lands on the open door in the doorway view.
+    private const float SitX = 0.30f;
+    private const float SitFeetY = -4.21f;            // under the desk, never seen
+    // Taller than he looks standing, on purpose. The near desk is drawn close
+    // to the camera and is tall for a child - its top is 2.55 units above the
+    // floor it stands on - so at 3.10 only his hair cleared it. 4.60 puts his
+    // head and shoulders above the surface, which is what sitting AT a desk
+    // looks like. He is also nearer the camera here than at the doorway, so
+    // reading larger than his standing height is correct rather than a cheat.
+    private const float SeatedHeight = 4.60f;
 
     // The surface of the desk he sits at, where his things end up. Both sit
     // just below the desk's far edge, so they read as lying on it.
-    private const float NotebookX = -6.30f;
-    private const float NotebookBaseY = -3.34f;
+    // Both sit ON the desk top, not on the floor, so their base is the desk
+    // surface at -1.67 rather than a height above the ground.
+    private const float NotebookX = -0.90f;
+    private const float NotebookBaseY = -1.67f;
     private const float NotebookHeight = 0.72f;
-    private const float PencilX = -4.25f;
-    private const float PencilBaseY = -3.20f;
+    private const float PencilX = 1.45f;
+    private const float PencilBaseY = -1.67f;
     private const float PencilHeight = 0.30f;
 
     // Teacher Rachel, behind her own desk at the front. char_teacher is a
     // WAIST-UP sprite - the mockup it was cut from crops her at the hip - so
     // her "floor" is her hip line, and the desk top at y -0.6 hides that cut.
     // Standing her anywhere else puts a sliced-off waist in open air.
-    private const float TeacherX = 2.60f;
-    private const float TeacherHipY = -0.70f;
-    private const float TeacherHeight = 1.95f;        // hip to crown
+    // Full body now, so she is measured feet to crown and stands on the floor
+    // like anyone else. The old sprite was cropped at the hip - its "floor"
+    // was her hip line at -0.70 and 1.95 was hip to crown - and the teacher's
+    // desk had to be positioned to hide the cut.
+    //
+    // 3.58 units comes off the art: the chalkboard behind her is 235px tall
+    // and a classroom chalkboard is about 1.2 m, which puts the room at
+    // ~196 px per metre, so a 1.6 m adult is ~313 px.
+    //
+    // She stands partway into the room rather than at the front. That is a
+    // compromise: she has to read through the doorway in the first half of
+    // the scene AND beside her desk in the second, and one position has to
+    // serve both because she is placed once.
+    private const float TeacherX = 0.70f;
+    private const float TeacherFeetY = -2.00f;
+    private const float TeacherHeight = 3.58f;        // feet to crown
 
     private const float DoorX = 8.30f;                // the classroom door, right edge
     private const float DoorY = 0.60f;
@@ -163,8 +192,15 @@ public class BuildPaaralanScene2
         SpriteRenderer bgSr = bg.AddComponent<SpriteRenderer>();
         // Not "a ?? b": ?? ignores Unity's overloaded null, so a missing asset
         // can slip through it. Ask explicitly.
+        // Two views of the same room, and the scene moves between them. The
+        // five words split in two: "Bukas" and "Kumusta" happen at the
+        // threshold, where a doorway shot is right; "Upo", "Kuha" and "Lapis"
+        // happen at a desk, which that shot has no room for. So "Upo" swaps
+        // the picture - he sits down AND the view goes in with him, which is
+        // what makes the word read as entering rather than just crouching.
         Sprite roomSprite = LoadSpriteOptional("klasrum_background");
         if (roomSprite == null) roomSprite = LoadSprite("menu_bg");
+        Sprite insideSprite = LoadSpriteOptional("klasrum_interior_background");
         bgSr.sprite = roomSprite;
         bgSr.sortingLayerName = "Background";
         bgSr.sortingOrder = 0;
@@ -175,9 +211,21 @@ public class BuildPaaralanScene2
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
 
+        SpriteSwap roomSwap = bg.AddComponent<SpriteSwap>();
+        roomSwap.target = bgSr;
+        roomSwap.beforeSprite = roomSprite;
+        roomSwap.afterSprite = insideSprite;
+
         // --- Teacher Rachel, behind her desk at the front ---
-        GameObject teacher = CreateStandingOptional("Char_Teacher", "char_teacher",
-                                                     TeacherX, TeacherHipY, TeacherHeight);
+        // Facing LEFT, because she stands to the right of where Kylo comes in
+        // and the greeting is aimed at him. char_teacher_side_left is the
+        // right-facing profile mirrored, so it costs no extra drawing.
+        // The old waist-up char_teacher is kept as the fallback.
+        string teacherSprite = LoadSpriteOptional("char_teacher_side_left") != null
+            ? "char_teacher_side_left"
+            : "char_teacher";
+        GameObject teacher = CreateStandingOptional("Char_Teacher", teacherSprite,
+                                                     TeacherX, TeacherFeetY, TeacherHeight);
 
         // --- Kylo ---
         // The listening rig is its own object and stays switched on. Bahay
@@ -244,7 +292,7 @@ public class BuildPaaralanScene2
         TimedOverlay gleamDoor = CreateGleamAt("Gleam_Door", DoorX, DoorY, 3.4f);
         TimedOverlay gleamGreet = teacher != null
             ? CreateGleam("Gleam_Teacher", teacher, 2.4f)
-            : CreateGleamAt("Gleam_TeacherDesk", TeacherX, TeacherHipY, 2.4f);
+            : CreateGleamAt("Gleam_TeacherDesk", TeacherX, TeacherFeetY + TeacherHeight * 0.5f, 2.4f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
         TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilX,
@@ -296,7 +344,12 @@ public class BuildPaaralanScene2
         var kumusta = MakeObjective("Kumusta", pKumusta);
         UnityEventTools.AddPersistentListener(kumusta.onCorrect, gleamGreet.Play);
 
+        // The view goes inside with him. Swapped before the poses change so
+        // the room is already the classroom in the frame he first appears
+        // seated in, rather than him sitting down in the doorway and the
+        // walls changing round him a frame later.
         var upo = MakeObjective("Upo", pUpo);
+        UnityEventTools.AddPersistentListener(upo.onCorrect, roomSwap.Apply);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
 
