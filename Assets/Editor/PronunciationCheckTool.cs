@@ -2,10 +2,17 @@
 //
 // Tools > SALINLAHI > Check Pronunciation Matching
 //
-// Proves that voice answers are judged correctly, without needing a phone and
-// without the Unity Test Framework (which this project doesn't have - see
-// Packages/manifest.json). Run it after editing WordVariants or
-// PronunciationChecker; it prints a pass/fail report to the Console.
+// Proves that voice answers are judged correctly, without needing a phone. Run
+// it after editing WordVariants or PronunciationChecker; it prints a pass/fail
+// report to the Console.
+//
+// A menu item rather than NUnit tests, deliberately. The Unity Test Framework
+// IS available here (1.8.0, builtin, pulled in by com.unity.ide.visualstudio),
+// so that is not the reason. The reason is that this project has no .asmdef
+// anywhere, and a test assembly would be the first one - which changes how
+// every script under Assets is compiled and referenced. That is not a change
+// worth making in order to land a bug fix. If assembly definitions arrive
+// later, these checks port to EditMode tests close to as they stand.
 //
 // The check that matters most is #3: every taught word against every OTHER
 // taught word, all 53x52 of them, none of which may be accepted. That is the
