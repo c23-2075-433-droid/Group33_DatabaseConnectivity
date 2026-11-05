@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6ed0ddb8ef0eaa1371c56a46b1b39171
+guid: 78a86e7f86c64caba832ce74417a8108
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 572285147750473139
-    second: ui_input_slot_0
+      213: 245208239828975676
+    second: ui_title_park_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,23 +128,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ui_input_slot_0
+      name: ui_title_park_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1682
-        height: 396
+        width: 2000
+        height: 1125
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData:
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d4a465f42019dcf89fc4585508fe7e6b
-      internalID: 572285147750473139
+      spriteID: 2cc2e984b727a1300800000000000000
+      internalID: 245208239828975676
       vertices: []
       indices:
       edges: []
@@ -153,7 +153,7 @@ TextureImporter:
     customData:
     physicsShape: []
     bones: []
-    spriteID: a151f0e4425340223524a0ebf7007043
+    spriteID: 349721fd07f4edff0800000000000000
     internalID: 0
     vertices: []
     indices:

@@ -3,8 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Wires up the Main Menu screen: nickname entry, Play/Settings/About buttons.
-/// Attached to the menu's Canvas by BuildMainMenuScene.cs.
+/// Wires up the Main Menu screen: nickname entry, Adventure/Settings/About
+/// buttons. Attached to the menu's Canvas by BuildMainMenuScene.cs.
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
@@ -19,9 +19,18 @@ public class MainMenuController : MonoBehaviour
     [Tooltip("Optional. Checks the name is not already in use and offers a free one instead. " +
               "Leave empty and any name is accepted, which is how older scenes behave.")]
     public NicknameAvailability nicknameAvailability;
+    [Tooltip("Optional. Throws the menu out of focus while the nickname dialog is open. " +
+              "Leave empty and the menu simply stays sharp behind it.")]
+    public MenuBlurBackdrop menuBlur;
 
     [Header("Buttons")]
-    public Button playButton;
+    [Tooltip("ADVENTURE - the story levels. This is the old PLAY button renamed, " +
+              "so it still opens the nickname dialog and then the journey map.")]
+    public Button adventureButton;
+    [Tooltip("MINI GAMES - drawn and clickable, but deliberately does nothing yet. " +
+              "There are no mini games to open, and a button that loads a stub " +
+              "screen would be a worse lie than one that sits still.")]
+    public Button miniGamesButton;
     public Button settingsButton;
     public Button aboutButton;
 
@@ -59,7 +68,8 @@ public class MainMenuController : MonoBehaviour
             nicknameInput.text = NicknameManager.Nickname;
         }
 
-        if (playButton != null) playButton.onClick.AddListener(OnPlayPressed);
+        if (adventureButton != null) adventureButton.onClick.AddListener(OnAdventurePressed);
+        // miniGamesButton is left unwired on purpose - see its tooltip.
         if (settingsButton != null) settingsButton.onClick.AddListener(OnSettingsPressed);
         if (aboutButton != null) aboutButton.onClick.AddListener(OnAboutPressed);
         if (settingsCloseButton != null) settingsCloseButton.onClick.AddListener(() => settingsPanel.SetActive(false));
@@ -128,11 +138,12 @@ public class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// Play no longer starts the game directly - it opens the nickname dialog
-    /// first, so each play session is saved under a real player name instead
-    /// of NicknameManager's fallback. OKAY starts the game; CANCEL backs out.
+    /// Adventure does not start the game directly - it opens the nickname
+    /// dialog first, so each play session is saved under a real player name
+    /// instead of NicknameManager's fallback. OKAY starts the game; CANCEL
+    /// backs out.
     /// </summary>
-    private void OnPlayPressed()
+    private void OnAdventurePressed()
     {
         if (nicknamePanel == null)
         {
@@ -142,6 +153,7 @@ public class MainMenuController : MonoBehaviour
             return;
         }
 
+        if (menuBlur != null) menuBlur.SetBlurred(true);
         nicknamePanel.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
@@ -185,6 +197,7 @@ public class MainMenuController : MonoBehaviour
     private void CloseNicknameDialog()
     {
         if (nicknamePanel != null) nicknamePanel.SetActive(false);
+        if (menuBlur != null) menuBlur.SetBlurred(false);
     }
 
     private void StartGame()

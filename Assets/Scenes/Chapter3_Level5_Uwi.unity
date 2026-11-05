@@ -207,6 +207,7 @@ GameObject:
   - component: {fileID: 38637600}
   - component: {fileID: 38637599}
   - component: {fileID: 38637598}
+  - component: {fileID: 1736227211}
   m_Layer: 0
   m_Name: SceneResult_Canvas
   m_TagString: Untagged
@@ -6351,7 +6352,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1736227212}
-  - component: {fileID: 1736227211}
   m_Layer: 0
   m_Name: WordsLearned_Content
   m_TagString: Untagged
@@ -6365,7 +6365,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1736227210}
+  m_GameObject: {fileID: 38637597}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71d8ac9bf67a64c8392f33f8908d6f04, type: 3}

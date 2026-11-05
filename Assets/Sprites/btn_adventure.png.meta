@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a4c12c26686a19a1f1b64b95a9f58f72
+guid: 3b9639c1a8b34f0abe7166e219690f47
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 520642706696056342
-    second: btn_play_0
+      213: 245208239828975676
+    second: btn_adventure_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,13 +128,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: btn_play_0
+      name: btn_adventure_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 858
-        height: 538
+        width: 2000
+        height: 1125
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +143,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7c751db36093661d0800000000000000
-      internalID: 520642706696056342
+      spriteID: 2cc2e984b727a1300800000000000000
+      internalID: 245208239828975676
       vertices: []
       indices:
       edges: []
@@ -153,7 +153,7 @@ TextureImporter:
     customData:
     physicsShape: []
     bones: []
-    spriteID: d24289034b09337b0800000000000000
+    spriteID: 349721fd07f4edff0800000000000000
     internalID: 0
     vertices: []
     indices:
