@@ -36,7 +36,7 @@ public class AddNicknameDialogToMainMenu
 
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        MainMenuController controller = Object.FindFirstObjectByType<MainMenuController>(FindObjectsInactive.Include);
+        MainMenuController controller = Object.FindAnyObjectByType<MainMenuController>(FindObjectsInactive.Include);
         if (controller == null)
         {
             Debug.LogError("[SALINLAHI] No MainMenuController found in " + ScenePath +

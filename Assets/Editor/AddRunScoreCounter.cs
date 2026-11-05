@@ -35,7 +35,7 @@ public class AddRunScoreCounter
 
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
+        VoiceCommand voiceCommand = Object.FindAnyObjectByType<VoiceCommand>(FindObjectsInactive.Include);
         if (voiceCommand == null)
         {
             Debug.LogError("[SALINLAHI] No VoiceCommand in " + ScenePath +
@@ -43,7 +43,7 @@ public class AddRunScoreCounter
             return;
         }
 
-        RunScoreCounter counter = Object.FindFirstObjectByType<RunScoreCounter>(FindObjectsInactive.Include);
+        RunScoreCounter counter = Object.FindAnyObjectByType<RunScoreCounter>(FindObjectsInactive.Include);
         bool isNew = counter == null;
         if (isNew)
         {

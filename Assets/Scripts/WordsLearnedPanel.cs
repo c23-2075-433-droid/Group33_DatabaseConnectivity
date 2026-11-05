@@ -65,7 +65,7 @@ public class WordsLearnedPanel : MonoBehaviour
     void Awake()
     {
         if (objectiveController == null)
-            objectiveController = FindFirstObjectByType<SceneObjectiveController>();
+            objectiveController = FindAnyObjectByType<SceneObjectiveController>();
 
         // The same trap SceneResultPanel guards against, and for the same
         // reason. Pointed at its own GameObject, the line below would fire the

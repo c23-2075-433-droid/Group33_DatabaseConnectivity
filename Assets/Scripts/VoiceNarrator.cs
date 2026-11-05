@@ -156,7 +156,7 @@ public class VoiceNarrator : MonoBehaviour
             if (isQuitting) return null;
             if (instance != null) return instance;
 
-            instance = FindFirstObjectByType<VoiceNarrator>();
+            instance = FindAnyObjectByType<VoiceNarrator>();
             if (instance == null)
             {
                 GameObject go = new GameObject("VoiceNarrator");
@@ -262,7 +262,7 @@ public class VoiceNarrator : MonoBehaviour
     {
         get
         {
-            if (voiceCommand == null) voiceCommand = FindFirstObjectByType<VoiceCommand>();
+            if (voiceCommand == null) voiceCommand = FindAnyObjectByType<VoiceCommand>();
             return voiceCommand;
         }
     }

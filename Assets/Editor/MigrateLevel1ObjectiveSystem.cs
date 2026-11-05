@@ -42,7 +42,7 @@ public class MigrateLevel1ObjectiveSystem
         Debug.Log("[SALINLAHI] Opened scene '" + scene.name + "' at " + scene.path +
                    " (isLoaded=" + scene.isLoaded + ", rootCount=" + scene.rootCount + ")");
 
-        if (Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include) != null)
+        if (Object.FindAnyObjectByType<SceneObjectiveController>(FindObjectsInactive.Include) != null)
         {
             Debug.Log("[SALINLAHI] " + ScenePath + " already has a SceneObjectiveController - nothing to migrate.");
             return;
@@ -52,9 +52,9 @@ public class MigrateLevel1ObjectiveSystem
         // (active-or-inactive) search of the scene's hierarchy instead, in
         // case the canvas or an ancestor is disabled.
         GameObject canvasGO = FindInScene(scene, CanvasName);
-        PlayerMovement playerMovement = Object.FindFirstObjectByType<PlayerMovement>(FindObjectsInactive.Include);
-        VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
-        ExitDoorTrigger exitTrigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+        PlayerMovement playerMovement = Object.FindAnyObjectByType<PlayerMovement>(FindObjectsInactive.Include);
+        VoiceCommand voiceCommand = Object.FindAnyObjectByType<VoiceCommand>(FindObjectsInactive.Include);
+        ExitDoorTrigger exitTrigger = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
 
         // Log each one individually so a failure says exactly what's missing,
         // instead of a single all-or-nothing error.
@@ -119,7 +119,7 @@ public class MigrateLevel1ObjectiveSystem
         // If the mic/replay buttons were already added, their reference to
         // the old (now-destroyed) sequencer went null - point it at the new
         // controller instead.
-        VoiceInteractionUI voiceUI = Object.FindFirstObjectByType<VoiceInteractionUI>(FindObjectsInactive.Include);
+        VoiceInteractionUI voiceUI = Object.FindAnyObjectByType<VoiceInteractionUI>(FindObjectsInactive.Include);
         if (voiceUI != null)
         {
             voiceUI.objectiveController = controller;

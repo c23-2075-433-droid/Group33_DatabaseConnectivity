@@ -83,7 +83,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
 
     void Awake()
     {
-        controller = FindFirstObjectByType<SceneObjectiveController>();
+        controller = FindAnyObjectByType<SceneObjectiveController>();
         if (controller == null)
         {
             enabled = false;
@@ -92,8 +92,8 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
 
         voice = controller.voiceCommand != null
             ? controller.voiceCommand
-            : FindFirstObjectByType<VoiceCommand>();
-        voiceUI = FindFirstObjectByType<VoiceInteractionUI>();
+            : FindAnyObjectByType<VoiceCommand>();
+        voiceUI = FindAnyObjectByType<VoiceInteractionUI>();
         narrator = VoiceNarrator.Instance;
 
         theme = UITheme.Load();
@@ -189,7 +189,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
         gameObject.AddComponent<GraphicRaycaster>();
 
-        if (FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        if (FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
@@ -417,7 +417,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         // Stop her mid-sentence: she should not keep talking over the fade out.
         if (narrator != null) narrator.StopSpeaking();
 
-        SceneFader fader = FindFirstObjectByType<SceneFader>();
+        SceneFader fader = FindAnyObjectByType<SceneFader>();
         if (fader != null) fader.FadeOutAndLoad(levelSelectSceneName);
         else SceneManager.LoadScene(levelSelectSceneName);
     }
@@ -628,8 +628,8 @@ public static class GameplayHUDBootstrap
     {
         // Only where words are asked for: the main menu and the journey map
         // have their own interfaces and no SceneObjectiveController.
-        if (Object.FindFirstObjectByType<SceneObjectiveController>() == null) return;
-        if (Object.FindFirstObjectByType<GameplayHUD>() != null) return;
+        if (Object.FindAnyObjectByType<SceneObjectiveController>() == null) return;
+        if (Object.FindAnyObjectByType<GameplayHUD>() != null) return;
 
         GameObject go = new GameObject("GameplayHUD");
         go.AddComponent<GameplayHUD>();

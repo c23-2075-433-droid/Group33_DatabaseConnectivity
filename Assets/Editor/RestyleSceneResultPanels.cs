@@ -46,7 +46,7 @@ public static class RestyleSceneResultPanels
             string path = AssetDatabase.GUIDToAssetPath(guid);
             Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
 
-            SceneResultPanel old = Object.FindFirstObjectByType<SceneResultPanel>(FindObjectsInactive.Include);
+            SceneResultPanel old = Object.FindAnyObjectByType<SceneResultPanel>(FindObjectsInactive.Include);
             if (old == null)
             {
                 skipped.Add(System.IO.Path.GetFileNameWithoutExtension(path));
@@ -69,14 +69,14 @@ public static class RestyleSceneResultPanels
             // The two things outside the panel that hold on to a piece of it.
             // Both are wired by DatabaseDemoBuilder on a level's last scene and
             // would otherwise be left pointing at the canvas just destroyed.
-            SessionScoreTracker tracker = Object.FindFirstObjectByType<SessionScoreTracker>(FindObjectsInactive.Include);
+            SessionScoreTracker tracker = Object.FindAnyObjectByType<SessionScoreTracker>(FindObjectsInactive.Include);
             if (tracker != null && levelEnd)
             {
                 tracker.resultPanel = rebuilt.panel;
                 tracker.recordsText = rebuilt.recordsText;
             }
 
-            ExitDoorTrigger exit = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+            ExitDoorTrigger exit = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
             if (exit != null)
             {
                 if (levelEnd) exit.levelCompleteUI = rebuilt.content;

@@ -140,11 +140,11 @@ public static class VolumeSettings
     {
         AudioListener.volume = Muted ? 0f : Master;
 
-        VoiceNarrator narrator = Object.FindFirstObjectByType<VoiceNarrator>();
+        VoiceNarrator narrator = Object.FindAnyObjectByType<VoiceNarrator>();
         if (narrator != null) narrator.ApplyNarrationVolume();
 
-        // Not FindFirstObjectByType: the music player outlives the scene, and
-        // its own static handle is both cheaper and correct across a load.
+        // Not a scene search: the music player outlives the scene, and its
+        // own static handle is both cheaper and correct across a load.
         if (MusicPlayer.Instance != null) MusicPlayer.Instance.ApplyMusicVolume();
     }
 }

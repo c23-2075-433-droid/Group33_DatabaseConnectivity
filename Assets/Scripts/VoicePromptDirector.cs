@@ -62,7 +62,7 @@ public class VoicePromptDirector : MonoBehaviour
 
     void Awake()
     {
-        controller = FindFirstObjectByType<SceneObjectiveController>();
+        controller = FindAnyObjectByType<SceneObjectiveController>();
         if (controller == null)
         {
             enabled = false;
@@ -71,7 +71,7 @@ public class VoicePromptDirector : MonoBehaviour
 
         voiceCommand = controller.voiceCommand != null
             ? controller.voiceCommand
-            : FindFirstObjectByType<VoiceCommand>();
+            : FindAnyObjectByType<VoiceCommand>();
 
         narrator = VoiceNarrator.Instance;
 
@@ -324,8 +324,8 @@ public static class VoicePromptBootstrap
         // Runs after every Awake and before every Start, so the director is
         // subscribed in time for SceneObjectiveController.Start() raising the
         // scene's first objective.
-        if (Object.FindFirstObjectByType<SceneObjectiveController>() == null) return;
-        if (Object.FindFirstObjectByType<VoicePromptDirector>() != null) return;
+        if (Object.FindAnyObjectByType<SceneObjectiveController>() == null) return;
+        if (Object.FindAnyObjectByType<VoicePromptDirector>() != null) return;
 
         GameObject go = new GameObject("VoicePromptDirector");
         go.AddComponent<VoicePromptDirector>();

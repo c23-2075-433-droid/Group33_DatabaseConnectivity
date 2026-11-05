@@ -215,8 +215,8 @@ public class MusicPlayer : MonoBehaviour
         if ((narrator == null || voice == null) && Time.unscaledTime >= lookAgainAt)
         {
             lookAgainAt = Time.unscaledTime + 0.5f;
-            if (narrator == null) narrator = FindFirstObjectByType<VoiceNarrator>();
-            if (voice == null) voice = FindFirstObjectByType<VoiceCommand>();
+            if (narrator == null) narrator = FindAnyObjectByType<VoiceNarrator>();
+            if (voice == null) voice = FindAnyObjectByType<VoiceCommand>();
         }
 
         bool speaking = narrator != null && narrator.IsSpeaking;

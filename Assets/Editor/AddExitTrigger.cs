@@ -35,7 +35,7 @@ public class AddExitTrigger
 
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        ExitDoorTrigger trigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+        ExitDoorTrigger trigger = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
         bool isNew = trigger == null;
 
         if (isNew)
@@ -62,7 +62,7 @@ public class AddExitTrigger
         trigger.nextSceneName = "Chapter1_Level2_Banyo";
         trigger.levelCompleteUI = LevelCompleteUIBuilder.BuildPanel("LEVEL COMPLETE");
 
-        SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
+        SceneObjectiveController controller = Object.FindAnyObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
         if (controller != null) trigger.objectiveController = controller;
 
         // "Lakad" has to walk Kylo all the way to this trigger, however far it
@@ -70,7 +70,7 @@ public class AddExitTrigger
         // walk end on arrival instead of after a fixed time - without this the
         // walk covers voiceWalkDuration x moveSpeed units and stops wherever
         // that lands, which left him short of the door.
-        PlayerMovement player = Object.FindFirstObjectByType<PlayerMovement>(FindObjectsInactive.Include);
+        PlayerMovement player = Object.FindAnyObjectByType<PlayerMovement>(FindObjectsInactive.Include);
         if (player != null)
         {
             player.walkTarget = trigger.transform;
