@@ -75,6 +75,22 @@ def flood_from_edges(smooth):
     return mask
 
 
+def edge_of(mask):
+    """Pixels of mask that have a neighbour outside it."""
+    p = np.pad(mask, 1, constant_values=False)
+    return mask & ~(p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:])
+
+
+def erode(mask):
+    p = np.pad(mask, 1, constant_values=False)
+    return p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:] & mask
+
+
+def dilate(mask):
+    p = np.pad(mask, 1, constant_values=False)
+    return p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:] | mask
+
+
 def largest_island(keep):
     """The cottage itself, without the flecks of plank the fill missed."""
     h, w = keep.shape
@@ -101,7 +117,12 @@ def write_meta(name, model='menu_bg'):
         return False
     base = io.open(os.path.join(SPRITES, model + '.png.meta'), encoding='utf-8').read()
     t = re.sub(r'^guid: [0-9a-f]{32}$', 'guid: ' + uuid.uuid4().hex, base, count=1, flags=re.M)
-    io.open(out, 'w', encoding='utf-8').write(t.replace(model + '_0', name + '_0'))
+    t = t.replace(model + '_0', name + '_0')
+    # menu_bg is a full-bleed background and carries alphaIsTransparency: 0,
+    # which on cut-out art lets Unity sample the colour under the transparency
+    # and fringe every edge. See Tools/clean_sprite_edges.py.
+    t = re.sub(r'^(\s*alphaIsTransparency:) 0$', r'\1 1', t, flags=re.M)
+    io.open(out, 'w', encoding='utf-8').write(t)
     return True
 
 
@@ -134,6 +155,43 @@ if __name__ == '__main__':
     lum = r*0.299 + g*0.587 + b*0.114
     knot = (r > g) & (g >= b) & (lum < 120)
     keep &= ~(corner & knot)
+
+    # The cottage was drawn standing on a soft white ellipse. On the mockup's
+    # own board that reads as ground; cut out and laid on this one it reads as
+    # a white rim left over from a bad cut, which is worse than no ground at
+    # all. It is the only near-white thing along the bottom - the chimney
+    # smoke is near-white too, but that is all in the top fifth, and the front
+    # steps are a good deal greyer than either.
+    ground = (smooth.min(axis=2) > 205) & \
+             ((smooth.max(axis=2) - smooth.min(axis=2)) < 26) & \
+             (ys > 0.84*h)
+    keep &= ~ground
+
+    # Taking the body of the ellipse away leaves its antialiased rim, which is
+    # the same white only mixed with the plank, so it is too dark and too warm
+    # for the test above and survives as a hairline. It is peeled off instead:
+    # three passes, each dropping pale pixels that have become edge pixels.
+    # Peeling stops of its own accord at the bushes and at the steps' shading,
+    # which are nowhere near this pale, and it only runs along the bottom, so
+    # the chimney smoke is never touched.
+    pale = (smooth.min(axis=2) > 178) & \
+           ((smooth.max(axis=2) - smooth.min(axis=2)) < 32) & \
+           (ys > 0.84*h)
+
+    # The front steps are pale too, and peeling by colour alone hollows them
+    # out. What tells them apart from a hairline is thickness, not colour: a
+    # shape that still has something left after being eroded three deep is a
+    # shape, so it is put back out of reach. A rim one or two pixels wide has
+    # no core and is left to the peel.
+    solid = pale.copy()
+    for _ in range(3):
+        solid = erode(solid)
+    for _ in range(5):
+        solid = dilate(solid)
+
+    for _ in range(3):
+        keep &= ~(pale & ~solid & edge_of(keep))
+
     keep = largest_island(keep)
 
     cut = Image.fromarray(np.dstack([colour.astype(np.uint8),

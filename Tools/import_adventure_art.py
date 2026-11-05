@@ -87,6 +87,10 @@ def write_meta(name, model='menu_bg'):
     base = io.open(os.path.join(SPRITES, model + '.png.meta'), encoding='utf-8').read()
     t = re.sub(r'^guid: [0-9a-f]{32}$', 'guid: ' + uuid.uuid4().hex, base, count=1, flags=re.M)
     t = t.replace(model + '_0', name + '_0')
+    # menu_bg is a full-bleed background and carries alphaIsTransparency: 0,
+    # which on cut-out art lets Unity sample the colour under the transparency
+    # and fringe every edge. See Tools/clean_sprite_edges.py.
+    t = re.sub(r'^(\s*alphaIsTransparency:) 0$', r'\1 1', t, flags=re.M)
     io.open(out, 'w', encoding='utf-8').write(t)
     return True
 
