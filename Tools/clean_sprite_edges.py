@@ -54,6 +54,89 @@ NAMES = [
     'map_bahay_modern', 'map_bahay_modern_locked',
 ]
 
+# The place pictures on the picker: older art, and a different fault - see
+# strip_sticker_halo(). Each maps to its greyscale locked twin, which is the
+# same drawing and so gets the silhouette worked out for the colour one
+# rather than having the test run again over grey, where light artwork and a
+# white border are no longer told apart.
+PLACE_PICTURES = {
+    'map_bahay':    'map_bahay_locked',
+    'map_paaralan': 'map_paaralan_locked',
+    'map_parke':    'map_parke_locked',
+    'map_palengke': 'map_palengke_locked',
+}
+
+
+def strip_sticker_halo(im):
+    """Cut the white sticker border off a place picture.
+
+    The hut, the school, the park and the market are drawn with a thick white
+    outline hugging them, the way a sticker is cut with a border left on. On
+    a white page nobody notices. On the picker's dark board the park is all
+    border - a swing frame and a bench are mostly outline for their size -
+    and it reads as a bad cut.
+
+    This is not a matte that can be divided back out: the white is painted,
+    and it fills the gaps between the swing's legs and between the bench
+    slats as well as running round the outside. So it is taken away instead.
+
+    What it is NOT allowed to take is the school, whose walls are cream and
+    almost as pale as the border. Two things tell them apart. Nearly all of
+    the border is soft - it is the sticker's own antialiased edge - so a pale
+    pixel is only removed outright where it is fully opaque AND practically
+    colourless, which the cream walls are not; everywhere else it has to be
+    partly transparent as well. That leaves the walls alone (58 pure-white
+    pixels in the school, against 837 in the park) while still taking the
+    park's border, which is nearly all of it.
+
+    That leaves one hairline where the white met the dark outline and the two
+    blended. Those pixels are too dark to be caught as white and too light to
+    belong, so three passes peel back any edge pixel clearly brighter than
+    the artwork just inside it - the same guard the project's
+    SpriteEdgeHaloFixer uses, which is what stops the peel eating into pale
+    artwork and running away inward.
+    """
+    a = np.asarray(im).astype(np.float64)
+    rgb, alpha = a[..., :3], a[..., 3].copy()
+    h, w = alpha.shape
+
+    low = rgb.min(axis=2)
+    saturation = rgb.max(axis=2) - low
+    soft_border = (low > 225) & (saturation < 18) & (alpha < 250)
+    solid_border = (low > 240) & (saturation < 10)
+    pale = soft_border | solid_border
+    if not pale.any():
+        return im, 0
+    alpha[pale] = 0
+    removed = int((pale & (np.asarray(im)[..., 3] > 16)).sum())
+
+    lum = (rgb * [0.299, 0.587, 0.114]).sum(axis=2)
+    for _ in range(3):
+        solid = alpha > 16
+        p = np.pad(solid, 1, constant_values=False)
+        edge = solid & ~(p[:-2, 1:-1] & p[2:, 1:-1] & p[1:-1, :-2] & p[1:-1, 2:])
+        inner = solid & ~edge
+
+        total = np.zeros((h, w))
+        count = np.zeros((h, w))
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            shifted, brightness = np.roll(inner, (dy, dx), (0, 1)), np.roll(lum, (dy, dx), (0, 1))
+            if dy:
+                shifted[0 if dy > 0 else -1, :] = False
+            if dx:
+                shifted[:, 0 if dx > 0 else -1] = False
+            total += brightness * shifted
+            count += shifted
+
+        reference = np.divide(total, count, out=np.zeros((h, w)), where=count > 0)
+        drop = edge & (count > 0) & (lum > reference + 22)
+        if not drop.any():
+            break
+        alpha[drop] = 0
+        removed += int(drop.sum())
+
+    return Image.fromarray(np.dstack([rgb, alpha]).round().astype(np.uint8)), removed
+
 
 def bleed(im):
     """Carry the edge colour outward under the transparency.
@@ -107,17 +190,45 @@ def set_alpha_flag(name):
     return True
 
 
+def finish(name, image, note=''):
+    """Bleed, save, set the flag, and say what happened."""
+    bled, painted = bleed(image)
+    bled.save(os.path.join(SPRITES, name + '.png'))
+    flagged = set_alpha_flag(name)
+    print('  %-26s %-24s %-16s%s' % (
+        name, note,
+        ('bled %d px' % painted) if painted else 'nothing to bleed',
+        '  + alphaIsTransparency' if flagged else ''))
+
+
+def load(name):
+    path = os.path.join(SPRITES, name + '.png')
+    return Image.open(path).convert('RGBA') if os.path.exists(path) else None
+
+
 if __name__ == '__main__':
     for name in NAMES:
-        path = os.path.join(SPRITES, name + '.png')
-        if not os.path.exists(path):
+        image = load(name)
+        if image is None:
             print('  skip %-26s (not here)' % name)
             continue
-        cleaned, painted = bleed(Image.open(path).convert('RGBA'))
-        if painted:
-            cleaned.save(path)
-        flagged = set_alpha_flag(name)
-        print('  %-26s %s%s' % (
-            name,
-            ('bled %d px' % painted) if painted else 'nothing to bleed',
-            '  + alphaIsTransparency' if flagged else ''))
+        finish(name, image)
+
+    for name, twin in PLACE_PICTURES.items():
+        image = load(name)
+        if image is None:
+            print('  skip %-26s (not here)' % name)
+            continue
+        stripped, removed = strip_sticker_halo(image)
+        finish(name, stripped, 'halo: %d px off' % removed)
+
+        locked = load(twin)
+        if locked is None:
+            continue
+        if locked.size != stripped.size:
+            print('  !! %s is %s but %s is %s - the twin is left alone, since '
+                  'the silhouette cannot be shared.' % (twin, locked.size, name, stripped.size))
+            continue
+        shared = np.dstack([np.asarray(locked)[..., :3],
+                            np.asarray(stripped)[..., 3]]).astype(np.uint8)
+        finish(twin, Image.fromarray(shared), 'halo: silhouette shared')
