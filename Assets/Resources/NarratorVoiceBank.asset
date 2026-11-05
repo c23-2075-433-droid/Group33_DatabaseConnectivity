@@ -69,7 +69,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_lakad_ask
     text: Start him moving with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 2f646f3d2dcc344c496729673ab7c6b4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_lakad_done
     text: Good! Kylo is walking down the hallway.
     gloss: 
@@ -81,7 +81,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_kaliwa_ask
     text: "Point him to the left \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: ef226f96de3d54086b2c24ec4e990dd5, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_kaliwa_done
     text: That's it! Kylo is looking to his left.
     gloss: 
@@ -93,7 +93,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_kanan_ask
     text: Turn him the other way with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 4aab9544b5a454c0b9860f2ec4384cf5, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_kanan_done
     text: Good eye! The bathroom door is on his right.
     gloss: 
@@ -105,7 +105,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_bukas_ask
     text: Let's get that door open! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 2c2e1fdeacd3440ca9d894114212bbbe, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_bukas_done
     text: Wonderful! The door swings open for Kylo.
     gloss: 
@@ -117,7 +117,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_ilaw_ask
     text: "Brighten the room for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: d6efe90b7f8c0494a8d25156a8914d2c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_ilaw_done
     text: Perfect! The bathroom is bright and warm now.
     gloss: 
@@ -129,11 +129,11 @@ MonoBehaviour:
   - id: rachel_l1_s2_tabo_ask
     text: Help him lift it down! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 42b877e306fed4510b660434e9dfd14c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_tabo_done
     text: Nice! Kylo is holding the tabo in his hands.
     gloss: 
-    clip: {fileID: 8300000, guid: f41655052805547f59d00d2ecd5b7e50, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_sabon_story
     text: Water alone will not get Kylo clean. He needs something that makes bubbles.
     gloss: 
@@ -141,7 +141,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_sabon_ask
     text: "Help him reach for it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 706fd8b14ae7c4e97a42e4b910755da9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_sabon_done
     text: Great! Kylo has the soap ready for his bath.
     gloss: 
@@ -153,7 +153,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_sipilyo_ask
     text: Hand him the right one by saying {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 698a47053d24846c38b2b965e52d9550, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_sipilyo_done
     text: Well done! Kylo is brushing his teeth.
     gloss: 
@@ -165,7 +165,7 @@ MonoBehaviour:
   - id: rachel_l1_s2_tuwalya_ask
     text: "Get him something to dry with \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: dc3996af59da24175add99677723fe6b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s2_tuwalya_done
     text: Excellent! Kylo has everything he needs now.
     gloss: 
@@ -185,7 +185,7 @@ MonoBehaviour:
   - id: rachel_l1_s3_kaliwa_ask
     text: Send him that way with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 1a26beae8f2994031b0719e17b3166e5, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s3_kaliwa_done
     text: Good! Kylo has moved over to the water jar.
     gloss: 
@@ -197,7 +197,7 @@ MonoBehaviour:
   - id: rachel_l1_s3_maligo_ask
     text: Let's get him washing! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 48fa2a28d391643e5968ce6bce8ea23b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s3_maligo_done
     text: Wonderful! Kylo is clean from head to toe.
     gloss: 
@@ -209,7 +209,7 @@ MonoBehaviour:
   - id: rachel_l1_s3_suklay_ask
     text: "Tidy it up for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 6eb312b8c253b456186d0ee73c8482b2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s3_suklay_done
     text: Very nice! Kylo's hair is neat and smooth.
     gloss: 
@@ -229,7 +229,7 @@ MonoBehaviour:
   - id: rachel_l1_s4_damit_ask
     text: "Help him put them on \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 48f8306bd1c2b417c864ab815149b131, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_damit_done
     text: Wonderful! Kylo is dressed in his school uniform.
     gloss: 
@@ -241,7 +241,7 @@ MonoBehaviour:
   - id: rachel_l1_s4_medyas_ask
     text: Warm them up for him! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: b46c5047cbd00488fa7b1f2fe13542fe, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_medyas_done
     text: Nice! Kylo has his socks on.
     gloss: 
@@ -253,7 +253,7 @@ MonoBehaviour:
   - id: rachel_l1_s4_sapatos_ask
     text: Finish his feet off with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: e7f42c4fe70904a69a9f07c98b903141, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_sapatos_done
     text: Great job! Kylo is ready to walk anywhere.
     gloss: 
@@ -265,23 +265,23 @@ MonoBehaviour:
   - id: rachel_l1_s4_bag_ask
     text: "Point him at it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 710c0c237666a405aad9d75935769aa7, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_bag_done
     text: Good! Kylo has spotted his school bag.
     gloss: 
-    clip: {fileID: 8300000, guid: f52a7f99def51409097581d48b7910d4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_kunin_story
     text: The bag is right there, but it will not carry itself.
     gloss: 
-    clip: {fileID: 8300000, guid: 6b6956b8c8517453a92294312d560835, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_kunin_ask
     text: Help him pick it up by saying {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 398f9f5e83dec4a9aa0802daf9a188d2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_kunin_done
     text: Excellent! Kylo has his bag over his shoulder.
     gloss: 
-    clip: {fileID: 8300000, guid: 0d6e05466c0d743f5ac69db7154d3f47, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s4_outro
     text: Kylo is dressed and packed. But first, he needs his breakfast!
     gloss: 
@@ -297,7 +297,7 @@ MonoBehaviour:
   - id: rachel_l1_s5_upo_ask
     text: "Get him settled \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: fc4ed37257a624ffea79f6280d94f071, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s5_upo_done
     text: Good! Kylo is sitting at the table.
     gloss: 
@@ -309,7 +309,7 @@ MonoBehaviour:
   - id: rachel_l1_s5_kanin_ask
     text: "Name it for Kylo \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 0e6a0963d34ae41d6a721c0570bb43a0, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s5_kanin_done
     text: That's right! Kylo's plate is full of rice.
     gloss: 
@@ -321,7 +321,7 @@ MonoBehaviour:
   - id: rachel_l1_s5_itlog_ask
     text: "Tell Kylo what it is \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 6cc4cfd8716334a78a874d9e0fea1e85, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s5_itlog_done
     text: Well done! The egg is Kylo's favourite part.
     gloss: 
@@ -333,7 +333,7 @@ MonoBehaviour:
   - id: rachel_l1_s5_kain_ask
     text: Let him start his breakfast! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 226028426c3304d509b7cc03857ab36b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s5_kain_done
     text: Yummy! Kylo is enjoying every bite.
     gloss: 
@@ -345,7 +345,7 @@ MonoBehaviour:
   - id: rachel_l1_s5_inom_ask
     text: Help him finish it off with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 9cb30b2c3281049bcb4a565465923eb4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s5_inom_done
     text: Wonderful! Kylo's breakfast is all done.
     gloss: 
@@ -355,9 +355,33 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: cb1e7840367b240259306c0e49696611, type: 3}
   - id: rachel_l2_s1_intro
-    text: Here is Kylo's school! The gate is open and the yard is full of children.
+    text: Here is Kylo's school! The gate is still shut, and the guard is waiting beside it.
     gloss: 
     clip: {fileID: 8300000, guid: 4c955351337324fec84b3e52908b6dd1, type: 3}
+  - id: rachel_l2_s1_lakad_story
+    text: Kylo can see his school now. The gate up ahead is still shut.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_lakad_ask
+    text: "Walk him up to it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_lakad_done
+    text: There he is, right at the gate.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_story
+    text: The guard is standing beside the gate, waiting to let him in.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_ask
+    text: "Ask him to open it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_done
+    text: The gate swings open!
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l2_s1_kumusta_story
     text: The guard at the gate smiles at Kylo every single morning.
     gloss: 
@@ -365,7 +389,7 @@ MonoBehaviour:
   - id: rachel_l2_s1_kumusta_ask
     text: "Greet him back \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 019372be0727b4b52a360f7c7540b061, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s1_kumusta_done
     text: Lovely manners! The guard waves Kylo through.
     gloss: 
@@ -377,7 +401,7 @@ MonoBehaviour:
   - id: rachel_l2_s1_pasok_ask
     text: Take him inside with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 3c1c47b400c5b42ab9e6d7fa1f639af5, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s1_pasok_done
     text: Good! Kylo is through the gate.
     gloss: 
@@ -389,7 +413,7 @@ MonoBehaviour:
   - id: rachel_l2_s1_takbo_ask
     text: "Hurry him along \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 7c96caece5af849d6b488b2a92af7df2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s1_takbo_done
     text: Excellent! Kylo made it before the bell.
     gloss: 
@@ -399,41 +423,29 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: d6e2a5347261a4aec918176f3b648ca9, type: 3}
   - id: rachel_l2_s2_intro
-    text: Kylo is outside his classroom, and Teacher Rachel is already inside.
+    text: Here is Kylo's classroom. His chair is waiting for him by the window.
     gloss: 
     clip: {fileID: 8300000, guid: 72ada230a0857429d9dfa97ce5d49a3d, type: 3}
-  - id: rachel_l2_s2_bukas_story
-    text: The classroom door is closed, and the lesson is about to begin.
+  - id: rachel_l2_s2_lakad_story
+    text: Kylo is inside the classroom, and his own chair is across the room by the window.
     gloss: 
-    clip: {fileID: 8300000, guid: ea6be6b19404148e7af9ec7d939714ff, type: 3}
-  - id: rachel_l2_s2_bukas_ask
-    text: "Let him in \u2014 say {word}!"
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_lakad_ask
+    text: "Walk him over to it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: a0c9e632898264d818630cf7f0664213, type: 3}
-  - id: rachel_l2_s2_bukas_done
-    text: Good! The classroom door is open.
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_lakad_done
+    text: There he is, right beside his desk.
     gloss: 
-    clip: {fileID: 8300000, guid: 2323b8de0711646b5bc57a653174e4dd, type: 3}
-  - id: rachel_l2_s2_kumusta_story
-    text: Teacher Rachel looks up from her desk and smiles at Kylo.
-    gloss: 
-    clip: {fileID: 8300000, guid: f36757b9509bb46eea13fe51629a3919, type: 3}
-  - id: rachel_l2_s2_kumusta_ask
-    text: "Greet Teacher Rachel back \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: 72da4e777fa534e60b32c24c3bbb5117, type: 3}
-  - id: rachel_l2_s2_kumusta_done
-    text: Very polite! Teacher Rachel smiles back at him.
-    gloss: 
-    clip: {fileID: 8300000, guid: c0b9d3dbac82c43f398bc9de0ba10153, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_upo_story
-    text: Kylo's desk is near the window, and his classmates are already seated.
+    text: Kylo's desk is beside the window, and the lesson is about to start.
     gloss: 
     clip: {fileID: 8300000, guid: 244f2dfe7793d4c60943c26c146a9461, type: 3}
   - id: rachel_l2_s2_upo_ask
     text: "Get him into his chair \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 4721a7a57c37c4f72a46f66d845acb32, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_upo_done
     text: Good! Kylo is in his seat, ready to learn.
     gloss: 
@@ -445,11 +457,11 @@ MonoBehaviour:
   - id: rachel_l2_s2_kuha_ask
     text: "Reach into the bag for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 91eb78967310e4bd99e52d854fe14d31, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_kuha_done
     text: Nice! Kylo is reaching into his school bag.
     gloss: 
-    clip: {fileID: 8300000, guid: f01ca0b8178ac43e781a193efc7dce3f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_lapis_story
     text: There is one thing Kylo needs before he can write anything down.
     gloss: 
@@ -457,13 +469,13 @@ MonoBehaviour:
   - id: rachel_l2_s2_lapis_ask
     text: "Name it for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 201fc55d14c7d4dd2a34dcc7421aacbb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_lapis_done
     text: Well done! Kylo has his pencil on the desk.
     gloss: 
     clip: {fileID: 8300000, guid: afd8362b61f2c4f90ab682622d1c7b5b, type: 3}
   - id: rachel_l2_s2_outro
-    text: Everyone is ready. It is time for the lesson to begin!
+    text: Kylo is ready. It is time for the lesson to begin!
     gloss: 
     clip: {fileID: 8300000, guid: 2ee0cd3354cd844a5984619a31cf3ea7, type: 3}
   - id: rachel_l2_s3_intro
@@ -477,7 +489,7 @@ MonoBehaviour:
   - id: rachel_l2_s3_aklat_ask
     text: "Help Kylo find it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: ae36d893a51b8453f9f388fe4053138f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s3_aklat_done
     text: Good! Kylo's book is open on his desk.
     gloss: 
@@ -489,7 +501,7 @@ MonoBehaviour:
   - id: rachel_l2_s3_basa_ask
     text: "Let Kylo join in \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: ed3a95f64fbe74da594db3cf1a421886, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s3_basa_done
     text: Wonderful! Kylo is reading with the class.
     gloss: 
@@ -501,7 +513,7 @@ MonoBehaviour:
   - id: rachel_l2_s3_sulat_ask
     text: Get his pencil moving with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 7f8b7104641404bf59a30a8444d52058, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s3_sulat_done
     text: Excellent! Kylo is writing the word down.
     gloss: 
@@ -513,7 +525,7 @@ MonoBehaviour:
   - id: rachel_l2_s3_tanong_ask
     text: "Give him the courage \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 47e0b4b067fb140dba627137d53f126a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s3_tanong_done
     text: Brave boy! Kylo has asked his question.
     gloss: 
@@ -525,7 +537,7 @@ MonoBehaviour:
   - id: rachel_l2_s3_sagot_ask
     text: Help him speak up by saying {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: decc54a95992f4f58813ef76f3683547, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s3_sagot_done
     text: Well done! Kylo gave the right answer.
     gloss: 
@@ -545,7 +557,7 @@ MonoBehaviour:
   - id: rachel_l2_s4_labas_ask
     text: "Let him out into the sun \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: c786225ca637a4256a9e79354628e8cd, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_labas_done
     text: Good! Kylo is out in the school yard.
     gloss: 
@@ -553,11 +565,11 @@ MonoBehaviour:
   - id: rachel_l2_s4_kain_story
     text: Nanay packed Kylo a snack, and it is still sitting in his bag.
     gloss: 
-    clip: {fileID: 8300000, guid: 9bffe07bc80c148448128ac2c33f6c4c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_kain_ask
     text: "Let him start his snack \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 5219ee520d52444fbb0cc31f993e6f00, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_kain_done
     text: Yummy! Kylo has finished his snack.
     gloss: 
@@ -569,7 +581,7 @@ MonoBehaviour:
   - id: rachel_l2_s4_laro_ask
     text: Send him over to join them! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: fcfe793e655df473daebb8f013ecd3dc, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_laro_done
     text: Wonderful! Kylo is playing with his classmates.
     gloss: 
@@ -581,7 +593,7 @@ MonoBehaviour:
   - id: rachel_l2_s4_tawa_ask
     text: "Let it out of him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 9cbc2967ef5db4dba984225e53b665f1, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_tawa_done
     text: What a happy sound! Kylo is laughing.
     gloss: 
@@ -593,7 +605,7 @@ MonoBehaviour:
   - id: rachel_l2_s4_tulong_ask
     text: Send Kylo over with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: db4621a0494024ff3a6d50d442b7dfbf, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s4_tulong_done
     text: So kind! Kylo helped the little one up.
     gloss: 
@@ -613,7 +625,7 @@ MonoBehaviour:
   - id: rachel_l2_s5_pasok_ask
     text: "Take him back inside \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: fa1cd8ed6412e44eb9caca8ced34ec60, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s5_pasok_done
     text: Good! Kylo is back in the classroom.
     gloss: 
@@ -625,7 +637,7 @@ MonoBehaviour:
   - id: rachel_l2_s5_upo_ask
     text: Settle him down with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 9f52380b240284419ad1112970b4c928, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s5_upo_done
     text: Good! Kylo is sitting at his desk again.
     gloss: 
@@ -637,7 +649,7 @@ MonoBehaviour:
   - id: rachel_l2_s5_linis_ask
     text: "Tidy it up with him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: eb838fef9c69b44168f54faccee894cb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s5_linis_done
     text: Spotless! Kylo's desk is neat again.
     gloss: 
@@ -649,7 +661,7 @@ MonoBehaviour:
   - id: rachel_l2_s5_bag_ask
     text: "Point him at it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: c9b3404d04e664e6a9da83ed2b22ca83, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s5_bag_done
     text: Good! Everything is packed away safely.
     gloss: 
@@ -661,7 +673,7 @@ MonoBehaviour:
   - id: rachel_l2_s5_alis_ask
     text: "Set him off for home \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 7e268d377ae964d8aba6743491c1e2b8, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s5_alis_done
     text: Great job! Kylo's school day is finished.
     gloss: 
@@ -681,7 +693,7 @@ MonoBehaviour:
   - id: rachel_l3_s1_lakad_ask
     text: "Start him off \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 8ad069582f969414db40a90a06e1d7b3, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s1_lakad_done
     text: Good! Kylo is on his way to the park.
     gloss: 
@@ -693,7 +705,7 @@ MonoBehaviour:
   - id: rachel_l3_s1_takbo_ask
     text: Speed him up with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: 908252f9db04d410a842768c1418b9be, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s1_takbo_done
     text: Wonderful! Kylo is almost at the park.
     gloss: 
@@ -705,7 +717,7 @@ MonoBehaviour:
   - id: rachel_l3_s1_tingin_ask
     text: "Turn his head that way \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: d2a1d47979e64423a90963d0a543f2c9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s1_tingin_done
     text: There it is! Kylo has spotted the playground.
     gloss: 
@@ -717,7 +729,7 @@ MonoBehaviour:
   - id: rachel_l3_s1_tuwa_ask
     text: Let him show it! Say {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: f66483a73c4a84c54809ce84c84ef40c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s1_tuwa_done
     text: Look at that smile! Kylo is full of joy.
     gloss: 
@@ -729,7 +741,7 @@ MonoBehaviour:
   - id: rachel_l3_s1_pasok_ask
     text: "Take him in \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 1183c6afac08840038635237d8e15d41, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s1_pasok_done
     text: Here we are! Kylo is inside the park.
     gloss: 
@@ -749,7 +761,7 @@ MonoBehaviour:
   - id: rachel_l3_s2_akyat_ask
     text: "Start him up the ladder \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 62e790720055e464d9af236c77beb199, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s2_akyat_done
     text: Up he goes! Kylo is at the top of the slide.
     gloss: 
@@ -761,7 +773,7 @@ MonoBehaviour:
   - id: rachel_l3_s2_dausdos_ask
     text: Send him down with {word}!
     gloss: 
-    clip: {fileID: 8300000, guid: af4a31cb858184a7ba82b4738af28fe2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s2_dausdos_done
     text: Wheee! Kylo slid all the way to the bottom.
     gloss: 
@@ -773,7 +785,7 @@ MonoBehaviour:
   - id: rachel_l3_s2_sakay_ask
     text: "Get him on board \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: dbfe7a82a374e4745948a4da9ef296a4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s2_sakay_done
     text: Nice! Kylo is sitting on the swing.
     gloss: 
@@ -785,7 +797,7 @@ MonoBehaviour:
   - id: rachel_l3_s2_tulak_ask
     text: "Give it a shove \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 344460f4b4dd449c5b3fe3e9243d939a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s2_tulak_done
     text: Higher and higher! Kylo is swinging.
     gloss: 
@@ -797,7 +809,7 @@ MonoBehaviour:
   - id: rachel_l3_s2_talon_ask
     text: "Launch him off \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: c48c7f846f8fe4b648b63dca1b59b024, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s2_talon_done
     text: What a landing! Kylo is safe in the sand.
     gloss: 
@@ -817,7 +829,7 @@ MonoBehaviour:
   - id: rachel_l3_s3_kumusta_ask
     text: "Break the ice for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 6a82eb3f3cbb1417099e783e4fbe30d7, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s3_kumusta_done
     text: Lovely! Kylo has said hello to them.
     gloss: 
@@ -829,7 +841,7 @@ MonoBehaviour:
   - id: rachel_l3_s3_ngiti_ask
     text: "Soften his face \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 1747797e3ac454c6bb2738a00f23782c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s3_ngiti_done
     text: Much better! Kylo's smile makes them smile too.
     gloss: 
@@ -841,7 +853,7 @@ MonoBehaviour:
   - id: rachel_l3_s3_tanong_ask
     text: "Help him speak up \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: d6efc47aa241148b4b1e7bf8e1a565e1, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s3_tanong_done
     text: Well done! Kylo asked them their names.
     gloss: 
@@ -853,7 +865,7 @@ MonoBehaviour:
   - id: rachel_l3_s3_laro_ask
     text: "Send him over \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: ecf71aeac6c8b43eba0cb9e7cb30c662, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s3_laro_done
     text: Wonderful! Kylo is playing with his new friends.
     gloss: 
@@ -865,7 +877,7 @@ MonoBehaviour:
   - id: rachel_l3_s3_bati_ask
     text: "Make him welcome \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 8f11012602de14289bc693fd020ec06a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s3_bati_done
     text: So friendly! Kylo welcomed him into the game.
     gloss: 
@@ -885,7 +897,7 @@ MonoBehaviour:
   - id: rachel_l3_s4_upo_ask
     text: "Find him a spot \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 1b1d90f9584d84ade83083c86e479e6f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s4_upo_done
     text: Good! Kylo is sitting on the picnic mat.
     gloss: 
@@ -897,7 +909,7 @@ MonoBehaviour:
   - id: rachel_l3_s4_kain_ask
     text: "Let him dig in \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: bcf0b45ce93794e09b4fa4d5b365853b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s4_kain_done
     text: Yummy! Kylo is enjoying the picnic.
     gloss: 
@@ -909,7 +921,7 @@ MonoBehaviour:
   - id: rachel_l3_s4_ibahagi_ask
     text: "Be generous for him \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 8bfc8322808904786924bf64f80801ef, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s4_ibahagi_done
     text: How kind! Everyone has something to eat now.
     gloss: 
@@ -921,7 +933,7 @@ MonoBehaviour:
   - id: rachel_l3_s4_inom_ask
     text: "Pass him the juice \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 1d5dc7099fdfb4f6c84d6db085946dad, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s4_inom_done
     text: Refreshing! Kylo is not thirsty any more.
     gloss: 
@@ -933,7 +945,7 @@ MonoBehaviour:
   - id: rachel_l3_s4_salamat_ask
     text: "Mind his manners \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 82ddd9640630649ad9a671b3e0bb466c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s4_salamat_done
     text: Beautiful manners! Kylo thanked his friends.
     gloss: 
@@ -953,7 +965,7 @@ MonoBehaviour:
   - id: rachel_l3_s5_paalam_ask
     text: "Send them off kindly \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: b090c39e05fa9431fa531e0aff9c77d9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s5_paalam_done
     text: Sweet! Kylo waved his friends goodbye.
     gloss: 
@@ -965,7 +977,7 @@ MonoBehaviour:
   - id: rachel_l3_s5_lakad_ask
     text: "Start him homeward \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: f47ba7d0309b149a1900f03139d419e4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s5_lakad_done
     text: Good! Kylo is walking home.
     gloss: 
@@ -977,7 +989,7 @@ MonoBehaviour:
   - id: rachel_l3_s5_tingin_ask
     text: "Turn his head \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 64a1d433555764a8c92c8196086c96b2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s5_tingin_done
     text: There it is! Kylo can see his own house.
     gloss: 
@@ -989,7 +1001,7 @@ MonoBehaviour:
   - id: rachel_l3_s5_pagod_ask
     text: "Let him admit it \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 051b9cbac65b04bcb8cc06b143d5850a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s5_pagod_done
     text: What a day! Kylo is ready for a rest.
     gloss: 
@@ -1001,7 +1013,7 @@ MonoBehaviour:
   - id: rachel_l3_s5_uwi_ask
     text: "Bring him home \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: e9be9142fc133460e90f8dcd9884f16e, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l3_s5_uwi_done
     text: Home at last! Kylo had a wonderful day.
     gloss: 
@@ -1061,403 +1073,403 @@ MonoBehaviour:
   - id: rachel_word_kaliwa_teach
     text: '''Kaliwa'' is the Filipino word for left, the side of your left hand.'
     gloss: Left
-    clip: {fileID: 8300000, guid: 7fb2f7d8f47d6495aae8ed469c0ed0ff, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kaliwa_recall
     text: Remember, 'Kaliwa' means left.
     gloss: Left
-    clip: {fileID: 8300000, guid: 8f95ac5ff28144467b96d7e0cbda96c8, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kanan_teach
     text: '''Kanan'' is the Filipino word for right, the other side from kaliwa.'
     gloss: Right
-    clip: {fileID: 8300000, guid: 4e41074169db24cbba8b879d99de3091, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kanan_recall
     text: Remember, 'Kanan' means right.
     gloss: Right
-    clip: {fileID: 8300000, guid: cad06110a12d747eb9eea82215118b7e, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bukas_teach
     text: In Filipino, 'Bukas' means open.
     gloss: Open
-    clip: {fileID: 8300000, guid: faf5dbba65b6a4b96ba36c32a1069fe8, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bukas_recall
     text: Remember, 'Bukas' means open.
     gloss: Open
-    clip: {fileID: 8300000, guid: 75ca06d07f8e545a08dc918c8e64cd98, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ilaw_teach
     text: '''Ilaw'' is the Filipino word for light, the one you switch on.'
     gloss: Light (turn on)
-    clip: {fileID: 8300000, guid: ab3aa37ab8d854f1cb2d99f4db04c501, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ilaw_recall
     text: Remember, 'Ilaw' means the light.
     gloss: Light (turn on)
-    clip: {fileID: 8300000, guid: 73faff73581ef4acc9c94bf8c7bf74f0, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tabo_teach
     text: A 'Tabo' is a dipper, the little cup for scooping water at bath time.
     gloss: Dipper
-    clip: {fileID: 8300000, guid: 14413dce8a375423f8ed4c3a6e303536, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tabo_recall
     text: Remember, a 'Tabo' is the water dipper.
     gloss: Dipper
-    clip: {fileID: 8300000, guid: 6edb129d03e054ac984c55ded73778f1, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_maligo_teach
     text: In Filipino, 'Maligo' means to take a bath.
     gloss: Take a bath
-    clip: {fileID: 8300000, guid: a635689bece544063add48586f77b294, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_maligo_recall
     text: Remember, 'Maligo' means to take a bath.
     gloss: Take a bath
-    clip: {fileID: 8300000, guid: 0f99eb56d81744385b0f26c3edfcfc30, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sabon_teach
     text: '''Sabon'' is the Filipino word for soap.'
     gloss: Soap
-    clip: {fileID: 8300000, guid: e128b65ff85b34865be581d3da6fe6e7, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sabon_recall
     text: Remember, 'Sabon' means soap.
     gloss: Soap
-    clip: {fileID: 8300000, guid: d4b00f8a1209244a8b19359d0b1b9b52, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_suklay_teach
     text: A 'Suklay' is a comb, for making tangled hair neat again.
     gloss: Comb
-    clip: {fileID: 8300000, guid: 30b1a66e2cc3c4506af78c22c0822593, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_suklay_recall
     text: Remember, a 'Suklay' is a comb.
     gloss: Comb
-    clip: {fileID: 8300000, guid: 2665b43fa5adf40d9a6cdc5d687c238a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sipilyo_teach
     text: '''Sipilyo'' is the Filipino word for a toothbrush.'
     gloss: Toothbrush
-    clip: {fileID: 8300000, guid: f79be4b90aba743a0807573eb5c5d1e1, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sipilyo_recall
     text: Remember, 'Sipilyo' means toothbrush.
     gloss: Toothbrush
-    clip: {fileID: 8300000, guid: 8079ad76af0c445cb99779b5710cb8ae, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tuwalya_teach
     text: A 'Tuwalya' is a towel, the soft cloth you dry yourself with.
     gloss: Towel
-    clip: {fileID: 8300000, guid: eef9110d835e145aab89d997967a6070, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tuwalya_recall
     text: Remember, a 'Tuwalya' is a towel.
     gloss: Towel
-    clip: {fileID: 8300000, guid: ac6bc4046a21f4810a5d98efba2449b1, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_damit_teach
     text: '''Damit'' is the Filipino word for clothes, like Kylo''s school uniform.'
     gloss: Clothes / uniform
-    clip: {fileID: 8300000, guid: 077830f55df33490494aa1146e2ae878, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_damit_recall
     text: Remember, 'Damit' means clothes.
     gloss: Clothes / uniform
-    clip: {fileID: 8300000, guid: fcdc25656bf014d0b9c2e4b9a241721f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_medyas_teach
     text: '''Medyas'' is the Filipino word for socks.'
     gloss: Socks
-    clip: {fileID: 8300000, guid: 6f9090d5846d446d9afed7708ba70bdb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_medyas_recall
     text: Remember, 'Medyas' means socks.
     gloss: Socks
-    clip: {fileID: 8300000, guid: 028c5674390ab4719a06b6775c02ad1f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sapatos_teach
     text: '''Sapatos'' is the Filipino word for shoes.'
     gloss: Shoes
-    clip: {fileID: 8300000, guid: fe86168f0fa524a139492cd5d297c169, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sapatos_recall
     text: Remember, 'Sapatos' means shoes.
     gloss: Shoes
-    clip: {fileID: 8300000, guid: 7b7e739c58c8146728c9202173f67dec, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bag_teach
     text: '''Bag'' means the same in Filipino as in English: something you carry things in.'
     gloss: Bag
-    clip: {fileID: 8300000, guid: 9447d6cfedd4840f2a56b99f6d9b8262, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bag_recall
     text: Remember, 'Bag' means bag.
     gloss: Bag
-    clip: {fileID: 8300000, guid: 414b99f37fa4049ff929dc87f206f0be, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kunin_teach
     text: In Filipino, 'Kunin' means to take something, or to go and get it.
     gloss: Take / get
-    clip: {fileID: 8300000, guid: dd59798fbe2ce44fc9f58f1e8061391b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kunin_recall
     text: Remember, 'Kunin' means to take it.
     gloss: Take / get
-    clip: {fileID: 8300000, guid: 77189b521add843f497525b12c109e0a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_upo_teach
     text: In Filipino, 'Upo' means to sit down.
     gloss: Sit down
-    clip: {fileID: 8300000, guid: 873b4c658a6ba4370bd11d7e393e0e32, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_upo_recall
     text: Remember, 'Upo' means to sit down.
     gloss: Sit down
-    clip: {fileID: 8300000, guid: fc749f01967c84eb882bf878e070a944, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kanin_teach
     text: '''Kanin'' is the Filipino word for cooked rice.'
     gloss: Rice
-    clip: {fileID: 8300000, guid: b50a4ed10890542afa612e53af6ddc75, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kanin_recall
     text: Remember, 'Kanin' means rice.
     gloss: Rice
-    clip: {fileID: 8300000, guid: 2cacec1f61e954c7eb527b8b0bba1153, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_itlog_teach
     text: '''Itlog'' is the Filipino word for an egg.'
     gloss: Egg
-    clip: {fileID: 8300000, guid: 54d8d87f2b3d84852b4034b741c25697, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_itlog_recall
     text: Remember, 'Itlog' means egg.
     gloss: Egg
-    clip: {fileID: 8300000, guid: 23c0e1643fa4245e1b188cbedb919617, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kain_teach
     text: In Filipino, 'Kain' means to eat.
     gloss: Eat
-    clip: {fileID: 8300000, guid: 16a308902d6f744148fedee62f4c4436, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kain_recall
     text: Remember, 'Kain' means to eat.
     gloss: Eat
-    clip: {fileID: 8300000, guid: b82e2813439b944279b62825070f81cb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_inom_teach
     text: In Filipino, 'Inom' means to drink.
     gloss: Drink
-    clip: {fileID: 8300000, guid: 28016b2566c224e7a8bff40539e5c150, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_inom_recall
     text: Remember, 'Inom' means to drink.
     gloss: Drink
-    clip: {fileID: 8300000, guid: 49ec1fc140ec84d84b13caf40ae08be9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kumusta_teach
     text: '''Kumusta'' is how you say hello in Filipino, and ask how someone is.'
     gloss: Hello / how are you
-    clip: {fileID: 8300000, guid: d1ddbffc6ee3d4dbe9abd5e944382aa2, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kumusta_recall
     text: Remember, 'Kumusta' means hello.
     gloss: Hello / how are you
-    clip: {fileID: 8300000, guid: 077f7477302f145a0ade3e1b14b1dfbb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_pasok_teach
     text: In Filipino, 'Pasok' means to go in, or to enter.
     gloss: Enter
-    clip: {fileID: 8300000, guid: fd7fb4c5a2bb54d359ce6e7c71e18432, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_pasok_recall
     text: Remember, 'Pasok' means to go in.
     gloss: Enter
-    clip: {fileID: 8300000, guid: 335efe99995274782b56ff1208fd12e4, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_takbo_teach
     text: In Filipino, 'Takbo' means to run.
     gloss: Run
-    clip: {fileID: 8300000, guid: 5ccab7bf6b5004279922bab2f22debad, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_takbo_recall
     text: Remember, 'Takbo' means to run.
     gloss: Run
-    clip: {fileID: 8300000, guid: 3227bcaa755f7427c9c19a48b9ed0d2e, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kuha_teach
     text: In Filipino, 'Kuha' means to get something, or to fetch it.
     gloss: Get / take
-    clip: {fileID: 8300000, guid: 6cbda64b16be54066b6273ecc0decc63, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_kuha_recall
     text: Remember, 'Kuha' means to get it.
     gloss: Get / take
-    clip: {fileID: 8300000, guid: 52e44a3ffb0d9415893af9951ab33ff3, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_lapis_teach
     text: '''Lapis'' is the Filipino word for a pencil.'
     gloss: Pencil
-    clip: {fileID: 8300000, guid: b7e117b0bdd4b46e0970869e31b2c683, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_lapis_recall
     text: Remember, 'Lapis' means pencil.
     gloss: Pencil
-    clip: {fileID: 8300000, guid: a71b142f1da68401a8233ad341297af6, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_aklat_teach
     text: '''Aklat'' is the Filipino word for a book.'
     gloss: Book
-    clip: {fileID: 8300000, guid: 3364ede1e0e8e40b2911cf846c543a8f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_aklat_recall
     text: Remember, 'Aklat' means book.
     gloss: Book
-    clip: {fileID: 8300000, guid: e4a909ed2b3404452a50bed4a49e096f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_basa_teach
     text: In Filipino, 'Basa' means to read.
     gloss: Read
-    clip: {fileID: 8300000, guid: 5dab41fb8cc0e44cbb6fc7b664f27689, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_basa_recall
     text: Remember, 'Basa' means to read.
     gloss: Read
-    clip: {fileID: 8300000, guid: 82ef66ef71a0d4a8bac8f3136046589a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sulat_teach
     text: In Filipino, 'Sulat' means to write.
     gloss: Write
-    clip: {fileID: 8300000, guid: 3dae60a202e0e467fa8417191bcb27da, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sulat_recall
     text: Remember, 'Sulat' means to write.
     gloss: Write
-    clip: {fileID: 8300000, guid: fa8d45cca3f5d42bf8f33f5065af04eb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tanong_teach
     text: '''Tanong'' is the Filipino word for a question, or to ask one.'
     gloss: Ask / question
-    clip: {fileID: 8300000, guid: 7c89e9bc68973492a8e2f6a787481243, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tanong_recall
     text: Remember, 'Tanong' means to ask.
     gloss: Ask / question
-    clip: {fileID: 8300000, guid: 93f9d3ec8307949b6a65be72955e9bd9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sagot_teach
     text: '''Sagot'' is the Filipino word for an answer, or to answer.'
     gloss: Answer
-    clip: {fileID: 8300000, guid: 516ac516666ed4b598a211c4f8f49e2c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sagot_recall
     text: Remember, 'Sagot' means to answer.
     gloss: Answer
-    clip: {fileID: 8300000, guid: 40a91597e3c204fffa66a0f5d25b59ea, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_labas_teach
     text: In Filipino, 'Labas' means to go outside.
     gloss: Go outside
-    clip: {fileID: 8300000, guid: 977d679b2026742c2b22df039b011176, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_labas_recall
     text: Remember, 'Labas' means to go outside.
     gloss: Go outside
-    clip: {fileID: 8300000, guid: c89eb1dc404294684ab5d66f01f7fc4c, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_laro_teach
     text: In Filipino, 'Laro' means to play.
     gloss: Play
-    clip: {fileID: 8300000, guid: dbde12d97c9ac49b0b58f62ab84b2656, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_laro_recall
     text: Remember, 'Laro' means to play.
     gloss: Play
-    clip: {fileID: 8300000, guid: 7a5218b35788248998f49e601eca7f86, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tawa_teach
     text: In Filipino, 'Tawa' means to laugh.
     gloss: Laugh
-    clip: {fileID: 8300000, guid: be91ce62ae56443368bd3164d71d9a0b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tawa_recall
     text: Remember, 'Tawa' means to laugh.
     gloss: Laugh
-    clip: {fileID: 8300000, guid: 3ff661ea336d641bbb7dccd6253b562a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tulong_teach
     text: '''Tulong'' is the Filipino word for help, or to help someone.'
     gloss: Help
-    clip: {fileID: 8300000, guid: aeb8b2f5e71184915aa45274c714c522, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tulong_recall
     text: Remember, 'Tulong' means help.
     gloss: Help
-    clip: {fileID: 8300000, guid: ae25106e4e7b948278a78611a83e4046, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_linis_teach
     text: In Filipino, 'Linis' means to clean up, or to tidy.
     gloss: Clean up
-    clip: {fileID: 8300000, guid: 9ac3c24c3c2ec43be971b16bc664271f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_linis_recall
     text: Remember, 'Linis' means to clean up.
     gloss: Clean up
-    clip: {fileID: 8300000, guid: ddd882985224843f6bbb316094f7b083, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_alis_teach
     text: In Filipino, 'Alis' means to leave, or to go away from a place.
     gloss: Leave / go
-    clip: {fileID: 8300000, guid: 2870083d795ef49a386710fa25564697, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_alis_recall
     text: Remember, 'Alis' means to leave.
     gloss: Leave / go
-    clip: {fileID: 8300000, guid: 19d76eacc7d924281a1efc3fcc283f7a, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_paalam_teach
     text: '''Paalam'' is the Filipino word for goodbye.'
     gloss: Goodbye
-    clip: {fileID: 8300000, guid: 509d22a513a584a2f8edfc03f743019f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_paalam_recall
     text: Remember, 'Paalam' means goodbye.
     gloss: Goodbye
-    clip: {fileID: 8300000, guid: 2d3f885d2468d4dfc83abd8749c4396b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tingin_teach
     text: In Filipino, 'Tingin' means to look at something.
     gloss: Look
-    clip: {fileID: 8300000, guid: 80115d02acc294d27810c7a493303ec0, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tingin_recall
     text: Remember, 'Tingin' means to look.
     gloss: Look
-    clip: {fileID: 8300000, guid: 63a346000458b47999cc372bdde6917b, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tuwa_teach
     text: '''Tuwa'' is the Filipino word for joy, the happy feeling inside you.'
     gloss: Joy / delight
-    clip: {fileID: 8300000, guid: 9a45ba4d8e85447438ef48f409fdd52d, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tuwa_recall
     text: Remember, 'Tuwa' means joy.
     gloss: Joy / delight
-    clip: {fileID: 8300000, guid: bba158cd8e9044283bdbab88e8bd1e84, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_akyat_teach
     text: In Filipino, 'Akyat' means to climb up.
     gloss: Climb
-    clip: {fileID: 8300000, guid: 68217c6eda00940629dad41a8575a3bb, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_akyat_recall
     text: Remember, 'Akyat' means to climb.
     gloss: Climb
-    clip: {fileID: 8300000, guid: ea3614cef4d534f88936fee7d465b192, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_dausdos_teach
     text: In Filipino, 'Dausdos' means to slide down.
     gloss: Slide
-    clip: {fileID: 8300000, guid: d13a7e00d733e4a6ca735e844edda122, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_dausdos_recall
     text: Remember, 'Dausdos' means to slide.
     gloss: Slide
-    clip: {fileID: 8300000, guid: 5b9771d0c37944e68b20615d713bbcf9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sakay_teach
     text: In Filipino, 'Sakay' means to ride, or to get on something.
     gloss: Ride
-    clip: {fileID: 8300000, guid: 30eb208e0f6f94af4a91e613a62de28d, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_sakay_recall
     text: Remember, 'Sakay' means to ride.
     gloss: Ride
-    clip: {fileID: 8300000, guid: 8129d0893744a4215b13106b2a59e8b9, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tulak_teach
     text: In Filipino, 'Tulak' means to push.
     gloss: Push
-    clip: {fileID: 8300000, guid: dfd8327d8072f47a7a3055d7acdde658, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_tulak_recall
     text: Remember, 'Tulak' means to push.
     gloss: Push
-    clip: {fileID: 8300000, guid: c31cd114c25cb4fb3a74c5fa6a5eae40, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_talon_teach
     text: In Filipino, 'Talon' means to jump.
     gloss: Jump
-    clip: {fileID: 8300000, guid: de312af3926d7492f90ece3f72e7e140, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_talon_recall
     text: Remember, 'Talon' means to jump.
     gloss: Jump
-    clip: {fileID: 8300000, guid: fbf0dabbf55404f0084bfa0d3f408277, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ngiti_teach
     text: In Filipino, 'Ngiti' means to smile.
     gloss: Smile
-    clip: {fileID: 8300000, guid: e8cff998b74d04dcea93fc0d74bc0116, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ngiti_recall
     text: Remember, 'Ngiti' means to smile.
     gloss: Smile
-    clip: {fileID: 8300000, guid: 214fb80a663cf4b6b99baf3d73ecb257, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bati_teach
     text: In Filipino, 'Bati' means to greet someone kindly.
     gloss: Greet
-    clip: {fileID: 8300000, guid: baba912f13bc640c5b6816aaaf9c69a3, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_bati_recall
     text: Remember, 'Bati' means to greet.
     gloss: Greet
-    clip: {fileID: 8300000, guid: 12e001c94914c42a38023e5c085bae6f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ibahagi_teach
     text: In Filipino, 'Ibahagi' means to share what you have.
     gloss: Share
-    clip: {fileID: 8300000, guid: 29a3fee26c88b4749b18291e6aa77464, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_ibahagi_recall
     text: Remember, 'Ibahagi' means to share.
     gloss: Share
-    clip: {fileID: 8300000, guid: ba4bec99a4aa64592a9c371f930aa380, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_salamat_teach
     text: '''Salamat'' is the Filipino word for thank you.'
     gloss: Thank you
-    clip: {fileID: 8300000, guid: c578975864ffb44c39e914252fa621fe, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_salamat_recall
     text: Remember, 'Salamat' means thank you.
     gloss: Thank you
-    clip: {fileID: 8300000, guid: 0b2b254690afd44ff8097b8b59eca4b8, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_pagod_teach
     text: In Filipino, 'Pagod' means tired, the way you feel after a long day.
     gloss: Tired
-    clip: {fileID: 8300000, guid: 125cbcfd4fa2d4c8bb13dcfe0c53dd06, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_pagod_recall
     text: Remember, 'Pagod' means tired.
     gloss: Tired
-    clip: {fileID: 8300000, guid: f76cfd217ffaa4147a3df73305433b98, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_uwi_teach
     text: In Filipino, 'Uwi' means to go home.
     gloss: Go home
-    clip: {fileID: 8300000, guid: da317643ef4aa4207b4c4d642ee77643, type: 3}
+    clip: {fileID: 0}
   - id: rachel_word_uwi_recall
     text: Remember, 'Uwi' means to go home.
     gloss: Go home
-    clip: {fileID: 8300000, guid: b4e6b9212cc71444ea95a10f604b4c50, type: 3}
+    clip: {fileID: 0}
   - id: rachel_frame_sabihin
     text: 'Sabihin mo:'
     gloss: 'Say:'
@@ -1533,203 +1545,203 @@ MonoBehaviour:
   - id: word_kaliwa
     text: Kaliwa
     gloss: Left
-    clip: {fileID: 8300000, guid: 313b89a48c38e4c53b0bca7e1d9353c5, type: 3}
+    clip: {fileID: 0}
   - id: word_kanan
     text: Kanan
     gloss: Right
-    clip: {fileID: 8300000, guid: 2def0b82469b44563aba306fa83f1f3e, type: 3}
+    clip: {fileID: 0}
   - id: word_bukas
     text: Bukas
     gloss: Open
-    clip: {fileID: 8300000, guid: c377a10e34f5746ebac107092fbf726e, type: 3}
+    clip: {fileID: 0}
   - id: word_ilaw
     text: Ilaw
     gloss: Light (turn on)
-    clip: {fileID: 8300000, guid: 1ac7e3f5ae0e347cc856503b7bc37608, type: 3}
+    clip: {fileID: 0}
   - id: word_tabo
     text: Tabo
     gloss: Dipper
-    clip: {fileID: 8300000, guid: 88f10fabf96844168a3f9f63ee790604, type: 3}
+    clip: {fileID: 0}
   - id: word_maligo
     text: Maligo
     gloss: Take a bath
-    clip: {fileID: 8300000, guid: 4c7382b60510842a9b1f1c92be90410f, type: 3}
+    clip: {fileID: 0}
   - id: word_sabon
     text: Sabon
     gloss: Soap
-    clip: {fileID: 8300000, guid: fc87da08b30944901b1ea7142be9e2dd, type: 3}
+    clip: {fileID: 0}
   - id: word_suklay
     text: Suklay
     gloss: Comb
-    clip: {fileID: 8300000, guid: 982c3373a717b4d2da3e4ff187ed5904, type: 3}
+    clip: {fileID: 0}
   - id: word_sipilyo
     text: Sipilyo
     gloss: Toothbrush
-    clip: {fileID: 8300000, guid: 0fee37354da9e48b3a48fdddc3b5e304, type: 3}
+    clip: {fileID: 0}
   - id: word_tuwalya
     text: Tuwalya
     gloss: Towel
-    clip: {fileID: 8300000, guid: 366bb0bb3c05845558f8397642a88040, type: 3}
+    clip: {fileID: 0}
   - id: word_damit
     text: Damit
     gloss: Clothes / uniform
-    clip: {fileID: 8300000, guid: e6422533d35f0486a9b87424c1b4cfd5, type: 3}
+    clip: {fileID: 0}
   - id: word_medyas
     text: Medyas
     gloss: Socks
-    clip: {fileID: 8300000, guid: 0b11f6fedc4ee4da191144f9f8304f6d, type: 3}
+    clip: {fileID: 0}
   - id: word_sapatos
     text: Sapatos
     gloss: Shoes
-    clip: {fileID: 8300000, guid: 341de997185cc41c09a4e74a3b38e7f8, type: 3}
+    clip: {fileID: 0}
   - id: word_bag
     text: Bag
     gloss: Bag
-    clip: {fileID: 8300000, guid: 82174036bda334af789f3700275c271b, type: 3}
+    clip: {fileID: 0}
   - id: word_kunin
     text: Kunin
     gloss: Take / get
-    clip: {fileID: 8300000, guid: f6f27a4541a184c9bb83375d9461f724, type: 3}
+    clip: {fileID: 0}
   - id: word_upo
     text: Upo
     gloss: Sit down
-    clip: {fileID: 8300000, guid: 92fa11ad6dd674ac0a6cbc4ffba07670, type: 3}
+    clip: {fileID: 0}
   - id: word_kanin
     text: Kanin
     gloss: Rice
-    clip: {fileID: 8300000, guid: 3f4b4883dc0bf4b5ab3003fcc992693a, type: 3}
+    clip: {fileID: 0}
   - id: word_itlog
     text: Itlog
     gloss: Egg
-    clip: {fileID: 8300000, guid: 9849f6f4e31c448b4910a45bae1fa42d, type: 3}
+    clip: {fileID: 0}
   - id: word_kain
     text: Kain
     gloss: Eat
-    clip: {fileID: 8300000, guid: add9bf0d63ff44923aec04ea270c51f5, type: 3}
+    clip: {fileID: 0}
   - id: word_inom
     text: Inom
     gloss: Drink
-    clip: {fileID: 8300000, guid: 6348d7f23b08f479797e2583506d147a, type: 3}
+    clip: {fileID: 0}
   - id: word_kumusta
     text: Kumusta
     gloss: Hello / how are you
-    clip: {fileID: 8300000, guid: 5cddd6318c9ad4a0fa48c16dff28ce4c, type: 3}
+    clip: {fileID: 0}
   - id: word_pasok
     text: Pasok
     gloss: Enter
-    clip: {fileID: 8300000, guid: 4f95193ebb3da4410a6694340b39732b, type: 3}
+    clip: {fileID: 0}
   - id: word_takbo
     text: Takbo
     gloss: Run
-    clip: {fileID: 8300000, guid: 4771cd2c6973348f992c117ad5a77b67, type: 3}
+    clip: {fileID: 0}
   - id: word_kuha
     text: Kuha
     gloss: Get / take
-    clip: {fileID: 8300000, guid: 8a3a347a9c49f495ba1d35d181f073b8, type: 3}
+    clip: {fileID: 0}
   - id: word_lapis
     text: Lapis
     gloss: Pencil
-    clip: {fileID: 8300000, guid: de92a959b887548a190b41fbdc4f5ee7, type: 3}
+    clip: {fileID: 0}
   - id: word_aklat
     text: Aklat
     gloss: Book
-    clip: {fileID: 8300000, guid: b7d98601e49f44f1f9fa965a7ed5c46d, type: 3}
+    clip: {fileID: 0}
   - id: word_basa
     text: Basa
     gloss: Read
-    clip: {fileID: 8300000, guid: f2b24cebd11b1411593cce35b7c4ece0, type: 3}
+    clip: {fileID: 0}
   - id: word_sulat
     text: Sulat
     gloss: Write
-    clip: {fileID: 8300000, guid: cc0f06bd620574604ba98f5c4c06a8e3, type: 3}
+    clip: {fileID: 0}
   - id: word_tanong
     text: Tanong
     gloss: Ask / question
-    clip: {fileID: 8300000, guid: 8ca46a6e6c7884761a4172eb0ac2f437, type: 3}
+    clip: {fileID: 0}
   - id: word_sagot
     text: Sagot
     gloss: Answer
-    clip: {fileID: 8300000, guid: 4460884c685ba4c16924d5a64852fea2, type: 3}
+    clip: {fileID: 0}
   - id: word_labas
     text: Labas
     gloss: Go outside
-    clip: {fileID: 8300000, guid: dc69db4a735cf4abb927108799df883d, type: 3}
+    clip: {fileID: 0}
   - id: word_laro
     text: Laro
     gloss: Play
-    clip: {fileID: 8300000, guid: 38d27b8a1f530478d9d0b7809e6de8bf, type: 3}
+    clip: {fileID: 0}
   - id: word_tawa
     text: Tawa
     gloss: Laugh
-    clip: {fileID: 8300000, guid: 7e3192051915b4c398bdd1150a8011c7, type: 3}
+    clip: {fileID: 0}
   - id: word_tulong
     text: Tulong
     gloss: Help
-    clip: {fileID: 8300000, guid: ee99cd0e73a954513bf4ee76effc6947, type: 3}
+    clip: {fileID: 0}
   - id: word_linis
     text: Linis
     gloss: Clean up
-    clip: {fileID: 8300000, guid: 2420bf4c960b34cdd90bea4166f0e49d, type: 3}
+    clip: {fileID: 0}
   - id: word_alis
     text: Alis
     gloss: Leave / go
-    clip: {fileID: 8300000, guid: 4b6a1a3d7a6ca49bb9af69193a49b67e, type: 3}
+    clip: {fileID: 0}
   - id: word_paalam
     text: Paalam
     gloss: Goodbye
-    clip: {fileID: 8300000, guid: 1ee45009c31644ff5afa3eaa535343e8, type: 3}
+    clip: {fileID: 0}
   - id: word_tingin
     text: Tingin
     gloss: Look
-    clip: {fileID: 8300000, guid: f5a1bef4b57cb46edbd798adadcb98eb, type: 3}
+    clip: {fileID: 0}
   - id: word_tuwa
     text: Tuwa
     gloss: Joy / delight
-    clip: {fileID: 8300000, guid: a6962af78203e4bcf90cd6b5462258e3, type: 3}
+    clip: {fileID: 0}
   - id: word_akyat
     text: Akyat
     gloss: Climb
-    clip: {fileID: 8300000, guid: cdfb8b15a6b3f47cf8fb6f2406f041e0, type: 3}
+    clip: {fileID: 0}
   - id: word_dausdos
     text: Dausdos
     gloss: Slide
-    clip: {fileID: 8300000, guid: ad387667b9691406bb478238aa07bfb6, type: 3}
+    clip: {fileID: 0}
   - id: word_sakay
     text: Sakay
     gloss: Ride
-    clip: {fileID: 8300000, guid: e0438cd8f3afe4d7ba2241ef186f4829, type: 3}
+    clip: {fileID: 0}
   - id: word_tulak
     text: Tulak
     gloss: Push
-    clip: {fileID: 8300000, guid: 17f50bf0142f1410785a2b008b9e6a4c, type: 3}
+    clip: {fileID: 0}
   - id: word_talon
     text: Talon
     gloss: Jump
-    clip: {fileID: 8300000, guid: 3e40cb0ecf9e044a29a66763ef79ecb4, type: 3}
+    clip: {fileID: 0}
   - id: word_ngiti
     text: Ngiti
     gloss: Smile
-    clip: {fileID: 8300000, guid: 0511a5cb88be5402aa753d0634ca6493, type: 3}
+    clip: {fileID: 0}
   - id: word_bati
     text: Bati
     gloss: Greet
-    clip: {fileID: 8300000, guid: 0f3e4e63489054b39810e3b8fa504272, type: 3}
+    clip: {fileID: 0}
   - id: word_ibahagi
     text: Ibahagi
     gloss: Share
-    clip: {fileID: 8300000, guid: 1f8ab49943f844418a8d0c66c5dae589, type: 3}
+    clip: {fileID: 0}
   - id: word_salamat
     text: Salamat
     gloss: Thank you
-    clip: {fileID: 8300000, guid: 1fb0e3064e58d4b31a1afe21d2354703, type: 3}
+    clip: {fileID: 0}
   - id: word_pagod
     text: Pagod
     gloss: Tired
-    clip: {fileID: 8300000, guid: 0a0b0df673fb249a5a013dbf5d10d2e7, type: 3}
+    clip: {fileID: 0}
   - id: word_uwi
     text: Uwi
     gloss: Go home
-    clip: {fileID: 8300000, guid: 367b25742a3284b3686e1f11bdcc1a5f, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l1_s6_intro
     text: It's time for school! Help Kylo get to the door and say goodbye to Nanay.
     gloss: 
@@ -1750,3 +1762,19 @@ MonoBehaviour:
     text: Salamin
     gloss: Mirror
     clip: {fileID: 0}
+  - id: rachel_l2_s2_bukas_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 2323b8de0711646b5bc57a653174e4dd, type: 3}
+  - id: rachel_l2_s2_bukas_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: ea6be6b19404148e7af9ec7d939714ff, type: 3}
+  - id: rachel_l2_s2_kumusta_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: c0b9d3dbac82c43f398bc9de0ba10153, type: 3}
+  - id: rachel_l2_s2_kumusta_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: f36757b9509bb46eea13fe51629a3919, type: 3}
