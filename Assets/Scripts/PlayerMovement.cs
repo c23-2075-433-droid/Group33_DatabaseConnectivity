@@ -75,6 +75,23 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("How close to walkTarget counts as having arrived, in world units.")]
     public float walkTargetThreshold = 0.35f;
 
+    [Tooltip("How far before walkTarget the character starts slowing down, in " +
+             "world units. A spoken walk otherwise runs at full speed until the " +
+             "instant it stops, which reads as a character being switched off " +
+             "rather than one arriving somewhere. Over this last stretch both " +
+             "the speed and the walk-cycle rate fall off together, so his legs " +
+             "slow with him instead of scurrying on the spot.\n\n" +
+             "Leave at 0 to keep the plain hard stop - that is what every scene " +
+             "built before this field existed expects, so the default changes " +
+             "nothing anywhere until a builder opts in.")]
+    public float arrivalEaseDistance = 0f;
+
+    [Tooltip("The slowest the character may creep while easing in, as a fraction " +
+             "of normal speed. Without a floor the approach would halve forever " +
+             "and never quite arrive.")]
+    [Range(0.05f, 1f)]
+    public float arrivalEaseFloor = 0.2f;
+
     // Counts down alongside voiceWalkTimer while a run is in effect, so a run
     // is an ordinary walk that simply moves and animates faster.
     private float runTimer = 0f;
@@ -192,8 +209,35 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        float speed = moveSpeed * (IsRunning ? runMultiplier : 1f);
+        float speed = moveSpeed * (IsRunning ? runMultiplier : 1f) * ArrivalEase();
         rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
+    }
+
+    /// <summary>
+    /// How much of full speed to use right now: 1 everywhere except the last
+    /// <see cref="arrivalEaseDistance"/> units before a walkTarget, where it
+    /// falls off to <see cref="arrivalEaseFloor"/> so the character settles
+    /// into place instead of stopping dead.
+    ///
+    /// Returns 1 unchanged when the feature is off, when there is no target,
+    /// when no spoken walk is in progress, or when the character is walking
+    /// away from the target rather than toward it - so it can only ever slow
+    /// an approach, never interfere with ordinary movement.
+    /// </summary>
+    private float ArrivalEase()
+    {
+        if (arrivalEaseDistance <= 0f || walkTarget == null || voiceWalkTimer <= 0f) return 1f;
+
+        float dx = walkTarget.position.x - transform.position.x;
+        if ((dx > 0f) != (voiceWalkDirection > 0f)) return 1f;   // not heading for it
+
+        // Measured to the point he actually stops at, not to the target's
+        // centre, so the slow-down finishes exactly as the walk ends.
+        float remaining = Mathf.Abs(dx) - walkTargetThreshold;
+        if (remaining >= arrivalEaseDistance) return 1f;
+
+        float k = Mathf.Clamp01(remaining / arrivalEaseDistance);
+        return Mathf.Lerp(arrivalEaseFloor, 1f, k);
     }
 
     /// <summary>
@@ -372,7 +416,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         walkFrameTimer += Time.deltaTime;
-        float fps = walkFramesPerSecond * (IsRunning ? runMultiplier : 1f);
+        // The same easing the speed uses, so a slowing walk takes shorter,
+        // slower strides rather than running on the spot as it creeps in.
+        float fps = walkFramesPerSecond * (IsRunning ? runMultiplier : 1f) * ArrivalEase();
         float frameDuration = 1f / Mathf.Max(0.01f, fps);
 
         if (walkFrameTimer >= frameDuration)

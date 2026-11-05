@@ -355,9 +355,33 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: 767bdb402f612824ca5f4ee0bfd73059, type: 3}
   - id: rachel_l2_s1_intro
-    text: Here is Kylo's school! The gate is open and the yard is full of children.
+    text: Here is Kylo's school! The gate is still shut, and the guard is waiting beside it.
     gloss: 
     clip: {fileID: 8300000, guid: 6bc541166a14d074e9594e5acd410866, type: 3}
+  - id: rachel_l2_s1_lakad_story
+    text: Kylo can see his school now. The gate up ahead is still shut.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_lakad_ask
+    text: "Walk him up to it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_lakad_done
+    text: There he is, right at the gate.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_story
+    text: The guard is standing beside the gate, waiting to let him in.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_ask
+    text: "Ask him to open it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s1_bukas_done
+    text: The gate swings open!
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l2_s1_kumusta_story
     text: The guard at the gate smiles at Kylo every single morning.
     gloss: 
@@ -399,35 +423,23 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: 1389b12b4ac7d58469e5410fc05064bc, type: 3}
   - id: rachel_l2_s2_intro
-    text: Kylo is outside his classroom, and Teacher Rachel is already inside.
+    text: Here is Kylo's classroom. His chair is waiting for him by the window.
     gloss: 
     clip: {fileID: 8300000, guid: fcbb4ed767c0a3f4ca368836e97c8857, type: 3}
-  - id: rachel_l2_s2_bukas_story
-    text: The classroom door is closed, and the lesson is about to begin.
-    gloss: 
-    clip: {fileID: 8300000, guid: d19fd6edb16fe19419cc264b3735f325, type: 3}
-  - id: rachel_l2_s2_bukas_ask
-    text: "Let him in \u2014 say {word}!"
+  - id: rachel_l2_s2_lakad_story
+    text: Kylo is inside the classroom, and his own chair is across the room by the window.
     gloss: 
     clip: {fileID: 0}
-  - id: rachel_l2_s2_bukas_done
-    text: Good! The classroom door is open.
-    gloss: 
-    clip: {fileID: 8300000, guid: 090f5148d51bfdb4fbc10f8dd5192b2a, type: 3}
-  - id: rachel_l2_s2_kumusta_story
-    text: Teacher Rachel looks up from her desk and smiles at Kylo.
-    gloss: 
-    clip: {fileID: 8300000, guid: c8fd4a3baba1e3e45b5fbef85aea017d, type: 3}
-  - id: rachel_l2_s2_kumusta_ask
-    text: "Greet Teacher Rachel back \u2014 say {word}!"
+  - id: rachel_l2_s2_lakad_ask
+    text: "Walk him over to it \u2014 say {word}!"
     gloss: 
     clip: {fileID: 0}
-  - id: rachel_l2_s2_kumusta_done
-    text: Very polite! Teacher Rachel smiles back at him.
+  - id: rachel_l2_s2_lakad_done
+    text: There he is, right beside his desk.
     gloss: 
-    clip: {fileID: 8300000, guid: 9480e3e557ba6f5449f0930e4b52f257, type: 3}
+    clip: {fileID: 0}
   - id: rachel_l2_s2_upo_story
-    text: Kylo's desk is near the window, and his classmates are already seated.
+    text: Kylo's desk is beside the window, and the lesson is about to start.
     gloss: 
     clip: {fileID: 8300000, guid: 9fc75b4f3b3437b4a9453258b2526fc1, type: 3}
   - id: rachel_l2_s2_upo_ask
@@ -463,7 +475,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: da28f9d183b2ce740b10c76eb9e515f7, type: 3}
   - id: rachel_l2_s2_outro
-    text: Everyone is ready. It is time for the lesson to begin!
+    text: Kylo is ready. It is time for the lesson to begin!
     gloss: 
     clip: {fileID: 8300000, guid: eb3137774af2a954abc44871a703823a, type: 3}
   - id: rachel_l2_s3_intro
@@ -1750,3 +1762,19 @@ MonoBehaviour:
     text: Salamin
     gloss: Mirror
     clip: {fileID: 0}
+  - id: rachel_l2_s2_bukas_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 090f5148d51bfdb4fbc10f8dd5192b2a, type: 3}
+  - id: rachel_l2_s2_bukas_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: d19fd6edb16fe19419cc264b3735f325, type: 3}
+  - id: rachel_l2_s2_kumusta_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 9480e3e557ba6f5449f0930e4b52f257, type: 3}
+  - id: rachel_l2_s2_kumusta_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: c8fd4a3baba1e3e45b5fbef85aea017d, type: 3}
