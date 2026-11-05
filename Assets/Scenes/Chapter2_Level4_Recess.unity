@@ -223,7 +223,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 88560029}
-  - component: {fileID: 88560028}
   m_Layer: 0
   m_Name: WordsLearned_Content
   m_TagString: Untagged
@@ -237,7 +236,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 88560027}
+  m_GameObject: {fileID: 421224593}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71d8ac9bf67a64c8392f33f8908d6f04, type: 3}
@@ -1410,6 +1409,7 @@ GameObject:
   - component: {fileID: 421224596}
   - component: {fileID: 421224595}
   - component: {fileID: 421224594}
+  - component: {fileID: 88560028}
   m_Layer: 0
   m_Name: SceneResult_Canvas
   m_TagString: Untagged
