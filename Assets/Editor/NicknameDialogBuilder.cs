@@ -1,19 +1,23 @@
 // Assets/Editor/NicknameDialogBuilder.cs
 //
 // Builds the "Enter Nickname" modal dialog shown when Adventure is pressed:
-// a dimmed backdrop, the bamboo panel, the name input slot, and OKAY /
-// CANCEL buttons.
+// a scrim that fades the menu behind it, the hanging board, and the OKAY /
+// CANCEL plates that hang under it on their own ropes.
 //
 // Art pieces (Assets/Sprites/), all with their labels painted in:
-//   ui_dialog_panel - frame, with "Enter Nickname:" already on it
-//   ui_input_slot   - wooden surround with a white writable interior
-//   btn_okay        - "OKAY"
-//   btn_cancel      - "CANCEL"
+//   ui_dialog_panel - the board: two ropes up to the top of the screen,
+//                     "ENTER NICKNAME:" and the white name field painted on
+//   btn_okay        - "OKAY", with the two short ropes that hold it
+//   btn_cancel      - "CANCEL", likewise
 //
-// Element sizes and positions below were measured off the group's composed
-// mockup by diffing it against the empty frame, then expressed as fractions
-// of the panel so they scale with it. To adjust, move the RectTransforms in
-// the Scene view - no code change needed.
+// There is no separate input-slot sprite any more: the white field is part of
+// the board, so the InputField below is an invisible rect laid over it.
+//
+// Positions and sizes are page coordinates from the Canva export, scaled by
+// 0.96 onto the 1920x1080 canvas, exactly as the menu behind it is laid out.
+// Tools/import_nickname_dialog_art.py prints every number in this file - run
+// it after a re-export. To adjust by hand, move the RectTransforms in the
+// Scene view; no code change needed.
 //
 // Used by AddNicknameDialogToMainMenu.cs (patches the built menu) and
 // BuildMainMenuScene.cs (fresh rebuild).
@@ -28,14 +32,39 @@ public static class NicknameDialogBuilder
 {
     public const string RootName = "NicknamePanel";
 
-    // Panel art is 1517x924 (~1.64:1); everything else is sized relative to it.
-    private const float PanelWidth = 1150f;
-    private const float PanelAspect = 1517f / 924f;
-    private const float Scale = PanelWidth / 1517f;
+    // The board, hanging from the top of the screen. Its ropes are painted in,
+    // so the sprite starts at the top edge of the Canva page and the rect sits
+    // high enough that they still reach it.
+    private static readonly Vector2 BoardPosition = new Vector2(46, 202);
+    private static readonly Vector2 BoardSize = new Vector2(1027, 677);
 
-    // The panel's interior isn't centred on the sprite - the bamboo and leaves
-    // sit further out on the left - so the contents sit slightly left of centre.
-    private const float ContentCentreX = -15f;
+    // The white name field, painted onto the board - these are offsets from
+    // the board's own centre, so nudging the board takes the field with it.
+    private static readonly Vector2 FieldPosition = new Vector2(8, -136);
+    private static readonly Vector2 FieldSize = new Vector2(792, 95);
+
+    // "Kylo is taken. Try Kylo01." Goes on the maroon plank below the field,
+    // which is clear from row 585 to row 645 of the board art - below that is
+    // the board's dark rim.
+    private static readonly Vector2 StatusPosition = new Vector2(8, -252);
+    private static readonly Vector2 StatusSize = new Vector2(792, 56);
+
+    // The two plates hang below the board on their own ropes, and the export
+    // does not draw them quite level or quite the same size - these are each
+    // plate's own box, so they land where the artist put them.
+    private static readonly Vector2 OkayPosition = new Vector2(-241, -232);
+    private static readonly Vector2 OkaySize = new Vector2(492, 190);
+    private static readonly Vector2 CancelPosition = new Vector2(314, -227);
+    private static readonly Vector2 CancelSize = new Vector2(487, 180);
+
+    /// <summary>
+    /// The scrim over the menu while the dialog is open. The mockup fades the
+    /// classroom towards white rather than darkening it, which keeps the
+    /// screen warm and lets the dark wooden board carry the eye - so this is a
+    /// pale cream wash, not the usual black. Raise the alpha to hide more of
+    /// the menu; swap the colour for black to get a conventional dim.
+    /// </summary>
+    private static readonly Color Scrim = new Color(1f, 0.97f, 0.91f, 0.55f);
 
     /// <summary>
     /// Result of building the dialog, so callers can wire MainMenuController.
@@ -57,10 +86,8 @@ public static class NicknameDialogBuilder
     {
         foreach (GameObject stale in FindAllInScene(RootName)) Object.DestroyImmediate(stale);
 
-        float panelHeight = PanelWidth / PanelAspect;
-
-        // Full-screen root: also catches clicks so the menu behind can't be
-        // used while the dialog is open.
+        // Full-screen root: carries the scrim, and catches clicks so the menu
+        // behind can't be used while the dialog is open.
         GameObject root = new GameObject(RootName, typeof(RectTransform));
         root.transform.SetParent(canvas, false);
         RectTransform rootRect = root.GetComponent<RectTransform>();
@@ -68,38 +95,32 @@ public static class NicknameDialogBuilder
         rootRect.anchorMax = Vector2.one;
         rootRect.offsetMin = Vector2.zero;
         rootRect.offsetMax = Vector2.zero;
-        Image dim = root.AddComponent<Image>();
-        dim.color = new Color(0f, 0f, 0f, 0.55f);
+        root.AddComponent<Image>().color = Scrim;
 
-        // Panel
+        // The board. Its ropes are painted in and run off the top of the
+        // sprite, so they meet the top of the screen at the reference
+        // resolution.
         GameObject panel = CreateImage(root.transform, "Panel", "ui_dialog_panel",
-            Vector2.zero, new Vector2(PanelWidth, panelHeight));
+            BoardPosition, BoardSize);
         panel.GetComponent<Image>().raycastTarget = false;
         Transform panelT = panel.transform;
 
-        // Input slot - measured at 1133x261 offset (-23.5, -17.0) in the mockup.
-        GameObject slot = CreateImage(panelT, "NicknameInput", "ui_input_slot",
-            new Vector2(-23.5f * Scale, -17f * Scale), new Vector2(1133f * Scale, 261f * Scale));
+        // The name field is painted on the board, so this is an invisible rect
+        // laid exactly over the white pill.
+        GameObject slot = CreateTransparentRect(panelT, "NicknameInput", FieldPosition, FieldSize);
         InputField input = BuildInputField(slot);
 
-        // Buttons - measured at 441x102, y offset -206.5, sitting either side
-        // of the content centre.
-        Vector2 buttonSize = new Vector2(441f * Scale, 102f * Scale);
-        float buttonY = -206.5f * Scale;
-        float buttonSpread = 243.5f * Scale;
+        // The plates hang off the board, so they are its siblings rather than
+        // its children: a plate is its own sign, not part of the board.
+        GameObject okayGO = CreateImage(root.transform, "OkayButton", "btn_okay",
+            OkayPosition, OkaySize);
+        GameObject cancelGO = CreateImage(root.transform, "CancelButton", "btn_cancel",
+            CancelPosition, CancelSize);
 
-        GameObject okayGO = CreateImage(panelT, "OkayButton", "btn_okay",
-            new Vector2(ContentCentreX - buttonSpread, buttonY), buttonSize);
-        GameObject cancelGO = CreateImage(panelT, "CancelButton", "btn_cancel",
-            new Vector2(ContentCentreX + buttonSpread, buttonY), buttonSize);
-
-        // "Kylo is taken. Try Kylo01." Sits BELOW the buttons:
-        // the gap between the input slot and the button row is about six
-        // pixels at this scale, which is not a line of text, and the panel art
-        // has clear bamboo-free interior under the buttons.
-        GameObject statusGO = CreateStatusText(panelT,
-            new Vector2(ContentCentreX, -285f * Scale),
-            new Vector2(1100f * Scale, 72f * Scale));
+        // "Kylo is taken. Try Kylo01." Goes on the board's lower plank, under
+        // the name field - the plates are off the board now, so the space
+        // below the field is clear wood with nothing painted on it.
+        GameObject statusGO = CreateStatusText(panelT, StatusPosition, StatusSize);
 
         root.SetActive(false); // MainMenuController turns this on when Adventure is pressed
 
@@ -146,16 +167,13 @@ public static class NicknameDialogBuilder
 
     private static InputField BuildInputField(GameObject slot)
     {
-        // The writable white area occupies the middle of the slot art; inset
-        // the text to match so it never runs onto the wooden surround or the
-        // leaves on the left (measured as fractions of the sprite).
-        RectTransform slotRect = slot.GetComponent<RectTransform>();
-        float w = slotRect.sizeDelta.x, h = slotRect.sizeDelta.y;
-        Vector2 offsetMin = new Vector2(w * 0.152f + 14f, h * 0.187f + 6f);
-        Vector2 offsetMax = new Vector2(-(w * 0.072f + 14f), -(h * 0.25f + 6f));
+        // The rect already matches the white pill, so the text only needs
+        // enough inset to keep it off the pill's rounded ends.
+        Vector2 offsetMin = new Vector2(36f, 6f);
+        Vector2 offsetMax = new Vector2(-36f, -6f);
 
-        // Dark text, because this slot's interior is white (unlike the wooden
-        // surfaces elsewhere in the menu, which take cream text).
+        // Dark text, because the pill is white (unlike the wooden surfaces
+        // elsewhere in the menu, which take cream text).
         Text placeholder = CreateFieldText(slot.transform, "Placeholder", "Your name?",
             new Color(0.45f, 0.38f, 0.30f, 0.8f), FontStyle.Italic, offsetMin, offsetMax);
         Text text = CreateFieldText(slot.transform, "Text", "",
@@ -193,7 +211,9 @@ public static class NicknameDialogBuilder
         text.font = UIFont.Get();
         text.fontSize = 44;
         text.fontStyle = style;
-        text.alignment = TextAnchor.MiddleLeft;
+        // Centred: the pill is far wider than any 16-character name, and a
+        // name tucked against the left end looks dropped rather than typed.
+        text.alignment = TextAnchor.MiddleCenter;
         text.color = color;
         text.supportRichText = false;
         RectTransform rect = go.GetComponent<RectTransform>();
@@ -202,6 +222,24 @@ public static class NicknameDialogBuilder
         rect.offsetMin = offsetMin;
         rect.offsetMax = offsetMax;
         return text;
+    }
+
+    /// <summary>
+    /// An Image that draws nothing but still takes clicks - what an InputField
+    /// needs as its targetGraphic when the field it sits in is painted on the
+    /// art behind it. Alpha plays no part in UI raycasting, so a fully
+    /// transparent graphic is still pressable.
+    /// </summary>
+    private static GameObject CreateTransparentRect(Transform parent, string name,
+        Vector2 anchoredPos, Vector2 size)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        go.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0f);
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchoredPosition = anchoredPos;
+        rect.sizeDelta = size;
+        return go;
     }
 
     private static GameObject CreateImage(Transform parent, string name, string spriteFile,
