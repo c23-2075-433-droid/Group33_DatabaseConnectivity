@@ -2524,8 +2524,8 @@ Transform:
   m_GameObject: {fileID: 562629928}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.31, y: 0.18, z: 0}
-  m_LocalScale: {x: 0.5161291, y: 0.5161291, z: 1}
+  m_LocalPosition: {x: 7.5625, y: 0.125, z: 0}
+  m_LocalScale: {x: 0.5555556, y: 0.5080645, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 304401633}
@@ -3218,7 +3218,7 @@ Transform:
   m_GameObject: {fileID: 718175874}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.23, z: 0}
+  m_LocalPosition: {x: 0, y: -4.37, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3466,7 +3466,7 @@ Transform:
   m_GameObject: {fileID: 767442054}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.5, y: -0.41391683, z: 0}
+  m_LocalPosition: {x: -6.5, y: -1.5539167, z: 0}
   m_LocalScale: {x: 0.83, y: 0.83, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4932,7 +4932,7 @@ MonoBehaviour:
   toRoom: {fileID: 1271370100}
   player: {fileID: 767442057}
   playerMovement: {fileID: 767442056}
-  arrivalPosition: {x: -5, y: -0.41391683}
+  arrivalPosition: {x: -5, y: -1.5539167}
   doorX: 7.31
   walkInDuration: 3
   arriveThreshold: 0.35
