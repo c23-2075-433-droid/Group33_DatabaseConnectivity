@@ -1,7 +1,7 @@
 // Assets/Editor/BuildPaaralanScene2.cs
 //
 // One-click scene builder for Paaralan Scene 2 ("Entering the Classroom").
-// Teaches five words: Bukas, Kumusta, Upo, Kuha, Lapis.
+// Teaches four words: Lakad, Upo, Kuha, Lapis.
 //
 // Only Kuha and Lapis are new. Bukas comes from Bahay Scene 2, Kumusta from
 // Paaralan Scene 1, Upo from Bahay Scene 5 - they are here because the design
@@ -28,11 +28,11 @@
 //                        already had a teacher drawn in this style waving. She
 //                        is WAIST-UP, because that mockup crops her at the hip,
 //                        which is why she stands behind her desk here.
-//   klasrum_desk_front   Tools/cut_classroom_desk.py - the front-left desk,
-//                        drawn again IN FRONT of Kylo so that sitting hides his
-//                        lap. Same trick as kusina_pov_table in Bahay Scene 5,
-//                        traced rather than split on a line because the middle
-//                        of this room is open floor that must not cover him.
+//   klasrum_desk_front   Tools/cut_classroom_desk.py - NO LONGER USED HERE. It
+//                        is a row of desks cut from the old wide classroom and
+//                        belongs to that camera; the locker corner has its own
+//                        desk in the background. Left on disk for whichever
+//                        scene goes back to the wide shot.
 //   prop_kuwaderno       Tools/make_classroom_props.py - drawn, not cut. A
 //   prop_lapis           pencil is a thin object lying on wood of nearly its
 //                        own colour and does not separate the way the bathroom
@@ -85,40 +85,84 @@ public class BuildPaaralanScene2
     // The first build stood him at x 6.3, y -2.8. That is inside the
     // right-hand desk cluster, where the painting has a desk top and no floor,
     // so he appeared to be standing on the furniture.
-    private const float FloorY = -3.15f;
-    private const float StandX = -0.90f;
-    private const float PlayerHeight = 2.85f;         // a 1.2 m child
+    // Measured off klasrum_background: the corridor tiles he stands on when
+    // the scene opens, not the classroom floor seen through the doorway. The
+    // old -3.15 was fitted to menu_bg, the main menu's room, which stood in
+    // here until the classroom art existed.
+    private const float FloorY = -5.40f;              // the bottom edge of the frame: this shot has no floor
+    private const float StandX = -5.60f;              // he starts at the far left, by the lockers
+    private const float PlayerHeight = 5.40f;               // a close shot - he fills most of the frame
 
-    // Seated: at the front-left desk, which klasrum_desk_front draws over his
-    // lap so only his head and shoulders clear it, the way a child at a desk
-    // actually looks from the front of a room. He is much nearer the camera
+    // Seated: at the desk in the background art. Nothing is drawn over his lap
+    // - the seated poses are already cropped at the desk line, so the crop
+    // itself is the desk edge. He is much nearer the camera
     // there than in the aisle, so he is drawn larger - the same jump between
     // standing and seated spots that Bahay Scene 5 makes. 3.10 is a little
     // above life size; at a strictly correct 2.6 his head barely cleared the
     // desk and the pose was unreadable.
-    private const float SitX = -5.20f;
-    private const float SitFeetY = -4.52f;            // under the desk, never seen
-    private const float SeatedHeight = 3.10f;
+    // The near desk in klasrum_interior_background, measured off the art: its
+    // top surface is at y -1.67, the floor under it at -4.21. He sits at that
+    // desk once "Upo" has moved the view inside; the old -5.20 was fitted to
+    // menu_bg and lands on the open door in the doorway view.
+    private const float SitX = 2.86f;                // the chair behind the desk
+    private const float SitFeetY = -3.009f;            // the desk's far edge, measured off the art
+    // Taller than he looks standing, on purpose: he is nearer the camera here
+    // than out by the lockers, so reading larger is correct rather than a
+    // cheat.
+    //
+    // This number is not chosen, it is measured. All three seated poses are
+    // cut to one 663x921 canvas whose BOTTOM edge is the desk's far edge and
+    // whose top leaves room for the raised pencil in "Lapis". 921 pixels at
+    // the 164.2 px-per-world the poses were fitted at is 5.609 world units,
+    // and the canvas bottom sits at SitFeetY. Change either without the other
+    // and he floats above the desk or sinks through it.
+    private const float SeatedHeight = 5.609f;
 
     // The surface of the desk he sits at, where his things end up. Both sit
     // just below the desk's far edge, so they read as lying on it.
-    private const float NotebookX = -6.30f;
-    private const float NotebookBaseY = -3.34f;
-    private const float NotebookHeight = 0.72f;
-    private const float PencilX = -4.25f;
-    private const float PencilBaseY = -3.20f;
+    // Both sit ON the desk top, not on the floor, so their base is the desk
+    // surface at -1.67 rather than a height above the ground.
+    private const float NotebookX = 1.20f;
+    private const float NotebookBaseY = -3.01f;
+    private const float NotebookHeight = 0.70f;
+    private const float PencilX = 4.60f;
+    private const float PencilBaseY = -3.01f;
     private const float PencilHeight = 0.30f;
+
+    // Where the pencil actually is when "Lapis" lands: in his raised hand, not
+    // on the desk. The prop above is still built and left switched off, so the
+    // gleam cannot follow it.
+    //
+    // Not estimated - found. The barrel is the only strong yellow anywhere on
+    // him, so it can be picked out of pencil_ready_uniform.png by colour: it
+    // centres on canvas pixel (119, 418) of 663x921, which at the seated
+    // sprite's placement is world (1.56, 0.05), and it stands 1.11 units tall.
+    // Re-measure if that pose is ever redrawn.
+    private const float PencilInHandX = 1.56f;
+    private const float PencilInHandY = 0.05f;
+    private const float PencilInHandSize = 1.30f;   // covers the 1.11-unit barrel
 
     // Teacher Rachel, behind her own desk at the front. char_teacher is a
     // WAIST-UP sprite - the mockup it was cut from crops her at the hip - so
     // her "floor" is her hip line, and the desk top at y -0.6 hides that cut.
     // Standing her anywhere else puts a sliced-off waist in open air.
-    private const float TeacherX = 2.60f;
-    private const float TeacherHipY = -0.70f;
-    private const float TeacherHeight = 1.95f;        // hip to crown
+    // Full body now, so she is measured feet to crown and stands on the floor
+    // like anyone else. The old sprite was cropped at the hip - its "floor"
+    // was her hip line at -0.70 and 1.95 was hip to crown - and the teacher's
+    // desk had to be positioned to hide the cut.
+    //
+    // 3.58 units comes off the art: the chalkboard behind her is 235px tall
+    // and a classroom chalkboard is about 1.2 m, which puts the room at
+    // ~196 px per metre, so a 1.6 m adult is ~313 px.
+    //
+    // She stands partway into the room rather than at the front. That is a
+    // compromise: she has to read through the doorway in the first half of
+    // the scene AND beside her desk in the second, and one position has to
+    // serve both because she is placed once.
+    private const float TeacherX = 0.70f;
+    private const float TeacherFeetY = -2.00f;
+    private const float TeacherHeight = 3.58f;        // feet to crown
 
-    private const float DoorX = 8.30f;                // the classroom door, right edge
-    private const float DoorY = 0.60f;
 
     // Nothing here converts pixels to units by hand. CreateFigure sizes each
     // sprite from its own bounds, so the standing art (214x745) and the seated
@@ -129,7 +173,6 @@ public class BuildPaaralanScene2
     // the art turned out not to import at 100 PPU.
 
     private const int OrderKylo = 0;
-    private const int OrderDeskFront = 10;            // the optional desk layer, in front of him
     private const int OrderDeskProps = 20;            // notebook and pencil, on top of the desk
 
     [MenuItem("Tools/SALINLAHI/Build Paaralan Scene 2")]
@@ -163,7 +206,16 @@ public class BuildPaaralanScene2
         SpriteRenderer bgSr = bg.AddComponent<SpriteRenderer>();
         // Not "a ?? b": ?? ignores Unity's overloaded null, so a missing asset
         // can slip through it. Ask explicitly.
-        Sprite roomSprite = LoadSpriteOptional("klasrum_background");
+        // Two views of the same room, and the scene moves between them. The
+        // five words split in two: "Bukas" and "Kumusta" happen at the
+        // threshold, where a doorway shot is right; "Upo", "Kuha" and "Lapis"
+        // happen at a desk, which that shot has no room for. So "Upo" swaps
+        // the picture - he sits down AND the view goes in with him, which is
+        // what makes the word read as entering rather than just crouching.
+        // The locker corner, and only that. The scene used to open outside the
+        // room and swap pictures twice; with "Bukas" and "Kumusta" gone there
+        // is one room in one state.
+        Sprite roomSprite = LoadSpriteOptional("klasrum_interior_background");
         if (roomSprite == null) roomSprite = LoadSprite("menu_bg");
         bgSr.sprite = roomSprite;
         bgSr.sortingLayerName = "Background";
@@ -175,9 +227,16 @@ public class BuildPaaralanScene2
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
 
+
         // --- Teacher Rachel, behind her desk at the front ---
-        GameObject teacher = CreateStandingOptional("Char_Teacher", "char_teacher",
-                                                     TeacherX, TeacherHipY, TeacherHeight);
+        // Facing LEFT, because she stands to the right of where Kylo comes in
+        // and the greeting is aimed at him. char_teacher_side_left is the
+        // right-facing profile mirrored, so it costs no extra drawing.
+        // The old waist-up char_teacher is kept as the fallback.
+        // No teacher here. She belonged to the version that showed the whole
+        // classroom with her at the chalkboard; in a corner of lockers she had
+        // nowhere to stand and floated against the doors. The storyboard has
+        // only Kylo, which is right: these four words are him getting ready.
 
         // --- Kylo ---
         // The listening rig is its own object and stays switched on. Bahay
@@ -187,7 +246,6 @@ public class BuildPaaralanScene2
         // next word onwards while real speech kept working - which made a
         // disabled component look like a recognition bug.
         GameObject rig = new GameObject("Kylo_Rig");
-        rig.tag = "Player";
         rig.transform.position = new Vector3(SitX, SitFeetY, 0f);
 
         // Both poses are PROFILES facing right, which is where the teacher is.
@@ -199,25 +257,57 @@ public class BuildPaaralanScene2
         // art is the right one and "Kumusta" is answered by her instead.
         GameObject standGO = CreateFigure("Kylo_Standing", "standing_uniform_with_bag",
                                            StandX, FloorY, PlayerHeight);
+        standGO.tag = "Player";                        // the body, not the ear
 
         // sitting_desk_uniform is a real seated pose - knees bent, hands
         // forward, sitting on a chair - so "Upo" no longer has to fake sitting
         // by sliding a standing boy downwards behind the furniture.
-        GameObject seatGO = CreateFigure("Kylo_Seated", "sitting_desk_uniform",
+        // Facing the CAMERA: this desk faces the viewer, so he must too. The
+        // back and side-on seated poses were for scenes where he faced away
+        // or across. sitting_desk_uniform stays as the fallback.
+        string seatedSprite = LoadSpriteOptional("sitting_front_uniform") != null
+            ? "sitting_front_uniform"
+            : "sitting_desk_uniform";
+        GameObject seatGO = CreateFigure("Kylo_Seated", seatedSprite,
                                           SitX, SitFeetY, SeatedHeight);
         seatGO.SetActive(false);                       // "Upo" turns him on
 
-        // --- The desk he sits at, drawn in front of him once its art exists ---
-        // Without this layer he sits in the open aisle. With it, the desk hides
-        // his lap and the chair seat and he reads as sitting at it, which is
-        // what kusina_pov_table does for the breakfast table.
-        GameObject deskFront = new GameObject("Foreground_Desk");
-        SpriteRenderer deskSr = deskFront.AddComponent<SpriteRenderer>();
-        deskSr.sprite = LoadSpriteOptional("klasrum_desk_front");
-        deskSr.sortingLayerName = "Player";
-        deskSr.sortingOrder = OrderDeskFront;
-        if (deskSr.sprite == null) deskFront.SetActive(false);
-        else deskFront.transform.localScale = bg.transform.localScale;
+        // ...and when it does, he lowers into the chair rather than appearing
+        // in it. PoseSettle runs on enable, so nothing extra has to be wired
+        // to the word itself.
+        PoseSettle sit = seatGO.AddComponent<PoseSettle>();
+        sit.dropFrom = 0.5f;
+        sit.driftFrom = -0.55f;        // he came from the left, down the aisle
+        sit.duration = 0.3f;
+
+        // "Kuha" and "Lapis" change his POSE, not a prop on the desk - that
+        // is what the storyboard shows. Two swaps on the seated renderer:
+        // reaching down into the bag, then sitting up with a pencil. Neither
+        // carries a beforeSprite, because CreateFigure has already set the
+        // sprite and SpriteSwap.Awake would otherwise fight over it.
+        SpriteRenderer seatSr = seatGO.GetComponent<SpriteRenderer>();
+
+        // Both cross-fade rather than cut. These are three drawings of one boy
+        // a moment apart, so a hard cut between them reads as a flicker; a
+        // short dip through the change reads as him moving.
+        SpriteSwap reachSwap = seatGO.AddComponent<SpriteSwap>();
+        reachSwap.target = seatSr;
+        reachSwap.afterSprite = LoadSpriteOptional("reach_bag_uniform");
+        reachSwap.fadeSeconds = 0.22f;
+
+        SpriteSwap pencilSwap = seatGO.AddComponent<SpriteSwap>();
+        pencilSwap.target = seatSr;
+        pencilSwap.afterSprite = LoadSpriteOptional("pencil_ready_uniform");
+        pencilSwap.fadeSeconds = 0.22f;
+
+        // --- No foreground desk layer here ---
+        // klasrum_desk_front was cut from the OLD wide classroom shot: a whole
+        // front row of desks, spanning the frame. It existed to hide Kylo's lap
+        // when he sat in an open aisle. The locker corner has its own desk
+        // painted into the background, so that row now lies across the bottom
+        // third of a picture it does not belong to and cuts him off at the
+        // neck. The occlusion it provided is already handled: the seated poses
+        // are cropped at the desk line, so the crop IS the desk edge.
 
         // --- What comes out of the bag, onto the desk in front of him ---
         // Still optional: if either sprite is missing the word just gleams the
@@ -227,28 +317,78 @@ public class BuildPaaralanScene2
         GameObject propLapis = CreatePropOptional("Prop_Lapis", "prop_lapis",
                                                    PencilX, PencilHeight, PencilBaseY);
 
-        // Nothing walks or falls in this scene, so Kylo needs no physics - he
-        // is placed, not dropped. PlayerMovement is still here because
-        // VoiceCommand needs one and the objective controller reads it to know
-        // when an action has finished.
-        PlayerMovement player = rig.AddComponent<PlayerMovement>();
+        // PlayerMovement goes on the object that HAS the picture.
+        //
+        // It used to live on the rig, which carries no SpriteRenderer. That
+        // looked harmless - the rig is the thing that moves - but it meant
+        // "Lakad" slid an invisible object across the room while the drawing of
+        // Kylo stood still at the lockers, and UpdateWalkAnimation returned on
+        // its first line because spriteRenderer was null. The four-frame walk
+        // cycle that Scene 1 plays had never once run here.
+        //
+        // Scene 1 has it right: one object carries the renderer, the body and
+        // the movement. The rig stays, because VoiceCommand must keep listening
+        // after he sits down and this object is switched off at "Upo" - but the
+        // rig is now purely the ear, not the body.
+        PlayerMovement player = standGO.AddComponent<PlayerMovement>();
         player.standingSprite = LoadSprite("standing_uniform_with_bag");
         player.walkFrames = UniformWalkFrames();
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;
-        rig.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+        // All five poses are drawn on the same 745px-tall canvas, so the scale
+        // CreateFigure worked out for the standing sprite fits every walk frame
+        // and he does not grow or shrink mid-stride.
+        //
+        // Kinematic: a kinematic Rigidbody2D moves perfectly well when
+        // PlayerMovement sets its velocity - what it skips is gravity, which is
+        // what we want in a shot whose "floor" is just the bottom of the frame.
+        player.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+
+        // He walks at a child's pace across a close-up shot. The default 5
+        // units/second crosses this whole room in under a second.
+        player.moveSpeed = 2.2f;
+        player.walkFramesPerSecond = 7f;
+
+        // Ease to a stop instead of halting on the spot - see the field's note
+        // in PlayerMovement. Only this scene asks for it; everywhere else the
+        // default of 0 keeps the old hard stop.
+        player.arrivalEaseDistance = 1.1f;
+
+        // Breathing while he waits, so the opening frame is a boy standing
+        // there rather than a sticker on the lockers. Idle only: it stops the
+        // moment he walks and never fights the walk cycle.
+        standGO.AddComponent<IdleBreath>();
+
+        // A marker, not a duration: he walks until he arrives, however far
+        // that is.
+        //
+        // Where he stops is a trade between two things. He sits at x 2.86, so
+        // every unit short of that is a sideways jump the player sees the
+        // instant he sits; but standing any further right than this draws his
+        // legs over the front panel of the desk and he reads as standing
+        // inside it. 0.40 is the last position where his body is still clear
+        // of the desktop - he arrives at its left edge, which is where a child
+        // walking up an aisle would stop before stepping round to the chair.
+        GameObject chairSpot = new GameObject("ChairSpot");
+        chairSpot.transform.position = new Vector3(0.40f, FloorY, 0f);
+        player.walkTarget = chairSpot.transform;
+        player.walkTargetThreshold = 0.35f;
+
+        // With a walkTarget set this is only a safety cap - arriving is what
+        // ends the walk - so it is deliberately generous. The journey is 6.0
+        // units: about 4.6 of them at the full 2.2 units/second, then the last
+        // 1.1 easing down to a fifth of that, which comes to roughly 2.9
+        // seconds. The old 2.4 was sized for the default speed and would now
+        // time out and strand him short of the desk.
+        player.voiceWalkDuration = 4.5f;
 
         VoiceCommand voiceCommand = rig.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
         // --- Something has to light up for every word that only names a thing ---
-        TimedOverlay gleamDoor = CreateGleamAt("Gleam_Door", DoorX, DoorY, 3.4f);
-        TimedOverlay gleamGreet = teacher != null
-            ? CreateGleam("Gleam_Teacher", teacher, 2.4f)
-            : CreateGleamAt("Gleam_TeacherDesk", TeacherX, TeacherHipY, 2.4f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
-        TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilX,
-                                                PencilBaseY + PencilHeight * 0.5f, 0.9f);
+        TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilInHandX,
+                                                PencilInHandY, PencilInHandSize);
         // The desk props rest on top of the desk layer, so they and their
         // gleams share the Player layer and sort above it.
         foreach (TimedOverlay fx in new[] { gleamKuha, gleamLapis })
@@ -269,7 +409,7 @@ public class BuildPaaralanScene2
         uiRoot.GetComponent<RectTransform>().sizeDelta = new Vector2(4000, 1200);
         uiRoot.AddComponent<GraphicRaycaster>();
 
-        if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();
@@ -281,39 +421,45 @@ public class BuildPaaralanScene2
         // teaching, so it has to point at what the word means.
         // Only one is ever on screen at a time, so they can overlap each other
         // freely - each sits directly over the thing its word acts on.
-        GameObject pBukas = CreatePromptUI(uiRoot.transform, "Prompt_Bukas", "Bukas", new Vector3(830, 190, 0));
-        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(260, 150, 0));
-        GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(-550, -130, 0));
-        GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(-575, -250, 0));
-        GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(-420, -268, 0));
+        GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-700, 60, 0));
+        GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(260, 120, 0));
+        GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(120, -150, 0));
+        GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(420, -40, 0));
 
         // --- Objectives: open the door, greet, sit, unpack ---
-        var bukas = MakeObjective("Bukas", pBukas);
-        UnityEventTools.AddPersistentListener(bukas.onCorrect, gleamDoor.Play);
+        // Four words now. The scene begins with Kylo already inside, by the
+        // lockers, and is about crossing to his seat and getting ready.
+        var lakad = MakeObjective("Lakad", pLakad);
+        UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
 
         // Kylo stays in profile, facing her, and SHE answers the greeting - she
         // is drawn mid-wave, so the gleam reads as the wave landing.
-        var kumusta = MakeObjective("Kumusta", pKumusta);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, gleamGreet.Play);
 
+        // The view goes inside with him. Swapped before the poses change so
+        // the room is already the classroom in the frame he first appears
+        // seated in, rather than him sitting down in the doorway and the
+        // walls changing round him a frame later.
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
 
         var kuha = MakeObjective("Kuha", pKuha);
+        UnityEventTools.AddPersistentListener(kuha.onCorrect, reachSwap.Apply);
         UnityEventTools.AddPersistentListener(kuha.onCorrect, gleamKuha.Play);
         if (propKuwaderno != null)
             UnityEventTools.AddBoolPersistentListener(kuha.onCorrect, propKuwaderno.SetActive, true);
 
+        // He holds the pencil himself now, so no pencil prop appears on the
+        // desk - two pencils would be one too many. propLapis stays built but
+        // switched off, for whichever scene needs one lying there.
         var lapis = MakeObjective("Lapis", pLapis);
+        UnityEventTools.AddPersistentListener(lapis.onCorrect, pencilSwap.Apply);
         UnityEventTools.AddPersistentListener(lapis.onCorrect, gleamLapis.Play);
-        if (propLapis != null)
-            UnityEventTools.AddBoolPersistentListener(lapis.onCorrect, propLapis.SetActive, true);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { bukas, kumusta, upo, kuha, lapis };
+        controller.objectives = new[] { lakad, upo, kuha, lapis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -341,11 +487,12 @@ public class BuildPaaralanScene2
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 2 built and saved to " + ScenePath +
-                   ". Words: Bukas, Kumusta, Upo, Kuha, Lapis. It fades into " + NextScene +
+                   ". Words: Lakad, Upo, Kuha, Lapis - walking to his chair, sitting, and " +
+                   "getting his things out. It fades into " + NextScene +
                    ", which ends the level - so build Paaralan Scene 3 as well, or the " +
                    "level runs into a scene that is not there. Missing art is optional and is " +
-                   "picked up automatically: char_teacher, klasrum_desk_front, " +
-                   "prop_kuwaderno, prop_lapis - see the notes at the top of this file.");
+                   "picked up automatically: prop_kuwaderno, prop_lapis - see the " +
+                   "notes at the top of this file.");
     }
 
     /// <summary>

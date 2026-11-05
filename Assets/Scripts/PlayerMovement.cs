@@ -45,14 +45,6 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Sprite shown while the character is standing (Tayo) / default idle.")]
     public Sprite standingSprite;
 
-    [Tooltip("How far the sitting pose settles into the bed, in world units, " +
-             "once its bottom edge has been matched to the lying pose. His feet " +
-             "reach lower in the sitting art than his backside does, so matching " +
-             "bottom edges alone leaves him perched with his seat off the " +
-             "mattress. Raise this to sink him further into the bed, lower it " +
-             "to lift him back out.")]
-    public float sittingPoseSeatDrop = 0.43f;
-
     [Header("Walk Cycle")]
     [Tooltip("Walk-cycle frames, in order, played on a loop while the character is moving. " +
              "Leave empty to just hold on standingSprite while walking (no animation).")]
@@ -83,6 +75,23 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("How close to walkTarget counts as having arrived, in world units.")]
     public float walkTargetThreshold = 0.35f;
 
+    [Tooltip("How far before walkTarget the character starts slowing down, in " +
+             "world units. A spoken walk otherwise runs at full speed until the " +
+             "instant it stops, which reads as a character being switched off " +
+             "rather than one arriving somewhere. Over this last stretch both " +
+             "the speed and the walk-cycle rate fall off together, so his legs " +
+             "slow with him instead of scurrying on the spot.\n\n" +
+             "Leave at 0 to keep the plain hard stop - that is what every scene " +
+             "built before this field existed expects, so the default changes " +
+             "nothing anywhere until a builder opts in.")]
+    public float arrivalEaseDistance = 0f;
+
+    [Tooltip("The slowest the character may creep while easing in, as a fraction " +
+             "of normal speed. Without a floor the approach would halve forever " +
+             "and never quite arrive.")]
+    [Range(0.05f, 1f)]
+    public float arrivalEaseFloor = 0.2f;
+
     // Counts down alongside voiceWalkTimer while a run is in effect, so a run
     // is an ordinary walk that simply moves and animates faster.
     private float runTimer = 0f;
@@ -100,12 +109,6 @@ public class PlayerMovement : MonoBehaviour
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
 
-    // Where the scene author put the character while he is still in bed. The
-    // sitting-up pose is measured off this, and standing goes back to it before
-    // physics takes over, so the authored position stays the single place the
-    // bed pose is tuned from.
-    private float bedPoseY;
-
     // Tracks which wake-up stage the player is in, so movement/jump input can be
     // ignored until the player has actually stood up (can't walk while lying down).
     public enum WakeStage { LyingDown, SittingUp, Standing }
@@ -116,8 +119,6 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-
-        bedPoseY = transform.position.y;
 
         // Level 1 opens with the character lying down asleep.
         if (spriteRenderer != null && lyingDownSprite != null)
@@ -208,8 +209,35 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        float speed = moveSpeed * (IsRunning ? runMultiplier : 1f);
+        float speed = moveSpeed * (IsRunning ? runMultiplier : 1f) * ArrivalEase();
         rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
+    }
+
+    /// <summary>
+    /// How much of full speed to use right now: 1 everywhere except the last
+    /// <see cref="arrivalEaseDistance"/> units before a walkTarget, where it
+    /// falls off to <see cref="arrivalEaseFloor"/> so the character settles
+    /// into place instead of stopping dead.
+    ///
+    /// Returns 1 unchanged when the feature is off, when there is no target,
+    /// when no spoken walk is in progress, or when the character is walking
+    /// away from the target rather than toward it - so it can only ever slow
+    /// an approach, never interfere with ordinary movement.
+    /// </summary>
+    private float ArrivalEase()
+    {
+        if (arrivalEaseDistance <= 0f || walkTarget == null || voiceWalkTimer <= 0f) return 1f;
+
+        float dx = walkTarget.position.x - transform.position.x;
+        if ((dx > 0f) != (voiceWalkDirection > 0f)) return 1f;   // not heading for it
+
+        // Measured to the point he actually stops at, not to the target's
+        // centre, so the slow-down finishes exactly as the walk ends.
+        float remaining = Mathf.Abs(dx) - walkTargetThreshold;
+        if (remaining >= arrivalEaseDistance) return 1f;
+
+        float k = Mathf.Clamp01(remaining / arrivalEaseDistance);
+        return Mathf.Lerp(arrivalEaseFloor, 1f, k);
     }
 
     /// <summary>
@@ -301,11 +329,7 @@ public class PlayerMovement : MonoBehaviour
         currentWakeStage = WakeStage.SittingUp;
         if (spriteRenderer != null)
         {
-            if (sittingUpSprite != null)
-            {
-                SwapPoseKeepingFeetDown(sittingUpSprite);
-                transform.position += Vector3.down * sittingPoseSeatDrop;
-            }
+            if (sittingUpSprite != null) spriteRenderer.sprite = sittingUpSprite;
             spriteRenderer.flipX = false; // undo the lying-down mirror
         }
         Debug.Log("PlayerMovement: Bangon triggered - now sitting up.");
@@ -320,13 +344,6 @@ public class PlayerMovement : MonoBehaviour
         if (currentWakeStage != WakeStage.SittingUp) return; // must Bangon first
 
         currentWakeStage = WakeStage.Standing;
-
-        // Undo the lift Bangon() applied, so he hands over to physics from the
-        // same height he always did and drops to the floor instead of falling
-        // the full height of the sitting art.
-        Vector3 p = transform.position;
-        transform.position = new Vector3(p.x, bedPoseY, p.z);
-
         if (spriteRenderer != null)
         {
             if (standingSprite != null) spriteRenderer.sprite = standingSprite;
@@ -338,40 +355,6 @@ public class PlayerMovement : MonoBehaviour
         if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
 
         Debug.Log("PlayerMovement: Tayo triggered - now standing, movement unlocked.");
-    }
-
-    /// <summary>
-    /// Swaps in a wake-up pose while keeping the BOTTOM edge of the art where
-    /// it already was, instead of its centre.
-    ///
-    /// Every pose pivots on its own centre, and the sitting art is far taller
-    /// than the lying art (5 units against 2.5). Assigning the sprite on its
-    /// own therefore hangs all that extra height below the pivot: Kylo slid
-    /// about a unit down through the mattress on "Bangon" and ended up sitting
-    /// in mid-air in front of the bed frame. Shifting up by half the height
-    /// difference puts the bottom of the art back on the same mattress line
-    /// his sleeping pose was resting on.
-    ///
-    /// That is the straight match; the caller then settles him by
-    /// sittingPoseSeatDrop, because in the sitting art his feet reach lower
-    /// than his backside and only the feet would be touching the bed.
-    /// </summary>
-    private void SwapPoseKeepingFeetDown(Sprite next)
-    {
-        if (spriteRenderer == null || next == null) return;
-
-        float before = PoseHeight(spriteRenderer.sprite);
-        spriteRenderer.sprite = next;
-        float after = PoseHeight(next);
-
-        transform.position += Vector3.up * (after - before) * 0.5f;
-    }
-
-    /// <summary>A pose's drawn height in world units, scale included.</summary>
-    private float PoseHeight(Sprite pose)
-    {
-        if (pose == null) return 0f;
-        return pose.bounds.size.y * Mathf.Abs(transform.lossyScale.y);
     }
 
     /// <summary>
@@ -433,7 +416,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         walkFrameTimer += Time.deltaTime;
-        float fps = walkFramesPerSecond * (IsRunning ? runMultiplier : 1f);
+        // The same easing the speed uses, so a slowing walk takes shorter,
+        // slower strides rather than running on the spot as it creeps in.
+        float fps = walkFramesPerSecond * (IsRunning ? runMultiplier : 1f) * ArrivalEase();
         float frameDuration = 1f / Mathf.Max(0.01f, fps);
 
         if (walkFrameTimer >= frameDuration)
