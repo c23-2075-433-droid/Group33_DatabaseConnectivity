@@ -3,10 +3,14 @@
 // Adds the "Enter Nickname" popup to the ALREADY-BUILT main menu scene
 // without regenerating it, so manual tweaks to the menu are preserved.
 //
-// Replaces the earlier inline name plank: pressing Play now opens a modal
-// dialog (dimmed backdrop, bamboo panel, name slot, OKAY / CANCEL) instead
-// of going straight to the journey map. Any leftover NicknameInput/
-// NicknameLabel objects from that older version are removed.
+// Replaces the earlier inline name plank: pressing Adventure now opens a
+// modal dialog (the hanging board, OKAY / CANCEL) instead of going straight
+// to the journey map. Any leftover NicknameInput/NicknameLabel objects from
+// that older version are removed.
+//
+// It does not set up MenuBlurBackdrop - a scene old enough to need patching
+// has no soft sprites paired up for it. The field is optional, so the menu
+// behind the dialog simply stays sharp. Build Main Menu Scene wires it.
 //
 // Safe to re-run: the dialog is rebuilt rather than duplicated.
 //

@@ -19,6 +19,9 @@ public class MainMenuController : MonoBehaviour
     [Tooltip("Optional. Checks the name is not already in use and offers a free one instead. " +
               "Leave empty and any name is accepted, which is how older scenes behave.")]
     public NicknameAvailability nicknameAvailability;
+    [Tooltip("Optional. Throws the menu out of focus while the nickname dialog is open. " +
+              "Leave empty and the menu simply stays sharp behind it.")]
+    public MenuBlurBackdrop menuBlur;
 
     [Header("Buttons")]
     [Tooltip("ADVENTURE - the story levels. This is the old PLAY button renamed, " +
@@ -150,6 +153,7 @@ public class MainMenuController : MonoBehaviour
             return;
         }
 
+        if (menuBlur != null) menuBlur.SetBlurred(true);
         nicknamePanel.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
@@ -193,6 +197,7 @@ public class MainMenuController : MonoBehaviour
     private void CloseNicknameDialog()
     {
         if (nicknamePanel != null) nicknamePanel.SetActive(false);
+        if (menuBlur != null) menuBlur.SetBlurred(false);
     }
 
     private void StartGame()

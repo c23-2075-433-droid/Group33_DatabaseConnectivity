@@ -58,13 +58,14 @@ public static class NicknameDialogBuilder
     private static readonly Vector2 CancelSize = new Vector2(487, 180);
 
     /// <summary>
-    /// The scrim over the menu while the dialog is open. The mockup fades the
-    /// classroom towards white rather than darkening it, which keeps the
-    /// screen warm and lets the dark wooden board carry the eye - so this is a
-    /// pale cream wash, not the usual black. Raise the alpha to hide more of
-    /// the menu; swap the colour for black to get a conventional dim.
+    /// The full-screen catcher behind the dialog. It draws nothing: the menu
+    /// is pushed back by going out of focus instead (MenuBlurBackdrop), not by
+    /// a wash of colour over it. The Image is still here because something has
+    /// to swallow clicks aimed at the menu underneath, and alpha plays no part
+    /// in UI raycasting. Give it an alpha if a tint is ever wanted on top of
+    /// the blur.
     /// </summary>
-    private static readonly Color Scrim = new Color(1f, 0.97f, 0.91f, 0.55f);
+    private static readonly Color Scrim = new Color(1f, 1f, 1f, 0f);
 
     /// <summary>
     /// Result of building the dialog, so callers can wire MainMenuController.

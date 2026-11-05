@@ -37,6 +37,15 @@ public class BuildMainMenuScene
     /// 611x223 on the mockup page, scaled by 0.96 onto the 1920x1080 canvas.</summary>
     private static readonly Vector2 ButtonSize = new Vector2(587, 214);
 
+    /// <summary>Everything this screen draws. Each also has a soft twin,
+    /// <name>_blur, written by Tools/import_main_menu_art.py, which
+    /// MenuBlurBackdrop swaps in while a dialog is open.</summary>
+    private static readonly string[] MenuSprites =
+    {
+        "menu_classroom_bg", "menu_title",
+        "btn_adventure", "btn_minigames", "btn_settings", "btn_about",
+    };
+
     [MenuItem("Tools/SALINLAHI/Build Main Menu Scene")]
     public static void BuildScene()
     {
@@ -48,11 +57,7 @@ public class BuildMainMenuScene
 
         // An Image handed a null sprite draws a white box, with nothing but a
         // console warning to say why. Make the art loadable first.
-        SpriteImportFixer.Verify(new[]
-        {
-            "menu_classroom_bg", "menu_title",
-            "btn_adventure", "btn_minigames", "btn_settings", "btn_about",
-        }, "Main Menu Scene");
+        SpriteImportFixer.Verify(MenuSprites, "Main Menu Scene");
 
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -129,6 +134,7 @@ public class BuildMainMenuScene
         // Same wiring the patcher does, so a fresh rebuild does not quietly
         // drop the "already taken" check that Add Nickname Dialog adds.
         controller.nicknameAvailability = NicknameCheckBuilder.Build(nicknameDialog);
+        controller.menuBlur = BuildBlurBackdrop(canvasGO);
         controller.adventureButton = adventureBtn.GetComponent<Button>();
         // Wired so the Inspector shows the plate, though the controller
         // deliberately hangs nothing off its click yet.
@@ -175,6 +181,35 @@ public class BuildMainMenuScene
     }
 
     // ---------- helpers ----------
+
+    /// <summary>
+    /// Pairs every menu sprite with its soft twin so MenuBlurBackdrop can
+    /// swap between them. A piece whose _blur is missing is left out rather
+    /// than paired with null, so it just stays sharp.
+    /// </summary>
+    private static MenuBlurBackdrop BuildBlurBackdrop(GameObject canvasGO)
+    {
+        List<Sprite> sharp = new List<Sprite>();
+        List<Sprite> blurred = new List<Sprite>();
+        foreach (string name in MenuSprites)
+        {
+            Sprite soft = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + name + "_blur.png");
+            if (soft == null)
+            {
+                Debug.LogWarning("[SALINLAHI] No " + name + "_blur.png, so " + name +
+                                  " will stay sharp behind the nickname dialog. Run " +
+                                  "Tools/import_main_menu_art.py to write the soft copies.");
+                continue;
+            }
+            sharp.Add(LoadSprite(name));
+            blurred.Add(soft);
+        }
+
+        MenuBlurBackdrop blur = canvasGO.AddComponent<MenuBlurBackdrop>();
+        blur.sharp = sharp.ToArray();
+        blur.blurred = blurred.ToArray();
+        return blur;
+    }
 
     private static GameObject CreateImage(Transform parent, string name, string spriteFile,
         Vector2 anchoredPos, Vector2 size, bool preserveAspect)

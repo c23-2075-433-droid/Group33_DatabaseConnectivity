@@ -45,6 +45,15 @@ BUTTONS = ['btn_adventure', 'btn_minigames', 'btn_settings', 'btn_about']
 PAD = 2              # breathing room around the trim, as in key_ui_sprites
 VISIBLE = 8          # alpha at or below this is nothing
 
+# Soft twins of every piece the menu draws, for the backdrop behind a dialog.
+# MenuBlurBackdrop swaps each Image's sprite for its <name>_blur while the
+# dialog is up, which is how the menu goes out of focus without a wash of
+# colour over it and without a blur shader.
+#
+# The radius is in page pixels, and every piece here is cut from the same
+# 2000x1125 page, so one number blurs them all by the same amount on screen.
+BLUR_RADIUS = 10
+
 
 def trim(im):
     """Crop to the drawn pixels. Returns the image unchanged if it is opaque."""
@@ -73,6 +82,27 @@ def bands(im):
     return out
 
 
+def blur(im):
+    """A soft copy, blurred on premultiplied alpha.
+
+    Blurring the channels as they come would drag the transparent background's
+    black into every edge, and the cut-out pieces would come back with a dark
+    halo. Premultiplying first means only the colours that are actually there
+    get averaged.
+    """
+    from PIL import ImageFilter
+    a = np.asarray(im).astype(np.float32)
+    alpha = a[..., 3:4] / 255.0
+    pm = np.concatenate([a[..., :3] * alpha, a[..., 3:4]], axis=2)
+    pm = Image.fromarray(pm.round().astype(np.uint8)) \
+              .filter(ImageFilter.GaussianBlur(BLUR_RADIUS))
+    b = np.asarray(pm).astype(np.float32)
+    out = b[..., 3:4] / 255.0
+    rgb = np.divide(b[..., :3], out, out=np.zeros_like(b[..., :3]), where=out > 0.004)
+    return Image.fromarray(np.concatenate(
+        [rgb.clip(0, 255), b[..., 3:4]], axis=2).round().astype(np.uint8))
+
+
 def write_meta(name, model='menu_bg'):
     """Copy a working sprite's import settings so Unity imports this as a Sprite.
 
@@ -96,6 +126,10 @@ def save(name, im, note=''):
     fresh = write_meta(name)
     print('  %-20s -> %dx%d%s%s' % (name + '.png', im.size[0], im.size[1], note,
                                     '  + new .meta' if fresh else ''))
+    # Every piece the menu draws gets its soft twin at the same time, so the
+    # two can never drift apart.
+    if not name.endswith('_blur'):
+        save(name + '_blur', blur(im))
 
 
 def slice_buttons():

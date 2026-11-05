@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.972549, b: 0.9098039, a: 0.5529412}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -516,6 +516,7 @@ GameObject:
   - component: {fileID: 266984880}
   - component: {fileID: 266984879}
   - component: {fileID: 266984878}
+  - component: {fileID: 266984882}
   m_Layer: 0
   m_Name: MainMenu_Canvas
   m_TagString: Untagged
@@ -568,6 +569,7 @@ MonoBehaviour:
   nicknameOkayButton: {fileID: 749434819}
   nicknameCancelButton: {fileID: 497809464}
   nicknameAvailability: {fileID: 828838409}
+  menuBlur: {fileID: 266984882}
   adventureButton: {fileID: 1847544975}
   miniGamesButton: {fileID: 1902113472}
   settingsButton: {fileID: 947417386}
@@ -645,6 +647,32 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &266984882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266984876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0853aff03ca14e4ab2cfe000b5dd41da, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuBlurBackdrop
+  sharp:
+  - {fileID: 21300000, guid: 8f82506e1b46427b87673a6df21e67ce, type: 3}
+  - {fileID: 21300000, guid: 78e77fe804888fce150efb669ca6cd0a, type: 3}
+  - {fileID: 21300000, guid: 3b9639c1a8b34f0abe7166e219690f47, type: 3}
+  - {fileID: 21300000, guid: f3dbd8f2b28845deace71dee6691eb9b, type: 3}
+  - {fileID: 21300000, guid: 5a1cf7f65e1a061549fb8d9a0680e0f0, type: 3}
+  - {fileID: 21300000, guid: 4a3a79734426e53aaf536bf0b792a6b2, type: 3}
+  blurred:
+  - {fileID: 21300000, guid: cabc80b18ac64818b911fdc5b3ac6704, type: 3}
+  - {fileID: 21300000, guid: 9925c92294f2437d998be61b3d28c870, type: 3}
+  - {fileID: 21300000, guid: a217d0742ab247ad968ef15686a99b91, type: 3}
+  - {fileID: 21300000, guid: a61f173862284d28b3672f2d8aef4d2a, type: 3}
+  - {fileID: 21300000, guid: 47933d9b13404a6b8636b30ad430632f, type: 3}
+  - {fileID: 21300000, guid: a7364018bbd84b559eefe44e4c091428, type: 3}
 --- !u!1 &432787455
 GameObject:
   m_ObjectHideFlags: 0
