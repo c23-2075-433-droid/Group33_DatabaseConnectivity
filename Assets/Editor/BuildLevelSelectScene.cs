@@ -1,37 +1,32 @@
 // Assets/Editor/BuildLevelSelectScene.cs
 //
-// One-click builder for the level select screen.
+// One-click builder for the two screens behind ADVENTURE.
 //
-// A page per place, flipped through with the arrows: Bahay, Paaralan, Parke,
-// Palengke, four pages and four dots. It used to be all sixteen scenes at
-// once, numbered straight through to 16. Paging them lets the tiles be big
-// enough for a small finger and lets the numbers restart inside each place,
-// which is how a child would say them - Bahay one to six, not nine to
-// fourteen.
+// First a board per place - HOME, SCHOOL, PARK - each with the picture the
+// journey map already uses for it. Pick one and the same canvas turns into
+// that place's levels: the big board, the place's own banner over it, and a
+// numbered tile per scene with its stars underneath.
+//
+// This replaces the single paged screen with arrows either side. A child who
+// wanted the park had to know it was three presses to the right; now it is
+// one press, onto a picture they can recognise.
 //
 // The order still comes from JourneyMap.Steps, which LevelProgress also counts
 // along, so the screen and the save file cannot disagree about what comes
 // next. Adding a scene there adds a tile here; nothing in this file changes.
+// A place with no scenes built at all gets no board - the kit draws three.
 //
 // A tile can be entered once the player has reached it AND the scene behind it
-// has been built. Anything else wears the padlock rather than a dimmed number:
-// with the numbering restarted per place there is no longer a run of sixteen
-// to read off the screen, so hiding an unreachable number costs nothing.
+// has been built. Anything else wears the padlock rather than a dimmed number.
 //
-// Positions were measured off the composed mockup, kept beside the pieces as
-// Art/levelselect_layout_reference.png (2000x1125), and scaled by 0.96 to the
-// 1920x1080 canvas.
+// Positions were measured off the composed mockups, kept beside the pieces as
+// Art/adventure_layout_reference.png and Art/levels_layout_reference.png
+// (2000x1125), and scaled by 0.96 to the 1920x1080 canvas.
 //
-// Sprites expected in Assets/Sprites/, all cut by
-// Tools/import_level_select_art.py:
-//   ui_level_board, ui_select_levels, btn_page_left, btn_page_right,
-//   btn_step_1..6, btn_step_locked, ui_step_star_on, ui_step_star_off,
-//   ui_page_dot_on, ui_page_dot_off
-// plus btn_back, and menu_room_bg from the main menu.
-//
-// There is no backdrop sprite of its own. The mockup's dimmed classroom is
-// menu_room_bg under a brown wash, so that colour is laid over the menu's own
-// background rather than shipping a second copy of the same room.
+// Sprites expected in Assets/Sprites/. The boards, banners and the two corner
+// buttons are cut by Tools/import_adventure_art.py; the tiles, stars and the
+// place pictures were already here, and the backdrop is the main menu's own
+// classroom, blurred (see MenuBlurBackdrop).
 //
 // Run via: Tools > SALINLAHI > Build Level Select Scene
 
@@ -49,34 +44,65 @@ public class BuildLevelSelectScene
     private const string LevelSelectScenePath = "Assets/Scenes/LevelSelect.unity";
     private const string FirstLevelPath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";
 
-    // Fitted against the mockup's backdrop: alpha 0.81 over this colour turns
-    // menu_room_bg into the dimmed room it shows, within 6/255 a channel.
-    private static readonly Color Wash = new Color(0.286f, 0.157f, 0.106f, 0.81f);
+    /// <summary>
+    /// The art for one place on the picker. Keyed by its level number on the
+    /// journey, so renaming or reordering places cannot hand HOME the park's
+    /// picture. lockedBoard is empty for a place that is never locked.
+    /// </summary>
+    private class PlaceArt
+    {
+        public string board, lockedBoard, picture, lockedPicture, title;
+    }
 
-    private static readonly Vector2 BoardPos = new Vector2(0f, -50f);
-    private static readonly Vector2 BoardSize = new Vector2(1340f, 898f);
-    private static readonly Vector2 TitlePos = new Vector2(0f, 362f);
-    private static readonly Vector2 TitleSize = new Vector2(791f, 273f);
-    private static readonly Vector2 BackPos = new Vector2(-859f, 434f);
-    private static readonly Vector2 BackSize = new Vector2(114f, 108f);
-    private static readonly Vector2 ArrowSize = new Vector2(175f, 164f);
-    private const float ArrowX = 648f;
-    private const float ArrowY = -38f;
+    private static readonly Dictionary<int, PlaceArt> Art = new Dictionary<int, PlaceArt>
+    {
+        { 1, new PlaceArt { board = "ui_place_home",   lockedBoard = "",
+                            picture = "map_bahay",     lockedPicture = "map_bahay_locked",
+                            title = "ui_title_home" } },
+        { 2, new PlaceArt { board = "ui_place_school", lockedBoard = "ui_place_school_locked",
+                            picture = "map_paaralan",  lockedPicture = "map_paaralan_locked",
+                            title = "ui_title_school" } },
+        { 3, new PlaceArt { board = "ui_place_park",   lockedBoard = "ui_place_park_locked",
+                            picture = "map_parke",     lockedPicture = "map_parke_locked",
+                            title = "ui_title_park" } },
+    };
+
+    // --- Shared furniture, on screen for both ---
+    private static readonly Vector2 BackPos = new Vector2(-852f, 429f);
+    private static readonly Vector2 BackSize = new Vector2(132f, 152f);
+    private static readonly Vector2 MenuPos = new Vector2(829f, 429f);
+    private static readonly Vector2 MenuSize = new Vector2(144f, 153f);
+
+    // --- The place picker ---
+    private static readonly Vector2 PickerTitlePos = new Vector2(-12f, 278f);
+    private static readonly Vector2 PickerTitleSize = new Vector2(1271f, 153f);
+    private static readonly Vector2 PlaceBoardSize = new Vector2(580f, 479f);
+    private const float PlaceBoardY = -114f;
+    private const float PlaceBoardPitch = 612f;
+
+    // The picture sits in the board's inner panel, inside the pale rim:
+    // measured on ui_place_home as x 36-574 of 604 and y 30-401 of 499, then
+    // pulled in so nothing touches the frame and, on a locked board, nothing
+    // runs under the padlock in the top right corner.
+    private static readonly Vector2 PictureOffset = new Vector2(-6f, 26f);
+    private static readonly Vector2 PictureSize = new Vector2(424f, 292f);
+
+    // --- The levels of one place ---
+    private static readonly Vector2 BoardPos = new Vector2(-9f, -27f);
+    private static readonly Vector2 BoardSize = new Vector2(1264f, 929f);
+    private static readonly Vector2 GridTitlePos = new Vector2(-23f, 415f);
+    private static readonly Vector2 GridTitleSize = new Vector2(866f, 151f);
 
     private const int Columns = 4;
     private const float TilePitch = 247f;
-    private const float TopRowY = 107f;        // y of a tile's centre, top row
-    private const float RowPitch = 266f;
-    private const float OneRowY = -26f;        // a place short enough for one row
+    private const float TopRowY = 150f;        // y of a tile's centre, top row
+    private const float RowPitch = 267f;
+    private const float OneRowY = 30f;         // a place short enough for one row
     private static readonly Vector2 TileSize = new Vector2(163f, 153f);
 
-    private const float StarDrop = 108f;       // below the tile's centre
+    private const float StarDrop = 119f;       // below the tile's centre
     private const float StarPitch = 58f;
     private static readonly Vector2 StarSize = new Vector2(48f, 47f);
-
-    private const float DotsY = -354f;
-    private const float DotPitch = 72f;
-    private static readonly Vector2 DotSize = new Vector2(34f, 34f);
 
     // The sheet prints tiles 1..6, which covers the longest place. A place
     // with more scenes than this would ask for a tile that does not exist.
@@ -93,15 +119,23 @@ public class BuildLevelSelectScene
 
         // An Image handed a null sprite draws a white box, with nothing but a
         // console warning to say why. Make the art loadable first.
-        SpriteImportFixer.Verify(new[]
+        List<string> needed = new List<string>
         {
-            "menu_room_bg", "ui_level_board", "ui_select_levels", "btn_back",
-            "btn_page_left", "btn_page_right", "btn_step_locked",
-            "ui_step_star_on", "ui_step_star_off",
-            "ui_page_dot_on", "ui_page_dot_off",
+            "menu_classroom_bg_blur", "ui_levels_board", "ui_title_adventure",
+            "btn_back_arrow", "btn_levels_menu",
+            "btn_step_locked", "ui_step_star_on", "ui_step_star_off",
             "btn_step_1", "btn_step_2", "btn_step_3",
             "btn_step_4", "btn_step_5", "btn_step_6",
-        }, "Level Select Scene");
+        };
+        foreach (PlaceArt art in Art.Values)
+        {
+            needed.Add(art.board);
+            needed.Add(art.picture);
+            needed.Add(art.lockedPicture);
+            needed.Add(art.title);
+            if (!string.IsNullOrEmpty(art.lockedBoard)) needed.Add(art.lockedBoard);
+        }
+        SpriteImportFixer.Verify(needed.ToArray(), "Level Select Scene");
 
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -111,7 +145,7 @@ public class BuildLevelSelectScene
         cam.orthographicSize = 5.4f;
         cam.transform.position = new Vector3(0, 0, -10);
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = new Color(Wash.r, Wash.g, Wash.b, 1f);
+        cam.backgroundColor = Color.black;
         camGO.tag = "MainCamera";
         camGO.AddComponent<AudioListener>();
 
@@ -130,8 +164,10 @@ public class BuildLevelSelectScene
 
         Transform canvasT = canvasGO.transform;
 
-        // --- The room, the wash over it, then the board ---
-        GameObject background = CreateImage(canvasT, "Background", "menu_room_bg",
+        // --- The same classroom the menu shows, already out of focus. Both
+        //     screens are things laid on top of the menu, so they keep its
+        //     backdrop rather than shipping a dimmed copy of the room. ---
+        GameObject background = CreateImage(canvasT, "Background", "menu_classroom_bg_blur",
                                             Vector2.zero, new Vector2(1920f, 1080f), false);
         RectTransform backgroundRect = background.GetComponent<RectTransform>();
         backgroundRect.anchorMin = backgroundRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -140,98 +176,108 @@ public class BuildLevelSelectScene
         fitter.aspectRatio = 2000f / 1125f;
         background.GetComponent<Image>().raycastTarget = false;
 
-        GameObject wash = new GameObject("Wash", typeof(RectTransform));
-        wash.transform.SetParent(canvasT, false);
-        Image washImage = wash.AddComponent<Image>();
-        washImage.color = Wash;
-        washImage.raycastTarget = false;
-        Stretch(wash.GetComponent<RectTransform>());
+        // --- The two screens, as roots that are switched on and off ---
+        GameObject pickerRoot = CreateStretched(canvasT, "PlacePicker");
+        GameObject gridRoot = CreateStretched(canvasT, "LevelGrid");
 
-        GameObject board = CreateImage(canvasT, "Board", "ui_level_board", BoardPos, BoardSize, true);
+        GameObject pickerTitle = CreateImage(pickerRoot.transform, "Title", "ui_title_adventure",
+                                             PickerTitlePos, PickerTitleSize, true);
+        pickerTitle.GetComponent<Image>().raycastTarget = false;
+
+        GameObject board = CreateImage(gridRoot.transform, "Board", "ui_levels_board",
+                                       BoardPos, BoardSize, true);
         board.GetComponent<Image>().raycastTarget = false;
 
-        GameObject title = CreateImage(canvasT, "Title", "ui_select_levels", TitlePos, TitleSize, true);
-        title.GetComponent<Image>().raycastTarget = false;
+        // Its sprite is replaced per place at runtime; HOME is only what the
+        // saved scene happens to show.
+        GameObject gridTitle = CreateImage(gridRoot.transform, "Title", Art[1].title,
+                                           GridTitlePos, GridTitleSize, true);
+        gridTitle.GetComponent<Image>().raycastTarget = false;
 
-        GameObject back = CreateSpriteButton(canvasT, "Button_Back", "btn_back", BackPos, BackSize);
-        GameObject pageLeft = CreateSpriteButton(canvasT, "Button_PageLeft", "btn_page_left",
-                                                 new Vector2(-ArrowX, ArrowY), ArrowSize);
-        GameObject pageRight = CreateSpriteButton(canvasT, "Button_PageRight", "btn_page_right",
-                                                  new Vector2(ArrowX, ArrowY), ArrowSize);
+        // --- Corner buttons, outside both roots: they are on either screen ---
+        GameObject back = CreateSpriteButton(canvasT, "Button_Back", "btn_back_arrow",
+                                             BackPos, BackSize);
+        GameObject menu = CreateSpriteButton(canvasT, "Button_Menu", "btn_levels_menu",
+                                             MenuPos, MenuSize);
 
-        // --- A page per place ---
+        // --- A board on the picker and a page of tiles for each place ---
         List<LevelSelectController.StepNode> nodes = new List<LevelSelectController.StepNode>();
-        List<LevelSelectController.Page> pages = new List<LevelSelectController.Page>();
-        Sprite lockedSprite = LoadSprite("btn_step_locked");
-        int overflowing = 0;
+        List<LevelSelectController.Place> places = new List<LevelSelectController.Place>();
+        Sprite lockedTile = LoadSprite("btn_step_locked");
+        int overflowing = 0, skipped = 0;
 
         foreach (int levelIndex in LevelsInOrder())
         {
             List<int> sceneSteps = SceneStepsOf(levelIndex);
             string placeName = PlaceName(levelIndex);
 
-            GameObject pageRoot = new GameObject("Page_" + pages.Count + "_" + placeName,
-                                                 typeof(RectTransform));
-            pageRoot.transform.SetParent(canvasT, false);
-            Stretch(pageRoot.GetComponent<RectTransform>());
-
-            if (sceneSteps.Count == 0)
+            // A place with nothing built, or with no board drawn for it, is
+            // left off rather than given an empty board to press. Palengke is
+            // both: it is on the journey as somewhere the game is going.
+            if (sceneSteps.Count == 0 || !Art.ContainsKey(levelIndex))
             {
-                // A place with nothing built yet still gets its page, so the
-                // dots count the journey rather than what happens to be
-                // finished. One padlock says what the empty board would not.
-                nodes.Add(CreateTile(pageRoot.transform, FirstStepOf(levelIndex),
-                                     "", 0, lockedSprite, new Vector2(0f, OneRowY)));
+                skipped++;
+                continue;
             }
-            else
+            PlaceArt art = Art[levelIndex];
+
+            GameObject tilesRoot = CreateStretched(gridRoot.transform, "Tiles_" + placeName);
+
+            if (sceneSteps.Count > HighestPrintedTile) overflowing++;
+            for (int i = 0; i < sceneSteps.Count; i++)
             {
-                if (sceneSteps.Count > HighestPrintedTile) overflowing++;
-                for (int i = 0; i < sceneSteps.Count; i++)
-                {
-                    int stepIndex = sceneSteps[i];
-                    nodes.Add(CreateTile(pageRoot.transform, stepIndex,
-                                         JourneyMap.Steps[stepIndex].sceneName, i + 1,
-                                         lockedSprite, SlotPosition(i, sceneSteps.Count)));
-                }
+                int stepIndex = sceneSteps[i];
+                nodes.Add(CreateTile(tilesRoot.transform, stepIndex,
+                                     JourneyMap.Steps[stepIndex].sceneName, i + 1,
+                                     lockedTile, SlotPosition(i, sceneSteps.Count)));
             }
 
             // Switched off here rather than left for Start, so the saved scene
-            // holds one readable page instead of four stacked on top of each
+            // holds one readable page instead of three stacked on top of each
             // other, and nothing flashes on the first frame.
-            pageRoot.SetActive(pages.Count == 0);
+            tilesRoot.SetActive(places.Count == 0);
 
-            pages.Add(new LevelSelectController.Page
+            float x = (places.Count - 1) * PlaceBoardPitch;   // three boards, middle on centre
+            GameObject boardGO = CreateSpriteButton(pickerRoot.transform, "Place_" + placeName,
+                                                    art.board, new Vector2(x, PlaceBoardY),
+                                                    PlaceBoardSize);
+
+            GameObject picture = CreateImage(boardGO.transform, "Picture", art.picture,
+                                             PictureOffset, PictureSize, true);
+            picture.GetComponent<Image>().raycastTarget = false;
+
+            places.Add(new LevelSelectController.Place
             {
-                root = pageRoot,
+                tilesRoot = tilesRoot,
+                boardButton = boardGO.GetComponent<Button>(),
+                boardImage = boardGO.GetComponent<Image>(),
+                openBoard = LoadSprite(art.board),
+                lockedBoard = string.IsNullOrEmpty(art.lockedBoard) ? null : LoadSprite(art.lockedBoard),
+                illustration = picture.GetComponent<Image>(),
+                openIllustration = LoadSprite(art.picture),
+                lockedIllustration = LoadSprite(art.lockedPicture),
+                gridTitle = LoadSprite(art.title),
                 label = placeName,
                 firstStep = FirstStepOf(levelIndex),
             });
         }
 
-        // --- The dots, one per page, under the board ---
-        GameObject dots = new GameObject("Dots", typeof(RectTransform));
-        dots.transform.SetParent(canvasT, false);
-        Stretch(dots.GetComponent<RectTransform>());
-        float firstDotX = -(pages.Count - 1) * DotPitch * 0.5f;
-        for (int i = 0; i < pages.Count; i++)
-        {
-            GameObject dot = CreateImage(dots.transform, "Dot_" + i, "ui_page_dot_off",
-                                         new Vector2(firstDotX + i * DotPitch, DotsY), DotSize, true);
-            dot.GetComponent<Image>().raycastTarget = false;
-            pages[i].dot = dot.GetComponent<Image>();
-        }
+        // The picker is where the screen opens, so the grid starts switched
+        // off - same reason the pages do.
+        pickerRoot.SetActive(true);
+        gridRoot.SetActive(false);
 
         LevelSelectController controller = canvasGO.AddComponent<LevelSelectController>();
         controller.mainMenuSceneName = "MainMenu";
         controller.backButton = back.GetComponent<Button>();
-        controller.previousPageButton = pageLeft.GetComponent<Button>();
-        controller.nextPageButton = pageRight.GetComponent<Button>();
+        controller.menuButton = menu.GetComponent<Button>();
+        controller.pickerRoot = pickerRoot;
+        controller.gridRoot = gridRoot;
+        controller.gridTitleImage = gridTitle.GetComponent<Image>();
         controller.nodes = nodes.ToArray();
-        controller.pages = pages.ToArray();
+        controller.places = places.ToArray();
         controller.starOnSprite = LoadSprite("ui_step_star_on");
         controller.starOffSprite = LoadSprite("ui_step_star_off");
-        controller.dotOnSprite = LoadSprite("ui_page_dot_on");
-        controller.dotOffSprite = LoadSprite("ui_page_dot_off");
 
         SceneFaderBuilder.Build();
 
@@ -244,8 +290,13 @@ public class BuildLevelSelectScene
             if (!string.IsNullOrEmpty(n.sceneName)) playable++;
 
         Debug.Log("[SALINLAHI] Level select built and saved to " + LevelSelectScenePath +
-                  ". " + pages.Count + " pages, " + nodes.Count + " tiles, " + playable +
+                  ". " + places.Count + " places, " + nodes.Count + " tiles, " + playable +
                   " of them with a scene behind them." +
+                  (skipped > 0
+                      ? " " + skipped + " place(s) on the journey have no board here, either " +
+                        "because nothing is built in them yet or because the kit draws no board " +
+                        "for them - add one to Art in this file."
+                      : "") +
                   (overflowing > 0
                       ? " " + overflowing + " place(s) have more than " + HighestPrintedTile +
                         " scenes, which is more than the sheet prints - cut the missing tiles " +
@@ -323,7 +374,7 @@ public class BuildLevelSelectScene
         colors.normalColor = Color.white;
         colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
         colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
-        colors.disabledColor = new Color(0.46f, 0.43f, 0.4f, 1f);
+        colors.disabledColor = Color.white;   // the locked face is drawn, not dimmed
         colors.fadeDuration = 0.08f;
         return colors;
     }
@@ -365,6 +416,15 @@ public class BuildLevelSelectScene
                 steps.Add(i);
         }
         return steps;
+    }
+
+    /// <summary>A full-screen, invisible holder for one screen's contents.</summary>
+    private static GameObject CreateStretched(Transform parent, string name)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        Stretch(go.GetComponent<RectTransform>());
+        return go;
     }
 
     /// <summary>Pin a RectTransform to every edge of its parent.</summary>
