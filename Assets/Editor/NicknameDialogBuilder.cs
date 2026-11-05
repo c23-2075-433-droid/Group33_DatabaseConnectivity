@@ -1,6 +1,6 @@
 // Assets/Editor/NicknameDialogBuilder.cs
 //
-// Builds the "Enter Nickname" modal dialog shown when Play is pressed:
+// Builds the "Enter Nickname" modal dialog shown when Adventure is pressed:
 // a dimmed backdrop, the bamboo panel, the name input slot, and OKAY /
 // CANCEL buttons.
 //
@@ -51,7 +51,7 @@ public static class NicknameDialogBuilder
 
     /// <summary>
     /// Creates the dialog under the given canvas, replacing any previous copy.
-    /// Starts inactive - MainMenuController shows it when Play is pressed.
+    /// Starts inactive - MainMenuController shows it when Adventure is pressed.
     /// </summary>
     public static Dialog Build(Transform canvas)
     {
@@ -101,7 +101,7 @@ public static class NicknameDialogBuilder
             new Vector2(ContentCentreX, -285f * Scale),
             new Vector2(1100f * Scale, 72f * Scale));
 
-        root.SetActive(false); // MainMenuController turns this on when Play is pressed
+        root.SetActive(false); // MainMenuController turns this on when Adventure is pressed
 
         return new Dialog
         {

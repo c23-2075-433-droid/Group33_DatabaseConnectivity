@@ -2,14 +2,15 @@
 //
 // One-click scene builder for the SALINLAHI main menu, assembled from the
 // team's Canva assets (Assets/Sprites/):
-//   menu_room_bg, menu_title, btn_play, btn_settings, btn_about
+//   menu_classroom_bg, menu_title, btn_adventure, btn_minigames,
+//   btn_settings, btn_about
 //
 // Positions/sizes were measured from the composed Canva mockup, kept at
-// Art/menu_layout_reference.png (2000x1125), and scaled by 0.96 to the
+// Art/menu_layout_new_reference.png (2000x1125), and scaled by 0.96 to the
 // 1920x1080 canvas used here. To tweak anything, move the object's
 // RectTransform in the Scene view - no code changes needed.
 //
-// Includes the "Enter Nickname" popup opened by Play (see
+// Includes the "Enter Nickname" popup opened by Adventure (see
 // NicknameDialogBuilder.cs), which feeds NicknameManager and therefore the
 // player_name on saved database records.
 //
@@ -32,6 +33,10 @@ public class BuildMainMenuScene
     private const string LevelSelectPath = "Assets/Scenes/LevelSelect.unity";
     private const string FirstLevelPath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";
 
+    /// <summary>All four menu plates are cut from one sheet, so they share a size:
+    /// 611x223 on the mockup page, scaled by 0.96 onto the 1920x1080 canvas.</summary>
+    private static readonly Vector2 ButtonSize = new Vector2(587, 214);
+
     [MenuItem("Tools/SALINLAHI/Build Main Menu Scene")]
     public static void BuildScene()
     {
@@ -45,7 +50,8 @@ public class BuildMainMenuScene
         // console warning to say why. Make the art loadable first.
         SpriteImportFixer.Verify(new[]
         {
-            "menu_room_bg", "menu_title", "btn_play", "btn_settings", "btn_about",
+            "menu_classroom_bg", "menu_title",
+            "btn_adventure", "btn_minigames", "btn_settings", "btn_about",
         }, "Main Menu Scene");
 
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -80,7 +86,7 @@ public class BuildMainMenuScene
         // --- Background: always covers the whole screen without stretching
         //     (wider phones like 19.5:9 crop a little top/bottom instead of
         //     showing black bars or squashing the art). ---
-        GameObject bg = CreateImage(canvasT, "Background", "menu_room_bg", Vector2.zero, new Vector2(1920, 1080), false);
+        GameObject bg = CreateImage(canvasT, "Background", "menu_classroom_bg", Vector2.zero, new Vector2(1920, 1080), false);
         RectTransform bgRect = bg.GetComponent<RectTransform>();
         bgRect.anchorMin = bgRect.anchorMax = new Vector2(0.5f, 0.5f);
         AspectRatioFitter fitter = bg.AddComponent<AspectRatioFitter>();
@@ -88,18 +94,20 @@ public class BuildMainMenuScene
         fitter.aspectRatio = 2000f / 1125f;
         bg.GetComponent<Image>().raycastTarget = false;
 
-        // --- Title, across the top. The mockup runs the sun's top rays off the
-        //     top of the page, so the rect sits high enough to clip them the
-        //     same way rather than pulling the whole logo down to fit. ---
-        GameObject title = CreateImage(canvasT, "Title", "menu_title", new Vector2(-50, 317), new Vector2(1278, 537), true);
+        // --- Title, over the left half. The mockup runs the sun's top rays and
+        //     the leftmost leaf off the edge of the page, so the rect sits
+        //     outside the canvas by the same margin rather than pulling the
+        //     whole logo in to fit. ---
+        GameObject title = CreateImage(canvasT, "Title", "menu_title", new Vector2(-394, 291), new Vector2(1190, 500), true);
         title.GetComponent<Image>().raycastTarget = false;
 
-        // --- Buttons: PLAY on the centre line, SETTINGS and ABOUT level with
-        //     each other beneath it. Heights follow each sprite's own ratio so
+        // --- Buttons: one column down the right, evenly spaced, all four the
+        //     same plate. Heights follow the sprite's own ratio so
         //     preserveAspect has nothing left to shrink. ---
-        GameObject playBtn = CreateSpriteButton(canvasT, "PlayButton", "btn_play", new Vector2(-4, -74), new Vector2(492, 309));
-        GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(-219, -367), new Vector2(421, 236));
-        GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(220, -367), new Vector2(428, 236));
+        GameObject adventureBtn = CreateSpriteButton(canvasT, "AdventureButton", "btn_adventure", new Vector2(517, 358), ButtonSize);
+        GameObject miniGamesBtn = CreateSpriteButton(canvasT, "MiniGamesButton", "btn_minigames", new Vector2(517, 119), ButtonSize);
+        GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(517, -120), ButtonSize);
+        GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(517, -358), ButtonSize);
 
         // --- Settings and About popups, in the same bamboo style as the
         //     nickname dialog (see SettingsAboutDialogBuilder). Both start
@@ -107,7 +115,7 @@ public class BuildMainMenuScene
         SettingsAboutDialogBuilder.Dialog settingsDialog = SettingsAboutDialogBuilder.BuildSettings(canvasT);
         SettingsAboutDialogBuilder.Dialog aboutDialog = SettingsAboutDialogBuilder.BuildAbout(canvasT);
 
-        // --- "Enter Nickname" popup, opened by Play, so saved records carry a
+        // --- "Enter Nickname" popup, opened by Adventure, so saved records carry a
         //     real player name instead of NicknameManager's "Bata" fallback. ---
         NicknameDialogBuilder.Dialog nicknameDialog = NicknameDialogBuilder.Build(canvasT);
 
@@ -121,7 +129,10 @@ public class BuildMainMenuScene
         // Same wiring the patcher does, so a fresh rebuild does not quietly
         // drop the "already taken" check that Add Nickname Dialog adds.
         controller.nicknameAvailability = NicknameCheckBuilder.Build(nicknameDialog);
-        controller.playButton = playBtn.GetComponent<Button>();
+        controller.adventureButton = adventureBtn.GetComponent<Button>();
+        // Wired so the Inspector shows the plate, though the controller
+        // deliberately hangs nothing off its click yet.
+        controller.miniGamesButton = miniGamesBtn.GetComponent<Button>();
         controller.settingsButton = settingsBtn.GetComponent<Button>();
         controller.aboutButton = aboutBtn.GetComponent<Button>();
         controller.settingsPanel = settingsDialog.root;
