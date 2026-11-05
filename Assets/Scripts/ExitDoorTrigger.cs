@@ -97,7 +97,7 @@ public class ExitDoorTrigger : MonoBehaviour
 
         // Fade out if the scene has a fader, otherwise cut straight across so
         // scenes without one still work.
-        SceneFader fader = Object.FindFirstObjectByType<SceneFader>();
+        SceneFader fader = Object.FindAnyObjectByType<SceneFader>();
         if (fader != null)
         {
             fader.FadeOutAndLoad(nextSceneName);

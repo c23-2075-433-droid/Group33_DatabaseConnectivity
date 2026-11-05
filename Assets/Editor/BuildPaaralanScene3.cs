@@ -215,7 +215,7 @@ public class BuildPaaralanScene3
         uiRoot.GetComponent<RectTransform>().sizeDelta = new Vector2(4000, 1200);
         uiRoot.AddComponent<GraphicRaycaster>();
 
-        if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<UnityEngine.EventSystems.EventSystem>();

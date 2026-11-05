@@ -164,9 +164,7 @@ public class UIClickSound : MonoBehaviour
     /// </summary>
     private bool IsMicrophone(Button button)
     {
-        // FindAnyObjectByType, not FindFirstObjectByType: there is one voice UI
-        // per scene, nothing here cares which is "first", and Unity 6 has
-        // deprecated the ordered one.
+        // There is one voice UI per scene, so "any" is also "the one".
         if (voiceUI == null) voiceUI = FindAnyObjectByType<VoiceInteractionUI>();
         return voiceUI != null && voiceUI.micButton == button;
     }

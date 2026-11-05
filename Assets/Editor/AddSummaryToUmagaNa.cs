@@ -43,11 +43,11 @@ public static class AddSummaryToUmagaNa
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
         SceneObjectiveController controller =
-            Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
+            Object.FindAnyObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
         VoiceCommand voiceCommand =
-            Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
+            Object.FindAnyObjectByType<VoiceCommand>(FindObjectsInactive.Include);
         ExitDoorTrigger door =
-            Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+            Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
 
         if (controller == null || door == null)
         {

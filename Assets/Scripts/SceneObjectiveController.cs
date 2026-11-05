@@ -376,7 +376,7 @@ public class SceneObjectiveController : MonoBehaviour
         // word just answered back on screen.
         currentIndex = nextIndex;
 
-        if (playerMovement == null) playerMovement = FindFirstObjectByType<PlayerMovement>();
+        if (playerMovement == null) playerMovement = FindAnyObjectByType<PlayerMovement>();
 
         // One frame first: the action is raised this frame and has not started
         // moving anything yet.

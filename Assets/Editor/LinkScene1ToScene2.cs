@@ -55,7 +55,7 @@ public class LinkScene1ToScene2
         // ---- Scene 1: hand off to Scene 2, drop the ending ----
         Scene s1 = EditorSceneManager.OpenScene(Scene1Path, OpenSceneMode.Single);
 
-        ExitDoorTrigger exit1 = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+        ExitDoorTrigger exit1 = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
         if (exit1 == null)
         {
             Debug.LogError("[SALINLAHI] No ExitDoorTrigger in " + Scene1Path +

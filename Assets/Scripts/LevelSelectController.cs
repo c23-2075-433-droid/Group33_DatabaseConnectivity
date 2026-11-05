@@ -245,7 +245,7 @@ public class LevelSelectController : MonoBehaviour
     {
         if (string.IsNullOrEmpty(sceneName)) return;
 
-        SceneFader fader = Object.FindFirstObjectByType<SceneFader>();
+        SceneFader fader = Object.FindAnyObjectByType<SceneFader>();
         if (fader != null) fader.FadeOutAndLoad(sceneName);
         else SceneManager.LoadScene(sceneName);
     }

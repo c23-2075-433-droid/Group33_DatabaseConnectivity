@@ -74,8 +74,8 @@ public class RoomTransition : MonoBehaviour
 
     void Awake()
     {
-        if (fader == null) fader = FindFirstObjectByType<SceneFader>();
-        if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
+        if (fader == null) fader = FindAnyObjectByType<SceneFader>();
+        if (objectiveController == null) objectiveController = FindAnyObjectByType<SceneObjectiveController>();
     }
 
     /// <summary>

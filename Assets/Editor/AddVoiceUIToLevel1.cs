@@ -35,8 +35,8 @@ public class AddVoiceUIToLevel1
 
         Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
-        VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>();
-        SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>();
+        VoiceCommand voiceCommand = Object.FindAnyObjectByType<VoiceCommand>();
+        SceneObjectiveController controller = Object.FindAnyObjectByType<SceneObjectiveController>();
 
         if (voiceCommand == null || controller == null)
         {

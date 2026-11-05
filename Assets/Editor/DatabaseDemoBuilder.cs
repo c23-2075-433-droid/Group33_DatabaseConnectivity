@@ -35,8 +35,8 @@ public static class DatabaseDemoBuilder
     public static bool Build(string levelName, string returnSceneName,
                              int levelIndex, string badgeSpriteFile)
     {
-        VoiceCommand voiceCommand = Object.FindFirstObjectByType<VoiceCommand>(FindObjectsInactive.Include);
-        SceneObjectiveController controller = Object.FindFirstObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
+        VoiceCommand voiceCommand = Object.FindAnyObjectByType<VoiceCommand>(FindObjectsInactive.Include);
+        SceneObjectiveController controller = Object.FindAnyObjectByType<SceneObjectiveController>(FindObjectsInactive.Include);
 
         if (voiceCommand == null || controller == null)
         {
@@ -57,7 +57,7 @@ public static class DatabaseDemoBuilder
         // here - the journey map, usually.
         summary.panel.levelSelectSceneName = returnSceneName;
 
-        ExitDoorTrigger exitTrigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+        ExitDoorTrigger exitTrigger = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
         if (exitTrigger != null) exitTrigger.levelCompleteUI = summary.content;
 
         GameObject host = GameObject.Find(HostName);
@@ -110,7 +110,7 @@ public static class DatabaseDemoBuilder
     /// </summary>
     public static void Remove()
     {
-        ExitDoorTrigger exitTrigger = Object.FindFirstObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
+        ExitDoorTrigger exitTrigger = Object.FindAnyObjectByType<ExitDoorTrigger>(FindObjectsInactive.Include);
         if (exitTrigger != null) exitTrigger.levelCompleteUI = null;
 
         int removed = 0;

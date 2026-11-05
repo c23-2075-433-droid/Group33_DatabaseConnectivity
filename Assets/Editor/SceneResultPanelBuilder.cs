@@ -153,7 +153,7 @@ public static class SceneResultPanelBuilder
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
         canvasGO.AddComponent<GraphicRaycaster>();
 
-        if (Object.FindFirstObjectByType<EventSystem>() == null)
+        if (Object.FindAnyObjectByType<EventSystem>() == null)
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();

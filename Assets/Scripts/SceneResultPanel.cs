@@ -137,8 +137,8 @@ public class SceneResultPanel : MonoBehaviour
 
     void Awake()
     {
-        if (voiceCommand == null) voiceCommand = FindFirstObjectByType<VoiceCommand>();
-        if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
+        if (voiceCommand == null) voiceCommand = FindAnyObjectByType<VoiceCommand>();
+        if (objectiveController == null) objectiveController = FindAnyObjectByType<SceneObjectiveController>();
         // Never the object this component is on. A deactivated GameObject runs
         // no coroutines and its components hear no events, so switching itself
         // off would cost it the listener that is supposed to switch it back on
@@ -393,7 +393,7 @@ public class SceneResultPanel : MonoBehaviour
         // the level select - so the next tile opens whichever button is used,
         // including Replay and Home. The child did finish the scene; which
         // button they pressed afterwards should not decide that.
-        SceneFader fader = Object.FindFirstObjectByType<SceneFader>();
+        SceneFader fader = Object.FindAnyObjectByType<SceneFader>();
         if (fader != null) fader.FadeOutAndLoad(sceneName);
         else SceneManager.LoadScene(sceneName);
     }

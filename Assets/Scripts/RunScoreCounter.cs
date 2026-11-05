@@ -23,8 +23,8 @@ public class RunScoreCounter : MonoBehaviour
 
     void Awake()
     {
-        if (voiceCommand == null) voiceCommand = FindFirstObjectByType<VoiceCommand>();
-        if (objectiveController == null) objectiveController = FindFirstObjectByType<SceneObjectiveController>();
+        if (voiceCommand == null) voiceCommand = FindAnyObjectByType<VoiceCommand>();
+        if (objectiveController == null) objectiveController = FindAnyObjectByType<SceneObjectiveController>();
         // Awake, not Start: a scene's first spoken answer can arrive before
         // Start has run everywhere, and clearing after that would lose it.
         if (resetOnStart) RunScore.Reset();
