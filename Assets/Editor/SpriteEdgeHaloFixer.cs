@@ -26,10 +26,17 @@
 // outline outward over the keyline, thickening that outline by 1 to 4 pixels.
 // At the size these sprites are drawn, that is under one screen pixel.
 //
-// The depth is measured per sprite rather than assumed, and capped at
-// MaxKeyline. A per-pixel guard then repaints a pixel only when it is really
-// brighter than the colour replacing it, so artwork that is legitimately pale
-// where it meets the silhouette, such as a flower petal, is left alone.
+// The whole MaxKeyline band is walked, and a per-pixel guard repaints a pixel
+// only when it is really brighter than the colour replacing it, so artwork
+// that is legitimately pale where it meets the silhouette, such as a flower
+// petal, is left alone. The guard is what decides where the keyline is.
+//
+// This used to measure one depth per sprite from the average brightness of
+// each ring, and that is too coarse: door_open carries a 2px keyline down the
+// open panel and none along other edges, so the average sized it at 1px, the
+// second pixel survived, and the door still drew a pale line down the panel at
+// runtime. Averages cannot describe an edge that varies, so the depth is no
+// longer guessed up front - every pixel in the band is now judged on its own.
 //
 // STAGE 2 - THE SOFT SILHOUETTE BAND (this one changes visible pixels)
 //
@@ -84,6 +91,7 @@
 //
 // Run via: Tools > SALINLAHI > Fix Level Summary Sprite Edges
 //          Tools > SALINLAHI > Fix Character Sprite Edges
+//          Tools > SALINLAHI > Fix Every Sprite Edge   (props included)
 
 using System.Collections.Generic;
 using UnityEditor;
@@ -103,19 +111,15 @@ public static class SpriteEdgeHaloFixer
         "star_grey_left", "star_grey_mid", "star_grey_right",
     };
 
-    // Stage 1. Past about 4 pixels we are no longer looking at a cutout
-    // artifact but at the artist's own shading, so the cap guards real art.
+    // Stage 1. How far in from the silhouette the keyline is looked for. Past
+    // about 4 pixels we are no longer looking at a cutout artifact but at the
+    // artist's own shading, so the cap guards real art.
     private const int MaxKeyline = 4;
 
-    // A ring counts as keyline when it is this much brighter than the artwork
-    // well inside the silhouette.
-    private const float KeylineMargin = 25f;
-
-    // Depth taken as "the real artwork", to compare the outer rings against.
-    private const int BaselineRing = 6;
-
     // Per-pixel guard: only repaint a pixel this much brighter than its
-    // replacement.
+    // replacement. With the fixed depth gone this is the whole of stage 1's
+    // judgement, so it is the number to reach for if the stage ever takes too
+    // much or too little.
     private const float RepaintGuard = 20f;
 
     // Stage 2. How far the soft silhouette band is repainted. A cutout edge is
@@ -145,6 +149,45 @@ public static class SpriteEdgeHaloFixer
     [MenuItem("Tools/SALINLAHI/Fix Character Sprite Edges")]
     public static void FixCharactersMenu()
     {
+        string[] names = SpriteNames(CharacterPrefixes);
+        if (names.Length == 0)
+        {
+            Debug.LogWarning("[SALINLAHI] No character sprites found in " +
+                             SpriteImportFixer.SpriteFolder + ".");
+            return;
+        }
+        Run(names, "character", "Fix Character Sprite Edges");
+    }
+
+    /// <summary>
+    /// The same two stages over every cut-out in the sprite folder, whatever
+    /// it is of. The two menu items above cover the sprites that came through
+    /// the art pipeline in a known batch; props do not match any prefix and so
+    /// were never reached - door_open and mic_icon both still carried their
+    /// white sticker edge long after the characters were cleaned. Rather than
+    /// start a third hardcoded list that goes stale the same way, this takes
+    /// the lot: a sprite that is already clean is read and left alone, and
+    /// full-bleed art with no cut-out edge is skipped outright (see Process).
+    /// </summary>
+    [MenuItem("Tools/SALINLAHI/Fix Every Sprite Edge")]
+    public static void FixEverythingMenu()
+    {
+        string[] names = SpriteNames(null);
+        if (names.Length == 0)
+        {
+            Debug.LogWarning("[SALINLAHI] No sprites found in " +
+                             SpriteImportFixer.SpriteFolder + ".");
+            return;
+        }
+        Run(names, "sprite", "Fix Every Sprite Edge");
+    }
+
+    /// <summary>
+    /// Names of the PNGs in the sprite folder, either all of them (pass null)
+    /// or only those whose filename starts with one of the given prefixes.
+    /// </summary>
+    private static string[] SpriteNames(string[] prefixes)
+    {
         List<string> names = new List<string>();
         foreach (string guid in AssetDatabase.FindAssets("t:Texture2D",
                                                          new[] { SpriteImportFixer.SpriteFolder }))
@@ -153,7 +196,13 @@ public static class SpriteEdgeHaloFixer
             if (!path.EndsWith(".png")) continue;
 
             string name = System.IO.Path.GetFileNameWithoutExtension(path);
-            foreach (string prefix in CharacterPrefixes)
+            if (prefixes == null)
+            {
+                names.Add(name);
+                continue;
+            }
+
+            foreach (string prefix in prefixes)
             {
                 if (!name.StartsWith(prefix)) continue;
                 names.Add(name);
@@ -161,14 +210,7 @@ public static class SpriteEdgeHaloFixer
             }
         }
         names.Sort();
-
-        if (names.Count == 0)
-        {
-            Debug.LogWarning("[SALINLAHI] No character sprites found in " +
-                             SpriteImportFixer.SpriteFolder + ".");
-            return;
-        }
-        Run(names.ToArray(), "character", "Fix Character Sprite Edges");
+        return names.ToArray();
     }
 
     private static void Run(string[] names, string label, string who)
@@ -177,6 +219,7 @@ public static class SpriteEdgeHaloFixer
 
         int fixedCount = 0;
         int repaintedTotal = 0;
+        int skippedSolid = 0;
 
         foreach (string name in names)
         {
@@ -189,6 +232,12 @@ public static class SpriteEdgeHaloFixer
                 continue;
             }
 
+            if (result.notCutout)
+            {
+                skippedSolid++;
+                continue;
+            }
+
             if (!result.changed)
             {
                 Debug.Log("[SALINLAHI] " + name + ": already clean.");
@@ -198,35 +247,37 @@ public static class SpriteEdgeHaloFixer
             fixedCount++;
             repaintedTotal += result.repainted + result.softRepainted;
             Debug.Log("[SALINLAHI] " + name + ": " +
-                      (result.keylineDepth > 0
-                          ? "keyline " + result.keylineDepth + " px, " + result.repainted +
-                            " visible px repainted, "
-                          : "no keyline, ") +
+                      result.repainted + " keyline px repainted, " +
                       result.softRepainted + " soft edge px repainted, " +
                       result.bled + " transparent px bled.");
         }
 
+        string solidNote = skippedSolid == 0
+            ? ""
+            : " " + skippedSolid + " full-bleed image(s) with no cut-out edge were skipped.";
+
         if (fixedCount == 0)
         {
-            Debug.Log("[SALINLAHI] All " + names.Length + " " + label +
-                      " sprites were already clean. Nothing was written.");
+            Debug.Log("[SALINLAHI] All " + (names.Length - skippedSolid) + " " + label +
+                      " sprites were already clean. Nothing was written." + solidNote);
             return;
         }
 
-        Debug.Log("[SALINLAHI] Fixed " + fixedCount + " of " + names.Length + " " + label +
-                  " sprite(s). " + repaintedTotal + " visible edge pixel(s) were repainted so " +
-                  "the dark outline now covers the old white edge. Every alpha value was left " +
-                  "untouched, so the silhouettes are exactly as they were.");
+        Debug.Log("[SALINLAHI] Fixed " + fixedCount + " of " + (names.Length - skippedSolid) +
+                  " " + label + " sprite(s). " + repaintedTotal + " visible edge pixel(s) were " +
+                  "repainted so the dark outline now covers the old white edge. Every alpha " +
+                  "value was left untouched, so the silhouettes are exactly as they were." +
+                  solidNote);
     }
 
     private class Result
     {
         public bool changed;
-        public int keylineDepth;
         public int repainted;
         public int softRepainted;
         public int bled;
         public string error;
+        public bool notCutout;
     }
 
     /// <summary>
@@ -273,25 +324,47 @@ public static class SpriteEdgeHaloFixer
         Color32[] pixels = texture.GetPixels32();
         Color32[] before = (Color32[])pixels.Clone();
 
+        // Every stage below reasons about a cut-out: the rings are measured
+        // inward from the silhouette, and "outward" means into transparency.
+        // Full-bleed art - the room backgrounds - has no silhouette at all, so
+        // those rings would be measured from the IMAGE BORDER instead and a
+        // bright sky along the top edge could read as a keyline and get
+        // repainted. Nothing here applies to such a file, so leave it alone.
+        bool cutout = false;
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            if (pixels[i].a != 0) continue;
+            cutout = true;
+            break;
+        }
+        if (!cutout)
+        {
+            Object.DestroyImmediate(texture);
+            result.notCutout = true;
+            return result;
+        }
+
         // ---- Stage 1: strip the opaque keyline ----
         bool[] opaque = new bool[pixels.Length];
         for (int i = 0; i < pixels.Length; i++) opaque[i] = pixels[i].a == 255;
 
-        result.keylineDepth = KeylineDepth(pixels, opaque, width, height);
-        if (result.keylineDepth > 0)
+        // Everything within MaxKeyline of the silhouette is offered to Bleed,
+        // which pulls the artwork from deeper in outward over it and keeps the
+        // result only where the old pixel was clearly the brighter of the two.
+        // A sprite thinner than twice the band erodes away to nothing, so step
+        // the band in until there is artwork left to pull from - a 5px wide
+        // star still gets the one or two rings it has room for.
+        int band = MaxKeyline;
+        bool[] core = Erode(opaque, width, height, band);
+        while (band > 1 && !AnyTrue(core))
         {
-            bool[] core = Erode(opaque, width, height, result.keylineDepth);
-            if (AnyTrue(core))
-            {
-                result.repainted = Bleed(pixels, core, width, height,
-                                         result.keylineDepth, opaque, true);
-            }
-            else
-            {
-                // Too thin to erode that far; there is no artwork left to pull
-                // outward, so report it as having no keyline rather than lie.
-                result.keylineDepth = 0;
-            }
+            band--;
+            core = Erode(opaque, width, height, band);
+        }
+
+        if (AnyTrue(core))
+        {
+            result.repainted = Bleed(pixels, core, width, height, band, opaque, true);
         }
 
         // ---- Stage 2: repaint the soft silhouette band ----
@@ -335,46 +408,6 @@ public static class SpriteEdgeHaloFixer
 
         if (result.changed) AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
         return result;
-    }
-
-    /// <summary>
-    /// How many opaque rings at the silhouette are leftover cutout edge rather
-    /// than artwork, judged by comparing each ring's luminance against the art
-    /// well inside it.
-    /// </summary>
-    private static int KeylineDepth(Color32[] pixels, bool[] opaque, int width, int height)
-    {
-        List<float> rings = new List<float>();
-        bool[] current = (bool[])opaque.Clone();
-
-        for (int d = 0; d <= BaselineRing; d++)
-        {
-            bool[] inner = Erode(current, width, height, 1);
-            double sum = 0;
-            int count = 0;
-            for (int i = 0; i < current.Length; i++)
-            {
-                if (!current[i] || inner[i]) continue;
-                sum += (pixels[i].r + pixels[i].g + pixels[i].b) / 3.0;
-                count++;
-            }
-            if (count == 0) break;
-            rings.Add((float)(sum / count));
-            current = inner;
-        }
-
-        // Without a few rings to compare there is nothing to judge against.
-        if (rings.Count < 3) return 0;
-
-        float baseline = rings[rings.Count - 1];
-        int depth = 0;
-        int limit = Mathf.Min(MaxKeyline, rings.Count);
-        for (int d = 0; d < limit; d++)
-        {
-            if (rings[d] <= baseline + KeylineMargin) break;
-            depth = d + 1;
-        }
-        return depth;
     }
 
     /// <summary>
