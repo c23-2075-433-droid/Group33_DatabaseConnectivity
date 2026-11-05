@@ -56,8 +56,12 @@ public class BuildLevelSelectScene
 
     private static readonly Dictionary<int, PlaceArt> Art = new Dictionary<int, PlaceArt>
     {
-        { 1, new PlaceArt { board = "ui_place_home",   lockedBoard = "",
-                            picture = "map_bahay",     lockedPicture = "map_bahay_locked",
+        // Bahay shows the modern cottage, not the journey map's nipa hut: next
+        // to the school and the park the hut read as the odd one out. See
+        // Tools/cut_modern_house.py, which is where it comes from and why.
+        { 1, new PlaceArt { board = "ui_place_home",      lockedBoard = "",
+                            picture = "map_bahay_modern",
+                            lockedPicture = "map_bahay_modern_locked",
                             title = "ui_title_home" } },
         { 2, new PlaceArt { board = "ui_place_school", lockedBoard = "ui_place_school_locked",
                             picture = "map_paaralan",  lockedPicture = "map_paaralan_locked",
