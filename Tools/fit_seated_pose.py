@@ -47,7 +47,54 @@ FILL_TOLERANCE = 8
 WALL = 2
 GAP_TOLERANCE = 25      # rows the hair scan may fail before it gives up
 HALO_LUMA = 205         # a pixel this pale on the silhouette is background, not drawing
-HALO_ROUNDS = 4         # how far the background may grow into the halo
+# How far the background may grow into pale pixels. This is not just the
+# anti-aliased halo: the generator draws thin white SLIVERS between his hair
+# spikes, reachable from outside only through necks too dark for the fill to
+# cross, and those are what made him look like a sticker cut out with
+# scissors. They are up to ~30px deep, so the growth has to run far enough to
+# eat them. Measured on pencil_ready: 4 rounds leaves 816 white pixels in the
+# hair, 20 leaves 45, 40 leaves none. It must also stop well short of his
+# white SHIRT, which the growth reaches at about 200 rounds - so 40 clears
+# the slivers with a wide margin on both sides.
+HALO_ROUNDS = 40
+
+
+def bleed_edges(im, rounds=6):
+    """Push the figure's own colour out into the transparent margin.
+
+    Cutting the background sets alpha to 0 but leaves those pixels WHITE,
+    because that is what they were. Nothing draws them, so the file looks
+    right - until something RESIZES it. Every resampler mixes neighbouring
+    pixels, transparent ones included, so each edge pixel ends up part
+    figure and part white, and the sprite acquires a pale rim. On the
+    classroom background that rim reads as a cut-out pasted on top, which
+    is exactly the "sticker" look.
+
+    Fixing it after the resize is hopeless - by then the white is mixed in.
+    So the colour of the nearest opaque pixel is spread outwards first,
+    leaving alpha untouched. The resampler then blends figure into figure
+    and the rim comes out the colour of his hair or his shirt, as it should.
+    """
+    a = np.asarray(im).astype(np.int16).copy()
+    opaque = a[:, :, 3] > 0
+    for _ in range(rounds):
+        if opaque.all():
+            break
+        # for each still-empty pixel, average the colour of opaque neighbours
+        filled = np.zeros_like(opaque)
+        acc = np.zeros(a.shape[:2] + (3,), np.int32)
+        cnt = np.zeros(a.shape[:2], np.int32)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            sh_o = np.roll(opaque, (dy, dx), (0, 1))
+            sh_c = np.roll(a[:, :, :3], (dy, dx), (0, 1))
+            take = sh_o & ~opaque
+            acc[take] += sh_c[take]
+            cnt[take] += 1
+            filled |= take
+        got = cnt > 0
+        a[:, :, :3][got] = (acc[got] // cnt[got][:, None]).astype(np.int16)
+        opaque = opaque | filled
+    return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8), "RGBA")
 
 
 def cut_background(path):
@@ -130,9 +177,11 @@ def cut_background(path):
     keep = ~is_bg
     hard = np.where(keep, 255, 0).astype(np.uint8)
     im = Image.fromarray(np.dstack([np.asarray(src), hard]), "RGBA")
-    # Half a pixel of softness, so the cut does not read as a sticker edge.
+    # Half a pixel of softness, so the cut does not read as a hard stencil.
     im.putalpha(Image.fromarray(hard).filter(ImageFilter.GaussianBlur(0.6)))
-    return im
+    # ...and push his own colour out past that edge, so the resize later on
+    # has figure colour to blend with rather than background white.
+    return bleed_edges(im)
 
 
 def hair_cap(im):
