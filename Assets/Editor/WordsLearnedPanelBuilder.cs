@@ -42,10 +42,18 @@ public static class WordsLearnedPanelBuilder
 
     // The word sits left on its plate and its meaning right, which is how the
     // mockup reads: a column of Filipino with a column of English beside it.
-    private const float WordLeft = 0.085f;
-    private const float WordWidth = 0.42f;
-    private const float MeaningRight = 0.915f;
-    private const float MeaningWidth = 0.40f;
+    //
+    // The plates themselves run 0.081 to 0.919 of the board, measured off
+    // ui_words_board.png. The text boxes used to start at 0.085 and end at
+    // 0.915, which left the lettering three pixels off the plate edge - close
+    // enough that a capital B looked welded to the rim. PlateInset holds them
+    // off it. The INNER edges are unchanged, so the gap down the middle
+    // between the two columns is what it always was.
+    private const float PlateInset = 0.028f;
+    private const float WordLeft = 0.085f + PlateInset;
+    private const float WordWidth = 0.42f - PlateInset;
+    private const float MeaningRight = 0.915f - PlateInset;
+    private const float MeaningWidth = 0.40f - PlateInset;
 
     private const float ContinueFrac = 0.885f;
     private const float ContinueWidthFrac = 0.29f;
