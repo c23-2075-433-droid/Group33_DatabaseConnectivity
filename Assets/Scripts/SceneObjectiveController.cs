@@ -382,8 +382,23 @@ public class SceneObjectiveController : MonoBehaviour
         // moving anything yet.
         yield return null;
 
+        // Drawn actions count as "still going" too, not just walking.
+        //
+        // This used to wait on IsVoiceWalking alone, which was enough while
+        // the only action that took time was crossing a room. It is not
+        // enough now: Paaralan Scene 3's "Sulat" is a two-second PoseSequence
+        // on a character who never moves, so IsVoiceWalking is false from the
+        // first frame and the next word went up about a quarter of a second
+        // in, while he was still writing. Answer it quickly and the new beat
+        // called Play on the same renderer, whose StopAllCoroutines cut the
+        // writing off mid-stroke.
+        //
+        // Found once rather than per frame: an action lasts a couple of
+        // seconds and this runs every time a word is answered.
+        PoseSequence[] poses = FindObjectsByType<PoseSequence>(FindObjectsSortMode.None);
+
         float waited = 0f;
-        while (playerMovement != null && playerMovement.IsVoiceWalking && waited < maxActionWait)
+        while (waited < maxActionWait && (IsWalking() || IsPosePlaying(poses)))
         {
             waited += Time.deltaTime;
             yield return null;
@@ -393,6 +408,24 @@ public class SceneObjectiveController : MonoBehaviour
 
         advanceRoutine = null;
         ShowObjective(currentIndex);
+    }
+
+    private bool IsWalking()
+    {
+        return playerMovement != null && playerMovement.IsVoiceWalking;
+    }
+
+    /// <summary>
+    /// True while any drawn action is still running. Destroyed components are
+    /// skipped rather than throwing: a scene transition can tear one down
+    /// while this is still counting.
+    /// </summary>
+    private static bool IsPosePlaying(PoseSequence[] poses)
+    {
+        if (poses == null) return false;
+        foreach (PoseSequence p in poses)
+            if (p != null && p.IsPlaying) return true;
+        return false;
     }
 
     /// <summary>
