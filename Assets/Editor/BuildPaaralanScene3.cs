@@ -1,12 +1,29 @@
 // Assets/Editor/BuildPaaralanScene3.cs
 //
 // One-click scene builder for Paaralan Scene 3 ("Vocabulary Lesson").
-// Teaches five words: Aklat, Basa, Sulat, Tanong, Sagot.
+// Teaches four words: Sulat, Basa, Tanong, Inom.
 //
-// All five are NEW - no other scene in the game uses any of them, which makes
-// this the largest single vocabulary gain left in the design document. It is
-// also the scene that document calls the core learning scene: the one where
-// the child is not fetching objects but taking part in a lesson.
+// ALL FOUR ARE ACTIONS, which is the point of the list and worth not undoing.
+// The scene used to teach Aklat, Basa, Sulat, Tanong and Sagot - a list that
+// mixed a THING (Aklat, a book) in with things Kylo does, and the thing was
+// the only one the scene could really show, because making an object appear
+// is easy and drawing a child reading is not. Writing, reading, putting a
+// hand up and taking a drink are four things he does, and every one of them
+// needs a drawn pose before it is really taught. That is a harder scene to
+// finish and a better one.
+//
+// Sulat is WRITE and Basa is READ. They are easy to swap by accident, and
+// swapping them would teach the wrong word with the right animation.
+//
+// INOM IS NOT A NEW WORD. Bahay Scene 5 and Parke Scene 4 both teach it
+// already - the design document's largest-vocabulary-gain note no longer
+// applies to this scene. Three words are new here, not four. Meeting a word
+// again in a different room is reinforcement rather than waste, but it IS a
+// repeat, and the level's word count should not be added up as though it were
+// not.
+//
+// This is the scene the design document calls the core learning scene: the
+// one where the child is not fetching objects but taking part in a lesson.
 //
 // A MIDDLE SCENE OF LEVEL 2. Scene 2 fades into this one; this one fades into
 // Scene 4, which ends the level and shows the result. It held that ending
@@ -42,19 +59,22 @@
 //   Aklat    the textbook appears on the desk
 //   Basa     it lights up - he is reading it
 //   Sulat    the open notebook lights up - he is writing in it
+//   Basa     the textbook lights up - he is reading it
 //   Tanong   Kylo's upper body lights up: he is putting his hand up
-//   Sagot    his head lights up: he is the one answering aloud
+//   Inom     the glass lights up - he is taking a drink
 //
-// Tanong and Sagot are both Kylo's in the design document, and with the
-// teacher gone they both land on him. Two different spots at two different
-// sizes keep them from reading as the same event, but only just: what should
-// really tell them apart is DRAWN poses - a hand raised, a mouth open - the
-// way Scene 2's beats are carried by drawn frames rather than by gleams.
-// Until those exist this is the honest staging, not the finished one.
+// NOTHING APPEARS ANY MORE. With "Aklat" gone there is no word whose job is
+// to put an object on the desk, so the desk is laid out from the start -
+// notebook, pencil, textbook and glass - and all four words gleam something
+// already there. That is the right staging for a list of actions, and it is
+// also why this scene is not finished: a gleam can say WHICH thing a word is
+// about, but it cannot show reading, writing, asking or drinking. All four
+// want drawn poses, the way Scene 2's beats are carried by drawn frames.
+// Until those exist this is the honest staging, not the final one.
 //
 // Sprites expected in Assets/Sprites/:
 //   klasrum_interior_background (or menu_bg), sitting_front_uniform,
-//   prop_aklat, prop_notebook_open, prop_lapis, fx_gleam,
+//   prop_aklat, prop_notebook_open, prop_lapis, item_baso, fx_gleam,
 //   ui_arrow, ui_word_badge, badge_paaralan
 //
 // Run via: Tools > SALINLAHI > Build Paaralan Scene 3
@@ -105,25 +125,60 @@ public class BuildPaaralanScene3
     private const float NotebookBaseY = -3.84f;
     private const float NotebookHeight = 0.83f;
 
-    // The textbook, which "Aklat" puts on the desk. To the RIGHT of the
-    // notebook rather than in front of him: at 0.83 units tall the notebook is
-    // 3.91 wide and spans x 0.91..4.81, which is the whole of the desk in
-    // front of him, and the left-hand strip is both narrower and bitten into
-    // by the desk's far edge. Centred at 5.75 the book spans 5.15..6.36, and
-    // its top at -3.12 clears the far edge, which by that x has dropped to
-    // about -3.07.
-    private const float AklatX = 5.75f;
-    private const float AklatBaseY = -3.82f;
-    private const float AklatHeight = 0.70f;
+    // BEWARE: THESE THREE SPRITES CARRY TRANSPARENT PADDING, so the world
+    // height given here is the height of the BOX, not of the drawing inside
+    // it. prop_aklat is 520x300 with its ink in a 481x218 box - 73% of the
+    // height; prop_lapis is 440x150 with ink 424x74 - 49%; item_baso is 54x61
+    // with ink 48x55 - 90%. The numbers below are chosen so that the DRAWN
+    // object lands where it should, and the drawn spans are written out with
+    // each one so the next person does not have to re-derive them.
+    //
+    // Not cropped to their ink the way prop_notebook_open was, because all
+    // three are shared: prop_aklat is also in Paaralan 4 and 5, prop_lapis in
+    // Paaralan 2 and 5, item_baso in four Bahay and Parke scenes. Cropping
+    // would silently grow them in every one of those.
 
-    // The pencil, already out of the bag too. On the LEFT strip, which has
-    // room for something this small and nothing else to hide it: at x 0.25 it
-    // spans -0.13..0.63, clear of both the notebook and of him. Parked at
-    // -3.40 rather than at the desk's near edge so it reads as lying on the
-    // wood rather than balanced on the rim.
-    private const float PencilX = 0.25f;
-    private const float PencilBaseY = -3.40f;
-    private const float PencilHeight = 0.26f;
+    // The textbook he reads from. On the desk from the start now - no word
+    // puts it there any more. To the RIGHT of the notebook, because at 0.83
+    // units tall the notebook is 3.91 wide and spans x 0.91..4.81, which is
+    // the whole of the desk in front of him. Overlapping HIS x range would be
+    // allowed - the notebook does it, and anything lying flat below -3.01 is
+    // in front of him rather than behind - but the right strip is free, so it
+    // may as well use it.
+    //
+    // Drawn span: x 4.50..6.10, y -3.80..-3.07. Sized UP from a first pass at
+    // 0.83, which drew the book 1.33 wide and read as a second, smaller
+    // notebook rather than as the textbook he is reading from. The cap is the
+    // desk's right edge, which is at about +6.20 on the row this book's far
+    // corner reaches - so this is as large as it goes without hanging off.
+    private const float AklatX = 5.30f;
+    private const float AklatBaseY = -3.84f;
+    private const float AklatHeight = 1.00f;
+
+    // The pencil, lying ON the open notebook's right-hand page rather than
+    // beside it. It used to be on the left strip; the glass needs that strip,
+    // and a pencil resting on the book he is writing in is where a pencil
+    // actually is. Drawn span: x 3.18..4.02, y -3.31..-3.16, inside the
+    // notebook's own -3.84..-3.01. Drawn one sorting order above the notebook
+    // so it is not a coin-flip which of the two wins.
+    private const float PencilX = 3.60f;
+    private const float PencilBaseY = -3.35f;
+    private const float PencilHeight = 0.30f;
+
+    // The glass, for "Inom". On the LEFT strip and STANDING, which is the one
+    // thing on this desk that is allowed to break the -3.01 line: that line
+    // matters because his sprite starts there, and at x -0.05 the glass is
+    // clear of him (he spans 0.84..4.88), so its top rises against the
+    // lockers instead of across his shirt. Drawn span: x -0.36..0.26,
+    // y -3.50..-2.78; the desk's left edge on that bottom row is -0.84, so it
+    // stands a third of a unit inside the wood rather than on the lip.
+    //
+    // Sized DOWN from a first pass at 1.05, which drew it 1.03 units tall -
+    // taller than the open notebook is deep, which on a school desk reads as
+    // a jug rather than a mug.
+    private const float BasoX = -0.05f;
+    private const float BasoBaseY = -3.54f;
+    private const float BasoHeight = 0.80f;
 
     private const int OrderKylo = 0;
     private const int OrderDeskProps = 20;            // his things, on top of the desk
@@ -144,7 +199,7 @@ public class BuildPaaralanScene3
         SpriteImportFixer.Verify(new[]
         {
             "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
-            "prop_lapis", "fx_gleam",
+            "prop_lapis", "item_baso", "fx_gleam",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 3");
 
@@ -183,8 +238,8 @@ public class BuildPaaralanScene3
         // --- No Teacher Rachel ---
         // See the note at the top of this file: she is a waist-up drawing made
         // for the chalkboard view and has nowhere to stand in a corner of
-        // lockers. "Sagot" lands on Kylo instead, which is also whose line it
-        // is in the design document.
+        // lockers. Nothing in the word list needs her now - "Sagot", the one
+        // word that pointed at her, is no longer taught here.
 
         // --- Kylo, already seated ---
         // The listening rig stays switched on and separate from the pose, the
@@ -208,9 +263,12 @@ public class BuildPaaralanScene3
         // line, so that crop is the occlusion klasrum_desk_front used to give.
 
         // --- What is on the desk ---
-        // The notebook and pencil are already out - he took them from his bag
-        // in Scene 2 - so they are switched on below. The textbook is not, and
-        // "Aklat" is what puts it there.
+        // Everything, from the start. He took the notebook and pencil out of
+        // his bag in Scene 2, and with "Aklat" no longer in the word list
+        // there is nothing left whose job is to make an object appear. So the
+        // desk is simply laid out for a lesson and the four words light up
+        // what they are about. CreatePropOptional builds them switched OFF,
+        // for the old appear-on-the-word behaviour, so each is switched on.
         GameObject propAklat = CreatePropOptional("Prop_Aklat", "prop_aklat",
                                                    AklatX, AklatHeight, AklatBaseY);
         // prop_notebook_open, not prop_kuwaderno: the shut blue hardback is
@@ -220,8 +278,13 @@ public class BuildPaaralanScene3
                                                       NotebookX, NotebookHeight, NotebookBaseY);
         GameObject propPencil = CreatePropOptional("Prop_Lapis", "prop_lapis",
                                                     PencilX, PencilHeight, PencilBaseY);
-        if (propNotebook != null) propNotebook.SetActive(true);
-        if (propPencil != null) propPencil.SetActive(true);
+        GameObject propBaso = CreatePropOptional("Prop_Baso", "item_baso",
+                                                  BasoX, BasoHeight, BasoBaseY);
+        foreach (GameObject prop in new[] { propAklat, propNotebook, propPencil, propBaso })
+            if (prop != null) prop.SetActive(true);
+        // The pencil lies on the notebook, so it has to beat the notebook.
+        if (propPencil != null)
+            propPencil.GetComponent<SpriteRenderer>().sortingOrder = OrderDeskProps + 1;
 
         // Nothing walks in this scene, so Kylo needs no physics. PlayerMovement
         // is here because VoiceCommand needs one and the objective controller
@@ -235,26 +298,19 @@ public class BuildPaaralanScene3
         voiceCommand.player = player;
 
         // --- What lights up for each word ---
-        TimedOverlay gleamAklat = CreateGleamAt("Gleam_Aklat", AklatX,
-                                                 AklatBaseY + AklatHeight * 0.5f, 1.5f);
-        TimedOverlay gleamBasa = CreateGleamAt("Gleam_Basa", AklatX,
-                                                AklatBaseY + AklatHeight * 0.5f, 1.9f);
-        // On the notebook itself, which is what he writes in. This used to be
-        // the midpoint of the notebook and the pencil; with the pencil moved
-        // to the far side of him, that midpoint is now his own stomach.
+        // Each gleam is centred on the DRAWN object, not on the middle of its
+        // padded sprite box - see the constants above for why those differ.
         TimedOverlay gleamSulat = CreateGleamAt("Gleam_Sulat", NotebookX,
                                                  NotebookBaseY + NotebookHeight * 0.5f, 2.6f);
-        // Both of the last two land on Kylo now. Sized and placed apart on
-        // purpose: a wide one over the upper body for putting a hand up, a
-        // tight one on the head for speaking. See the note at the top - drawn
-        // poses are what should carry these beats, and these are the stand-in.
+        TimedOverlay gleamBasa = CreateGleamAt("Gleam_Basa", AklatX, -3.44f, 2.0f);
+        // The only one that lands on Kylo: wide, over the upper body, for a
+        // hand going up. A drawn pose should replace it.
         TimedOverlay gleamTanong = CreateGleamAt("Gleam_Tanong", SitX,
                                                   SitFeetY + SeatedHeight * 0.64f, 3.2f);
-        TimedOverlay gleamSagot = CreateGleamAt("Gleam_Sagot", SitX,
-                                                 SitFeetY + SeatedHeight * 0.78f, 2.0f);
+        TimedOverlay gleamInom = CreateGleamAt("Gleam_Inom", BasoX, -3.14f, 1.3f);
 
         // The desk props sit above the desk layer, so their gleams must too.
-        foreach (TimedOverlay fx in new[] { gleamAklat, gleamBasa, gleamSulat })
+        foreach (TimedOverlay fx in new[] { gleamSulat, gleamBasa, gleamInom })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderDeskProps + 1;
@@ -290,34 +346,31 @@ public class BuildPaaralanScene3
         // placed there disappears behind it. Nor does anything sit between
         // x 0.84 and 4.88, which is the width of his own sprite - a badge
         // there is a label pinned to his chest.
-        GameObject pAklat = CreatePromptUI(uiRoot.transform, "Prompt_Aklat", "Aklat", new Vector3(590, -160, 0));
-        GameObject pBasa = CreatePromptUI(uiRoot.transform, "Prompt_Basa", "Basa", new Vector3(590, -40, 0));
         GameObject pSulat = CreatePromptUI(uiRoot.transform, "Prompt_Sulat", "Sulat", new Vector3(-35, -190, 0));
+        GameObject pBasa = CreatePromptUI(uiRoot.transform, "Prompt_Basa", "Basa", new Vector3(610, -60, 0));
         GameObject pTanong = CreatePromptUI(uiRoot.transform, "Prompt_Tanong", "Tanong", new Vector3(290, 230, 0));
-        GameObject pSagot = CreatePromptUI(uiRoot.transform, "Prompt_Sagot", "Sagot", new Vector3(-35, 60, 0));
+        GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-35, 60, 0));
 
-        // --- Objectives: take the book out, read, write, ask, answer ---
-        var aklat = MakeObjective("Aklat", pAklat);
-        if (propAklat != null)
-            UnityEventTools.AddBoolPersistentListener(aklat.onCorrect, propAklat.SetActive, true);
-        UnityEventTools.AddPersistentListener(aklat.onCorrect, gleamAklat.Play);
+        // --- Objectives: write, read, ask, drink ---
+        // In the order the lesson asks for them. Nothing switches a prop on
+        // any more: the desk is laid out from the start, so each word gleams
+        // what it is about and the sequence is purely what Kylo does.
+        var sulat = MakeObjective("Sulat", pSulat);
+        UnityEventTools.AddPersistentListener(sulat.onCorrect, gleamSulat.Play);
 
         var basa = MakeObjective("Basa", pBasa);
         UnityEventTools.AddPersistentListener(basa.onCorrect, gleamBasa.Play);
 
-        var sulat = MakeObjective("Sulat", pSulat);
-        UnityEventTools.AddPersistentListener(sulat.onCorrect, gleamSulat.Play);
-
         var tanong = MakeObjective("Tanong", pTanong);
         UnityEventTools.AddPersistentListener(tanong.onCorrect, gleamTanong.Play);
 
-        var sagot = MakeObjective("Sagot", pSagot);
-        UnityEventTools.AddPersistentListener(sagot.onCorrect, gleamSagot.Play);
+        var inom = MakeObjective("Inom", pInom);
+        UnityEventTools.AddPersistentListener(inom.onCorrect, gleamInom.Play);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { aklat, basa, sulat, tanong, sagot };
+        controller.objectives = new[] { sulat, basa, tanong, inom };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -344,11 +397,14 @@ public class BuildPaaralanScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 3 built and saved to " + ScenePath +
-                   ". Words: Aklat, Basa, Sulat, Tanong, Sagot - all five new to the game. " +
-                   "Staged in Scene 2's locker corner now: Scene 2's seat, Scene 2's tee, no " +
+                   ". Words: Sulat, Basa, Tanong, Inom - four actions. Three are new; INOM IS " +
+                   "NOT, it is also taught in Bahay Scene 5 and Parke Scene 4, so do not count " +
+                   "it twice in the level total. " +
+                   "Staged in Scene 2's locker corner: Scene 2's seat, Scene 2's tee, no " +
                    "foreground desk layer and no teacher - see the notes at the top of " +
-                   "BuildPaaralanScene3 for why each of those went. Tanong and Sagot both " +
-                   "gleam Kylo until drawn poses exist for them. " +
+                   "BuildPaaralanScene3 for why each of those went. The desk is laid out from " +
+                   "the start and every word gleams something already on it; all four want " +
+                   "drawn poses before this scene is finished. " +
                    "It fades into " + NextScene + ", which ends the level - so build Paaralan " +
                    "Scene 4 as well, or the level runs into a scene that is not there.");
     }
