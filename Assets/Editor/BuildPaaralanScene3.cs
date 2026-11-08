@@ -58,7 +58,9 @@
 //
 //   Aklat    the textbook appears on the desk
 //   Basa     it lights up - he is reading it
-//   Sulat    the open notebook lights up - he is writing in it
+//   Sulat    DRAWN: he puts his hand on the desk, brings the pencil to the
+//            page, writes, and sits back. Built from Paaralan Scene 2's
+//            pencil poses, which are the same boy by construction.
 //   Basa     the textbook lights up - he is reading it
 //   Tanong   Kylo's upper body lights up: he is putting his hand up
 //   Inom     the glass lights up - he is taking a drink
@@ -180,6 +182,16 @@ public class BuildPaaralanScene3
     private const float BasoBaseY = -3.54f;
     private const float BasoHeight = 0.80f;
 
+    // One knob for the speed of every drawn action in this scene, the same
+    // way Paaralan Scene 2 does it. Anything measured in SECONDS divides by
+    // Pace; anything measured PER SECOND multiplies by it. Below 1 is slower.
+    //
+    // It was left out while this scene had no animation to slow - a constant
+    // multiplying nothing is just a thing to get wrong later. Sulat is drawn
+    // now, so it earns its place, and it matches Scene 2's 0.65 so the two
+    // scenes move at the same speed.
+    private const float Pace = 0.65f;
+
     private const int OrderKylo = 0;
     private const int OrderDeskProps = 20;            // his things, on top of the desk
 
@@ -200,6 +212,8 @@ public class BuildPaaralanScene3
         {
             "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
             "prop_lapis", "item_baso", "fx_gleam",
+            // Paaralan Scene 2's pencil poses, reused for "Sulat".
+            "place_frame_3_uniform", "lapis_frame_1_uniform", "lapis_frame_2_uniform",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 3");
 
@@ -286,6 +300,83 @@ public class BuildPaaralanScene3
         if (propPencil != null)
             propPencil.GetComponent<SpriteRenderer>().sortingOrder = OrderDeskProps + 1;
 
+        // --- "Sulat": the writing action, in four parts ---
+        //
+        // BUILT ENTIRELY FROM POSES THAT ALREADY EXIST, and that is the point
+        // rather than a shortcut. A Canva strip was generated for this beat
+        // and thrown away: it fitted the canvas but came back off-model - a
+        // rounder face, a different hair silhouette, and a torso about 7%
+        // short, so forcing the arms down to the desk made the head 7% too
+        // big. Swapping between that and the real art mid-action changed who
+        // the character was, which is the one thing the animation rules say
+        // must never happen.
+        //
+        // Paaralan Scene 2's "Lapis" frames are the same boy by construction:
+        // same pipeline, same base sprite, crown on row 142 and hair within
+        // two pixels across all of them. Read in reverse they are a pencil
+        // coming DOWN to the page, which is exactly the preparation writing
+        // needs.
+        //
+        //   lead-in   place_frame_3  hands come onto the desk
+        //             lapis_frame_2  the pencil is in his hand, chest height
+        //             lapis_frame_1  the pencil reaches the page
+        //   loop      lapis_frame_1 <-> lapis_frame_2, the lift and return
+        //             between words. Slower than the lead-in: writing is not
+        //             frantic, and the swing is wide enough that at full
+        //             speed it waves rather than writes.
+        //   tail      lapis_frame_2  the pencil lifts away
+        //             place_frame_3  hands rest on the desk
+        //   idle      sitting_front_uniform
+        //
+        // HONEST ABOUT WHAT THIS IS: lapis_frame_1 is the only drawing in the
+        // project with a pencil actually on the page, so the loop is a lift
+        // and return rather than a hand travelling across a line. It is real
+        // motion by the same character, which a redrawn boy would not be.
+        // Replace the loop with purpose-drawn frames when they exist and are
+        // on model - only loopFrames changes.
+        PoseSequence sulatFrames = seatGO.AddComponent<PoseSequence>();
+        sulatFrames.target = seatGO.GetComponent<SpriteRenderer>();
+        sulatFrames.frames = new[]
+        {
+            LoadSpriteOptional("place_frame_3_uniform"),
+            LoadSpriteOptional("lapis_frame_2_uniform"),
+            LoadSpriteOptional("lapis_frame_1_uniform"),
+        };
+        sulatFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("lapis_frame_1_uniform"),
+            LoadSpriteOptional("lapis_frame_2_uniform"),
+        };
+        sulatFrames.loopCycles = 3;
+        sulatFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("lapis_frame_2_uniform"),
+            LoadSpriteOptional("place_frame_3_uniform"),
+        };
+        sulatFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
+        sulatFrames.framesPerSecond = 11f * Pace;
+        sulatFrames.loopFramesPerSecond = 7f * Pace;
+        // OFF, so nothing runs until the child says the word and the voice
+        // recogniser accepts it. The seated Kylo is already on screen, so
+        // playOnEnable here would fire the whole action the moment the scene
+        // loaded.
+        sulatFrames.playOnEnable = false;
+
+        // The pencil cannot be in two places. It leaves the desk on the frame
+        // where it appears in his hand - frame 1, lapis_frame_2 - and comes
+        // back when he has finished and his hands are down again.
+        if (propPencil != null)
+        {
+            sulatFrames.fireOnFrame = 1;
+            UnityEventTools.AddBoolPersistentListener(
+                sulatFrames.onFrameReached, propPencil.SetActive, false);
+            UnityEventTools.AddBoolPersistentListener(
+                sulatFrames.onFinished, propPencil.SetActive, true);
+        }
+
+        // He is never completely still between words.
+        seatGO.AddComponent<IdleBreath>();
+
         // Nothing walks in this scene, so Kylo needs no physics. PlayerMovement
         // is here because VoiceCommand needs one and the objective controller
         // reads it to know when an action has finished.
@@ -356,6 +447,7 @@ public class BuildPaaralanScene3
         // any more: the desk is laid out from the start, so each word gleams
         // what it is about and the sequence is purely what Kylo does.
         var sulat = MakeObjective("Sulat", pSulat);
+        UnityEventTools.AddPersistentListener(sulat.onCorrect, sulatFrames.Play);
         UnityEventTools.AddPersistentListener(sulat.onCorrect, gleamSulat.Play);
 
         var basa = MakeObjective("Basa", pBasa);
