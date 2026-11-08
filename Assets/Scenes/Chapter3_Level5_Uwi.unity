@@ -2197,11 +2197,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 6bb6e4a1f248422388ed83488322fbb6, type: 3}
-    m_FontSize: 44
+    m_FontSize: 58
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 28
-    m_MaxSize: 44
+    m_MaxSize: 58
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
