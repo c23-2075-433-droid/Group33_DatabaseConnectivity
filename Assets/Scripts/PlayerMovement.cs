@@ -45,6 +45,14 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Sprite shown while the character is standing (Tayo) / default idle.")]
     public Sprite standingSprite;
 
+    [Tooltip("How far the sitting pose settles into the bed, in world units, " +
+             "once its bottom edge has been matched to the lying pose. His feet " +
+             "reach lower in the sitting art than his backside does, so matching " +
+             "bottom edges alone leaves him perched with his seat off the " +
+             "mattress. Raise this to sink him further into the bed, lower it " +
+             "to lift him back out.")]
+    public float sittingPoseSeatDrop = 0.43f;
+
     [Header("Walk Cycle")]
     [Tooltip("Walk-cycle frames, in order, played on a loop while the character is moving. " +
              "Leave empty to just hold on standingSprite while walking (no animation).")]
@@ -109,6 +117,12 @@ public class PlayerMovement : MonoBehaviour
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
 
+    // Where the scene author put the character while he is still in bed. The
+    // sitting-up pose is measured off this, and standing goes back to it before
+    // physics takes over, so the authored position stays the single place the
+    // bed pose is tuned from.
+    private float bedPoseY;
+
     // Tracks which wake-up stage the player is in, so movement/jump input can be
     // ignored until the player has actually stood up (can't walk while lying down).
     public enum WakeStage { LyingDown, SittingUp, Standing }
@@ -119,6 +133,8 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        bedPoseY = transform.position.y;
 
         // Level 1 opens with the character lying down asleep.
         if (spriteRenderer != null && lyingDownSprite != null)
@@ -329,7 +345,11 @@ public class PlayerMovement : MonoBehaviour
         currentWakeStage = WakeStage.SittingUp;
         if (spriteRenderer != null)
         {
-            if (sittingUpSprite != null) spriteRenderer.sprite = sittingUpSprite;
+            if (sittingUpSprite != null)
+            {
+                SwapPoseKeepingFeetDown(sittingUpSprite);
+                transform.position += Vector3.down * sittingPoseSeatDrop;
+            }
             spriteRenderer.flipX = false; // undo the lying-down mirror
         }
         Debug.Log("PlayerMovement: Bangon triggered - now sitting up.");
@@ -344,6 +364,13 @@ public class PlayerMovement : MonoBehaviour
         if (currentWakeStage != WakeStage.SittingUp) return; // must Bangon first
 
         currentWakeStage = WakeStage.Standing;
+
+        // Undo the lift Bangon() applied, so he hands over to physics from the
+        // same height he always did and drops to the floor instead of falling
+        // the full height of the sitting art.
+        Vector3 p = transform.position;
+        transform.position = new Vector3(p.x, bedPoseY, p.z);
+
         if (spriteRenderer != null)
         {
             if (standingSprite != null) spriteRenderer.sprite = standingSprite;
@@ -355,6 +382,40 @@ public class PlayerMovement : MonoBehaviour
         if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
 
         Debug.Log("PlayerMovement: Tayo triggered - now standing, movement unlocked.");
+    }
+
+    /// <summary>
+    /// Swaps in a wake-up pose while keeping the BOTTOM edge of the art where
+    /// it already was, instead of its centre.
+    ///
+    /// Every pose pivots on its own centre, and the sitting art is far taller
+    /// than the lying art (5 units against 2.5). Assigning the sprite on its
+    /// own therefore hangs all that extra height below the pivot: Kylo slid
+    /// about a unit down through the mattress on "Bangon" and ended up sitting
+    /// in mid-air in front of the bed frame. Shifting up by half the height
+    /// difference puts the bottom of the art back on the same mattress line
+    /// his sleeping pose was resting on.
+    ///
+    /// That is the straight match; the caller then settles him by
+    /// sittingPoseSeatDrop, because in the sitting art his feet reach lower
+    /// than his backside and only the feet would be touching the bed.
+    /// </summary>
+    private void SwapPoseKeepingFeetDown(Sprite next)
+    {
+        if (spriteRenderer == null || next == null) return;
+
+        float before = PoseHeight(spriteRenderer.sprite);
+        spriteRenderer.sprite = next;
+        float after = PoseHeight(next);
+
+        transform.position += Vector3.up * (after - before) * 0.5f;
+    }
+
+    /// <summary>A pose's drawn height in world units, scale included.</summary>
+    private float PoseHeight(Sprite pose)
+    {
+        if (pose == null) return 0f;
+        return pose.bounds.size.y * Mathf.Abs(transform.lossyScale.y);
     }
 
     /// <summary>
