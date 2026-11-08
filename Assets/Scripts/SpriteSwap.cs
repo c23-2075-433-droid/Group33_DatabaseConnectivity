@@ -30,8 +30,11 @@ public class SpriteSwap : MonoBehaviour
     [Tooltip("What it changes to. Leave empty and Apply() does nothing, which is how an unbuilt art asset degrades.")]
     public Sprite afterSprite;
 
+    // Instantiated rather than left null, so a builder can wire a listener
+    // to it the moment the component is added. Same trap that PoseSequence
+    // fell into; this one never bit only because no scene has wired it yet.
     [Tooltip("Runs after the swap, for a gleam or a sound.")]
-    public UnityEvent onApplied;
+    public UnityEvent onApplied = new UnityEvent();
 
     [Tooltip("Seconds to dip the art out and back in around the change, so one " +
              "pose melts into the next instead of popping. A quarter of this is " +
