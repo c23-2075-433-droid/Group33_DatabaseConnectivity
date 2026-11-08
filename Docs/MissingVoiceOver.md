@@ -1,26 +1,21 @@
 # Voice-over still missing
 
-24 of the 432 script lines have no clip. None was ever recorded — these are
-gaps in the original pass, not something a merge removed. Re-check at any time
-with `python3 -I Tools/completeness_report.py`.
+**15 of the 432 script lines have no clip**, and all fifteen need a human
+voice. Re-check at any time with `python3 -I Tools/completeness_report.py`.
 
 | Segment | Voiced | Missing |
 |---|---|---|
 | Cue | 0 / 8 | all |
 | Feedback | 0 / 7 | all |
-| Story | 71 / 74 | 3 |
-| Prompt | 71 / 74 | 3 |
-| Praise | 71 / 74 | 3 |
+| everything else | 417 / 417 | none |
 
----
+These are the loudest gap left in the game, because none of them belongs to a
+single scene: the framing before every word, and the reply to every answer
+whether right or wrong, are silent everywhere.
 
-## Group 1 — 15 lines that need your voice
-
-These are **already written up as Part 2 of `Docs/RecordingScript.md`, numbers
-51-65**; nothing new to write, they simply were never recorded. They are the
-loudest gap in the game, because none belongs to a single scene: the framing
-before every word and the reply to every answer, right or wrong, are silent
-everywhere.
+They are also **already written out as Part 2 of `Docs/RecordingScript.md`,
+numbers 51-65** — nothing new to write. The table below adds the filename each
+one has to become, and when the game reaches for it.
 
 | # | Say this | File it becomes | When the game uses it |
 |---|---|---|---|
@@ -40,68 +35,29 @@ everywhere.
 | 64 | Hindi kita narinig. I did not hear you - try once more. | `rachel_feedback_nothear_1.wav` | Nothing recognised at all - distinct from a wrong word, which gets incorrect_1/2. |
 | 65 | Pakilakasan mo ang boses mo. A little louder, please! | `rachel_feedback_nothear_2.wav` | Two no-hears in a row. |
 
-Record them in your normal teaching voice, the way Part 2 of that script
-describes: quiet room, phone a hand's width away, each line said as one
-sentence rather than as a Filipino half and an English half.
+## How to record them
 
-**There is no tool that cuts these apart yet.** `split_word_recording.py` and
-`split_by_transcript.py` both exist for the 50 single words — one cuts on
-silence and assigns by position, the other asks the recogniser which word it
-heard. Neither knows these fifteen sentence filenames. So either record each
-line as its own file and save it straight into `Assets/Audio/VO` under the
-name in the table, which needs no tooling at all, or record one pass and ask
-for a splitter to be written for them.
+Your normal teaching voice, quiet room, phone about a hand's width away and
+off the desk. Several lines mix Filipino and English in one breath — say each
+as one sentence, the way a teacher would, not as two halves.
 
-**Skip the `voice_changer.py --words` step that `RecordingScript.md` ends on.**
-That instruction predates the decision of 4 November to keep your own voice
+**There is no tool that cuts these apart.** `split_word_recording.py` cuts on
+silence and assigns the pieces by position; `split_by_transcript.py` asks the
+recogniser which word it heard. Both exist for the 50 single words and neither
+knows these fifteen sentence filenames. So record each line as its own file
+and save it straight into `Assets/Audio/VO` under the name in the table —
+fifteen takes, no tooling, nothing that can mislabel a clip.
+
+Then in Unity: **Tools > SALINLAHI > Refresh Narrator Voice Bank**, which is
+what links a new clip to its line.
+
+**Do not run `voice_changer.py --words`,** which `RecordingScript.md` still
+ends on. That predates the decision of 4 November to keep your own voice
 rather than re-render it in Rachel's cloned one.
 
----
+## What was here before
 
-## Group 2 — 9 Paaralan lines that are generated, not recorded
-
-English narration for the two scenes that came over from Lacida's history
-(`Chapter2_Level1_Paaralan`, `Chapter2_Level2_Klasrum`). The scenes arrived;
-their narration never did. This is why `completeness_report.py` lists **Bukas**
-and **Lakad** as taught by caption rather than by voice — both words are
-voiced fine back in Bahay, but silent here.
-
-The Filipino words themselves are already recorded
-(`rachel_word_bukas_*`, `rachel_word_lakad_*`), so nothing here needs your
-voice — only the English frame, with the existing word spliced in.
-
-| File | Scene | Word | Line |
-|---|---|---|---|
-| `rachel_l2_s1_bukas_ask.wav` | S1 | Bukas | Ask him to open it — say {word}! |
-| `rachel_l2_s1_bukas_done.wav` | S1 | Bukas | The gate swings open! |
-| `rachel_l2_s1_bukas_story.wav` | S1 | Bukas | The guard is standing beside the gate, waiting to let him in. |
-| `rachel_l2_s1_lakad_ask.wav` | S1 | Lakad | Walk him up to it — say {word}! |
-| `rachel_l2_s1_lakad_done.wav` | S1 | Lakad | There he is, right at the gate. |
-| `rachel_l2_s1_lakad_story.wav` | S1 | Lakad | Kylo can see his school now. The gate up ahead is still shut. |
-| `rachel_l2_s2_lakad_ask.wav` | S2 | Lakad | Walk him over to it — say {word}! |
-| `rachel_l2_s2_lakad_done.wav` | S2 | Lakad | There he is, right beside his desk. |
-| `rachel_l2_s2_lakad_story.wav` | S2 | Lakad | Kylo is inside the classroom, and his own chair is across the room by the window. |
-
-Put the nine ids in a file, say `Recordings/missing_ids.txt`, one per line,
-then:
-
-```
-python3 Tools/generate_voiceover.py --ids-from Recordings/missing_ids.txt --dry-run
-```
-
-`--dry-run` prints the bill and touches neither the key nor the account, so
-run that first. Without `--force`, the generator skips any clip that already
-exists, so it cannot overwrite the 405 that are already right. Then:
-
-```
-python3 Tools/generate_voiceover.py --ids-from Recordings/missing_ids.txt
-python3 Tools/splice_word_lines.py --ids-from Recordings/missing_ids.txt
-python3 Tools/match_word_loudness.py
-```
-
-**Rotate the ElevenLabs key first.** `Tools/generate_voiceover.py` reads
-`Tools/elevenlabs.key`, which is still tracked in `main` (commit `0250197`) and
-must be treated as exposed. Generating against it spends a compromised
-credential.
-
-Run `match_word_loudness.py` last, or these nine will sit ~3 dB above the rest.
+This list held 24 lines. The other nine — Story, Prompt and Praise for
+Paaralan Scenes 1 and 2 — were generated and merged in PR #14, which also
+wired up 233 clips that were already on disk but unreachable because the
+voice bank had been left half-linked after PR #11 rewrote the asset GUIDs.
