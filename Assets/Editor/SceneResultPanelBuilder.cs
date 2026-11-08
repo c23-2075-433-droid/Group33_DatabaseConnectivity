@@ -68,8 +68,50 @@ public static class SceneResultPanelBuilder
     // The figures are right-aligned near the plates' right edge, because the
     // labels printed on the board are long - WORDS COMPLETED: reaches most of
     // the way across its own plate - and what follows them is short.
-    private const float ValueRightFrac = 0.92f;
+    //
+    // 0.92 put them ON the rim: the two plates end at 0.918 and 0.916 of the
+    // board, measured off ui_result_board.png, so the last digit was touching
+    // the moulding. Held off it by the same amount as the vocabulary rows.
+    // Only the right edge moves - the box keeps its width, so the figures
+    // have exactly as much room to shrink into as before.
+    private const float ValueRightFrac = 0.92f - WordsLearnedPanelBuilder.PlateInset;
     private const float ValueWidthFrac = 0.30f;
+
+    // "WORDS COMPLETED:" is the longer label by a wide margin. Measured off
+    // ui_result_board.png, its last pixel is at 0.730 of the board against
+    // 0.571 for "TOTAL POINTS:" - so where the points figure has 237px of
+    // bare plate to fill, the words figure has 120. This is that 120 less a
+    // gap, as a fraction of the board.
+    private const float WordsValueWidthFrac = 0.1405f;
+
+    // Sized against the lettering printed beside them: those capitals are
+    // 44px in the 941px-tall art, 41.1px at the size the panel is built, and
+    // this font's capitals are 0.695 of its point size - so 59 would match
+    // exactly. 52 is deliberately a little under that.
+    //
+    // 52 is the largest ceiling at which the two rows agree. The words box
+    // is narrow, so a short score tops out near 53 however high the ceiling
+    // goes; at 59 the points figure took the full 59 and the words figure
+    // sat at 53 beside it, close enough to look like a mistake rather than a
+    // decision. At 52 a typical "60" and "3 / 5" are both 52.
+    private const int ValueMaxSize = 52;
+
+    // Above the figures, so the congratulation leads and the score follows.
+    // Only a short nickname actually reaches it - the box holds 16 characters
+    // and best fit takes a long one down - but the common case is a short one.
+    private const int GreetingMaxSize = 58;
+
+    // 60 is not spare room, it is the ceiling that stops best fit WRAPPING.
+    //
+    // Best fit picks the largest size that fits the box, and with wrapping
+    // allowed a two-line layout is one of the things that can fit: at 76px
+    // tall, "12 / 20" fit better as two 38px lines than as one 35px line, so
+    // the score stacked itself. A box 60 tall can hold two lines only up to
+    // 30px, and every score shape the game can produce sets larger than that
+    // on one line, so one line always wins. The matching Truncate is below -
+    // with the vertical Overflow this builder uses elsewhere, height is not
+    // a constraint at all and the wrap is free.
+    private const float ValueHeight = 60f;
 
     private const float ButtonWidthFrac = 0.26f;
     private const float ButtonXFrac = 0.19f;
@@ -206,9 +248,29 @@ public static class SceneResultPanelBuilder
 
         // The two lines the board speaks to the child with. Neither existed
         // before: the panel knew the run but never the player.
+        // 58 so the line the board actually says to the child is the biggest
+        // thing on it. At 44 it was smaller than the two figures, which made
+        // the score look like the point of the screen and the congratulation
+        // like a caption on it.
+        //
+        // It is the largest size that needs nothing else moved: the box is 62
+        // tall, and the gap under the greeting is the tight one - the stars
+        // leave 55.8px above its centre but the place line only 38.7 below,
+        // so a centred 58px line clears that line by 9.7px. Past about 64 the
+        // two would touch.
         Text greetingText = CreateText(panel.transform, "GreetingText", "",
             new Vector2(0f, FromTop(GreetingFrac)),
-            new Vector2(PanelWidth * 0.82f, 62f), 44, TextAnchor.MiddleCenter);
+            new Vector2(PanelWidth * 0.82f, 62f), GreetingMaxSize, TextAnchor.MiddleCenter);
+
+        // This line carries a name somebody typed, and the box takes 16
+        // characters. "GREAT JOB, JIRO!" is 333px of a 607px box at 44, but
+        // "GREAT JOB, JUAN MIGUEL JOSE!" is 607 exactly and a name of wide
+        // letters runs to 882 - and with no best fit at all it had nothing to
+        // do but wrap and hang off the board. Same shape of fault as the
+        // score stacking, just waiting on a longer nickname.
+        greetingText.resizeTextForBestFit = true;
+        greetingText.resizeTextMinSize = 28;
+        greetingText.resizeTextMaxSize = GreetingMaxSize;
 
         Text placeText = CreateText(panel.transform, "PlaceText", "",
             new Vector2(0f, FromTop(PlaceFrac)),
@@ -217,25 +279,69 @@ public static class SceneResultPanelBuilder
         placeText.resizeTextMinSize = 16;
         placeText.resizeTextMaxSize = 26;
 
+        // The greeting and the place line are set in the display face too.
+        // Everything the child reads on this board now letters the same way
+        // as the lettering painted into it; the records strip underneath is
+        // the one thing left in the UI font, because it is a column of
+        // dates and scores rather than a sentence addressed to them.
+        //
+        // Truncate for the same reason the figures have it - see the note
+        // there. Longest place line is "YOU SUCCESSFULLY COMPLETED
+        // PAARALAN: LEVEL 2!" at 589px of a 666px box, so it holds 26 and
+        // stays on one line.
+        foreach (Text line in new[] { greetingText, placeText })
+        {
+            line.verticalOverflow = VerticalWrapMode.Truncate;
+            VocabularyFont.Apply(line);
+        }
+
         // Right-aligned against the plates, because the labels printed on the
         // board are long and the figures that follow them are short.
-        float valueWidth = PanelWidth * ValueWidthFrac;
-        float valueX = PanelWidth * (ValueRightFrac - 0.5f) - valueWidth * 0.5f;
+        //
+        // The two boxes share a right edge and nothing else. Each one reaches
+        // left only as far as its own printed label allows, because best fit
+        // measures the BOX and knows nothing about the lettering in the art -
+        // give the words figure the room the points figure has and a run of
+        // "12 / 20" sets itself large enough to park on top of the D of
+        // COMPLETED.
+        float valueRight = PanelWidth * (ValueRightFrac - 0.5f);
 
+        float pointsWidth = PanelWidth * ValueWidthFrac;
         Text pointsText = CreateText(panel.transform, "PointsText", "",
-            new Vector2(valueX, FromTop(PointsFrac)),
-            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+            new Vector2(valueRight - pointsWidth * 0.5f, FromTop(PointsFrac)),
+            new Vector2(pointsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
+        float wordsWidth = PanelWidth * WordsValueWidthFrac;
         Text wordsText = CreateText(panel.transform, "WordsText", "",
-            new Vector2(valueX, FromTop(WordsFrac)),
-            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+            new Vector2(valueRight - wordsWidth * 0.5f, FromTop(WordsFrac)),
+            new Vector2(wordsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
         // A four-figure score, or "12 / 15", must not grow into its label.
+        //
+        // These two, and ONLY these two, are set in the display face.
+        // "TOTAL POINTS:" and "WORDS COMPLETED:" are painted into
+        // ui_result_board in the same chunky distressed capitals as the
+        // vocabulary board, so the figures that follow them sit on the same
+        // plate, an inch away, in a different typeface - which is the one
+        // place on this board where the mismatch is impossible to miss. The
+        // greeting, the place line and the records strip are sentences to
+        // read rather than lettering to match, and stay in the UI font.
         foreach (Text figure in new[] { pointsText, wordsText })
         {
             figure.resizeTextForBestFit = true;
             figure.resizeTextMinSize = 20;
-            figure.resizeTextMaxSize = 34;
+            figure.resizeTextMaxSize = ValueMaxSize;
+
+            // A score is one line or it is wrong. Everything else on this
+            // board overflows downwards on purpose - the records strip grows
+            // to however many rows came back - but that setting makes height
+            // free, and free height is what lets best fit answer "too wide"
+            // by stacking "3 / 5" into "3 /" over "5". Truncate puts the
+            // height back in play, and ValueHeight above keeps two lines
+            // from ever being the better fit.
+            figure.verticalOverflow = VerticalWrapMode.Truncate;
+
+            VocabularyFont.Apply(figure);
         }
 
         // Only on a level's last scene: the scores read back out of the

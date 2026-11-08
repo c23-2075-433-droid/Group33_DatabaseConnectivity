@@ -42,10 +42,21 @@ public static class WordsLearnedPanelBuilder
 
     // The word sits left on its plate and its meaning right, which is how the
     // mockup reads: a column of Filipino with a column of English beside it.
-    private const float WordLeft = 0.085f;
-    private const float WordWidth = 0.42f;
-    private const float MeaningRight = 0.915f;
-    private const float MeaningWidth = 0.40f;
+    //
+    // The plates themselves run 0.081 to 0.919 of the board, measured off
+    // ui_words_board.png. The text boxes used to start at 0.085 and end at
+    // 0.915, which left the lettering three pixels off the plate edge - close
+    // enough that a capital B looked welded to the rim. PlateInset holds them
+    // off it. The INNER edges are unchanged, so the gap down the middle
+    // between the two columns is what it always was.
+    // Public because the summary board's two figures are held off their own
+    // plates by the same amount - see SceneResultPanelBuilder.ValueRightFrac.
+    // The two boards are the same art at the same size, so one number.
+    public const float PlateInset = 0.028f;
+    private const float WordLeft = 0.085f + PlateInset;
+    private const float WordWidth = 0.42f - PlateInset;
+    private const float MeaningRight = 0.915f - PlateInset;
+    private const float MeaningWidth = 0.40f - PlateInset;
 
     private const float ContinueFrac = 0.885f;
     private const float ContinueWidthFrac = 0.29f;
@@ -53,7 +64,6 @@ public static class WordsLearnedPanelBuilder
     private const float CloseX = 0.438f;
     private const float CloseSize = 112f;
 
-    private static readonly Color Cream = new Color(0.99f, 0.96f, 0.89f);
 
     /// <summary>A fraction of the way down the board, as a Y from its centre.</summary>
     private static float FromTop(float frac)
@@ -165,20 +175,17 @@ public static class WordsLearnedPanelBuilder
         go.transform.SetParent(parent, false);
         Text text = go.AddComponent<Text>();
         text.text = content;
-        text.font = UIFont.Get();
         text.fontSize = fontSize;
-        text.fontStyle = FontStyle.Bold;
         text.alignment = align;
-        text.color = Cream;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Truncate;
         text.raycastTarget = false;
 
-        // Cream on mid-brown woodgrain is weak on its own - the grain runs
-        // straight through the letters. The same outline the summary uses.
-        Outline outline = go.AddComponent<Outline>();
-        outline.effectColor = new Color(0.16f, 0.09f, 0.04f, 0.95f);
-        outline.effectDistance = new Vector2(2.2f, -2.2f);
+        // The vocabulary's own face, not the UI's - and the colour and stroke
+        // that go with it. White on mid-brown woodgrain needs separating from
+        // it either way: the grain runs straight through the letters.
+        go.AddComponent<Outline>();
+        VocabularyFont.Apply(text);
 
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchoredPosition = position;
