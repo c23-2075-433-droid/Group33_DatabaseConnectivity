@@ -53,7 +53,17 @@ public static class WordsLearnedPanelBuilder
     private const float CloseX = 0.438f;
     private const float CloseSize = 112f;
 
-    private static readonly Color Cream = new Color(0.99f, 0.96f, 0.89f);
+    // The words and their meanings are very slightly warm white rather than
+    // pure #FFFFFF, so they sit with the painted lettering on the title plaque
+    // instead of glaring next to it. Near enough to white to read as white.
+    private static readonly Color Chalk = new Color(1f, 0.988f, 0.957f);
+
+    // Behind them, flat near-black at a wide offset. The old cream-on-brown
+    // was readable only because the letters were thin; the display face is
+    // heavy enough that the woodgrain shows through its counters instead, and
+    // a soft brown halo does not stop that. See Art/words_learned_reference.png.
+    private static readonly Color InkOutline = new Color(0.04f, 0.03f, 0.02f, 1f);
+    private const float OutlineDistance = 3f;
 
     /// <summary>A fraction of the way down the board, as a Y from its centre.</summary>
     private static float FromTop(float frac)
@@ -165,20 +175,32 @@ public static class WordsLearnedPanelBuilder
         go.transform.SetParent(parent, false);
         Text text = go.AddComponent<Text>();
         text.text = content;
-        text.font = UIFont.Get();
+
+        // The vocabulary's own face, not the UI's. VocabularyFont is a
+        // separate lookup for exactly this reason - see the note at the top of
+        // Assets/Editor/VocabularyFont.cs.
+        text.font = VocabularyFont.Get();
         text.fontSize = fontSize;
-        text.fontStyle = FontStyle.Bold;
+
+        // NOT Bold. Both Gagalin and Luckiest Guy ship one weight, and it is
+        // already a heavy one; with no bold face to switch to, Unity fakes the
+        // weight by emboldening the outlines it has, which thickens the
+        // letters into each other and - on Gagalin especially - fills in the
+        // chipped edges that are the whole point of the face.
+        text.fontStyle = FontStyle.Normal;
+
         text.alignment = align;
-        text.color = Cream;
+        text.color = Chalk;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Truncate;
         text.raycastTarget = false;
 
-        // Cream on mid-brown woodgrain is weak on its own - the grain runs
-        // straight through the letters. The same outline the summary uses.
+        // White on mid-brown woodgrain still needs separating from it: the
+        // grain runs straight through the letters. Outline draws the glyphs
+        // four more times, one per corner, so the distance is the stroke.
         Outline outline = go.AddComponent<Outline>();
-        outline.effectColor = new Color(0.16f, 0.09f, 0.04f, 0.95f);
-        outline.effectDistance = new Vector2(2.2f, -2.2f);
+        outline.effectColor = InkOutline;
+        outline.effectDistance = new Vector2(OutlineDistance, -OutlineDistance);
 
         RectTransform rect = go.GetComponent<RectTransform>();
         rect.anchoredPosition = position;
