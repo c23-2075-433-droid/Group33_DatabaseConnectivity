@@ -247,12 +247,38 @@ public static class SceneResultPanelBuilder
             new Vector2(0f, FromTop(GreetingFrac)),
             new Vector2(PanelWidth * 0.82f, 62f), 44, TextAnchor.MiddleCenter);
 
+        // This line carries a name somebody typed, and the box takes 16
+        // characters. "GREAT JOB, JIRO!" is 333px of a 607px box at 44, but
+        // "GREAT JOB, JUAN MIGUEL JOSE!" is 607 exactly and a name of wide
+        // letters runs to 882 - and with no best fit at all it had nothing to
+        // do but wrap and hang off the board. Same shape of fault as the
+        // score stacking, just waiting on a longer nickname.
+        greetingText.resizeTextForBestFit = true;
+        greetingText.resizeTextMinSize = 28;
+        greetingText.resizeTextMaxSize = 44;
+
         Text placeText = CreateText(panel.transform, "PlaceText", "",
             new Vector2(0f, FromTop(PlaceFrac)),
             new Vector2(PanelWidth * 0.90f, 44f), 26, TextAnchor.MiddleCenter);
         placeText.resizeTextForBestFit = true;
         placeText.resizeTextMinSize = 16;
         placeText.resizeTextMaxSize = 26;
+
+        // The greeting and the place line are set in the display face too.
+        // Everything the child reads on this board now letters the same way
+        // as the lettering painted into it; the records strip underneath is
+        // the one thing left in the UI font, because it is a column of
+        // dates and scores rather than a sentence addressed to them.
+        //
+        // Truncate for the same reason the figures have it - see the note
+        // there. Longest place line is "YOU SUCCESSFULLY COMPLETED
+        // PAARALAN: LEVEL 2!" at 589px of a 666px box, so it holds 26 and
+        // stays on one line.
+        foreach (Text line in new[] { greetingText, placeText })
+        {
+            line.verticalOverflow = VerticalWrapMode.Truncate;
+            VocabularyFont.Apply(line);
+        }
 
         // Right-aligned against the plates, because the labels printed on the
         // board are long and the figures that follow them are short.
