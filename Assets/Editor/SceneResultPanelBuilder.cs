@@ -96,6 +96,11 @@ public static class SceneResultPanelBuilder
     // decision. At 52 a typical "60" and "3 / 5" are both 52.
     private const int ValueMaxSize = 52;
 
+    // Above the figures, so the congratulation leads and the score follows.
+    // Only a short nickname actually reaches it - the box holds 16 characters
+    // and best fit takes a long one down - but the common case is a short one.
+    private const int GreetingMaxSize = 58;
+
     // 60 is not spare room, it is the ceiling that stops best fit WRAPPING.
     //
     // Best fit picks the largest size that fits the box, and with wrapping
@@ -243,9 +248,19 @@ public static class SceneResultPanelBuilder
 
         // The two lines the board speaks to the child with. Neither existed
         // before: the panel knew the run but never the player.
+        // 58 so the line the board actually says to the child is the biggest
+        // thing on it. At 44 it was smaller than the two figures, which made
+        // the score look like the point of the screen and the congratulation
+        // like a caption on it.
+        //
+        // It is the largest size that needs nothing else moved: the box is 62
+        // tall, and the gap under the greeting is the tight one - the stars
+        // leave 55.8px above its centre but the place line only 38.7 below,
+        // so a centred 58px line clears that line by 9.7px. Past about 64 the
+        // two would touch.
         Text greetingText = CreateText(panel.transform, "GreetingText", "",
             new Vector2(0f, FromTop(GreetingFrac)),
-            new Vector2(PanelWidth * 0.82f, 62f), 44, TextAnchor.MiddleCenter);
+            new Vector2(PanelWidth * 0.82f, 62f), GreetingMaxSize, TextAnchor.MiddleCenter);
 
         // This line carries a name somebody typed, and the box takes 16
         // characters. "GREAT JOB, JIRO!" is 333px of a 607px box at 44, but
@@ -255,7 +270,7 @@ public static class SceneResultPanelBuilder
         // score stacking, just waiting on a longer nickname.
         greetingText.resizeTextForBestFit = true;
         greetingText.resizeTextMinSize = 28;
-        greetingText.resizeTextMaxSize = 44;
+        greetingText.resizeTextMaxSize = GreetingMaxSize;
 
         Text placeText = CreateText(panel.transform, "PlaceText", "",
             new Vector2(0f, FromTop(PlaceFrac)),
