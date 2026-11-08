@@ -330,7 +330,7 @@ def build(md_path, pdf_path):
                           bottomMargin=BMARGIN,
                           title="Activity 7 - Version Control and "
                                 "Collaborative Development",
-                          author="Manzanero, Kyla Samantha - Group 33",
+                          author="Daquis, Jhesza Mhei G. - Group 33",
                           subject="SALINLAHI capstone - version control")
     frame = Frame(LMARGIN, BMARGIN, AVAIL, PAGE[1] - TMARGIN - BMARGIN,
                   id="main")
