@@ -216,6 +216,80 @@ def hair_cap(im):
 
     span = bottom - crown
     if span < 0.08 * (last - crown):
+        # SOMETHING THAT IS NOT HAIR IS ABOVE THE HEAD.
+        #
+        # The scan above starts at the topmost opaque row and assumes it is
+        # the tip of a hair spike. That holds for every pose drawn so far,
+        # and it has to start there, because the spike tips are anti-aliased
+        # and too pale to count as dark - starting at the dark mass instead
+        # would shave a few pixels off every head and silently rescale every
+        # sprite in the project.
+        #
+        # It does not hold for "Tanong", where his hand goes up above his
+        # head. There the scan begins on skin, never finds a dense-hair row
+        # before the gap tolerance runs out, and reports a 1px head.
+        #
+        # So: find the hair mass first, take the head's COLUMNS from it, and
+        # only then walk back up for the spike tips - within those columns,
+        # so the raised arm cannot be mistaken for more hair.
+        # The ratio alone is not enough to find hair here, and the reason is
+        # worth keeping: the topmost rows of a raised arm are a FINGERTIP, six
+        # opaque pixels whose outline is nearly all dark. That sails through
+        # "45% of this row is dark" and the fallback latched onto row 71
+        # instead of the hair at row 267. So a hair row must also be WIDE -
+        # a tenth of the figure's widest row. Hair spans 190-430 pixels here;
+        # the fingertip spans six.
+        wide = 0.10 * ow.max()
+        dense = [y for y in range(crown, last + 1)
+                 if ow[y] >= wide and dw[y] >= 0.45 * ow[y]]
+        if dense:
+            start = dense[0]
+            bottom, misses = start, 0
+            for y in range(start, last + 1):
+                if ow[y] >= wide and dw[y] >= 0.45 * ow[y]:
+                    bottom, misses = y, 0
+                else:
+                    misses += 1
+                    if misses > GAP_TOLERANCE:
+                        break
+
+            # The raised arm occupies COLUMNS as well as rows, and they
+            # overlap the head's - his arm is outlined in black, so taking
+            # every dark column in the hair rows put the head's left edge at
+            # the arm. Find the arm on a row safely above the hair and leave
+            # those columns out.
+            ref = max(rows[0], start - 20)
+            blocked = np.zeros(a.shape[1], dtype=bool)
+            ref_cols = np.where(opaque[ref])[0]
+            if len(ref_cols):
+                blocked[max(0, ref_cols[0] - 8):ref_cols[-1] + 9] = True
+
+            head = dark[start:bottom + 1].any(axis=0) & ~blocked
+            head_cols = np.where(head)[0]
+            if len(head_cols) == 0:                     # nothing left: no arm
+                head_cols = np.where(dark[start:bottom + 1].any(axis=0))[0]
+            c0, c1 = head_cols[0], head_cols[-1]
+
+            # OPAQUE, not dark, walking up: the spike tips are anti-aliased
+            # and too pale to count as dark, which is the whole reason the
+            # main scan starts from the topmost opaque row. Confined to the
+            # head's columns, the arm cannot be mistaken for a spike.
+            crown, misses = start, 0
+            for y in range(start - 1, rows[0] - 1, -1):
+                if opaque[y, c0:c1 + 1].any():
+                    crown, misses = y, 0
+                else:
+                    misses += 1
+                    if misses > GAP_TOLERANCE:
+                        break
+
+            span = bottom - crown
+            if span >= 0.08 * (last - crown):
+                # Centre from the HEAD's columns, not from every dark pixel
+                # in these rows - the raised arm is outlined in black too,
+                # and including it drags the centre sideways.
+                return crown, bottom, (c0 + c1) // 2
+
         raise SystemExit(
             f"hair cap came out {span}px on a {last - crown}px figure, which "
             f"cannot be right - the scale factor would be nonsense. Look at "
@@ -269,7 +343,7 @@ def split_columns(img):
 
 
 def fit_strip(raw_path, out_pattern, crowns, seat_feet_y=-3.009,
-              seated_height=5.609):
+              seated_height=5.609, flush_to_bottom=False, canvas_pad=0):
     """Cut a row of generated poses out of one image and fit each to the canvas.
 
     One Canva generation gives three poses in a row, which is three times
@@ -302,6 +376,32 @@ def fit_strip(raw_path, out_pattern, crowns, seat_feet_y=-3.009,
         padded = Image.new("RGB", (crop.size[0], crop.size[1] + 60),
                            (255, 255, 255))
         padded.paste(crop, (0, 30))
+
+        # SEAL THE BOTTOM OF THE SILHOUETTE BEFORE CUTTING.
+        #
+        # The pad above and below has to be background, so the border wall in
+        # cut_background has something to bite on. That is fine until a
+        # generation draws the shirt the same white as the paper - the Tanong
+        # strip came back with both at 254,254,254 - AND the figure runs off
+        # the bottom of the frame, so the shirt is open to the outside. Then
+        # no fill tolerance can help: the flood runs up through the open
+        # bottom and eats his torso, and he renders with the classroom
+        # showing through his chest.
+        #
+        # His outline is the only thing that distinguishes shirt from paper,
+        # so close it. The torso's left and right outline edges do reach the
+        # bottom row; a line joining them turns the open shape into a closed
+        # one. The line is removed again after the cut, so it never reaches
+        # the sprite.
+        seal_row = 30 + crop.size[1]
+        ca = np.asarray(crop.convert("RGB")).astype(int)
+        bottom_dark = np.where(ca[-1].max(axis=1) < 110)[0]
+        sealed = len(bottom_dark) >= 2
+        if sealed:
+            ImageDraw.Draw(padded).line(
+                [(int(bottom_dark[0]), seal_row), (int(bottom_dark[-1]), seal_row)],
+                fill=(20, 20, 20), width=3)
+
         tmp = f"{raw_path}.__frame{i}.png"
         padded.save(tmp)
         try:
@@ -309,21 +409,65 @@ def fit_strip(raw_path, out_pattern, crowns, seat_feet_y=-3.009,
         finally:
             os.remove(tmp)
 
+        # Take the seal back off. Everything from it downward is pad, so
+        # clearing those rows removes the line and nothing else.
+        if sealed:
+            arr = np.asarray(cut).copy()
+            arr[seal_row:, :, 3] = 0
+            cut = Image.fromarray(arr, "RGBA")
+
         c, b, cx = hair_cap(cut)
-        scale = base_hair / (b - c)
 
         a = np.asarray(cut)
         opaque = a[:, :, 3] > 60
         rows = np.where(opaque.any(axis=1))[0]
         cols = np.where(opaque.any(axis=0))[0]
+
+        crown_row = int(round((canvas_top - crowns[i]) / unit))
+
+        if flush_to_bottom:
+            # TWO constraints instead of one: the crown on its row AND the
+            # lowest ink on the canvas bottom, which is the desk's far edge.
+            # That determines the scale rather than leaving it free.
+            #
+            # For when a generation comes back slightly short in the body. Fit
+            # such a figure by hair alone and his arms stop above the desk
+            # with background showing under them; fit it this way and the only
+            # cost is a head off by however short it was. Use it for a couple
+            # of percent, not for the six that got a strip rejected - see
+            # Tools/check_pose_strip.py, which measures exactly this.
+            scale = (base.size[1] - crown_row) / float(rows[-1] - c + 1)
+            # Note: measured against the UNPADDED height on purpose. The pad
+            # is empty room above and below; the desk is still the bottom of
+            # the original canvas.
+        else:
+            scale = base_hair / (b - c)
+
         content = cut.crop((cols[0], rows[0], cols[-1] + 1, rows[-1] + 1))
         scaled = content.resize((int(round(content.size[0] * scale)),
                                  int(round(content.size[1] * scale))),
                                 Image.LANCZOS)
 
-        out = Image.new("RGBA", base.size, (0, 0, 0, 0))
+        # A SYMMETRIC pad, when a pose needs room above the head.
+        #
+        # "Tanong" raises a hand about 180 rows above the crown, and the
+        # seated canvas has only 142 - the fingertips were cut off. Padding
+        # the TOP alone would not do: these sprites pivot at their centre, so
+        # a taller canvas on the same renderer grows downwards as well, and
+        # his arms would hang below the desk's edge. Padding both ends by the
+        # same amount keeps the centre where it was, so the figure does not
+        # move at all and the extra room is free.
+        out = Image.new("RGBA",
+                        (base.size[0], base.size[1] + 2 * canvas_pad),
+                        (0, 0, 0, 0))
         x = int(round(b_cx - (cx - cols[0]) * scale))
-        y = int(round((canvas_top - crowns[i]) / unit))
+        # Offset by however far the crown sits below the top of the drawing.
+        # For every pose so far that is zero - the crown IS the topmost pixel.
+        # It is not zero when something is drawn above the head: "Tanong"
+        # raises a hand, and without this the whole figure would be pushed
+        # down by the height of the arm and his head would sink through the
+        # chair.
+        y = int(round(crown_row - (c - rows[0]) * scale)) + canvas_pad
         out.alpha_composite(scaled, (x, y))
         path = out_pattern.format(i + 1)
         out.save(path)

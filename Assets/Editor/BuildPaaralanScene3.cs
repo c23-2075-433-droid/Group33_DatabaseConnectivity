@@ -62,7 +62,9 @@
 //            page, writes, and sits back. Built from Paaralan Scene 2's
 //            pencil poses, which are the same boy by construction.
 //   Basa     the textbook lights up - he is reading it
-//   Tanong   Kylo's upper body lights up: he is putting his hand up
+//   Tanong   DRAWN: his hand rises off the desk, up past his head, holds
+//            there, and comes back down. Plays once - a hand going up is
+//            not a thing that repeats.
 //   Inom     the glass lights up - he is taking a drink
 //
 // NOTHING APPEARS ANY MORE. With "Aklat" gone there is no word whose job is
@@ -214,6 +216,8 @@ public class BuildPaaralanScene3
             "prop_lapis", "item_baso", "fx_gleam",
             // Paaralan Scene 2's pencil poses, reused for "Sulat".
             "place_frame_3_uniform", "lapis_frame_1_uniform", "lapis_frame_2_uniform",
+            // Drawn for "Tanong".
+            "tanong_frame_1_uniform", "tanong_frame_2_uniform", "tanong_frame_3_uniform",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 3");
 
@@ -374,6 +378,53 @@ public class BuildPaaralanScene3
                 sulatFrames.onFinished, propPencil.SetActive, true);
         }
 
+        // --- "Tanong": putting a hand up, in four parts ---
+        //
+        // One generation gave the whole action, which is why this pose was
+        // done before Basa and Inom: three frames of the hand rising read
+        // forwards as the preparation, the last one held is the action, and
+        // read backwards they are the ending movement.
+        //
+        // PLAYS ONCE. The project's rules name raising a hand as one of the
+        // actions that must not repeat, so loopFrames holds the TOP pose
+        // rather than cycling a motion - nothing moves while it is held, it
+        // just stays up long enough to be seen, and IdleBreath keeps him
+        // alive. A hold is not a loop.
+        //
+        // THESE FRAMES ARE ON A TALLER CANVAS, 663x1201 against the seated
+        // 663x921, because his hand goes about 180 rows above the crown and
+        // the seated canvas has 142 - the fingertips were being cut off. The
+        // extra rows are split evenly above and below so the figure's centre
+        // does not move: these sprites pivot at their centre, and the
+        // renderer's scale is fixed, so a taller sprite with the same centre
+        // draws in exactly the same place with room to spare. Measured
+        // afterwards: all three land their lowest ink on -3.00, the desk's
+        // far edge, exactly where the seated pose ends.
+        //
+        // His hand reaches world +2.84 and the narration plaque starts at
+        // +2.79, so about five pixels of fingertip pass behind it. Checked
+        // rather than assumed; it is not worth redrawing for.
+        PoseSequence tanongFrames = seatGO.AddComponent<PoseSequence>();
+        tanongFrames.target = seatGO.GetComponent<SpriteRenderer>();
+        tanongFrames.frames = new[]
+        {
+            LoadSpriteOptional("tanong_frame_1_uniform"),
+            LoadSpriteOptional("tanong_frame_2_uniform"),
+            LoadSpriteOptional("tanong_frame_3_uniform"),
+        };
+        // The top pose, held - not a repeating motion.
+        tanongFrames.loopFrames = new[] { LoadSpriteOptional("tanong_frame_3_uniform") };
+        tanongFrames.loopCycles = 4;
+        tanongFrames.loopFramesPerSecond = 4f * Pace;
+        tanongFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("tanong_frame_2_uniform"),
+            LoadSpriteOptional("tanong_frame_1_uniform"),
+        };
+        tanongFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
+        tanongFrames.framesPerSecond = 11f * Pace;
+        tanongFrames.playOnEnable = false;
+
         // He is never completely still between words.
         seatGO.AddComponent<IdleBreath>();
 
@@ -454,6 +505,7 @@ public class BuildPaaralanScene3
         UnityEventTools.AddPersistentListener(basa.onCorrect, gleamBasa.Play);
 
         var tanong = MakeObjective("Tanong", pTanong);
+        UnityEventTools.AddPersistentListener(tanong.onCorrect, tanongFrames.Play);
         UnityEventTools.AddPersistentListener(tanong.onCorrect, gleamTanong.Play);
 
         var inom = MakeObjective("Inom", pInom);

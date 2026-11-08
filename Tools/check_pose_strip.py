@@ -81,6 +81,12 @@ COLOUR_TOLERANCE = 26         # max channel distance on the medians
 # reject here throws away good art and costs a whole cooldown to rediscover.
 MIN_HAIR_PX = 120
 
+# Kylo's three colours, read off sitting_front_uniform. The checks below ask
+# whether a generated figure still USES these, not where it puts them.
+REF_HAIR = (25, 31, 34)
+REF_SKIN = (253, 183, 111)
+REF_SHIRT = (250, 250, 250)
+
 
 def measure(im):
     """Hair height, body length in heads, head width in heads, colours."""
@@ -93,38 +99,52 @@ def measure(im):
 
     reach = (rows[-1] - crown) / float(hair)
 
-    # Head width at eye level - a third of the way down the hair cap is about
-    # the brow, which is the widest part of the skull in this art style.
-    eye_row = int(crown + hair * 0.75)
-    eye_row = min(max(eye_row, 0), a.shape[0] - 1)
-    cols = np.where(opaque[eye_row])[0]
+    # Head width at eye level, measured NEAR THE HEAD.
+    #
+    # This used to take the full width of the row, which is fine until an arm
+    # is in it: "Tanong" raises a hand beside his head and the head came out
+    # 19% wider. The head is about 0.66 hair-heights from its centre to its
+    # edge, so 0.8 contains it with room to spare and still excludes an arm.
+    eye_row = min(max(int(crown + hair * 0.75), 0), a.shape[0] - 1)
+    span = int(hair * 0.8)
+    lo, hi = max(0, cx - span), min(a.shape[1], cx + span)
+    cols = np.where(opaque[eye_row, lo:hi])[0]
     width = (cols[-1] - cols[0]) / float(hair) if len(cols) else float("nan")
 
-    # Colours, sampled where each thing reliably is.
-    def median(r0, r1, c0, c1):
-        sel = opaque[r0:r1, c0:c1]
-        px = a[r0:r1, c0:c1, :3][sel]
-        return np.median(px, axis=0) if len(px) else np.array([0, 0, 0])
+    # COLOURS, BY COLOUR RATHER THAN BY PLACE.
+    #
+    # Three attempts at sampling "where the shirt is" were defeated by three
+    # different poses: the chest centre read the notebook he holds up in
+    # place_frame_1, the shoulders broke when one side came out empty, and a
+    # band across the torso read his own forearm as his shirt in the first two
+    # Tanong frames - skin against white is a distance of 139, so every frame
+    # failed on a 26 tolerance.
+    #
+    # Geometry cannot win this: the whole point of an animation strip is that
+    # the limbs are somewhere different in every frame. So ask the question
+    # the other way round. Take the pixels that are already CLOSE to the
+    # colour being checked, and report their median. If his shirt is still
+    # that white, the median comes back at that white wherever the shirt is;
+    # if it has been restyled grey, the pixels near white are few and the
+    # median drifts. No assumption about where anything is.
+    def near(target, radius=70):
+        d = np.abs(a[:, :, :3] - np.array(target)).max(axis=2)
+        sel = opaque & (d <= radius)
+        px = a[:, :, :3][sel]
+        return (np.median(px, axis=0) if len(px) else np.array([0, 0, 0]),
+                float(sel.sum()) / max(1, int(opaque.sum())))
 
-    hair_c = median(crown + int(hair * 0.1), crown + int(hair * 0.4),
-                    cx - int(hair * 0.3), cx + int(hair * 0.3))
-    skin_c = median(crown + int(hair * 1.15), crown + int(hair * 1.35),
-                    cx - int(hair * 0.15), cx + int(hair * 0.15))
-    # The shirt, sampled across the whole torso band with the MIDDLE LEFT OUT.
-    # Taking the chest centre read the white notebook Kylo holds up in
-    # place_frame_1 as his shirt and called a frame that shipped a reject;
-    # anything he holds is held centrally, so excluding the middle third is
-    # what makes this robust. One median over everything that is left, rather
-    # than one per side, so a side that happens to be empty cannot skew it.
-    r0 = min(max(crown + int(hair * 1.6), 0), a.shape[0] - 1)
-    r1 = min(max(crown + int(hair * 2.1), r0 + 1), a.shape[0])
-    band = np.zeros(a.shape[:2], dtype=bool)
-    band[r0:r1, :] = True
-    band &= opaque
-    gap = int(hair * 0.30)
-    band[:, max(0, cx - gap):cx + gap] = False
-    px = a[:, :, :3][band]
-    shirt_c = np.median(px, axis=0) if len(px) else np.array([0, 0, 0])
+    hair_c, hair_f = near(REF_HAIR)
+    skin_c, skin_f = near(REF_SKIN)
+    shirt_c, shirt_f = near(REF_SHIRT)
+    # A colour that has all but vanished is drift too - a median over four
+    # stray pixels would otherwise pass happily.
+    if hair_f < 0.02:
+        hair_c = np.array([0, 0, 0])
+    if skin_f < 0.02:
+        skin_c = np.array([0, 0, 0])
+    if shirt_f < 0.02:
+        shirt_c = np.array([0, 0, 0])
     return hair, reach, width, hair_c, skin_c, shirt_c
 
 
