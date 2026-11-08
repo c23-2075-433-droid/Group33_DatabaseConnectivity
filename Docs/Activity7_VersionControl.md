@@ -188,7 +188,7 @@ request.
 | `fix/find-any-object-by-type` | Clear the Unity 6 deprecation warnings across the script base | Daquis | `FindAnyObjectByType` in place of `FindObjectOfType` in 7 scripts |
 | `feature/paaralan-parke-levels` | Build out Chapters 2 and 3 as playable scenes | Manzanero | Paaralan scenes 1–5 and Parke scenes 1–5, with their builders and props |
 | `feature/nickname-availability` | Handle a nickname that is already taken | Manzanero | `NicknameAvailability` and `NicknameSuggester` offering a free nickname against Supabase |
-| `feature/paaralan-scenes` | Build the Paaralan gate and the classroom | Lacida | `Paaralan_Gate` and `Klasrum` scenes, uniform walk and sitting sprites, the teacher and the guard |
+| `feature/paaralan-scenes` | Build the Paaralan gate and the classroom | Lacida | `Chapter2_Level1_Paaralan` and `Chapter2_Level2_Klasrum` scenes, uniform walk and sitting sprites, the teacher and the guard |
 | `docs/version-control-workflow` | This activity: document and establish the group's version-control workflow | Daquis | `Docs/Activity7_VersionControl.md` plus the reviewed pull request that merges it |
 
 The names above are the convention the group adopts from here (`feature/…`,
@@ -313,7 +313,7 @@ words-learned panels into all fifteen scenes.
 | Branch name | `salinlahi-local-main` (his own project history), integrated through `claude/paaralan-from-groupmate` |
 | Recorded change identifiers | `64a8c92`, `390be73` |
 | Change descriptions | *Build the Paaralan gate and classroom scenes*; *Make Kylo walk to his desk, and sit down at it* |
-| Relevant files | `Assets/Scenes/Paaralan_Gate.unity`, `Assets/Scenes/Klasrum.unity`, their two builder scripts, `WalkIntoScene.cs`, `SpriteSwap.cs`, `IdleBreath.cs`, `PoseSettle.cs`, the teacher and guard sprites, the back-view walk frames and sitting poses |
+| Relevant files | `Assets/Scenes/Chapter2_Level1_Paaralan.unity`, `Assets/Scenes/Chapter2_Level2_Klasrum.unity`, their two builder scripts, `WalkIntoScene.cs`, `SpriteSwap.cs`, `IdleBreath.cs`, `PoseSettle.cs`, the teacher and guard sprites, the back-view walk frames and sitting poses |
 | Pull request | #11, merged as `2705335` on 5 November 2026 |
 | Traceable author | `Kylo Bryan Lacida <lacidakylo@gmail.com>` on `origin/salinlahi-local-main`. **His authorship does not appear on `main`:** the two histories cannot be merged (Part VII), so his files were carried across in `ddf78af`, which is authored by Daquis. The branch is kept on the remote precisely so his authorship stays provable. |
 | Final status | Merged as files; authorship traceable only on `origin/salinlahi-local-main` |
@@ -408,7 +408,8 @@ git checkout main && git pull --ff-only origin main
 checked at the reference level — no scene points at a GUID the project cannot
 resolve — but the project has not been opened in Unity since. Until it is, the
 Paaralan gate and classroom count as integrated, not as working. Opening
-`Assets/Scenes/Paaralan_Gate.unity` and `Klasrum.unity` and pressing Play is
+`Assets/Scenes/Chapter2_Level1_Paaralan.unity` and
+`Chapter2_Level2_Klasrum.unity` and pressing Play is
 the next action on the group's list.
 
 ### After every merge
@@ -461,7 +462,7 @@ Prevention is cheaper than resolution, and all of it is procedural:
   in hours rather than weeks.
 - **One owner per scene at a time.** Scenes and sprites are the files Git is
   worst at merging, so the group claims them in the group chat before editing —
-  *"I have `Klasrum.unity` this afternoon"* — which is the same discipline Unity
+  *"I have `Chapter2_Level2_Klasrum.unity` this afternoon"* — which is the same discipline Unity
   Version Control automates with file locking.
 - **Commit the `.meta` file with its asset, always**, in the same commit.
 
@@ -494,7 +495,8 @@ What was actually done, and what the group would do again:
 Reference integrity first: no scene or ScriptableObject reference may point at
 an unresolvable GUID — this was checked, and it is what makes the rest worth
 testing. Then open the project in Unity and confirm it compiles with no missing
-scripts. Then play the two imported scenes, `Paaralan_Gate` and `Klasrum`, and
+scripts. Then play the two imported scenes, `Chapter2_Level1_Paaralan` and
+`Chapter2_Level2_Klasrum`, and
 check the sprites, the walk and the sitting pose. Then — the step that matters
 most after a GUID rewrite — play the **unaffected** scenes, the four Bahay
 scenes, and listen: if audio GUIDs were repointed wrongly, the symptom is a
