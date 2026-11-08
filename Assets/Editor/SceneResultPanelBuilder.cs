@@ -68,7 +68,13 @@ public static class SceneResultPanelBuilder
     // The figures are right-aligned near the plates' right edge, because the
     // labels printed on the board are long - WORDS COMPLETED: reaches most of
     // the way across its own plate - and what follows them is short.
-    private const float ValueRightFrac = 0.92f;
+    //
+    // 0.92 put them ON the rim: the two plates end at 0.918 and 0.916 of the
+    // board, measured off ui_result_board.png, so the last digit was touching
+    // the moulding. Held off it by the same amount as the vocabulary rows.
+    // Only the right edge moves - the box keeps its width, so the figures
+    // have exactly as much room to shrink into as before.
+    private const float ValueRightFrac = 0.92f - WordsLearnedPanelBuilder.PlateInset;
     private const float ValueWidthFrac = 0.30f;
 
     private const float ButtonWidthFrac = 0.26f;
@@ -231,11 +237,21 @@ public static class SceneResultPanelBuilder
             new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
 
         // A four-figure score, or "12 / 15", must not grow into its label.
+        //
+        // These two, and ONLY these two, are set in the display face.
+        // "TOTAL POINTS:" and "WORDS COMPLETED:" are painted into
+        // ui_result_board in the same chunky distressed capitals as the
+        // vocabulary board, so the figures that follow them sit on the same
+        // plate, an inch away, in a different typeface - which is the one
+        // place on this board where the mismatch is impossible to miss. The
+        // greeting, the place line and the records strip are sentences to
+        // read rather than lettering to match, and stay in the UI font.
         foreach (Text figure in new[] { pointsText, wordsText })
         {
             figure.resizeTextForBestFit = true;
             figure.resizeTextMinSize = 20;
             figure.resizeTextMaxSize = 34;
+            VocabularyFont.Apply(figure);
         }
 
         // Only on a level's last scene: the scores read back out of the
