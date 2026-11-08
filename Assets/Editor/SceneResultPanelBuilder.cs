@@ -77,6 +77,30 @@ public static class SceneResultPanelBuilder
     private const float ValueRightFrac = 0.92f - WordsLearnedPanelBuilder.PlateInset;
     private const float ValueWidthFrac = 0.30f;
 
+    // "WORDS COMPLETED:" is the longer label by a wide margin. Measured off
+    // ui_result_board.png, its last pixel is at 0.730 of the board against
+    // 0.571 for "TOTAL POINTS:" - so where the points figure has 237px of
+    // bare plate to fill, the words figure has 120. This is that 120 less a
+    // gap, as a fraction of the board.
+    private const float WordsValueWidthFrac = 0.1405f;
+
+    // The figures are set to the size of the lettering printed beside them.
+    // Those capitals measure 44px in the 941px-tall art, which is 41.1px at
+    // the size the panel is built - and this font's capitals are 0.695 of
+    // its point size, so 59 is the number that makes them the same height.
+    //
+    // Best fit takes it down from there whenever the figure is too long,
+    // which on the words row is most of the time: only a short score like
+    // "3 / 3" actually reaches 59. Nothing can be done about that without
+    // repainting the label, and a figure that matches on the points row and
+    // comes close on the words row beats one that is too small on both.
+    private const int ValueMaxSize = 59;
+
+    // Tall enough to hold a 59px line. The box has no background and does not
+    // take clicks, so the extra height is invisible; the two rows are 105px
+    // apart and these are 76, so they still cannot touch.
+    private const float ValueHeight = 76f;
+
     private const float ButtonWidthFrac = 0.26f;
     private const float ButtonXFrac = 0.19f;
 
@@ -225,16 +249,24 @@ public static class SceneResultPanelBuilder
 
         // Right-aligned against the plates, because the labels printed on the
         // board are long and the figures that follow them are short.
-        float valueWidth = PanelWidth * ValueWidthFrac;
-        float valueX = PanelWidth * (ValueRightFrac - 0.5f) - valueWidth * 0.5f;
+        //
+        // The two boxes share a right edge and nothing else. Each one reaches
+        // left only as far as its own printed label allows, because best fit
+        // measures the BOX and knows nothing about the lettering in the art -
+        // give the words figure the room the points figure has and a run of
+        // "12 / 20" sets itself large enough to park on top of the D of
+        // COMPLETED.
+        float valueRight = PanelWidth * (ValueRightFrac - 0.5f);
 
+        float pointsWidth = PanelWidth * ValueWidthFrac;
         Text pointsText = CreateText(panel.transform, "PointsText", "",
-            new Vector2(valueX, FromTop(PointsFrac)),
-            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+            new Vector2(valueRight - pointsWidth * 0.5f, FromTop(PointsFrac)),
+            new Vector2(pointsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
+        float wordsWidth = PanelWidth * WordsValueWidthFrac;
         Text wordsText = CreateText(panel.transform, "WordsText", "",
-            new Vector2(valueX, FromTop(WordsFrac)),
-            new Vector2(valueWidth, 60f), 34, TextAnchor.MiddleRight);
+            new Vector2(valueRight - wordsWidth * 0.5f, FromTop(WordsFrac)),
+            new Vector2(wordsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
         // A four-figure score, or "12 / 15", must not grow into its label.
         //
@@ -250,7 +282,7 @@ public static class SceneResultPanelBuilder
         {
             figure.resizeTextForBestFit = true;
             figure.resizeTextMinSize = 20;
-            figure.resizeTextMaxSize = 34;
+            figure.resizeTextMaxSize = ValueMaxSize;
             VocabularyFont.Apply(figure);
         }
 
