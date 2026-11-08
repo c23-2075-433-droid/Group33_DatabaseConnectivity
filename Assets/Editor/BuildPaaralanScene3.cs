@@ -14,26 +14,47 @@
 //
 // STAGING. The same classroom, the same desk, the same seat as Scene 2 - the
 // child sat down at the end of that scene and the lesson begins where they
-// are. So every placement below is Scene 2's, unchanged, and Kylo starts
-// seated with no standing pose in the scene at all.
+// are. Scene 2 has since MOVED: it is now the locker corner of
+// klasrum_interior_background, with Kylo nearly six world units tall, seated
+// at the near desk at x 2.86 and cropped at that desk's far edge. This scene
+// follows it there. Every placement below is Scene 2's own, copied rather
+// than re-derived, so that leaving Scene 2 and arriving here does not move
+// the furniture.
+//
+// Three things followed from that move:
+//
+//   - No foreground desk layer. klasrum_desk_front was cut from the OLD wide
+//     classroom shot and lies across the bottom third of a picture it does
+//     not belong to, cutting Kylo off at the neck. The occlusion it gave is
+//     already handled: the seated poses are cropped at the desk line, so the
+//     crop IS the desk edge.
+//   - No Teacher Rachel. char_teacher is a waist-up drawing made for the
+//     chalkboard view; in a corner of lockers she has nowhere to stand and
+//     floats against the doors. Scene 2 cut her for that reason, and this
+//     scene cannot keep her while sharing its background.
+//   - The tee, not the polo. sitting_front_uniform is the pose Scene 2 ends
+//     on, so his shirt does not change between one scene and the next.
 //
 // WHAT EACH WORD DOES. Four of the five are things rather than actions, and
-// the one pose available is a seated profile, so the feedback is carried by
+// the only pose drawn so far is the seated one, so the feedback is carried by
 // what lights up rather than by what Kylo does:
 //
 //   Aklat    the textbook appears on the desk
 //   Basa     it lights up - he is reading it
-//   Sulat    the notebook and pencil light up - he is writing
-//   Tanong   Kylo lights up: he is the one putting his hand up
-//   Sagot    Teacher Rachel lights up, answering him - "Tama! Magaling!"
+//   Sulat    the open notebook lights up - he is writing in it
+//   Tanong   Kylo's upper body lights up: he is putting his hand up
+//   Sagot    his head lights up: he is the one answering aloud
 //
-// Tanong and Sagot are both Kylo's in the design document. Lighting him twice
-// in a row reads as nothing happening, so the answer is shown landing on the
-// teacher instead, which is also what the document's dialogue describes.
+// Tanong and Sagot are both Kylo's in the design document, and with the
+// teacher gone they both land on him. Two different spots at two different
+// sizes keep them from reading as the same event, but only just: what should
+// really tell them apart is DRAWN poses - a hand raised, a mouth open - the
+// way Scene 2's beats are carried by drawn frames rather than by gleams.
+// Until those exist this is the honest staging, not the finished one.
 //
 // Sprites expected in Assets/Sprites/:
-//   menu_bg (or klasrum_background), sitting_desk_uniform, char_teacher,
-//   klasrum_desk_front, prop_aklat, prop_kuwaderno, prop_lapis, fx_gleam,
+//   klasrum_interior_background (or menu_bg), sitting_front_uniform,
+//   prop_aklat, prop_notebook_open, prop_lapis, fx_gleam,
 //   ui_arrow, ui_word_badge, badge_paaralan
 //
 // Run via: Tools > SALINLAHI > Build Paaralan Scene 3
@@ -54,40 +75,57 @@ public class BuildPaaralanScene3
     private const float ViewHeight = 10.8f;           // camera is orthographic 5.4
     private const float ViewWidth = 19.2f;
 
-    // Scene 2's seat, unchanged. See BuildPaaralanScene2 for where these came
-    // from - a student desk measures 1.7 world units in this painting and a
-    // school desk is about 0.70 m, which fixes the scale of everything else.
-    private const float SitX = -5.20f;
-    private const float SitFeetY = -4.52f;            // under the desk, never seen
-    private const float SeatedHeight = 3.10f;
+    // Scene 2's seat, copied exactly. These are measured values, not fitted
+    // ones: the near desk in klasrum_interior_background has its far edge at
+    // y -3.01 and its near edge at about -3.84, read off the painting, and the
+    // seated sprite is pinned to that far edge so its crop reads as the desk.
+    // The old -5.20 / -4.52 / 3.10 belonged to menu_bg and land on the open
+    // door of the doorway view. See BuildPaaralanScene2 for the full working.
+    private const float SitX = 2.86f;                 // the chair behind the near desk
+    private const float SitFeetY = -3.009f;           // the desk's far edge
+    private const float SeatedHeight = 5.609f;
 
-    // The desk surface. The notebook and pencil are already out - the child
-    // took them from the bag in Scene 2 - so only the textbook arrives here.
-    // Nearer the camera than Scene 2 put them. Higher up the desk, the left
-    // half is taken by the stack of textbooks painted into the room - an open
-    // book placed there disappeared behind Filipino, Matematika and Araling
-    // Panlipunan. This band is clear desk top across its whole width.
-    private const float AklatX = -5.60f;
-    private const float AklatBaseY = -4.15f;
-    private const float AklatHeight = 1.00f;
-    private const float NotebookX = -4.20f;
-    private const float NotebookBaseY = -3.95f;
-    private const float NotebookHeight = 0.70f;
-    // In front of the open book rather than beside the notebook: at the same
-    // x as the notebook the two overlapped almost exactly and the pencil was
-    // invisible under it.
-    private const float PencilX = -5.60f;
-    private const float PencilBaseY = -4.62f;
-    private const float PencilHeight = 0.28f;
+    // What is on the desk, and why each thing is where it is.
+    //
+    // The desk top in this view was measured the same way as everything else
+    // in these two scenes: scanning klasrum_interior_background for its wood
+    // gives a surface running from y -3.00 down to about -3.85, spreading from
+    // x -0.5..+5.1 at the far edge to x +0.9..+7.4 at the near one - wider
+    // towards the camera, as a receding surface is.
+    //
+    // His own sprite covers x 0.84..4.88 of that, so the clear desk is a strip
+    // either side of him, and the two props take one strip each.
+    //
+    // THE NOTEBOOK IS SCENE 2'S, UNMOVED. Same x, same base, same height, so
+    // the book he took out of his bag in the last scene is still lying where
+    // he put it. The height is not a free choice: his sprite's bottom edge IS
+    // the desk's far edge at -3.01, so anything reaching above that line gets
+    // drawn across his shirt.
+    private const float NotebookX = 2.86f;
+    private const float NotebookBaseY = -3.84f;
+    private const float NotebookHeight = 0.83f;
 
-    // Teacher Rachel, behind her desk at the front. char_teacher is WAIST-UP,
-    // so her "floor" is her hip line and the desk top hides that cut.
-    private const float TeacherX = 2.60f;
-    private const float TeacherHipY = -0.70f;
-    private const float TeacherHeight = 1.95f;
+    // The textbook, which "Aklat" puts on the desk. To the RIGHT of the
+    // notebook rather than in front of him: at 0.83 units tall the notebook is
+    // 3.91 wide and spans x 0.91..4.81, which is the whole of the desk in
+    // front of him, and the left-hand strip is both narrower and bitten into
+    // by the desk's far edge. Centred at 5.75 the book spans 5.15..6.36, and
+    // its top at -3.12 clears the far edge, which by that x has dropped to
+    // about -3.07.
+    private const float AklatX = 5.75f;
+    private const float AklatBaseY = -3.82f;
+    private const float AklatHeight = 0.70f;
+
+    // The pencil, already out of the bag too. On the LEFT strip, which has
+    // room for something this small and nothing else to hide it: at x 0.25 it
+    // spans -0.13..0.63, clear of both the notebook and of him. Parked at
+    // -3.40 rather than at the desk's near edge so it reads as lying on the
+    // wood rather than balanced on the rim.
+    private const float PencilX = 0.25f;
+    private const float PencilBaseY = -3.40f;
+    private const float PencilHeight = 0.26f;
 
     private const int OrderKylo = 0;
-    private const int OrderDeskFront = 10;            // the desk layer, in front of him
     private const int OrderDeskProps = 20;            // his things, on top of the desk
 
     [MenuItem("Tools/SALINLAHI/Build Paaralan Scene 3")]
@@ -105,8 +143,8 @@ public class BuildPaaralanScene3
         // it still is not.
         SpriteImportFixer.Verify(new[]
         {
-            "sitting_desk_uniform", "char_teacher", "klasrum_desk_front",
-            "prop_aklat", "prop_kuwaderno", "prop_lapis", "fx_gleam",
+            "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
+            "prop_lapis", "fx_gleam",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 3");
 
@@ -125,7 +163,12 @@ public class BuildPaaralanScene3
         // --- The classroom ---
         GameObject bg = new GameObject("Background_Klasrum");
         SpriteRenderer bgSr = bg.AddComponent<SpriteRenderer>();
-        Sprite roomSprite = LoadSpriteOptional("klasrum_background");
+        // Scene 2's room, and the same corner of it. klasrum_background is the
+        // old wide shot; klasrum_interior_background is the locker corner this
+        // desk was measured in, and every placement in this file assumes it.
+        // So it is asked for first, and menu_bg is a last resort that keeps
+        // the scene playable rather than one that looks right.
+        Sprite roomSprite = LoadSpriteOptional("klasrum_interior_background");
         if (roomSprite == null) roomSprite = LoadSprite("menu_bg");
         bgSr.sprite = roomSprite;
         bgSr.sortingLayerName = "Background";
@@ -137,8 +180,11 @@ public class BuildPaaralanScene3
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
 
-        GameObject teacher = CreateStandingOptional("Char_Teacher", "char_teacher",
-                                                     TeacherX, TeacherHipY, TeacherHeight);
+        // --- No Teacher Rachel ---
+        // See the note at the top of this file: she is a waist-up drawing made
+        // for the chalkboard view and has nowhere to stand in a corner of
+        // lockers. "Sagot" lands on Kylo instead, which is also whose line it
+        // is in the design document.
 
         // --- Kylo, already seated ---
         // The listening rig stays switched on and separate from the pose, the
@@ -149,24 +195,28 @@ public class BuildPaaralanScene3
         rig.tag = "Player";
         rig.transform.position = new Vector3(SitX, SitFeetY, 0f);
 
-        GameObject seatGO = CreateFigure("Kylo_Seated", "sitting_desk_uniform",
+        // sitting_front_uniform, the pose Scene 2 ends on: the tee rather than
+        // the polo, hands cut off below the sleeve so the arms run down behind
+        // the desk, and the canvas cropped at the desk's far edge.
+        // sitting_desk_uniform is the old polo drawing, and using it here
+        // changes his shirt between one scene and the next.
+        GameObject seatGO = CreateFigure("Kylo_Seated", "sitting_front_uniform",
                                           SitX, SitFeetY, SeatedHeight);
 
-        // The desk, drawn over his lap so he reads as sitting AT it.
-        GameObject deskFront = new GameObject("Foreground_Desk");
-        SpriteRenderer deskSr = deskFront.AddComponent<SpriteRenderer>();
-        deskSr.sprite = LoadSpriteOptional("klasrum_desk_front");
-        deskSr.sortingLayerName = "Player";
-        deskSr.sortingOrder = OrderDeskFront;
-        if (deskSr.sprite == null) deskFront.SetActive(false);
-        else deskFront.transform.localScale = bg.transform.localScale;
+        // --- No foreground desk layer ---
+        // See the note at the top. The seated pose is cropped at the desk
+        // line, so that crop is the occlusion klasrum_desk_front used to give.
 
         // --- What is on the desk ---
-        // The notebook and pencil are already out; the textbook is not, and
+        // The notebook and pencil are already out - he took them from his bag
+        // in Scene 2 - so they are switched on below. The textbook is not, and
         // "Aklat" is what puts it there.
         GameObject propAklat = CreatePropOptional("Prop_Aklat", "prop_aklat",
                                                    AklatX, AklatHeight, AklatBaseY);
-        GameObject propNotebook = CreatePropOptional("Prop_Kuwaderno", "prop_kuwaderno",
+        // prop_notebook_open, not prop_kuwaderno: the shut blue hardback is
+        // the wrong object for a lesson being written in, and the open book is
+        // what Scene 2 leaves lying on this desk.
+        GameObject propNotebook = CreatePropOptional("Prop_Kuwaderno", "prop_notebook_open",
                                                       NotebookX, NotebookHeight, NotebookBaseY);
         GameObject propPencil = CreatePropOptional("Prop_Lapis", "prop_lapis",
                                                     PencilX, PencilHeight, PencilBaseY);
@@ -177,7 +227,7 @@ public class BuildPaaralanScene3
         // is here because VoiceCommand needs one and the objective controller
         // reads it to know when an action has finished.
         PlayerMovement player = rig.AddComponent<PlayerMovement>();
-        player.standingSprite = LoadSprite("sitting_desk_uniform");
+        player.standingSprite = LoadSprite("sitting_front_uniform");
         player.currentWakeStage = PlayerMovement.WakeStage.Standing;
         rig.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
 
@@ -189,12 +239,19 @@ public class BuildPaaralanScene3
                                                  AklatBaseY + AklatHeight * 0.5f, 1.5f);
         TimedOverlay gleamBasa = CreateGleamAt("Gleam_Basa", AklatX,
                                                 AklatBaseY + AklatHeight * 0.5f, 1.9f);
-        TimedOverlay gleamSulat = CreateGleamAt("Gleam_Sulat", (NotebookX + PencilX) * 0.5f,
-                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.6f);
-        TimedOverlay gleamTanong = CreateGleamAt("Gleam_Tanong", SitX, SitFeetY + SeatedHeight * 0.72f, 2.4f);
-        TimedOverlay gleamSagot = teacher != null
-            ? CreateGleam("Gleam_Sagot", teacher, 2.4f)
-            : CreateGleamAt("Gleam_Sagot", TeacherX, TeacherHipY + TeacherHeight * 0.5f, 2.4f);
+        // On the notebook itself, which is what he writes in. This used to be
+        // the midpoint of the notebook and the pencil; with the pencil moved
+        // to the far side of him, that midpoint is now his own stomach.
+        TimedOverlay gleamSulat = CreateGleamAt("Gleam_Sulat", NotebookX,
+                                                 NotebookBaseY + NotebookHeight * 0.5f, 2.6f);
+        // Both of the last two land on Kylo now. Sized and placed apart on
+        // purpose: a wide one over the upper body for putting a hand up, a
+        // tight one on the head for speaking. See the note at the top - drawn
+        // poses are what should carry these beats, and these are the stand-in.
+        TimedOverlay gleamTanong = CreateGleamAt("Gleam_Tanong", SitX,
+                                                  SitFeetY + SeatedHeight * 0.64f, 3.2f);
+        TimedOverlay gleamSagot = CreateGleamAt("Gleam_Sagot", SitX,
+                                                 SitFeetY + SeatedHeight * 0.78f, 2.0f);
 
         // The desk props sit above the desk layer, so their gleams must too.
         foreach (TimedOverlay fx in new[] { gleamAklat, gleamBasa, gleamSulat })
@@ -224,11 +281,20 @@ public class BuildPaaralanScene3
 
         // Only one is on screen at a time, so they overlap freely - each sits
         // over the thing its word acts on.
-        GameObject pAklat = CreatePromptUI(uiRoot.transform, "Prompt_Aklat", "Aklat", new Vector3(-700, -230, 0));
-        GameObject pBasa = CreatePromptUI(uiRoot.transform, "Prompt_Basa", "Basa", new Vector3(-700, -150, 0));
-        GameObject pSulat = CreatePromptUI(uiRoot.transform, "Prompt_Sulat", "Sulat", new Vector3(-425, -220, 0));
-        GameObject pTanong = CreatePromptUI(uiRoot.transform, "Prompt_Tanong", "Tanong", new Vector3(-520, -40, 0));
-        GameObject pSagot = CreatePromptUI(uiRoot.transform, "Prompt_Sagot", "Sagot", new Vector3(260, 150, 0));
+        // The canvas is scaled 0.01, so these are world units x 100. The old
+        // numbers pointed at a desk on the LEFT of the frame, which is where
+        // menu_bg put it. Each badge now sits over the thing its word acts on,
+        // lifted clear of the desk so the label is against the room rather
+        // than on the wood. Nothing goes above y 265: the narration plaque
+        // occupies the top of the frame from about world +2.79 up, and a badge
+        // placed there disappears behind it. Nor does anything sit between
+        // x 0.84 and 4.88, which is the width of his own sprite - a badge
+        // there is a label pinned to his chest.
+        GameObject pAklat = CreatePromptUI(uiRoot.transform, "Prompt_Aklat", "Aklat", new Vector3(590, -160, 0));
+        GameObject pBasa = CreatePromptUI(uiRoot.transform, "Prompt_Basa", "Basa", new Vector3(590, -40, 0));
+        GameObject pSulat = CreatePromptUI(uiRoot.transform, "Prompt_Sulat", "Sulat", new Vector3(-35, -190, 0));
+        GameObject pTanong = CreatePromptUI(uiRoot.transform, "Prompt_Tanong", "Tanong", new Vector3(290, 230, 0));
+        GameObject pSagot = CreatePromptUI(uiRoot.transform, "Prompt_Sagot", "Sagot", new Vector3(-35, 60, 0));
 
         // --- Objectives: take the book out, read, write, ask, answer ---
         var aklat = MakeObjective("Aklat", pAklat);
@@ -279,6 +345,10 @@ public class BuildPaaralanScene3
 
         Debug.Log("[SALINLAHI] Paaralan Scene 3 built and saved to " + ScenePath +
                    ". Words: Aklat, Basa, Sulat, Tanong, Sagot - all five new to the game. " +
+                   "Staged in Scene 2's locker corner now: Scene 2's seat, Scene 2's tee, no " +
+                   "foreground desk layer and no teacher - see the notes at the top of " +
+                   "BuildPaaralanScene3 for why each of those went. Tanong and Sagot both " +
+                   "gleam Kylo until drawn poses exist for them. " +
                    "It fades into " + NextScene + ", which ends the level - so build Paaralan " +
                    "Scene 4 as well, or the level runs into a scene that is not there.");
     }
@@ -304,25 +374,6 @@ public class BuildPaaralanScene3
         return go;
     }
 
-    /// <summary>A character sized by world height; null when its art is absent.</summary>
-    private static GameObject CreateStandingOptional(string name, string spriteFile,
-                                                      float x, float floorY, float worldHeight)
-    {
-        Sprite sprite = LoadSpriteOptional(spriteFile);
-        if (sprite == null) return null;
-
-        GameObject go = new GameObject(name);
-        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = sprite;
-        sr.sortingLayerName = "Props";
-        sr.sortingOrder = 5;
-
-        float s = sprite.bounds.size.y > 0.0001f ? worldHeight / sprite.bounds.size.y : 1f;
-        go.transform.localScale = new Vector3(s, s, 1f);
-        go.transform.position = new Vector3(x, floorY + worldHeight * 0.5f, 0f);
-        return go;
-    }
-
     /// <summary>A prop on a surface, switched off until its word. Null when art is absent.</summary>
     private static GameObject CreatePropOptional(string name, string spriteFile,
                                                   float x, float worldHeight, float baseY)
@@ -341,11 +392,6 @@ public class BuildPaaralanScene3
         go.transform.position = new Vector3(x, baseY + worldHeight * 0.5f, 0f);
         go.SetActive(false);
         return go;
-    }
-
-    private static TimedOverlay CreateGleam(string name, GameObject target, float worldSize)
-    {
-        return CreateGleamAt(name, target.transform.position.x, target.transform.position.y, worldSize);
     }
 
     private static TimedOverlay CreateGleamAt(string name, float x, float y, float worldSize)
