@@ -84,22 +84,29 @@ public static class SceneResultPanelBuilder
     // gap, as a fraction of the board.
     private const float WordsValueWidthFrac = 0.1405f;
 
-    // The figures are set to the size of the lettering printed beside them.
-    // Those capitals measure 44px in the 941px-tall art, which is 41.1px at
-    // the size the panel is built - and this font's capitals are 0.695 of
-    // its point size, so 59 is the number that makes them the same height.
+    // Sized against the lettering printed beside them: those capitals are
+    // 44px in the 941px-tall art, 41.1px at the size the panel is built, and
+    // this font's capitals are 0.695 of its point size - so 59 would match
+    // exactly. 52 is deliberately a little under that.
     //
-    // Best fit takes it down from there whenever the figure is too long,
-    // which on the words row is most of the time: only a short score like
-    // "3 / 3" actually reaches 59. Nothing can be done about that without
-    // repainting the label, and a figure that matches on the points row and
-    // comes close on the words row beats one that is too small on both.
-    private const int ValueMaxSize = 59;
+    // 52 is the largest ceiling at which the two rows agree. The words box
+    // is narrow, so a short score tops out near 53 however high the ceiling
+    // goes; at 59 the points figure took the full 59 and the words figure
+    // sat at 53 beside it, close enough to look like a mistake rather than a
+    // decision. At 52 a typical "60" and "3 / 5" are both 52.
+    private const int ValueMaxSize = 52;
 
-    // Tall enough to hold a 59px line. The box has no background and does not
-    // take clicks, so the extra height is invisible; the two rows are 105px
-    // apart and these are 76, so they still cannot touch.
-    private const float ValueHeight = 76f;
+    // 60 is not spare room, it is the ceiling that stops best fit WRAPPING.
+    //
+    // Best fit picks the largest size that fits the box, and with wrapping
+    // allowed a two-line layout is one of the things that can fit: at 76px
+    // tall, "12 / 20" fit better as two 38px lines than as one 35px line, so
+    // the score stacked itself. A box 60 tall can hold two lines only up to
+    // 30px, and every score shape the game can produce sets larger than that
+    // on one line, so one line always wins. The matching Truncate is below -
+    // with the vertical Overflow this builder uses elsewhere, height is not
+    // a constraint at all and the wrap is free.
+    private const float ValueHeight = 60f;
 
     private const float ButtonWidthFrac = 0.26f;
     private const float ButtonXFrac = 0.19f;
@@ -283,6 +290,16 @@ public static class SceneResultPanelBuilder
             figure.resizeTextForBestFit = true;
             figure.resizeTextMinSize = 20;
             figure.resizeTextMaxSize = ValueMaxSize;
+
+            // A score is one line or it is wrong. Everything else on this
+            // board overflows downwards on purpose - the records strip grows
+            // to however many rows came back - but that setting makes height
+            // free, and free height is what lets best fit answer "too wide"
+            // by stacking "3 / 5" into "3 /" over "5". Truncate puts the
+            // height back in play, and ValueHeight above keeps two lines
+            // from ever being the better fit.
+            figure.verticalOverflow = VerticalWrapMode.Truncate;
+
             VocabularyFont.Apply(figure);
         }
 
