@@ -117,6 +117,51 @@ public class WakeUpSequence : MonoBehaviour
     [Tooltip("How quickly the snore ducks and comes back.")]
     public float duckSeconds = 0.3f;
 
+    [Header("While he is asleep")]
+    [Tooltip("Breathe his mouth with the snore, by swapping between the three " +
+             "sleeping poses Tools/make_sleep_art.py draws. They differ in nothing " +
+             "but how far his mouth is open, so this costs a sprite assignment a " +
+             "frame and cannot drift out of register with him the way an overlaid " +
+             "mouth would.")]
+    public bool breatheMouth = true;
+
+    [Tooltip("Send a Z up with each breath. Not one drawn \"zzzZzzz\" but a letter " +
+             "per snore, rising and fading, its size wandering - which is where that " +
+             "shape comes from, and it stays in time with the sound for free.")]
+    public bool showZzz = true;
+
+    [Tooltip("Where a Z starts, in world units from the character. The default is " +
+             "just above and behind his head, which in this art is up and to the " +
+             "LEFT - he sleeps with his head at the pillow end.")]
+    public Vector2 zzzFrom = new Vector2(-1.25f, 1.05f);
+
+    [Tooltip("How many go up per snore. One at a time is a hiccup; two or three " +
+             "overlapping is the trail of letters the thing is meant to be, since " +
+             "each outlives the next one starting.")]
+    [Range(1, 4)]
+    public int zzzPerBreath = 2;
+
+    [Tooltip("The beat between them within one breath.")]
+    public float zzzGap = 0.5f;
+
+    [Tooltip("How far a Z climbs before it is gone, in world units.")]
+    public float zzzRise = 0.85f;
+
+    [Tooltip("How far it wanders sideways on the way up. A Z that goes straight up " +
+             "reads as a balloon on a string.")]
+    public float zzzDrift = 0.3f;
+
+    [Tooltip("How tall a Z is in world units, before the per-breath wander below.")]
+    public float zzzSize = 0.48f;
+
+    [Tooltip("How much the size varies breath to breath, as a fraction. This is the " +
+             "difference between \"zzz\" and \"ZZZ\".")]
+    [Range(0f, 0.8f)]
+    public float zzzSizeWander = 0.35f;
+
+    [Tooltip("How long one Z takes to rise and fade.")]
+    public float zzzSeconds = 2.4f;
+
     [Header("Drawn in-between frames")]
     [Tooltip("Where the sit-up's drawn frames live, under a Resources folder so a " +
              "run-time object can load them. Made by Tools/import_wakeup_frames.py " +
@@ -242,6 +287,14 @@ public class WakeUpSequence : MonoBehaviour
     // The drawn sit-up, frame 0 first, or null when it has not been made yet.
     private Sprite[] frames;
 
+    // The sleeping pose at three mouth openings, closed first.
+    private Sprite[] mouths;
+    private Sprite zed;
+
+    // Zs in the air. Tracked only so a scene that ends mid-snore does not
+    // leave them behind: each one clears itself up when it has faded.
+    private readonly List<GameObject> floating = new List<GameObject>();
+
     // Where the sit-up has to end up: read once, at the moment the word lands,
     // and kept as fields so a sit-up cut short by a fast "Tayo" can be put back
     // exactly rather than left on a half-rotated frame.
@@ -321,6 +374,19 @@ public class WakeUpSequence : MonoBehaviour
         if (frames == null && found.Count == 1)
             Debug.Log("WakeUpSequence: only frame 0 of the drawn sit-up is there, so " +
                       "the swing plays instead. See Tools/import_wakeup_frames.py.");
+
+        // The sleeping half. Absent, he simply sleeps still and silent-mouthed,
+        // which is what he did before any of this existed.
+        List<Sprite> open = new List<Sprite>();
+        for (int i = 0; ; i++)
+        {
+            Sprite s = Resources.Load<Sprite>(framesFolder + "sleep_" + i);
+            if (s == null) break;
+            open.Add(s);
+        }
+        mouths = open.Count >= 2 ? open.ToArray() : null;
+
+        zed = Resources.Load<Sprite>(framesFolder + "zzz");
     }
 
     /// <summary>
@@ -352,6 +418,14 @@ public class WakeUpSequence : MonoBehaviour
         // when this component does. A scene left mid-dissolve would otherwise
         // keep a sleeping boy on the bed with nobody left to fade him out.
         if (sleepingGhost != null) Destroy(sleepingGhost.gameObject);
+
+        // Same for any Z still in the air: the coroutine that would have
+        // cleared it up stops the moment this object goes.
+        foreach (GameObject z in floating)
+        {
+            if (z != null) Destroy(z);
+        }
+        floating.Clear();
     }
 
     // ------------------------------------------------------------------
@@ -370,14 +444,21 @@ public class WakeUpSequence : MonoBehaviour
             // and the whistle that answers it are the same chest.
             float pitch = 1f + Random.Range(-pitchWander, pitchWander);
 
-            yield return PlayBreath(SnoreInId, pitch);
+            StartCoroutine(SendUpZs());
+
+            // Wide on the way in, barely parted on the way out - which is what
+            // the two clips are, a buzzing inhale and a thin whistle.
+            yield return PlayBreath(SnoreInId, pitch, 1f);
+            SetMouth(0f);
             yield return new WaitForSeconds(breathGap);
-            yield return PlayBreath(SnoreOutId, pitch);
+
+            yield return PlayBreath(SnoreOutId, pitch, 0.4f);
+            SetMouth(0f);
             yield return new WaitForSeconds(breathRest);
         }
     }
 
-    private IEnumerator PlayBreath(string id, float pitch)
+    private IEnumerator PlayBreath(string id, float pitch, float openTo)
     {
         AudioClip clip = Resources.Load<AudioClip>(SoundEffects.Folder + id);
 
@@ -387,7 +468,15 @@ public class WakeUpSequence : MonoBehaviour
         // quiet rather than spinning on a tight loop.
         if (clip == null)
         {
-            yield return new WaitForSeconds(0.9f);
+            // No sound, but he should still breathe: the mouth and the Zs are
+            // the only thing saying he is asleep on a device with the effects
+            // turned down, so they do not wait for a clip that may never exist.
+            float silent = 0.9f;
+            for (float q = 0f; q < silent; q += Time.deltaTime)
+            {
+                SetMouth(openTo * Mathf.Sin(Mathf.PI * (q / silent)));
+                yield return null;
+            }
             yield break;
         }
 
@@ -403,8 +492,106 @@ public class WakeUpSequence : MonoBehaviour
         for (float t = 0f; t < length && snoreSource.isPlaying; t += Time.deltaTime)
         {
             snoreSource.volume = Level();
+
+            // Open and shut across the breath, so the widest point of his
+            // mouth is the loudest part of the sound rather than its start.
+            SetMouth(openTo * Mathf.Sin(Mathf.PI * Mathf.Clamp01(t / length)));
             yield return null;
         }
+    }
+
+    /// <summary>
+    /// How far open his mouth is, 0 shut to 1 wide, as the nearest of the
+    /// three sleeping poses. Does nothing once he is up - the poses are of a
+    /// boy lying down, and putting one on a boy who is sitting would lay him
+    /// back down for a frame.
+    /// </summary>
+    private void SetMouth(float openness)
+    {
+        if (!breatheMouth || mouths == null || sprite == null) return;
+        if (movement == null || movement.currentWakeStage != PlayerMovement.WakeStage.LyingDown) return;
+
+        int i = Mathf.Clamp(Mathf.RoundToInt(Mathf.Clamp01(openness) * (mouths.Length - 1)),
+                            0, mouths.Length - 1);
+        if (sprite.sprite != mouths[i]) sprite.sprite = mouths[i];
+    }
+
+    // ------------------------------------------------------------------
+    // the Zs
+    // ------------------------------------------------------------------
+
+    /// <summary>
+    /// One Z, rising off his head and fading, for the breath just starting.
+    ///
+    /// Its own object rather than a child of his, for the reason the dissolve
+    /// copy is: parented, it would inherit his scale and the 23 degrees of Y
+    /// he is turned by to face into the room, and a letter seen at an angle
+    /// reads as a mistake rather than as perspective.
+    /// </summary>
+    /// <summary>
+    /// The breath's worth of Zs, spaced a beat apart. Its own coroutine, so
+    /// the trailing ones still go up while the snore itself plays on.
+    /// </summary>
+    private IEnumerator SendUpZs()
+    {
+        for (int i = 0; i < zzzPerBreath; i++)
+        {
+            SendUpAZ();
+            if (i + 1 < zzzPerBreath) yield return new WaitForSeconds(zzzGap);
+        }
+    }
+
+    private void SendUpAZ()
+    {
+        if (!showZzz || zed == null || sprite == null) return;
+
+        GameObject go = new GameObject("Zzz");
+        go.transform.SetParent(transform.parent, false);
+
+        SpriteRenderer r = go.AddComponent<SpriteRenderer>();
+        r.sprite = zed;
+        r.sortingLayerID = sprite.sortingLayerID;
+        r.sortingOrder = sprite.sortingOrder + 5;      // in front of him and the bed
+
+        floating.Add(go);
+        StartCoroutine(FloatAway(go, r));
+    }
+
+    private IEnumerator FloatAway(GameObject go, SpriteRenderer r)
+    {
+        float size = zzzSize * (1f + Random.Range(-zzzSizeWander, zzzSizeWander));
+        float lean = Random.Range(-14f, 6f);
+        float sway = Random.value < 0.5f ? -1f : 1f;
+
+        // Sized in world units rather than by whatever the art happens to
+        // measure, so redrawing the Z bigger changes nothing on screen.
+        float unit = zed.bounds.size.y;
+        Vector3 start = transform.localPosition + new Vector3(zzzFrom.x, zzzFrom.y, 0f);
+
+        for (float t = 0f; t < zzzSeconds; t += Time.deltaTime)
+        {
+            if (go == null) yield break;
+            float k = Mathf.Clamp01(t / zzzSeconds);
+
+            // Up at a steady drift, sideways on a slow curve, and growing a
+            // little as it goes - a thing getting further away would shrink,
+            // and this is meant to read as rising towards the viewer.
+            go.transform.localPosition = start + new Vector3(
+                sway * zzzDrift * Mathf.Sin(k * Mathf.PI * 0.9f), zzzRise * k, -0.01f);
+
+            float grow = size * (0.65f + 0.35f * k) / Mathf.Max(unit, 0.0001f);
+            go.transform.localScale = new Vector3(grow, grow, 1f);
+            go.transform.localRotation = Quaternion.Euler(0f, 0f, lean * k);
+
+            // In quickly, out over the back half, so it is never a hard pop
+            // at either end.
+            float alpha = Mathf.Min(Smoothstep(k / 0.15f), 1f - Smoothstep((k - 0.45f) / 0.55f));
+            r.color = WithAlpha(Color.white, alpha);
+            yield return null;
+        }
+
+        floating.Remove(go);
+        if (go != null) Destroy(go);
     }
 
     void Update()
