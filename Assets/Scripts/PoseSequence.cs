@@ -146,6 +146,27 @@ public class PoseSequence : MonoBehaviour
         if (target == null) target = GetComponent<SpriteRenderer>();
         if (target == null) return;
 
+        // TAKE THE RENDERER OFF ANY OTHER ACTION FIRST.
+        //
+        // StopAllCoroutines below stops THIS component's coroutines, not the
+        // object's. That was harmless while a character had one drawn action;
+        // Paaralan Scene 3 is the first scene to put two on one figure -
+        // "Sulat" and "Tanong" - and they share a SpriteRenderer. Started
+        // over the top of each other they would both write a sprite every
+        // frame and the figure would flicker between writing and putting its
+        // hand up, with the loser's onFinished firing partway through the
+        // winner and, in Sulat's case, dropping the pencil back on the desk
+        // mid-gesture.
+        //
+        // SceneObjectiveController waits for a drawn action to finish before
+        // asking the next word, so this should not arise in ordinary play. It
+        // is cheap to make impossible rather than unlikely: that wait gives up
+        // after maxActionWait, and a scene replayed without a rebuild has no
+        // such protection at all.
+        foreach (PoseSequence other in GetComponents<PoseSequence>())
+            if (other != this && other.running && other.target == target)
+                other.Halt();
+
         // Read the fallback now rather than caching it in Awake: a previous
         // beat may have changed the sprite since, and this has to land on what
         // is current, not on what was first.
@@ -164,6 +185,21 @@ public class PoseSequence : MonoBehaviour
 
         StopAllCoroutines();
         StartCoroutine(Run());
+    }
+
+    /// <summary>
+    /// Drops this action immediately, without touching the sprite.
+    ///
+    /// For handing the renderer to another action that is starting now: it
+    /// is about to set its own first frame, so putting the idle pose up here
+    /// would only insert one frame of him sitting still between the two.
+    /// Nor does onFinished fire - this action did not finish, it was
+    /// interrupted, and anything listening would be acting on a lie.
+    /// </summary>
+    private void Halt()
+    {
+        StopAllCoroutines();
+        running = false;
     }
 
     /// <summary>
