@@ -1,7 +1,13 @@
 // Assets/Editor/BuildBahayScene5.cs
 //
 // One-click scene builder for Bahay Scene 5 ("Eating Breakfast").
-// Teaches five words: Upo, Kanin, Itlog, Kain, Inom.
+// Teaches three words: Upo, Kain, Inom.
+//
+// Kanin and Itlog are no longer spoken objectives. The restructure keeps
+// them as bonus vocabulary to be TAPPED rather than said - "Can you find the
+// kanin and itlog?" - which is a different interaction and is not built yet.
+// The rice and the egg stay on the plate either way: they are what Kain
+// clears, and the scene would be a boy eating nothing without them.
 //
 // This scene was in the design document from the start and was never built -
 // Level 1 ran Scene 1 -> 2 -> 3 -> 4 and then ended, so Kylo got dressed and
@@ -209,10 +215,8 @@ public class BuildBahayScene5
         voiceCommand.player = player;
 
         // Something has to light up when a word only names a thing.
-        TimedOverlay gleamKanin = CreateGleam("Gleam_Kanin", propKanin, 2.4f);
-        TimedOverlay gleamItlog = CreateGleam("Gleam_Itlog", propItlog, 1.9f);
         TimedOverlay gleamBaso  = CreateGleam("Gleam_Baso",  propBaso,  2.0f);
-        foreach (TimedOverlay fx in new[] { gleamKanin, gleamItlog, gleamBaso })
+        foreach (TimedOverlay fx in new[] { gleamBaso })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderFood + 1;
@@ -239,8 +243,6 @@ public class BuildBahayScene5
         // Canvas units are world units x100. Each prompt sits above the thing
         // it names; "Upo" sits over the chair Kylo is about to use.
         GameObject pUpo   = CreatePromptUI(uiRoot.transform, "Prompt_Upo",   "Upo",   new Vector3(520, 250, 0));
-        GameObject pKanin = CreatePromptUI(uiRoot.transform, "Prompt_Kanin", "Kanin", new Vector3(-20, -235, 0));
-        GameObject pItlog = CreatePromptUI(uiRoot.transform, "Prompt_Itlog", "Itlog", new Vector3(-230, -235, 0));
         GameObject pKain  = CreatePromptUI(uiRoot.transform, "Prompt_Kain",  "Kain",  new Vector3(-20, 300, 0));
         GameObject pInom  = CreatePromptUI(uiRoot.transform, "Prompt_Inom",  "Inom",  new Vector3(190, -235, 0));
 
@@ -248,12 +250,6 @@ public class BuildBahayScene5
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
-
-        var kanin = MakeObjective("Kanin", pKanin);
-        UnityEventTools.AddPersistentListener(kanin.onCorrect, gleamKanin.Play);
-
-        var itlog = MakeObjective("Itlog", pItlog);
-        UnityEventTools.AddPersistentListener(itlog.onCorrect, gleamItlog.Play);
 
         // Eating swaps the full dishes for the empty ones.
         var kain = MakeObjective("Kain", pKain);
@@ -271,7 +267,7 @@ public class BuildBahayScene5
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { upo, kanin, itlog, kain, inom };
+        controller.objectives = new[] { upo, kain, inom };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
@@ -286,7 +282,9 @@ public class BuildBahayScene5
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 5 built and saved to " + ScenePath +
-                   ". Words: Upo, Kanin, Itlog, Kain, Inom. Level 1 now ends here, " +
+                   ". Words: Upo, Kain, Inom. Kanin and Itlog are now tap-to-name bonus " +
+                   "vocabulary rather than spoken objectives, and that interaction is not " +
+                   "built yet - the food itself is still on the plate. Level 1 now ends here, " +
                    "so re-run Build Bahay Scene 4 as well - it fades into this scene " +
                    "instead of showing the result itself.");
     }

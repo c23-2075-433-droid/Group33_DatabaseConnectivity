@@ -107,21 +107,23 @@ public class BuildBahayScene2
         // gaps repainted by Tools/fill_bathroom_background.py, so these
         // positions are exactly where they were painted and the room looks
         // unchanged until something is picked up.
-        GameObject itemTabo    = CreateBathroomItem(bathroom.transform, "Item_Tabo",    "item_tabo",    new Vector2(-7.056f, 0.738f), 5);
-        GameObject itemSabon   = CreateBathroomItem(bathroom.transform, "Item_Sabon",   "item_sabon",   new Vector2( 1.556f, 1.025f), 5);
+        CreateBathroomItem(bathroom.transform, "Item_Tabo",    "item_tabo",    new Vector2(-7.056f, 0.738f), 5);
+        CreateBathroomItem(bathroom.transform, "Item_Sabon",   "item_sabon",   new Vector2( 1.556f, 1.025f), 5);
         CreateBathroomItem(bathroom.transform, "Item_Suklay",  "item_suklay",  new Vector2( 2.750f, 0.988f), 5);
         // The brush stands in the cup, so the cup has to draw over it.
-        GameObject itemSipilyo = CreateBathroomItem(bathroom.transform, "Item_Sipilyo", "item_sipilyo", new Vector2( 4.225f, 1.694f), 4);
+        CreateBathroomItem(bathroom.transform, "Item_Sipilyo", "item_sipilyo", new Vector2( 4.225f, 1.694f), 4);
         CreateBathroomItem(bathroom.transform, "Item_Baso",    "item_baso",    new Vector2( 3.931f, 1.188f), 5);
-        GameObject itemTuwalya = CreateBathroomItem(bathroom.transform, "Item_Tuwalya", "item_tuwalya", new Vector2( 7.262f, 1.019f), 5);
+        CreateBathroomItem(bathroom.transform, "Item_Tuwalya", "item_tuwalya", new Vector2( 7.262f, 1.019f), 5);
 
-        // Saying one of these words takes that object off the wall or shelf.
-        // Suklay and Baso have no word yet - combing belongs with getting
-        // dressed - so they stay as scenery.
-        PickUpItem pickTabo    = AddPickUp(itemTabo);
-        PickUpItem pickSabon   = AddPickUp(itemSabon);
-        PickUpItem pickSipilyo = AddPickUp(itemSipilyo);
-        PickUpItem pickTuwalya = AddPickUp(itemTuwalya);
+        // NOTHING IS PICKED UP IN THIS SCENE ANY MORE. Sabon, Sipilyo and
+        // Tuwalya moved to Bahay 3, where the bath actually happens, and Tabo
+        // left the game's word list altogether. Every object stays exactly
+        // where it was painted: this scene's job is now to get Kylo into the
+        // bathroom and put the light on, and the room has to be furnished for
+        // the scene that follows it.
+        //
+        // The three locals above are gone with the objectives that used them,
+        // which is why the items are no longer stored.
 
         // --- Darkness over the bathroom only; the hallway stays lit ---
         GameObject darkGO = new GameObject("BathroomDarkness");
@@ -259,13 +261,6 @@ public class BuildBahayScene2
         // rather than one screen to the right.
         GameObject pIlaw   = CreatePromptUI(uiRoot.transform, "Prompt_Ilaw",   "Ilaw",   new Vector3(0, 400, 0));
 
-        // The four objects in the bathroom. Each prompt sits just above the
-        // thing it names, worked out from the sprite's own height.
-        GameObject pTabo    = CreatePromptUI(uiRoot.transform, "Prompt_Tabo",    "Tabo",    new Vector3(-706, 195, 0));
-        GameObject pSabon   = CreatePromptUI(uiRoot.transform, "Prompt_Sabon",   "Sabon",   new Vector3( 156, 185, 0));
-        GameObject pSipilyo = CreatePromptUI(uiRoot.transform, "Prompt_Sipilyo", "Sipilyo", new Vector3( 422, 255, 0));
-        GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 390, 0));
-
         // --- Objectives, in order. Each onCorrect is a persistent listener so
         //     it shows up and stays editable in the Inspector. ---
         var lakad  = MakeObjective("Lakad",  pLakad);
@@ -288,25 +283,9 @@ public class BuildBahayScene2
         var ilaw   = MakeObjective("Ilaw",   pIlaw);
         UnityEventTools.AddPersistentListener(ilaw.onCorrect, lightSwitch.TurnOnLight);
 
-        // Now the room is lit, the things in it can be named and taken. The
-        // order follows the routine: water, soap, teeth, then the towel to
-        // dry off with. No voice-over for these yet - the prompts carry them.
-        var tabo    = MakeObjective("Tabo",    pTabo);
-        UnityEventTools.AddPersistentListener(tabo.onCorrect, pickTabo.PickUp);
-
-        var sabon   = MakeObjective("Sabon",   pSabon);
-        UnityEventTools.AddPersistentListener(sabon.onCorrect, pickSabon.PickUp);
-
-        var sipilyo = MakeObjective("Sipilyo", pSipilyo);
-        UnityEventTools.AddPersistentListener(sipilyo.onCorrect, pickSipilyo.PickUp);
-
-        var tuwalya = MakeObjective("Tuwalya", pTuwalya);
-        UnityEventTools.AddPersistentListener(tuwalya.onCorrect, pickTuwalya.PickUp);
-
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { lakad, kaliwa, kanan, bukas, ilaw,
-                                        tabo, sabon, sipilyo, tuwalya };
+        controller.objectives = new[] { lakad, kaliwa, kanan, bukas, ilaw };
 
         // The transition holds the sequence while Kylo walks through the door,
         // so "Ilaw" is not asked until the bathroom has actually faded in.
@@ -340,7 +319,10 @@ public class BuildBahayScene2
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 2 built and saved to " + ScenePath + ". " +
-                   "Words: Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tabo, Sabon, Sipilyo, Tuwalya. " +
+                   "Words: Lakad, Kaliwa, Kanan, Bukas, Ilaw - getting to the bathroom and " +
+                   "putting the light on. Tabo, Sabon, Sipilyo and Tuwalya have moved to " +
+                   "Bahay Scene 3, where the washing happens; the objects stay here as the " +
+                   "furnished room that scene reuses. " +
                    (LoadSprite("door_open") == null
                        ? "NOTE: door_open sprite not found - the Door_Open object exists but has no art yet. " +
                          "Import it and re-run this command."
