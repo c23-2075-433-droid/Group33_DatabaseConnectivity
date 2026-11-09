@@ -215,7 +215,7 @@ public class BuildPaaralanScene3
             "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
             "prop_lapis", "item_baso", "fx_gleam",
             // Paaralan Scene 2's pencil poses, the lead-in and tail of "Sulat".
-            "place_frame_3_uniform", "lapis_frame_2_uniform",
+            "place_frame_3_uniform", "lapis_frame_1_uniform", "lapis_frame_2_uniform",
             // Drawn for "Sulat" - the only poses with the pencil on the page.
             "sulat_frame_1_uniform", "sulat_frame_2_uniform", "sulat_frame_3_uniform",
             // Drawn for "Tanong".
@@ -343,10 +343,16 @@ public class BuildPaaralanScene3
         // Tools/make_sulat_frames.py records what finally had to be pinned.
         PoseSequence sulatFrames = seatGO.AddComponent<PoseSequence>();
         sulatFrames.target = seatGO.GetComponent<SpriteRenderer>();
+        // Three steps down, not two. The pencil appears at chest height in
+        // lapis_frame_2 and the writing frames have it on the page; going
+        // straight between them skips the whole descent, which is the kind of
+        // jump the lead-in exists to avoid. lapis_frame_1 holds it lower and
+        // bridges them.
         sulatFrames.frames = new[]
         {
             LoadSpriteOptional("place_frame_3_uniform"),
             LoadSpriteOptional("lapis_frame_2_uniform"),
+            LoadSpriteOptional("lapis_frame_1_uniform"),
         };
         sulatFrames.loopFrames = new[]
         {
@@ -355,8 +361,11 @@ public class BuildPaaralanScene3
             LoadSpriteOptional("sulat_frame_3_uniform"),
         };
         sulatFrames.loopCycles = 3;
+        // The same descent in reverse, so the pencil leaves the page the way
+        // it arrived rather than teleporting back to his chest.
         sulatFrames.tailFrames = new[]
         {
+            LoadSpriteOptional("lapis_frame_1_uniform"),
             LoadSpriteOptional("lapis_frame_2_uniform"),
             LoadSpriteOptional("place_frame_3_uniform"),
         };
