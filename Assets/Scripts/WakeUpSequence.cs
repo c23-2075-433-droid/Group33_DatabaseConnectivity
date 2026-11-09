@@ -134,8 +134,22 @@ public class WakeUpSequence : MonoBehaviour
 
     [Tooltip("How far back the sitting pose is tipped when it starts, in degrees - " +
              "roughly where the sleeping pose lay. Positive tips the head toward the " +
-             "pillow end of the bed, which in this art is the left.")]
+             "pillow end of the bed, which in this art is the left.\n\n" +
+             "A rigid rotation cannot match both ends of the sleeping pose at once: " +
+             "the sitting art measures about 3.7 units from seat to crown, and swung " +
+             "flat enough for the head to touch the mattress it reaches further left " +
+             "than the sleeping pose does. Flatter is the better error - a child who " +
+             "starts half upright has not been woken by anything - so this is set " +
+             "flat and Rise Drift X pulls the overreach back in.")]
     public float riseFromAngle = 68f;
+
+    [Tooltip("How far to the right the pose starts, in world units, easing back to " +
+             "nothing as he comes up. This is what keeps his head on the pillow at " +
+             "the first frame rather than through the headboard - see Rise From " +
+             "Angle. Measured for Level 1's bed: at 68 degrees the crown overreaches " +
+             "the sleeping pose by a little under a unit. The same trick, and the " +
+             "same reasoning, as PoseSettle's Drift From.")]
+    public float riseDriftX = 0.9f;
 
     [Tooltip("How far past upright the sit-up swings before rocking back, in degrees. " +
              "This is the whole difference between a child sitting up and a plank " +
@@ -397,10 +411,18 @@ public class WakeUpSequence : MonoBehaviour
         restScale = transform.localScale;
         restRotation = transform.localRotation;
 
-        // The hip he pivots on: the bottom of the sprite, in local units. A
-        // character rotated about his centre swings his feet through the
-        // mattress, which reads as a figure toppling rather than one sitting.
-        float pivotDrop = HalfHeight() * Mathf.Abs(restScale.y);
+        // The seat he pivots on. A figure rotated about his CENTRE swings his
+        // feet through the mattress, which reads as a plank being tipped rather
+        // than a child sitting up - so the turn happens where his weight
+        // actually rests.
+        //
+        // Not the bottom edge of the art either, which is his feet: they hang
+        // lower than his backside in the sitting pose, which is the whole
+        // reason PlayerMovement sinks him by sittingPoseSeatDrop on "Bangon".
+        // That number IS the gap between the two, so his seat is exactly that
+        // far up from the bottom edge - and reading it from there rather than
+        // keeping a second copy means the bed stays tuned in one place.
+        float pivotDrop = HalfHeight() * Mathf.Abs(restScale.y) - SeatAboveFeet();
         Vector3 pivot = restPosition + new Vector3(0f, -pivotDrop, 0f);
 
         // The sequencer waits on this, so "Tayo" is not asked over the top of
@@ -431,7 +453,7 @@ public class WakeUpSequence : MonoBehaviour
             float rock = Mathf.Sin(Mathf.PI * k * k * k);   // peaks at four fifths, zero at both ends
 
             float angle = riseFromAngle * (1f - swing) - riseOvershoot * rock;
-            SetPose(pivot, angle, startSquash * (1f - swing));
+            SetPose(pivot, riseDriftX * (1f - swing), angle, startSquash * (1f - swing));
             yield return null;
         }
 
@@ -474,15 +496,26 @@ public class WakeUpSequence : MonoBehaviour
     }
 
     /// <summary>
-    /// Rotates the figure about a pivot below it, with a little squash, and
-    /// leaves the transform somewhere Rest() can return from exactly.
+    /// Rotates the figure about a seat below it, offset sideways, with a little
+    /// squash - and leaves the transform somewhere Rest() can return from
+    /// exactly, since every term here falls to zero together.
+    ///
+    /// The rotation is composed onto the pose's own, never assigned over it:
+    /// Level 1's Kylo is turned 23 degrees about Y so he faces into the room,
+    /// and overwriting that would snap him flat to the camera for the length of
+    /// the sit-up.
     /// </summary>
-    private void SetPose(Vector3 pivot, float angle, float squash)
+    private void SetPose(Vector3 pivot, float driftX, float angle, float squash)
     {
         Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
 
+        // The seat drifts with him, so the turn stays under his weight rather
+        // than under the place his weight is going to end up.
+        Vector3 from = restPosition + new Vector3(driftX, 0f, 0f);
+        Vector3 seat = pivot + new Vector3(driftX, 0f, 0f);
+
         transform.localRotation = rotation * restRotation;
-        transform.localPosition = pivot + rotation * (restPosition - pivot);
+        transform.localPosition = seat + rotation * (from - seat);
         transform.localScale = new Vector3(restScale.x * (1f + squash * 0.5f),
                                            restScale.y * (1f - squash),
                                            restScale.z);
@@ -500,14 +533,31 @@ public class WakeUpSequence : MonoBehaviour
     }
 
     /// <summary>
-    /// Half the height of the sprite currently showing, in local units. These
+    /// Half the height of the sprite currently showing, before scale. These
     /// sprites are positioned by their CENTRE - IdleBreath says the same - so
-    /// this is the distance down to the floor of the pose.
+    /// this is the distance down from the transform to the bottom edge of the
+    /// art, which in the sitting pose is the soles of his feet.
     /// </summary>
     private float HalfHeight()
     {
         if (sprite == null || sprite.sprite == null) return 0.5f;
         return sprite.sprite.bounds.size.y * 0.5f;
+    }
+
+    /// <summary>
+    /// How far his backside sits above the bottom edge of the sitting art, in
+    /// world units.
+    ///
+    /// This is PlayerMovement's sittingPoseSeatDrop, which is the same
+    /// measurement seen from the other side: "Bangon" matches the bottom edges
+    /// of the two poses and then sinks him by this much, precisely so that the
+    /// thing resting on the mattress is his seat rather than his toes. Read
+    /// rather than copied, so there is one number to tune and not two that can
+    /// drift apart.
+    /// </summary>
+    private float SeatAboveFeet()
+    {
+        return movement != null ? movement.sittingPoseSeatDrop : 0f;
     }
 }
 
