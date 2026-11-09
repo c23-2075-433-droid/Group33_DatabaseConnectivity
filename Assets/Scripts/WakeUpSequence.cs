@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -116,6 +117,22 @@ public class WakeUpSequence : MonoBehaviour
     [Tooltip("How quickly the snore ducks and comes back.")]
     public float duckSeconds = 0.3f;
 
+    [Header("Drawn in-between frames")]
+    [Tooltip("Where the sit-up's drawn frames live, under a Resources folder so a " +
+             "run-time object can load them. Made by Tools/import_wakeup_frames.py " +
+             "out of one Canva strip - the same way the Upo frames are made.\n\n" +
+             "With the frames present they ARE the sit-up: his arms, back and knees " +
+             "genuinely change between drawings, which no transform can imitate. " +
+             "Without them the swing below plays instead, which is the cheap " +
+             "nine-tenths PoseSettle's comment describes. Nothing breaks either way.")]
+    public string framesFolder = "Wake/";
+
+    [Tooltip("What fraction of the sit-up is the drawn frames, the rest being the " +
+             "dissolve from the last frame into the real sitting pose. Only used " +
+             "when the frames are there.")]
+    [Range(0.2f, 0.9f)]
+    public float framesShare = 0.6f;
+
     [Header("Waking up")]
     [Tooltip("Beat between the snore stopping and the sit-up starting. The yawn " +
              "begins in this gap, so the sound leads the movement by a hair - which " +
@@ -219,6 +236,9 @@ public class WakeUpSequence : MonoBehaviour
     // assuming white.
     private Color spriteTint = Color.white;
 
+    // The drawn sit-up, frame 0 first, or null when it has not been made yet.
+    private Sprite[] frames;
+
     // Where the sit-up has to end up: read once, at the moment the word lands,
     // and kept as fields so a sit-up cut short by a fast "Tayo" can be put back
     // exactly rather than left on a half-rotated frame.
@@ -268,7 +288,36 @@ public class WakeUpSequence : MonoBehaviour
         if (movement.currentWakeStage != PlayerMovement.WakeStage.LyingDown) return;
 
         RememberSleepingPose();
+        LoadFrames();
         snoring = StartCoroutine(Snore());
+    }
+
+    /// <summary>
+    /// Picks up the drawn sit-up, if it has been made: frame 0, then as many
+    /// numbered frames as are there.
+    ///
+    /// Frame 0 is the sleeping pose re-drawn on the frames' own canvas, and it
+    /// is what makes the rest of this simple - every frame shares one canvas
+    /// whose centre is the sitting pose's centre, so the whole sit-up plays
+    /// from one renderer at one transform with no geometry in the C# at all.
+    /// One frame on its own is not a sit-up, so fewer than two is the same as
+    /// none.
+    /// </summary>
+    private void LoadFrames()
+    {
+        List<Sprite> found = new List<Sprite>();
+        for (int i = 0; ; i++)
+        {
+            Sprite s = Resources.Load<Sprite>(framesFolder + "wake_frame_" + i);
+            if (s == null) break;
+            found.Add(s);
+        }
+
+        frames = found.Count >= 2 ? found.ToArray() : null;
+
+        if (frames == null && found.Count == 1)
+            Debug.Log("WakeUpSequence: only frame 0 of the drawn sit-up is there, so " +
+                      "the swing plays instead. See Tools/import_wakeup_frames.py.");
     }
 
     /// <summary>
@@ -422,11 +471,11 @@ public class WakeUpSequence : MonoBehaviour
     /// remembered, or the dissolve turned off - in which case he is left
     /// visible and the sit-up simply plays as a straight swap.
     /// </summary>
-    private bool BeginDissolve()
+    private bool BeginDissolve(Sprite from, Vector3 pos, Quaternion rot, Vector3 scale)
     {
-        if (sprite == null || sleepingSprite == null || poseCrossFade <= 0f) return false;
+        if (sprite == null || from == null || poseCrossFade <= 0f) return false;
 
-        sleepingGhost = NewGhost();
+        sleepingGhost = NewGhost(from, pos, rot, scale);
         sprite.color = WithAlpha(spriteTint, 0f);
         return true;
     }
@@ -456,18 +505,19 @@ public class WakeUpSequence : MonoBehaviour
         ClearSleepingGhost();
     }
 
-    private SpriteRenderer NewGhost()
+    private SpriteRenderer NewGhost(Sprite from, Vector3 pos, Quaternion rot, Vector3 scale)
     {
-        GameObject go = new GameObject("Kylo Asleep (dissolving)");
+        GameObject go = new GameObject("Kylo Waking (dissolving)");
 
-        // Root level, and placed in world terms: it must not inherit the swing.
+        // Beside him, never under him: parented, it would inherit the swing
+        // and tip over with him.
         go.transform.SetParent(transform.parent, false);
-        go.transform.localPosition = sleepingPosition;
-        go.transform.localRotation = sleepingRotation;
-        go.transform.localScale = sleepingScale;
+        go.transform.localPosition = pos;
+        go.transform.localRotation = rot;
+        go.transform.localScale = scale;
 
         SpriteRenderer r = go.AddComponent<SpriteRenderer>();
-        r.sprite = sleepingSprite;
+        r.sprite = from;
         r.flipX = sprite.flipX;
         r.sharedMaterial = sprite.sharedMaterial;
         r.sortingLayerID = sprite.sortingLayerID;
@@ -528,6 +578,16 @@ public class WakeUpSequence : MonoBehaviour
         }
         ClearSleepingGhost();
 
+        // Off an in-between and back onto a real pose. A sit-up cut short
+        // would otherwise leave him on whichever drawn frame was showing -
+        // halfway out of bed, for the rest of the scene.
+        if (sprite != null && frames != null && movement != null &&
+            movement.sittingUpSprite != null &&
+            movement.currentWakeStage == PlayerMovement.WakeStage.SittingUp)
+        {
+            sprite.sprite = movement.sittingUpSprite;
+        }
+
         // Rotation and scale only, deliberately - NOT position. Whatever stage
         // just took over has already decided where the character stands, and
         // "Tayo" in particular puts him back down to his bed height before
@@ -585,14 +645,28 @@ public class WakeUpSequence : MonoBehaviour
         // the point of it.
         StartCoroutine(StopSnoring());
 
-        // This frame, before anything is drawn. "Bangon" has already put the
-        // sitting picture on him at its final place, so without this the yawn
-        // beat below would hold on a boy sitting bolt upright in bed for a
-        // sixth of a second - the very cut the dissolve exists to remove. The
-        // copy goes up, he goes to nothing, and he is moved to the bottom of
-        // his arc so that there is no upright frame to catch.
-        bool dissolving = BeginDissolve();
-        SetPose(pivot, riseDriftX, riseFromAngle, startSquash);
+        // Either way, this frame, before anything is drawn: "Bangon" has
+        // already put the sitting picture on him at its final place, so
+        // leaving it alone would hold on a boy sitting bolt upright in bed
+        // through the yawn - the very cut all of this exists to remove.
+        bool drawn = frames != null;
+        bool dissolving = false;
+
+        if (drawn)
+        {
+            // Frame 0 IS the sleeping pose, drawn on the frames' own canvas,
+            // which is centred where he now sits. So he simply goes on looking
+            // asleep, in the right place, with no copy and no dissolve needed
+            // at this end at all.
+            Rest();
+            sprite.sprite = frames[0];
+        }
+        else
+        {
+            dissolving = BeginDissolve(sleepingSprite, sleepingPosition,
+                                       sleepingRotation, sleepingScale);
+            SetPose(pivot, riseDriftX, riseFromAngle, startSquash);
+        }
 
         // The yawn leads the movement by a hair. A yawn is what wakes you up,
         // not something you do once you are already upright - so it sounds
@@ -600,12 +674,77 @@ public class WakeUpSequence : MonoBehaviour
         SoundEffects.Play(YawnId, wakeVolume);
         if (yawnLead > 0f) yield return new WaitForSeconds(yawnLead);
 
-        // Now, with the swing: the dissolve has to happen DURING the movement.
-        // Held so a sit-up cut short takes it down rather than leaving a second
-        // boy lying on the bed.
+        if (drawn)
+        {
+            yield return PlayDrawnRise();
+        }
+        else
+        {
+            yield return SwingUp(pivot, dissolving);
+        }
+
+        // Land exactly where the scene meant, never on a rounding error. This
+        // is the sitting pose as the scene built it, untouched.
+        Rest();
+
+        // --- the stretch, a breath after the landing ---
+        if (stretchDelay > 0f) yield return new WaitForSeconds(stretchDelay);
+
+        SoundEffects.Play(StretchId, wakeVolume);
+
+        yield return StretchBeat(pivot, pivotDrop);
+
+        Rest();
+
+        if (movement != null) movement.SetPosing(false);
+        waking = null;
+    }
+
+    /// <summary>
+    /// The drawn sit-up: his arms, back and knees change between pictures,
+    /// which is the thing no transform can imitate. The last frame then
+    /// dissolves into the real sitting pose, which covers its change of view -
+    /// the frames are side-on, the sitting pose is three-quarter, and he puts
+    /// his glasses on somewhere in there.
+    ///
+    /// Nothing here touches the transform. The frames are drawn on one canvas
+    /// centred on the sitting pose's centre, so every one of them is correct
+    /// at the transform he is already sitting at.
+    /// </summary>
+    private IEnumerator PlayDrawnRise()
+    {
+        int steps = frames.Length - 1;                       // frame 0 is already up
+        float each = (riseSeconds * framesShare) / Mathf.Max(1, steps);
+
+        for (int i = 1; i < frames.Length; i++)
+        {
+            sprite.sprite = frames[i];
+            yield return new WaitForSeconds(each);
+        }
+
+        // Hand the last frame to a copy, put the real pose back on him, and
+        // dissolve between the two over what is left of the sit-up.
+        bool dissolving = BeginDissolve(frames[frames.Length - 1],
+                                        restPosition, restRotation, restScale);
+        if (movement != null && movement.sittingUpSprite != null)
+            sprite.sprite = movement.sittingUpSprite;
+
+        if (dissolving) yield return FinishDissolve();
+        else if (sprite != null) sprite.color = spriteTint;
+    }
+
+    /// <summary>
+    /// The sit-up done with a transform, for before the frames are drawn: the
+    /// sitting pose swings up about his seat out of a dissolve from the
+    /// sleeping one. PoseSettle's comment calls this shape of thing the cheap
+    /// nine-tenths, and that is exactly what it is.
+    /// </summary>
+    private IEnumerator SwingUp(Vector3 pivot, bool dissolving)
+    {
+        // The dissolve has to happen DURING the movement. Held so a sit-up cut
+        // short takes it down rather than leaving a second boy on the bed.
         if (dissolving) fading = StartCoroutine(FinishDissolve());
 
-        // --- the sit-up ---
         for (float t = 0f; t < riseSeconds; t += Time.deltaTime)
         {
             float k = Mathf.Clamp01(t / riseSeconds);
@@ -629,15 +768,15 @@ public class WakeUpSequence : MonoBehaviour
             yield return null;
         }
 
-        // Land exactly where the scene meant, never on a rounding error. This
-        // is the sitting pose as the scene built it, untouched.
-        Rest();
+    }
 
-        // --- the stretch, a breath after the landing ---
-        if (stretchDelay > 0f) yield return new WaitForSeconds(stretchDelay);
-
-        SoundEffects.Play(StretchId, wakeVolume);
-
+    /// <summary>
+    /// The stretch on the end of the sit-up: he reaches up and over and lets
+    /// go. Played whichever way he got upright, because it works on the real
+    /// sitting pose either way.
+    /// </summary>
+    private IEnumerator StretchBeat(Vector3 pivot, float pivotDrop)
+    {
         for (float t = 0f; t < stretchSeconds; t += Time.deltaTime)
         {
             // A single arc up and back down: reaching, holding for an instant,
@@ -649,7 +788,7 @@ public class WakeUpSequence : MonoBehaviour
                                                restScale.y * (1f + reach),
                                                restScale.z);
 
-            // Grown and leaned about the same hip the sit-up turned on. These
+            // Grown and leaned about the same seat the sit-up turned on. These
             // sprites are positioned by their CENTRE, so a figure that simply
             // got taller would push half the gain down through the mattress,
             // and one that simply rotated would swing his seat off the bed.
@@ -660,11 +799,6 @@ public class WakeUpSequence : MonoBehaviour
             transform.localPosition = pivot + lean * (lifted - pivot);
             yield return null;
         }
-
-        Rest();
-
-        if (movement != null) movement.SetPosing(false);
-        waking = null;
     }
 
     /// <summary>
