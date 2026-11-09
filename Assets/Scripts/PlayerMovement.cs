@@ -106,6 +106,44 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public bool IsVoiceWalking => voiceWalkTimer > 0f;
 
+    /// <summary>
+    /// True while a pose is being animated into place rather than simply
+    /// switched - the sit-up WakeUpSequence plays for "Bangon". Set by whoever
+    /// is doing the animating, through SetPosing.
+    /// </summary>
+    public bool IsPosing { get; private set; }
+
+    /// <summary>
+    /// True while ANY action a spoken word started is still playing out,
+    /// whether that is movement or a pose being animated.
+    ///
+    /// This is the one SceneObjectiveController waits on. The distinction
+    /// matters because the two kinds of action look nothing alike to this
+    /// script - a walk is a timer this file owns, a sit-up is a coroutine in
+    /// another component - and the sequencer should not have to know which
+    /// kind the word it just heard started.
+    /// </summary>
+    public bool IsActionPlaying => IsVoiceWalking || IsPosing;
+
+    /// <summary>
+    /// Held true by WakeUpSequence for the length of the sit-up, so the next
+    /// word is not asked over the top of it. Anything that animates a pose on
+    /// this character should do the same.
+    /// </summary>
+    public void SetPosing(bool posing) => IsPosing = posing;
+
+    /// <summary>
+    /// Raised after the wake stage changes, with the stage just entered.
+    ///
+    /// Bangon() and TayoUp() are already the single place each of those words
+    /// lands - they are what the objective's onCorrect event calls, and they
+    /// return early unless the stage before was the right one. So this fires
+    /// exactly once per real transition and never for a wrong answer, which is
+    /// what WakeUpSequence needs in order to stop the snoring and start the
+    /// sit-up without a second copy of the "was that correct?" question.
+    /// </summary>
+    public event System.Action<WakeStage> OnWakeStageChanged;
+
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
 
@@ -333,6 +371,11 @@ public class PlayerMovement : MonoBehaviour
             spriteRenderer.flipX = false; // undo the lying-down mirror
         }
         Debug.Log("PlayerMovement: Bangon triggered - now sitting up.");
+
+        // Last, so anything listening sees a character already on the sitting
+        // pose. WakeUpSequence animates that pose up off the mattress from
+        // here, and it cannot animate a sprite that has not been set yet.
+        OnWakeStageChanged?.Invoke(currentWakeStage);
     }
 
     /// <summary>
@@ -355,6 +398,8 @@ public class PlayerMovement : MonoBehaviour
         if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
 
         Debug.Log("PlayerMovement: Tayo triggered - now standing, movement unlocked.");
+
+        OnWakeStageChanged?.Invoke(currentWakeStage);
     }
 
     /// <summary>

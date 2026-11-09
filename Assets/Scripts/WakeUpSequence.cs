@@ -1,0 +1,553 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+/// <summary>
+/// Kylo asleep, and Kylo waking up: the snoring that runs under Level 1's
+/// opening, and the sit-up that answers "Bangon".
+///
+/// Level 1 starts on a child asleep in bed being asked to wake him. Until this
+/// existed, that was a still picture and a silence - and then the picture
+/// changed, in one frame, to a different still picture. Nothing told the child
+/// that Kylo was asleep, and nothing told them their word had done anything
+/// except that the badge went away.
+///
+/// Two halves, and they share a file because they are two halves of one beat:
+///
+///   SLEEPING. A soft snore breathes under the scene - inhale, pause, whistle,
+///   rest, round again - for as long as Kylo is lying down. It keeps going
+///   through a wrong answer and through one the recognizer could not make out,
+///   because he is still asleep after both. See Rhythm, below, for why the
+///   loop is built out of two one-shots instead of a looping clip.
+///
+///   WAKING UP. The moment Bangon lands, the snore stops, Kylo yawns, and the
+///   sitting pose rises up off the mattress and settles upright with a stretch
+///   on the end of it. Nothing here decides whether the answer was right:
+///   PlayerMovement.Bangon() is what the objective's onCorrect event calls,
+///   and it raises OnWakeStageChanged only on the real transition, so a wrong
+///   word cannot reach any of this.
+///
+/// Why a coroutine and a transform rather than an Animator. There is not one
+/// Animator, AnimationClip or AnimatorController anywhere in this project, and
+/// that is not an oversight - every pose in the game is a SpriteRenderer swap,
+/// and every bit of motion over the top of it is a coroutine on a transform
+/// (see PoseSettle, IdleBreath, WalkIntoScene). An Animator here would mean a
+/// second system animating the one character the sprite-swap system already
+/// owns, with two things writing one transform, which is how a character
+/// starts to jitter. What it would buy is in-between DRAWINGS, and those need
+/// an artist, not a state machine. So this does what PoseSettle does, one step
+/// further: the sitting pose starts tipped back near-horizontal where the
+/// sleeping one lay, and swings up onto its hip, overshooting a little and
+/// rocking back the way a child actually sits up.
+///
+/// Rhythm, and why the snore is two files. A loop baked into one clip either
+/// breathes mechanically or carries its own trailing silence - and
+/// Tools/import_sfx.py trims silence off every effect that arrives, for the
+/// good reason that a footstep with 80 ms of padding fires late. So the
+/// pauses live here as fields, and the pitch wanders a touch each breath, the
+/// same trick SoundEffects plays on footsteps so five in a row are not five
+/// copies of one sound.
+///
+/// The microphone. This game listens to the child almost continuously and the
+/// recognizer hears the device's own speaker - VoiceCommand says so plainly,
+/// and MusicPlayer ducks the soundtrack for exactly that reason. A snore is a
+/// harder case than music, because it plays WHILE the child is being asked for
+/// the word: silence it and the sleeping half of the scene is gone. So it is
+/// quiet, it sits around 100-130 Hz where a six-year-old's vowels do not, it
+/// drops right back under Rachel, and it pulls back a little while the
+/// microphone is open. That last number is the one to measure on a real phone
+/// rather than trust - see Docs/VoicePromptingDesign.md.
+///
+/// Nothing in a saved scene refers to this. WakeUpSequenceBootstrap attaches
+/// it at run time to whichever character starts a scene lying down, for the
+/// reason the HUD, the music and the prompt director are all built that way:
+/// the chapter scenes are generated, and anything added to one by hand is
+/// destroyed the next time its builder runs.
+/// </summary>
+public class WakeUpSequence : MonoBehaviour
+{
+    // The ids are the file names under Assets/Resources/Sfx. Made by
+    // Tools/make_wakeup_sfx.py; a missing one is silent and is not an error.
+    public const string SnoreInId = "snore_in";
+    public const string SnoreOutId = "snore_out";
+    public const string YawnId = "yawn";
+    public const string StretchId = "stretch";
+
+    [Header("Snoring")]
+    [Tooltip("How loud the snore is, before the Effects setting. Low on purpose: " +
+             "it is atmosphere playing under a child who is being listened to, not " +
+             "a punchline.")]
+    [Range(0f, 1f)]
+    public float snoreVolume = 0.4f;
+
+    [Tooltip("Gap between the inhale and the whistle that answers it.")]
+    public float breathGap = 0.26f;
+
+    [Tooltip("Rest after the whistle, before the next breath starts. The slowest " +
+             "part of the cycle - about three seconds a breath altogether, which is " +
+             "a sleeping child rather than one running a fever.")]
+    public float breathRest = 0.85f;
+
+    [Tooltip("How far the pitch of each breath may wander, so the snore does not " +
+             "tick over like a machine. The same dial SoundEffects turns on footsteps.")]
+    [Range(0f, 0.3f)]
+    public float pitchWander = 0.07f;
+
+    [Tooltip("How quickly the snore is gone once Bangon lands. Fast, but not a cut: " +
+             "a sound that stops dead in one frame clicks.")]
+    public float snoreFadeOut = 0.12f;
+
+    [Header("How far the snore gets out of the way")]
+    [Tooltip("Volume while Teacher Rachel is speaking, as a fraction of the above. " +
+             "She is the game; a snore must never compete with the thing the child " +
+             "is meant to understand.")]
+    [Range(0f, 1f)]
+    public float duckUnderNarration = 0.3f;
+
+    [Tooltip("Volume while the microphone is open. Unlike the music, this does not " +
+             "go to nearly nothing: the snore is what tells the child Kylo is " +
+             "asleep, and it is wanted during the very moment they are answering. " +
+             "Measure it on a real phone against the attempt log rather than " +
+             "trusting the default - if answers start getting lost, this is the " +
+             "first number to pull down.")]
+    [Range(0f, 1f)]
+    public float duckWhileListening = 0.7f;
+
+    [Tooltip("How quickly the snore ducks and comes back.")]
+    public float duckSeconds = 0.3f;
+
+    [Header("Waking up")]
+    [Tooltip("Beat between the snore stopping and the sit-up starting. The yawn " +
+             "begins in this gap, so the sound leads the movement by a hair - which " +
+             "is the right way round, since a yawn is what wakes you.")]
+    public float yawnLead = 0.16f;
+
+    [Tooltip("How long the sit-up takes. Long enough to read as a movement, short " +
+             "enough that the child is not kept waiting for the next word.")]
+    public float riseSeconds = 0.6f;
+
+    [Tooltip("A breath held sitting upright before he stretches. Worth having for " +
+             "two reasons: it is what a person actually does - up first, stretch " +
+             "second - and it keeps the stretch's slide-whistle out of the loud " +
+             "middle of the yawn, which is a little over a second long.")]
+    public float stretchDelay = 0.22f;
+
+    [Tooltip("How far back the sitting pose is tipped when it starts, in degrees - " +
+             "roughly where the sleeping pose lay. Positive tips the head toward the " +
+             "pillow end of the bed, which in this art is the left.")]
+    public float riseFromAngle = 68f;
+
+    [Tooltip("How far past upright the sit-up swings before rocking back, in degrees. " +
+             "This is the whole difference between a child sitting up and a plank " +
+             "being raised; set it to 0 for a plain rise.")]
+    public float riseOvershoot = 9f;
+
+    [Tooltip("How much the figure is squashed into the mattress at the start, as a " +
+             "fraction of its height.")]
+    [Range(0f, 0.25f)]
+    public float startSquash = 0.07f;
+
+    [Tooltip("How long the stretch on the end of the sit-up takes.")]
+    public float stretchSeconds = 0.45f;
+
+    [Tooltip("How far the figure reaches up in the stretch, as a fraction of its " +
+             "height.")]
+    [Range(0f, 0.3f)]
+    public float stretchReach = 0.08f;
+
+    [Tooltip("How far the stretch leans, in degrees, so he reaches rather than " +
+             "merely inflates.")]
+    public float stretchLean = 5f;
+
+    [Tooltip("Loudness of the yawn and the stretch, before the Effects setting. " +
+             "Louder than the snore: these are the game answering a word the child " +
+             "got right.")]
+    [Range(0f, 1f)]
+    public float wakeVolume = 0.85f;
+
+    private PlayerMovement movement;
+    private SpriteRenderer sprite;
+    private AudioSource snoreSource;
+
+    private Coroutine snoring;
+    private Coroutine waking;
+
+    // Where the sit-up has to end up: read once, at the moment the word lands,
+    // and kept as fields so a sit-up cut short by a fast "Tayo" can be put back
+    // exactly rather than left on a half-rotated frame.
+    private Vector3 restPosition;
+    private Vector3 restScale;
+    private Quaternion restRotation;
+
+    // Eased towards its target every frame rather than snapped, the way
+    // MusicPlayer does it, so a line of Rachel's does not punch a hole in the
+    // snore.
+    private float duck = 1f;
+
+    // Found per scene, and never VoiceNarrator.Instance - that getter CREATES
+    // a narrator if there is none, and conjuring one up just to ask whether to
+    // duck is the mistake MusicPlayer records having avoided.
+    private VoiceNarrator narrator;
+    private VoiceCommand voice;
+    private float lookAgainAt;
+
+    void Awake()
+    {
+        movement = GetComponent<PlayerMovement>();
+        sprite = GetComponent<SpriteRenderer>();
+
+        snoreSource = gameObject.AddComponent<AudioSource>();
+        snoreSource.playOnAwake = false;
+        snoreSource.loop = false;
+        // 2D. The bed is a few units from the camera and a snore panned to one
+        // ear would be a bug, not a feature.
+        snoreSource.spatialBlend = 0f;
+    }
+
+    void OnEnable()
+    {
+        if (movement != null) movement.OnWakeStageChanged += HandleWakeStageChanged;
+    }
+
+    void OnDisable()
+    {
+        if (movement != null) movement.OnWakeStageChanged -= HandleWakeStageChanged;
+    }
+
+    void Start()
+    {
+        if (movement != null && movement.currentWakeStage == PlayerMovement.WakeStage.LyingDown)
+            snoring = StartCoroutine(Snore());
+    }
+
+    void OnDestroy()
+    {
+        // The stage this held open belongs to the sequencer, and a scene left
+        // mid-sit-up must not hand the next one a character that is forever
+        // mid-action.
+        if (movement != null) movement.SetPosing(false);
+    }
+
+    // ------------------------------------------------------------------
+    // sleeping
+    // ------------------------------------------------------------------
+
+    private IEnumerator Snore()
+    {
+        // A beat before the first breath, so the scene does not open on a
+        // snore already in progress.
+        yield return new WaitForSeconds(0.4f);
+
+        while (true)
+        {
+            // One wander for the whole breath, not one per clip: the inhale
+            // and the whistle that answers it are the same chest.
+            float pitch = 1f + Random.Range(-pitchWander, pitchWander);
+
+            yield return PlayBreath(SnoreInId, pitch);
+            yield return new WaitForSeconds(breathGap);
+            yield return PlayBreath(SnoreOutId, pitch);
+            yield return new WaitForSeconds(breathRest);
+        }
+    }
+
+    private IEnumerator PlayBreath(string id, float pitch)
+    {
+        AudioClip clip = Resources.Load<AudioClip>(SoundEffects.Folder + id);
+
+        // A missing clip is silent and is NOT an error - SoundEffects says the
+        // same, and most of this game's sound has still to be made. The wait
+        // keeps the rhythm honest so the sleeping half of the scene is merely
+        // quiet rather than spinning on a tight loop.
+        if (clip == null)
+        {
+            yield return new WaitForSeconds(0.9f);
+            yield break;
+        }
+
+        snoreSource.clip = clip;
+        snoreSource.pitch = pitch;
+        snoreSource.volume = Level();
+        snoreSource.Play();
+
+        // Held here rather than with one WaitForSeconds, so the duck follows
+        // Rachel and the microphone WHILE a breath is sounding - a sustained
+        // sound cannot have its volume set once at the start and be done with.
+        float length = clip.length / Mathf.Max(pitch, 0.01f);
+        for (float t = 0f; t < length && snoreSource.isPlaying; t += Time.deltaTime)
+        {
+            snoreSource.volume = Level();
+            yield return null;
+        }
+    }
+
+    void Update()
+    {
+        // Only the snore is ducked, and only while it is running. Once Kylo is
+        // awake this component has nothing left to listen for.
+        if (snoring == null) return;
+
+        // Both are created at run time and may not exist yet when a scene has
+        // only just loaded, so look again a couple of times a second rather
+        // than every frame.
+        if ((narrator == null || voice == null) && Time.unscaledTime >= lookAgainAt)
+        {
+            lookAgainAt = Time.unscaledTime + 0.5f;
+            if (narrator == null) narrator = FindAnyObjectByType<VoiceNarrator>();
+            if (voice == null) voice = FindAnyObjectByType<VoiceCommand>();
+        }
+
+        float target = 1f;
+        if (narrator != null && narrator.IsSpeaking) target = Mathf.Min(target, duckUnderNarration);
+        if (voice != null && voice.IsListening) target = Mathf.Min(target, duckWhileListening);
+
+        duck = duckSeconds <= 0f
+            ? target
+            : Mathf.MoveTowards(duck, target, Time.unscaledDeltaTime / duckSeconds);
+    }
+
+    private float Level()
+    {
+        return Mathf.Clamp01(VolumeSettings.Effects * snoreVolume * Mathf.Clamp01(duck));
+    }
+
+    /// <summary>
+    /// Stops the snoring, quickly but not in one frame. Safe to call when
+    /// nothing is snoring.
+    /// </summary>
+    private IEnumerator StopSnoring()
+    {
+        if (snoring != null)
+        {
+            StopCoroutine(snoring);
+            snoring = null;
+        }
+
+        if (snoreSource == null || !snoreSource.isPlaying) yield break;
+
+        float from = snoreSource.volume;
+        for (float t = 0f; t < snoreFadeOut; t += Time.deltaTime)
+        {
+            snoreSource.volume = Mathf.Lerp(from, 0f, t / snoreFadeOut);
+            yield return null;
+        }
+
+        snoreSource.Stop();
+        snoreSource.clip = null;
+        snoreSource.volume = 0f;
+    }
+
+    // ------------------------------------------------------------------
+    // waking up
+    // ------------------------------------------------------------------
+
+    private void HandleWakeStageChanged(PlayerMovement.WakeStage stage)
+    {
+        if (stage == PlayerMovement.WakeStage.SittingUp)
+        {
+            if (waking != null) StopCoroutine(waking);
+            waking = StartCoroutine(WakeUp());
+            return;
+        }
+
+        // Standing, or anything else: whatever we were animating is over. A
+        // child who says "Tayo" the instant he is upright gets to stand up, and
+        // the sit-up lets go of the transform rather than fighting for it.
+        CancelWakeUp();
+    }
+
+    private void CancelWakeUp()
+    {
+        if (waking == null) return;
+
+        StopCoroutine(waking);
+        waking = null;
+
+        // Rotation and scale only, deliberately - NOT position. Whatever stage
+        // just took over has already decided where the character stands, and
+        // "Tayo" in particular puts him back down to his bed height before
+        // handing him to physics. Restoring the seated position over the top of
+        // that would undo the decision of the thing that interrupted us. The
+        // rotation and the squash are ours alone, and leaving either behind
+        // would strand a standing boy tipped over at nine degrees.
+        transform.localRotation = restRotation;
+        transform.localScale = restScale;
+
+        if (movement != null) movement.SetPosing(false);
+    }
+
+    /// <summary>
+    /// Puts the transform back exactly where the sit-up has to end: the end of
+    /// the rise and the end of the stretch, so neither ever lands on a rounding
+    /// error. A sit-up cut short does NOT come through here - see CancelWakeUp.
+    /// </summary>
+    private void Rest()
+    {
+        transform.localRotation = restRotation;
+        transform.localPosition = restPosition;
+        transform.localScale = restScale;
+    }
+
+    private IEnumerator WakeUp()
+    {
+        // Rest is read here, at the moment the word lands, so the pose settles
+        // back to wherever the scene actually put the character. Nothing in
+        // this routine changes where he ends up - only how he gets there.
+        restPosition = transform.localPosition;
+        restScale = transform.localScale;
+        restRotation = transform.localRotation;
+
+        // The hip he pivots on: the bottom of the sprite, in local units. A
+        // character rotated about his centre swings his feet through the
+        // mattress, which reads as a figure toppling rather than one sitting.
+        float pivotDrop = HalfHeight() * Mathf.Abs(restScale.y);
+        Vector3 pivot = restPosition + new Vector3(0f, -pivotDrop, 0f);
+
+        // The sequencer waits on this, so "Tayo" is not asked over the top of
+        // the sit-up and the results of the last word are not shown mid-move.
+        if (movement != null) movement.SetPosing(true);
+
+        // First, and immediately: he is awake, so he is not snoring. Started
+        // rather than yielded on - the fade runs alongside the yawn, which is
+        // the point of it.
+        StartCoroutine(StopSnoring());
+
+        // The yawn leads the movement by a hair. A yawn is what wakes you up,
+        // not something you do once you are already upright.
+        SoundEffects.Play(YawnId, wakeVolume);
+        if (yawnLead > 0f) yield return new WaitForSeconds(yawnLead);
+
+        // --- the sit-up ---
+        for (float t = 0f; t < riseSeconds; t += Time.deltaTime)
+        {
+            float k = Mathf.Clamp01(t / riseSeconds);
+
+            // Two things at once, which is what stops this reading as a
+            // drawbridge being raised. The swing itself eases in and out and
+            // is done by four fifths of the way through; over the top of it a
+            // single forward rock leans him past upright and settles him back
+            // to exactly nothing at the end.
+            float swing = Smoothstep(Mathf.Clamp01(k / 0.8f));
+            float rock = Mathf.Sin(Mathf.PI * k * k * k);   // peaks at four fifths, zero at both ends
+
+            float angle = riseFromAngle * (1f - swing) - riseOvershoot * rock;
+            SetPose(pivot, angle, startSquash * (1f - swing));
+            yield return null;
+        }
+
+        // Land exactly where the scene meant, never on a rounding error. This
+        // is the sitting pose as the scene built it, untouched.
+        Rest();
+
+        // --- the stretch, a breath after the landing ---
+        if (stretchDelay > 0f) yield return new WaitForSeconds(stretchDelay);
+
+        SoundEffects.Play(StretchId, wakeVolume);
+
+        for (float t = 0f; t < stretchSeconds; t += Time.deltaTime)
+        {
+            // A single arc up and back down: reaching, holding for an instant,
+            // letting go.
+            float bell = Mathf.Sin(Mathf.Clamp01(t / stretchSeconds) * Mathf.PI);
+            float reach = stretchReach * bell;
+
+            transform.localScale = new Vector3(restScale.x * (1f - reach * 0.3f),
+                                               restScale.y * (1f + reach),
+                                               restScale.z);
+
+            // Grown and leaned about the same hip the sit-up turned on. These
+            // sprites are positioned by their CENTRE, so a figure that simply
+            // got taller would push half the gain down through the mattress,
+            // and one that simply rotated would swing his seat off the bed.
+            Quaternion lean = Quaternion.Euler(0f, 0f, -stretchLean * bell);
+            Vector3 lifted = restPosition + new Vector3(0f, pivotDrop * reach, 0f);
+
+            transform.localRotation = lean * restRotation;
+            transform.localPosition = pivot + lean * (lifted - pivot);
+            yield return null;
+        }
+
+        Rest();
+
+        if (movement != null) movement.SetPosing(false);
+        waking = null;
+    }
+
+    /// <summary>
+    /// Rotates the figure about a pivot below it, with a little squash, and
+    /// leaves the transform somewhere Rest() can return from exactly.
+    /// </summary>
+    private void SetPose(Vector3 pivot, float angle, float squash)
+    {
+        Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
+
+        transform.localRotation = rotation * restRotation;
+        transform.localPosition = pivot + rotation * (restPosition - pivot);
+        transform.localScale = new Vector3(restScale.x * (1f + squash * 0.5f),
+                                           restScale.y * (1f - squash),
+                                           restScale.z);
+    }
+
+    /// <summary>
+    /// Eases in and out between 0 and 1 - slow to start, quickest in the
+    /// middle, slow to arrive. A sit-up has to start gently: a child pushing
+    /// himself up off a mattress has to get moving before he can move.
+    /// </summary>
+    private static float Smoothstep(float k)
+    {
+        k = Mathf.Clamp01(k);
+        return k * k * (3f - 2f * k);
+    }
+
+    /// <summary>
+    /// Half the height of the sprite currently showing, in local units. These
+    /// sprites are positioned by their CENTRE - IdleBreath says the same - so
+    /// this is the distance down to the floor of the pose.
+    /// </summary>
+    private float HalfHeight()
+    {
+        if (sprite == null || sprite.sprite == null) return 0.5f;
+        return sprite.sprite.bounds.size.y * 0.5f;
+    }
+}
+
+/// <summary>
+/// Puts a WakeUpSequence on whichever character starts a scene lying down.
+///
+/// The same shape as VoicePromptBootstrap, for the same reason: the chapter
+/// scenes are generated, so a component added to a saved scene by hand is
+/// destroyed the next time somebody runs its builder. Nothing created at run
+/// time can be wiped.
+///
+/// Only Level 1 starts in bed - every other scene builder sets the stage to
+/// Standing - so in practice this attaches once, in Chapter1_Level1_UmagaNa,
+/// and quietly does nothing everywhere else. A second bedroom scene would get
+/// it for free.
+/// </summary>
+public static class WakeUpSequenceBootstrap
+{
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void Install()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        Attach();
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Attach();
+    }
+
+    private static void Attach()
+    {
+        // Runs after every Awake and before every Start, so the snore is in
+        // place for the opening of the scene rather than a breath late.
+        PlayerMovement player = Object.FindAnyObjectByType<PlayerMovement>();
+        if (player == null) return;
+        if (player.currentWakeStage != PlayerMovement.WakeStage.LyingDown) return;
+        if (player.GetComponent<WakeUpSequence>() != null) return;
+
+        player.gameObject.AddComponent<WakeUpSequence>();
+    }
+}

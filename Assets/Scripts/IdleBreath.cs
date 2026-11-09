@@ -92,7 +92,13 @@ public class IdleBreath : MonoBehaviour
     private bool IsMoving()
     {
         if (player == null) return false;
-        if (player.IsVoiceWalking) return true;
+
+        // Any action, not just a walk: a pose being animated into place (the
+        // sit-up WakeUpSequence plays for "Bangon") writes this same transform,
+        // and two things writing one transform is how a character starts to
+        // jitter. Standing down also re-reads his resting place, so he breathes
+        // around wherever the animation left him.
+        if (player.IsActionPlaying) return true;
 
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         return rb != null && Mathf.Abs(rb.linearVelocity.x) > 0.01f;

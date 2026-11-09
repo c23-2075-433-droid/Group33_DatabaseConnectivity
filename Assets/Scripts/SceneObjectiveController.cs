@@ -383,7 +383,13 @@ public class SceneObjectiveController : MonoBehaviour
         yield return null;
 
         float waited = 0f;
-        while (playerMovement != null && playerMovement.IsVoiceWalking && waited < maxActionWait)
+
+        // IsActionPlaying, not IsVoiceWalking: a word's action is not always a
+        // walk. "Bangon" starts a sit-up (WakeUpSequence), which is over in
+        // about a second but is exactly the kind of thing this wait exists
+        // for - without it the next word was asked, and Rachel started
+        // introducing it, while Kylo was still half out of bed.
+        while (playerMovement != null && playerMovement.IsActionPlaying && waited < maxActionWait)
         {
             waited += Time.deltaTime;
             yield return null;
