@@ -122,9 +122,21 @@ public class WakeUpSequence : MonoBehaviour
              "is the right way round, since a yawn is what wakes you.")]
     public float yawnLead = 0.16f;
 
+    [Tooltip("How long the sleeping pose takes to dissolve into the sitting one.\n\n" +
+             "Without this the two drawings change over in a single frame, and no " +
+             "amount of easing the swing hides that: they are different pictures - " +
+             "6.1 units wide lying down against 3.9 sitting - so the silhouette jumps " +
+             "however well the geometry lines up. Fading one into the other while the " +
+             "swing is already under way is what turns a cut into a movement. Keep it " +
+             "shorter than the swing; a long dissolve reads as a ghost rather than a " +
+             "boy.")]
+    public float poseCrossFade = 0.22f;
+
     [Tooltip("How long the sit-up takes. Long enough to read as a movement, short " +
-             "enough that the child is not kept waiting for the next word.")]
-    public float riseSeconds = 0.6f;
+             "enough that the child is not kept waiting for the next word. At 0.85 " +
+             "the swing peaks around 165 degrees a second; it was 237 at 0.6, which " +
+             "is quick enough to read as a snap rather than a child getting up.")]
+    public float riseSeconds = 0.85f;
 
     [Tooltip("A breath held sitting upright before he stretches. Worth having for " +
              "two reasons: it is what a person actually does - up first, stretch " +
@@ -151,9 +163,11 @@ public class WakeUpSequence : MonoBehaviour
              "same reasoning, as PoseSettle's Drift From.")]
     public float riseDriftX = 0.9f;
 
-    [Tooltip("How far past upright the sit-up swings before rocking back, in degrees. " +
-             "This is the whole difference between a child sitting up and a plank " +
-             "being raised; set it to 0 for a plain rise.")]
+    [Tooltip("How far past upright the sit-up leans before settling, in degrees, and " +
+             "it is exactly that many - the lean is applied to what is left of the " +
+             "swing rather than added on top of it, so the two cannot fight. This is " +
+             "the whole difference between a child sitting up and a plank being " +
+             "raised; set it to 0 for a plain rise.")]
     public float riseOvershoot = 9f;
 
     [Tooltip("How much the figure is squashed into the mattress at the start, as a " +
@@ -185,6 +199,25 @@ public class WakeUpSequence : MonoBehaviour
 
     private Coroutine snoring;
     private Coroutine waking;
+    private Coroutine fading;
+
+    // The sleeping pose as the scene authored it, read while he is still in it.
+    // The dissolve needs a copy of the picture he was lying in, and by the time
+    // "Bangon" has been called PlayerMovement has already replaced it.
+    private Sprite sleepingSprite;
+    private Vector3 sleepingPosition;
+    private Quaternion sleepingRotation;
+    private Vector3 sleepingScale;
+
+    // The second renderer the dissolve fades out. A plain GameObject rather
+    // than a child of this one: parented, it would inherit the swing and tip
+    // over with him, and the whole point is that the sleeping pose stays on the
+    // mattress while the sitting one rises off it.
+    private SpriteRenderer sleepingGhost;
+
+    // His own tint, so the dissolve can be undone exactly rather than by
+    // assuming white.
+    private Color spriteTint = Color.white;
 
     // Where the sit-up has to end up: read once, at the moment the word lands,
     // and kept as fields so a sit-up cut short by a fast "Tayo" can be put back
@@ -209,6 +242,7 @@ public class WakeUpSequence : MonoBehaviour
     {
         movement = GetComponent<PlayerMovement>();
         sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null) spriteTint = sprite.color;
 
         snoreSource = gameObject.AddComponent<AudioSource>();
         snoreSource.playOnAwake = false;
@@ -230,8 +264,29 @@ public class WakeUpSequence : MonoBehaviour
 
     void Start()
     {
-        if (movement != null && movement.currentWakeStage == PlayerMovement.WakeStage.LyingDown)
-            snoring = StartCoroutine(Snore());
+        if (movement == null) return;
+        if (movement.currentWakeStage != PlayerMovement.WakeStage.LyingDown) return;
+
+        RememberSleepingPose();
+        snoring = StartCoroutine(Snore());
+    }
+
+    /// <summary>
+    /// Keeps the sleeping pose - picture, place and turn - while he is still
+    /// in it, for the dissolve to fade out of later.
+    ///
+    /// The sprite comes from PlayerMovement's own authored field rather than
+    /// off the renderer, so it is the pose the scene MEANT him to sleep in
+    /// even if something else has painted over it by now.
+    /// </summary>
+    private void RememberSleepingPose()
+    {
+        sleepingSprite = movement.lyingDownSprite;
+        if (sleepingSprite == null && sprite != null) sleepingSprite = sprite.sprite;
+
+        sleepingPosition = transform.localPosition;
+        sleepingRotation = transform.localRotation;
+        sleepingScale = transform.localScale;
     }
 
     void OnDestroy()
@@ -240,6 +295,11 @@ public class WakeUpSequence : MonoBehaviour
         // mid-sit-up must not hand the next one a character that is forever
         // mid-action.
         if (movement != null) movement.SetPosing(false);
+
+        // The dissolve's copy is a GameObject of its own, so it does not go
+        // when this component does. A scene left mid-dissolve would otherwise
+        // keep a sleeping boy on the bed with nobody left to fade him out.
+        if (sleepingGhost != null) Destroy(sleepingGhost.gameObject);
     }
 
     // ------------------------------------------------------------------
@@ -355,6 +415,90 @@ public class WakeUpSequence : MonoBehaviour
     // waking up
     // ------------------------------------------------------------------
 
+    /// <summary>
+    /// Puts the sleeping picture up as a copy of its own and takes him down to
+    /// nothing, in one frame, so the dissolve can start from there. Returns
+    /// false if there is nothing to dissolve - no renderer, no sleeping pose
+    /// remembered, or the dissolve turned off - in which case he is left
+    /// visible and the sit-up simply plays as a straight swap.
+    /// </summary>
+    private bool BeginDissolve()
+    {
+        if (sprite == null || sleepingSprite == null || poseCrossFade <= 0f) return false;
+
+        sleepingGhost = NewGhost();
+        sprite.color = WithAlpha(spriteTint, 0f);
+        return true;
+    }
+
+    /// <summary>
+    /// Fades the sleeping copy out and him in, while he is already swinging up.
+    ///
+    /// The two halves are deliberately not symmetrical: he comes in on the
+    /// SQUARE of the curve, so he is most of the way solid by the time the
+    /// sleeping copy has gone faint. Matched fades put two equally
+    /// half-transparent boys on screen through the middle of it, which is what
+    /// reads as a ghost rather than as one pose becoming another.
+    /// </summary>
+    private IEnumerator FinishDissolve()
+    {
+        for (float t = 0f; t < poseCrossFade; t += Time.deltaTime)
+        {
+            float k = Smoothstep(Mathf.Clamp01(t / poseCrossFade));
+
+            if (sleepingGhost != null) sleepingGhost.color = WithAlpha(spriteTint, 1f - k);
+            if (sprite != null) sprite.color = WithAlpha(spriteTint, k * k);
+
+            yield return null;
+        }
+
+        fading = null;
+        ClearSleepingGhost();
+    }
+
+    private SpriteRenderer NewGhost()
+    {
+        GameObject go = new GameObject("Kylo Asleep (dissolving)");
+
+        // Root level, and placed in world terms: it must not inherit the swing.
+        go.transform.SetParent(transform.parent, false);
+        go.transform.localPosition = sleepingPosition;
+        go.transform.localRotation = sleepingRotation;
+        go.transform.localScale = sleepingScale;
+
+        SpriteRenderer r = go.AddComponent<SpriteRenderer>();
+        r.sprite = sleepingSprite;
+        r.flipX = sprite.flipX;
+        r.sharedMaterial = sprite.sharedMaterial;
+        r.sortingLayerID = sprite.sortingLayerID;
+
+        // One behind him, so as he solidifies he is the one in front.
+        r.sortingOrder = sprite.sortingOrder - 1;
+        r.color = spriteTint;
+        return r;
+    }
+
+    /// <summary>
+    /// Takes the dissolve down: the copy goes, and he is left at his own full
+    /// tint. Safe at any point, including when no dissolve ever started.
+    /// </summary>
+    private void ClearSleepingGhost()
+    {
+        if (sleepingGhost != null)
+        {
+            Destroy(sleepingGhost.gameObject);
+            sleepingGhost = null;
+        }
+
+        if (sprite != null) sprite.color = spriteTint;
+    }
+
+    private static Color WithAlpha(Color c, float a)
+    {
+        c.a = Mathf.Clamp01(a);
+        return c;
+    }
+
     private void HandleWakeStageChanged(PlayerMovement.WakeStage stage)
     {
         if (stage == PlayerMovement.WakeStage.SittingUp)
@@ -376,6 +520,13 @@ public class WakeUpSequence : MonoBehaviour
 
         StopCoroutine(waking);
         waking = null;
+
+        if (fading != null)
+        {
+            StopCoroutine(fading);
+            fading = null;
+        }
+        ClearSleepingGhost();
 
         // Rotation and scale only, deliberately - NOT position. Whatever stage
         // just took over has already decided where the character stands, and
@@ -434,25 +585,46 @@ public class WakeUpSequence : MonoBehaviour
         // the point of it.
         StartCoroutine(StopSnoring());
 
+        // This frame, before anything is drawn. "Bangon" has already put the
+        // sitting picture on him at its final place, so without this the yawn
+        // beat below would hold on a boy sitting bolt upright in bed for a
+        // sixth of a second - the very cut the dissolve exists to remove. The
+        // copy goes up, he goes to nothing, and he is moved to the bottom of
+        // his arc so that there is no upright frame to catch.
+        bool dissolving = BeginDissolve();
+        SetPose(pivot, riseDriftX, riseFromAngle, startSquash);
+
         // The yawn leads the movement by a hair. A yawn is what wakes you up,
-        // not something you do once you are already upright.
+        // not something you do once you are already upright - so it sounds
+        // while he is still lying there, and the picture does not change yet.
         SoundEffects.Play(YawnId, wakeVolume);
         if (yawnLead > 0f) yield return new WaitForSeconds(yawnLead);
+
+        // Now, with the swing: the dissolve has to happen DURING the movement.
+        // Held so a sit-up cut short takes it down rather than leaving a second
+        // boy lying on the bed.
+        if (dissolving) fading = StartCoroutine(FinishDissolve());
 
         // --- the sit-up ---
         for (float t = 0f; t < riseSeconds; t += Time.deltaTime)
         {
             float k = Mathf.Clamp01(t / riseSeconds);
 
-            // Two things at once, which is what stops this reading as a
-            // drawbridge being raised. The swing itself eases in and out and
-            // is done by four fifths of the way through; over the top of it a
-            // single forward rock leans him past upright and settles him back
-            // to exactly nothing at the end.
-            float swing = Smoothstep(Mathf.Clamp01(k / 0.8f));
-            float rock = Mathf.Sin(Mathf.PI * k * k * k);   // peaks at four fifths, zero at both ends
+            // The swing eases across the WHOLE duration, and the forward lean
+            // takes over what is left of it rather than being added on top.
+            //
+            // Both of those are corrections. The swing used to finish at four
+            // fifths and the lean used to be a separate term, so around that
+            // point the two went slack together: the angle crept to within two
+            // degrees a second and sat there before reversing, which is a hitch
+            // and not an overshoot. Handing the lean the remainder keeps
+            // something always moving, puts the turnaround inside about two
+            // frames, and - because the lean owns the angle outright when it
+            // peaks - makes riseOvershoot mean the degrees it says.
+            float swing = Smoothstep(k);
+            float lean = Mathf.Sin(Mathf.PI * k * k * k * k * k); // 1 at k=0.87, 0 at both ends
 
-            float angle = riseFromAngle * (1f - swing) - riseOvershoot * rock;
+            float angle = riseFromAngle * (1f - swing) * (1f - lean) - riseOvershoot * lean;
             SetPose(pivot, riseDriftX * (1f - swing), angle, startSquash * (1f - swing));
             yield return null;
         }
