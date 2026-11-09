@@ -42,10 +42,29 @@ WHAT THIS SCRIPT DOES, which is make_sit_frames' job with two differences.
   1. Splits the strip on the empty columns between the figures.
   2. Cuts each background with the shared routine in fit_seated_pose, which
      knows not to eat a pale shirt.
-  3. Normalises each frame so its HAIR CAP matches the sleeping pose's. The
-     generator never draws three poses at quite the same scale, and a head
-     that changes size between frames is the one thing that gives an
-     animation away.
+  3. Scales the frames so the two ENDS of the sequence match the real art,
+     and walks between those two scales in the middle.
+
+     make_sit_frames normalises on the hair cap and is right to: a head that
+     changes size between frames is the one thing that gives an animation
+     away. It does not work here, and both reasons are worth recording so
+     nobody tries it again. hair_cap measures a VERTICAL run of dark pixels,
+     and in the sleeping pose his head is on its side, so the number it
+     returns for the pose this sequence starts from measures his head across
+     rather than down - 198 px against the sitting pose's 161, which reads as
+     a bigger head when it is the same head lying down. Measuring the dark
+     blob in both axes instead does not rescue it either: this art is outlined
+     in black, so the hair is joined to the outline of the whole body and the
+     "head" comes out 538 px of a 600 px sprite.
+
+     So the frames are anchored on what can be measured without ambiguity -
+     the drawn size of the two sprites they run between. The first frame is
+     scaled to the sleeping pose's width, because it is a lying pose and its
+     length is what reads; the last to the sitting pose's height, because
+     that is the drawing it dissolves into and a figure that changes size
+     mid-dissolve is the most visible mistake available here. Anything in
+     between is interpolated. The three scales come out close together, which
+     is the check that the generator did draw the poses at one size.
   4. Places each by the BOTTOM of the figure rather than by its crown, which
      is where make_sit_frames and this part company. Those frames were a
      seated body descending, so the crown was the thing to control. This is a
@@ -91,11 +110,12 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fit_seated_pose import cut_background, hair_cap          # noqa: E402
+from fit_seated_pose import cut_background                    # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "Art", "wake_frames_raw.png")
 SLEEPING = os.path.join(ROOT, "Assets", "Sprites", "lying_down_barefoot.png")
+SEATED = os.path.join(ROOT, "Assets", "Sprites", "sitting_up_barefoot.png")
 OUTDIR = os.path.join(ROOT, "Assets", "Resources", "Wake")
 OUT = os.path.join(OUTDIR, "wake_frame_{}.png")
 
@@ -128,9 +148,12 @@ def main():
     os.makedirs(OUTDIR, exist_ok=True)
 
     sleeping = Image.open(SLEEPING).convert("RGBA")
-    base_crown, base_bottom, _ = hair_cap(sleeping)
-    base_hair = base_bottom - base_crown
-    print("  sleeping pose: hair cap %d px, art %dx%d" % (base_hair, *sleeping.size))
+    seated = Image.open(SEATED).convert("RGBA")
+
+    sleeping_width = sleeping.size[0] * UNIT
+    seated_height = seated.size[1] * UNIT
+    print("  anchors: sleeping pose %.3f u wide, sitting pose %.3f u tall"
+          % (sleeping_width, seated_height))
 
     # Frame 0 is the sleeping pose itself, moved onto the shared canvas.
     place(sleeping, MATTRESS_Y, 0)
@@ -149,14 +172,19 @@ def main():
         sys.exit("expected %d figures in %s, found %d: %s"
                  % (len(FEET), os.path.relpath(RAW, ROOT), len(spans), spans))
 
-    for i, (x0, x1) in enumerate(spans):
-        cut = cut_one(strip, x0, x1, i)
+    cuts = [trim(cut_one(strip, x0, x1, i)) for i, (x0, x1) in enumerate(spans)]
 
-        crown, bottom, _ = hair_cap(cut)
-        scale = base_hair / float(bottom - crown)
-        print("  frame %d: hair %d -> %d px (x%.3f)" % (i + 1, bottom - crown, base_hair, scale))
+    # The two ends, measured against the real art; see the note above.
+    first = sleeping_width / (cuts[0].size[0] * UNIT)
+    last = seated_height / (cuts[-1].size[1] * UNIT)
+    print("  scales: first frame x%.3f (to the sleeping width), "
+          "last x%.3f (to the sitting height)" % (first, last))
 
-        place(cut, FEET[i], i + 1, scale)
+    for i, content in enumerate(cuts):
+        t = i / float(len(cuts) - 1) if len(cuts) > 1 else 1.0
+        scale = first + (last - first) * t
+
+        place(content, FEET[i], i + 1, scale)
 
     print("\n  now let Unity reimport. WakeUpSequence picks the frames up on its own.")
     return 0

@@ -718,6 +718,25 @@ public class WakeUpSequence : MonoBehaviour
 
         for (int i = 1; i < frames.Length; i++)
         {
+            // The first step is dissolved and the rest are cut, and the
+            // difference is which drawings meet.
+            //
+            // Frames 1 upward are one set, drawn in one pass, so stepping
+            // between them is animation and wants a clean cut - fading one
+            // pose into the next would only blur the movement. But frame 0 is
+            // the game's own sleeping art, and that is a different hand: he is
+            // drawn smaller there, with a smaller head, than in either the
+            // generated poses or the sitting sprite. The sequence cannot
+            // reconcile that, and the import's own note says why it should not
+            // try. So it is faded, exactly as the far end is.
+            if (i == 1 &&
+                BeginDissolve(frames[0], restPosition, restRotation, restScale))
+            {
+                sprite.sprite = frames[1];
+                yield return FinishDissolve();
+                continue;
+            }
+
             sprite.sprite = frames[i];
             yield return new WaitForSeconds(each);
         }
