@@ -40,8 +40,34 @@ Save the download as Art/wake_frames_raw.png.
 WHAT THIS SCRIPT DOES, which is make_sit_frames' job with two differences.
 
   1. Splits the strip on the empty columns between the figures.
-  2. Cuts each background with the shared routine in fit_seated_pose, which
-     knows not to eat a pale shirt.
+  2. Cuts the white off each pose, and does NOT use fit_seated_pose's shared
+     cut_background to do it, which is worth explaining because sharing it
+     was the first thing tried.
+
+     That routine fills from the corners at a tolerance of 8, and its comment
+     says exactly why it is that tight: the poses it was written for wear a
+     near-white polo, and any looser a fill steps off the background and
+     hollows out his shirt. Tolerance 8 cannot get into a narrow notch,
+     because the anti-aliased gradient across the mouth of the notch exceeds
+     it and stops the fill dead. This boy's hair is drawn as spikes, so the
+     silhouette is nothing but narrow notches, and every one of them kept a
+     wedge of white background trapped between the spikes - about one and a
+     half per cent of the figure, sitting around six pixels deep.
+
+     So this keys at tolerance 60 instead, which is safe here for a reason
+     that does not hold for the seated poses: nothing this boy wears is
+     white. The only near-white in the drawing is the whites of his eyes,
+     and a fill seeded at the corners cannot reach those - they are enclosed
+     by his outline. Then the boundary is softened, because a hard key on
+     anti-aliased art leaves a jagged edge.
+
+     Afterwards the edge colour is bled outward under the transparency and
+     alphaIsTransparency is turned on, both for the reason
+     Tools/clean_sprite_edges.py gives: with the flag off Unity does not
+     bleed for you, and the moment a sprite is drawn at any size but 1:1 the
+     bilinear filter mixes real pixels with whatever is stored under the
+     transparent texels. Leave white there and a rim of it shows all the way
+     round.
   3. Scales the frames so the two ENDS of the sequence match the real art,
      and walks between those two scales in the middle.
 
@@ -108,9 +134,9 @@ import sys
 
 import numpy as np
 from PIL import Image
+from scipy import ndimage
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fit_seated_pose import cut_background                    # noqa: E402
+from PIL import ImageDraw                                     # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW = os.path.join(ROOT, "Art", "wake_frames_raw.png")
@@ -136,6 +162,39 @@ SEATED_FEET_Y = -1.215
 
 # Where the bottom of each in-between sits, stepping between those two.
 FEET = [-0.8925, -1.0, -1.1075]
+
+# How the white is keyed. See the note at the top for why this is six times
+# looser than fit_seated_pose's 8, and why that is safe for this character.
+FILL_TOLERANCE = 60
+WALL = 2
+
+# Background the fill can never reach, because it is walled in by the figure:
+# the triangle between his chest and the mattress, the slot behind a bent
+# knee, the gap between his face and his raised forearm. Anything near-white
+# and bigger than this is one of those; anything smaller is artwork, and the
+# thing it is in practice is the white of an eye.
+#
+# The gap between the two is wide, so this is not a delicate number: in this
+# strip the largest piece of artwork it must keep is an eye at about 110 px
+# and the smallest gap it must cut is about 870.
+POCKET_WHITE = 205
+POCKET_MIN = 250
+
+# Bits the generator drew loose - a spare curl of toes floating beside a foot,
+# outline and all. They are not something the key severed: they come away with
+# a clean gap around them, because they were drawn detached. Anything this
+# much smaller than the figure is one of those, and in the game it would be a
+# scrap of foot hanging in the air beside him.
+ISLAND_MIN_FRACTION = 0.02
+
+# The band over which the edge fades out, as channel minimums. A pixel at or
+# above SOFT_HI is background, at or below SOFT_LO is solid, and between the
+# two it is the anti-aliased rim and gets a proportional alpha.
+SOFT_LO = 150
+SOFT_HI = 248
+
+# How far the edge colour is carried into the transparency, in pixels.
+BLEED = 8
 
 # One canvas for every frame, centred on the sitting pose's centre. Wide
 # enough for him lying down (6.1 units of art), tall enough for him sitting
@@ -221,12 +280,112 @@ def cut_one(strip, x0, x1, i):
     padded = Image.new("RGB", (crop.size[0], crop.size[1] + 60), (255, 255, 255))
     padded.paste(crop, (0, 30))
 
-    tmp = os.path.join(ROOT, "Art", "_wake_tmp_%d.png" % i)
-    padded.save(tmp)
-    try:
-        return cut_background(tmp)
-    finally:
-        os.remove(tmp)
+    return cut_white(padded)
+
+
+def cut_white(src):
+    """Lifts the figure off its white background, softly.
+
+    The same shape as fit_seated_pose.cut_background - wall the border so a
+    fill cannot run along an edge where the figure is cut, then seed from the
+    corners that really are background - but at a tolerance that can get into
+    the notches between his hair spikes, and with a soft edge on the end. See
+    the note at the top of this file.
+    """
+    w, h = src.size
+    work = src.copy()
+    sentinel = (255, 0, 255)
+
+    # The wall. Two pixels is enough to stop 4-connected propagation.
+    ImageDraw.Draw(work).rectangle([0, 0, w - 1, h - 1], outline=(0, 0, 0), width=WALL)
+
+    probe = np.asarray(src).astype(int)
+    inside = WALL + 1
+    used = 0
+    for x, y in ((inside, inside), (w - 1 - inside, inside),
+                 (inside, h - 1 - inside), (w - 1 - inside, h - 1 - inside)):
+        # Only seed where it really is background; a corner the figure
+        # reaches must not become a hole.
+        if probe[y, x].min() < 225:
+            continue
+        ImageDraw.floodfill(work, (x, y), sentinel, thresh=FILL_TOLERANCE)
+        used += 1
+    if used == 0:
+        sys.exit("no corner of a pose looks like background - check the strip")
+
+    filled = np.all(np.asarray(work).astype(int) == sentinel, axis=2)
+
+    # The wall itself is not artwork. Left opaque it is a black frame around
+    # the whole pose, which trim() then reads as the figure's own extent -
+    # that measured the poses at twice their height and halved their scale.
+    filled[:WALL, :] = True
+    filled[-WALL:, :] = True
+    filled[:, :WALL] = True
+    filled[:, -WALL:] = True
+
+    # Then the pockets the fill could not get into - see POCKET_MIN.
+    pockets = (~filled) & (probe.min(axis=2) >= POCKET_WHITE)
+    label, count = ndimage.label(pockets)
+    if count:
+        sizes = ndimage.sum(pockets, label, range(1, count + 1))
+        keep = [k + 1 for k in range(count) if sizes[k] >= POCKET_MIN]
+        if keep:
+            filled |= np.isin(label, keep)
+
+    # Hard transparent where the fill reached; everywhere else, fade out the
+    # anti-aliased rim by how close to white it is. Only pixels touching the
+    # fill are faded, so pale art well inside the figure - his skin, the
+    # whites of his eyes - is never thinned.
+    near = ndimage.binary_dilation(filled, iterations=2) & ~filled
+    whiteness = (probe.min(axis=2) - SOFT_LO) / float(SOFT_HI - SOFT_LO)
+
+    alpha = np.where(filled, 0.0, 255.0)
+    alpha[near] = 255.0 * (1.0 - np.clip(whiteness[near], 0.0, 1.0))
+
+    alpha = drop_islands(alpha)
+
+    out = np.dstack([probe, alpha]).astype(np.uint8)
+    return bleed(Image.fromarray(out, "RGBA"))
+
+
+def drop_islands(alpha):
+    """Rubs out anything the generator drew loose. See ISLAND_MIN_FRACTION."""
+    solid = alpha > 60
+    label, count = ndimage.label(solid)
+    if count <= 1:
+        return alpha
+
+    sizes = ndimage.sum(solid, label, range(1, count + 1))
+    biggest = sizes.max()
+    for k in range(count):
+        if sizes[k] < biggest * ISLAND_MIN_FRACTION:
+            alpha[label == k + 1] = 0.0
+            print("     dropped a loose %d px fragment" % sizes[k])
+    return alpha
+
+
+def bleed(im):
+    """Carries the edge colour out under the transparency.
+
+    Alpha is untouched, so nothing looks different today - it only changes
+    what Unity's bilinear filter finds when it reaches past the edge at any
+    scale but 1:1. Without it the white that was keyed out is still sitting
+    there in the file, ready to be smeared back around him.
+    """
+    a = np.asarray(im).astype(np.uint8)
+    rgb, al = a[..., :3].copy(), a[..., 3]
+
+    solid = al > 8
+    if not solid.any():
+        return im
+
+    # Nearest drawn neighbour for every transparent pixel, which is exactly
+    # what a distance transform hands back for free.
+    _, (iy, ix) = ndimage.distance_transform_edt(~solid, return_indices=True)
+    reach = ndimage.distance_transform_edt(~solid) <= BLEED
+
+    rgb[reach] = rgb[iy[reach], ix[reach]]
+    return Image.fromarray(np.dstack([rgb, al]).astype(np.uint8), "RGBA")
 
 
 def place(pose, feet_y, index, scale=1.0):
@@ -287,6 +446,10 @@ def write_meta(path):
     out = re.sub(r"213: -?\d+", "213: -%d" % internal, out, count=1)
     out = out.replace("lying_down_barefoot_0", name + "_0")
     out = re.sub(r"^  spriteName: .*$", "  spriteName: " + name, out, flags=re.M)
+
+    # Unity bleeds the edge colour outward for you only with this on, and the
+    # sleeping pose this template comes from has it off. See bleed() above.
+    out = re.sub(r"^  alphaIsTransparency: 0$", "  alphaIsTransparency: 1", out, flags=re.M)
 
     open(path + ".meta", "w", encoding="utf-8").write(out)
 

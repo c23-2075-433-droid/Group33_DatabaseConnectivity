@@ -137,7 +137,7 @@ public class WakeUpSequence : MonoBehaviour
     [Tooltip("Beat between the snore stopping and the sit-up starting. The yawn " +
              "begins in this gap, so the sound leads the movement by a hair - which " +
              "is the right way round, since a yawn is what wakes you.")]
-    public float yawnLead = 0.16f;
+    public float yawnLead = 0.2f;
 
     [Tooltip("How long the sleeping pose takes to dissolve into the sitting one.\n\n" +
              "Without this the two drawings change over in a single frame, and no " +
@@ -147,19 +147,22 @@ public class WakeUpSequence : MonoBehaviour
              "swing is already under way is what turns a cut into a movement. Keep it " +
              "shorter than the swing; a long dissolve reads as a ghost rather than a " +
              "boy.")]
-    public float poseCrossFade = 0.22f;
+    public float poseCrossFade = 0.3f;
 
-    [Tooltip("How long the sit-up takes. Long enough to read as a movement, short " +
-             "enough that the child is not kept waiting for the next word. At 0.85 " +
-             "the swing peaks around 165 degrees a second; it was 237 at 0.6, which " +
-             "is quick enough to read as a snap rather than a child getting up.")]
-    public float riseSeconds = 0.85f;
+    [Tooltip("How long the sit-up takes, drawn frames or swing. Long enough to read " +
+             "as a movement, short enough that the child is not kept waiting for the " +
+             "next word.\n\n" +
+             "With the frames, Frames Share of this is divided between them - at 1.6 " +
+             "that is about a third of a second a pose, where 0.85 gave a sixth and " +
+             "went past too quickly to see what he was doing. The whole beat, yawn to " +
+             "stretch, then runs about 2.3 seconds and \"Tayo\" is asked at around 2.6.")]
+    public float riseSeconds = 1.6f;
 
     [Tooltip("A breath held sitting upright before he stretches. Worth having for " +
              "two reasons: it is what a person actually does - up first, stretch " +
              "second - and it keeps the stretch's slide-whistle out of the loud " +
              "middle of the yawn, which is a little over a second long.")]
-    public float stretchDelay = 0.22f;
+    public float stretchDelay = 0.3f;
 
     [Tooltip("How far back the sitting pose is tipped when it starts, in degrees - " +
              "roughly where the sleeping pose lay. Positive tips the head toward the " +
@@ -193,7 +196,7 @@ public class WakeUpSequence : MonoBehaviour
     public float startSquash = 0.07f;
 
     [Tooltip("How long the stretch on the end of the sit-up takes.")]
-    public float stretchSeconds = 0.45f;
+    public float stretchSeconds = 0.6f;
 
     [Tooltip("How far the figure reaches up in the stretch, as a fraction of its " +
              "height.")]
