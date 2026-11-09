@@ -186,6 +186,12 @@ public class BuildBahayScene4
 
         // --- A gleam, for the one word that names something rather than takes it ---
         TimedOverlay gleamBag = CreateGleam("Gleam_Bag", propBag, 2.8f);
+        // "Salamin" has NOTHING OF ITS OWN TO POINT AT. This bedroom is drawn
+        // without a mirror - see the note at the top of this file - so the
+        // word lands on Kylo himself, which is at least who he is checking.
+        // It wants a mirror drawn into the room and the gleam moved onto it;
+        // until then this is the honest staging rather than the finished one.
+        TimedOverlay gleamSalamin = CreateGleam("Gleam_Salamin", playerGO, 3.4f);
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -210,8 +216,8 @@ public class BuildBahayScene4
         GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-600, -60, 0));
         GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-380, -150, 0));
         GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-200, -140, 0));
+        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin", new Vector3(360, 60, 0));
         GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(20, -30, 0));
-        GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",   new Vector3(20, 60, 0));
 
         // --- Objectives, in the order you would actually get dressed ---
         var damit = MakeObjective("Damit", pDamit);
@@ -223,18 +229,22 @@ public class BuildBahayScene4
         var sapatos = MakeObjective("Sapatos", pSapatos);
         UnityEventTools.AddPersistentListener(sapatos.onCorrect, takeSapatos.PickUp);
 
-        // "Bag" names the thing instead of taking it, so it gleams; "Kunin"
-        // below is what actually picks it up.
+        // He checks himself before leaving.
+        var salamin = MakeObjective("Salamin", pSalamin);
+        UnityEventTools.AddPersistentListener(salamin.onCorrect, gleamSalamin.Play);
+
+        // "Bag" BOTH names the bag and takes it now. It used to only gleam,
+        // with a second word - "Kunin" - to pick it up; the restructure drops
+        // Kunin, so the pickup moves here rather than being lost. Without
+        // this the bag would stay on the floor and Kylo would leave for
+        // school without it.
         var bag = MakeObjective("Bag", pBag);
         UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
-
-        // ...and then Kunin takes it, and Kylo is wearing it from here on.
-        var kunin = MakeObjective("Kunin", pKunin);
-        UnityEventTools.AddPersistentListener(kunin.onCorrect, takeBag.PickUp);
+        UnityEventTools.AddPersistentListener(bag.onCorrect, takeBag.PickUp);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
+        controller.objectives = new[] { damit, medyas, sapatos, salamin, bag };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

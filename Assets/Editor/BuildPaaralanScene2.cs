@@ -570,6 +570,8 @@ public class BuildPaaralanScene2
         voiceCommand.player = player;
 
         // --- Something has to light up for every word that only names a thing ---
+        TimedOverlay gleamBati = CreateGleamAt("Gleam_Bati", StandX,
+                                                FloorY + PlayerHeight * 0.62f, 3.6f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
         TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilInHandX,
@@ -607,6 +609,7 @@ public class BuildPaaralanScene2
         // Only one is ever on screen at a time, so they can overlap each other
         // freely - each sits directly over the thing its word acts on.
         GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-700, 60, 0));
+        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-700, -60, 0));
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(260, 120, 0));
         GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(120, -150, 0));
         GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(420, -40, 0));
@@ -616,6 +619,15 @@ public class BuildPaaralanScene2
         // lockers, and is about crossing to his seat and getting ready.
         var lakad = MakeObjective("Lakad", pLakad);
         UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
+
+        // "Bati" HAS NOBODY TO GREET IN THIS ROOM. Teacher Rachel was cut
+        // from this view - she is a waist-up drawing made for the chalkboard
+        // shot and floats against the lockers - so the greeting lands on
+        // Kylo, who is the one doing it. It wants either a drawn wave or
+        // somebody drawn to greet; until then the word is taught and the
+        // staging is thin, and saying so is better than quietly dropping it.
+        var bati = MakeObjective("Bati", pBati);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
 
         // Kylo stays in profile, facing her, and SHE answers the greeting - she
         // is drawn mid-wave, so the gleam reads as the wave landing.
@@ -656,7 +668,7 @@ public class BuildPaaralanScene2
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { lakad, upo, kuha, lapis };
+        controller.objectives = new[] { lakad, bati, upo, kuha, lapis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

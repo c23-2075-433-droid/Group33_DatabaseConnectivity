@@ -175,8 +175,16 @@ public class BuildParkeScene5
         // --- What lights up ---
         TimedOverlay gleamPaalam = CreateGleamAt("Gleam_Paalam", FriendX, FloorY + 1.6f, 3.4f);
         // Wide: the whole park at once, which is what a last look is.
-        TimedOverlay gleamTingin = CreateGleamAt("Gleam_Tingin", -0.50f, -2.40f, 8.0f);
-        TimedOverlay gleamPagod = CreateGleamAt("Gleam_Pagod", StartX + 3.75f, FloorY + 1.8f, 2.6f);
+        // "Apir" is a high five, so it lands between the two of them, the
+        // way the greeting did.
+        TimedOverlay gleamApir = CreateGleamAt("Gleam_Apir", (StartX + FriendX) * 0.5f,
+                                                FloorY + 2.0f, 2.8f);
+        // A last drink before going home. item_baso is the mug the rest of
+        // the game uses.
+        GameObject propBaso = CreateProp("Prop_Baso", "item_baso",
+                                          StartX + 1.30f, 0.55f, FloorY, 4);
+        TimedOverlay gleamInom = CreateGleamAt("Gleam_Inom", StartX + 1.30f,
+                                                FloorY + 0.28f, 1.3f);
         TimedOverlay gleamUwi = CreateGleamAt("Gleam_Uwi", GateX, -1.80f, 3.6f);
 
         // --- Word prompts ---
@@ -199,9 +207,8 @@ public class BuildParkeScene5
         }
 
         GameObject pPaalam = CreatePromptUI(uiRoot.transform, "Prompt_Paalam", "Paalam", new Vector3(-450, -60, 0));
-        GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-200, -120, 0));
-        GameObject pTingin = CreatePromptUI(uiRoot.transform, "Prompt_Tingin", "Tingin", new Vector3(-50, 60, 0));
-        GameObject pPagod = CreatePromptUI(uiRoot.transform, "Prompt_Pagod", "Pagod", new Vector3(175, -40, 0));
+        GameObject pApir = CreatePromptUI(uiRoot.transform, "Prompt_Apir", "Apir", new Vector3(-200, -120, 0));
+        GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-50, -250, 0));
         GameObject pUwi = CreatePromptUI(uiRoot.transform, "Prompt_Uwi", "Uwi", new Vector3(720, -110, 0));
 
         // --- Objectives: wave, walk, look back, be tired, go home ---
@@ -209,26 +216,30 @@ public class BuildParkeScene5
         UnityEventTools.AddPersistentListener(paalam.onCorrect, wave.Apply);
         UnityEventTools.AddPersistentListener(paalam.onCorrect, gleamPaalam.Play);
 
-        var lakad = MakeObjective("Lakad", pLakad);
-        UnityEventTools.AddPersistentListener(lakad.onCorrect, walkPose.Apply);
-        UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
+        var apir = MakeObjective("Apir", pApir);
+        UnityEventTools.AddPersistentListener(apir.onCorrect, gleamApir.Play);
 
-        var tingin = MakeObjective("Tingin", pTingin);
-        UnityEventTools.AddPersistentListener(tingin.onCorrect, gleamTingin.Play);
+        var inom = MakeObjective("Inom", pInom);
+        if (propBaso != null)
+            UnityEventTools.AddBoolPersistentListener(inom.onCorrect, propBaso.SetActive, false);
+        UnityEventTools.AddPersistentListener(inom.onCorrect, gleamInom.Play);
 
         // Holds his standing pose - see the note at the top about there being
         // no tired one.
-        var pagod = MakeObjective("Pagod", pPagod);
-        UnityEventTools.AddPersistentListener(pagod.onCorrect, gleamPagod.Play);
-
+        // "Uwi" WALKS HIM OUT NOW. Lakad used to do that and the restructure
+        // drops it, which would have left him standing by the banig while the
+        // gate lit up at the other end of the park. The word went; the walk
+        // should not.
         var uwi = MakeObjective("Uwi", pUwi);
+        UnityEventTools.AddPersistentListener(uwi.onCorrect, walkPose.Apply);
+        UnityEventTools.AddPersistentListener(uwi.onCorrect, player.WalkForward);
         UnityEventTools.AddPersistentListener(uwi.onCorrect, player.WalkForward);
         UnityEventTools.AddPersistentListener(uwi.onCorrect, gleamUwi.Play);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { paalam, lakad, tingin, pagod, uwi };
+        controller.objectives = new[] { paalam, apir, inom, uwi };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();

@@ -1,9 +1,15 @@
 // Assets/Editor/BuildPaaralanScene5.cs
 //
 // One-click scene builder for Paaralan Scene 5 ("Afternoon Class & Dismissal").
-// Teaches five words: Pasok, Upo, Linis, Bag, Alis.
+// Teaches five words: Pasok, Upo, Ligpit, Suot, Alis.
 //
-// Only Linis and Alis are new. The other three are deliberate returns - Pasok
+// Two of them are renames rather than new staging. "Ligpit" (clean) became
+// "Ligpit" (tidy up), which is the more exact word for packing away at the
+// end of a day, and "Bag" became "Suot" (wear / put on) - naming the bag was
+// doing the work of putting it on, and the restructure says what the child
+// is actually doing. Both keep the object and the gleam they already had.
+//
+// Only Ligpit and Alis are new. The other three are deliberate returns - Pasok
 // from the gate in Scene 1, Upo from sitting down in Scene 2, Bag from
 // getting dressed in Bahay Scene 4 - and they come back here in a different
 // situation, which is what the design document's reuse column is for. Pasok
@@ -22,11 +28,11 @@
 //
 //   Pasok   the classroom door lights up - he is back inside
 //   Upo     standing Kylo swaps for seated Kylo, at his own desk
-//   Linis   the book, notebook and pencil go - the desk is cleared
+//   Ligpit   the book, notebook and pencil go - the desk is cleared
 //   Bag     his bag comes up onto the cleared desk
 //   Alis    he stands with the bag on, and the level ends on the result panel
 //
-// Linis is the one word in the whole level that takes several things away at
+// Ligpit is the one word in the whole level that takes several things away at
 // once, which is exactly what tidying looks like. It is also why the desk
 // starts covered: the lesson's things are still lying there from Scene 3.
 //
@@ -62,7 +68,7 @@ public class BuildPaaralanScene5
     private const float SitFeetY = -4.52f;
     private const float SeatedHeight = 3.10f;
 
-    // The lesson's things, still out from Scene 3 - Linis is what clears them.
+    // The lesson's things, still out from Scene 3 - Ligpit is what clears them.
     private const float AklatX = -5.60f;
     private const float AklatBaseY = -4.15f;
     private const float AklatHeight = 1.00f;
@@ -189,13 +195,13 @@ public class BuildPaaralanScene5
         // --- What lights up ---
         TimedOverlay gleamPasok = CreateGleamAt("Gleam_Pasok", DoorX, DoorY, 3.4f);
         TimedOverlay gleamUpo = CreateGleamAt("Gleam_Upo", SitX, SitFeetY + SeatedHeight * 0.6f, 2.4f);
-        TimedOverlay gleamLinis = CreateGleamAt("Gleam_Linis", -4.90f, -4.10f, 2.8f);
+        TimedOverlay gleamLigpit = CreateGleamAt("Gleam_Ligpit", -4.90f, -4.10f, 2.8f);
         TimedOverlay gleamBag = CreateGleamAt("Gleam_Bag", BagX, BagBaseY + BagHeight * 0.5f, 1.6f);
         TimedOverlay gleamAlis = teacher != null
             ? CreateGleam("Gleam_Alis", teacher, 2.4f)
             : CreateGleamAt("Gleam_Alis", TeacherX, TeacherHipY + TeacherHeight * 0.5f, 2.4f);
 
-        foreach (TimedOverlay fx in new[] { gleamLinis, gleamBag })
+        foreach (TimedOverlay fx in new[] { gleamLigpit, gleamBag })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderDeskProps + 1;
@@ -222,8 +228,8 @@ public class BuildPaaralanScene5
 
         GameObject pPasok = CreatePromptUI(uiRoot.transform, "Prompt_Pasok", "Pasok", new Vector3(830, 190, 0));
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(-520, -60, 0));
-        GameObject pLinis = CreatePromptUI(uiRoot.transform, "Prompt_Linis", "Linis", new Vector3(-490, -280, 0));
-        GameObject pBag = CreatePromptUI(uiRoot.transform, "Prompt_Bag", "Bag", new Vector3(-430, -350, 0));
+        GameObject pLigpit = CreatePromptUI(uiRoot.transform, "Prompt_Ligpit", "Ligpit", new Vector3(-490, -280, 0));
+        GameObject pSuot = CreatePromptUI(uiRoot.transform, "Prompt_Suot", "Suot", new Vector3(-430, -350, 0));
         GameObject pAlis = CreatePromptUI(uiRoot.transform, "Prompt_Alis", "Alis", new Vector3(260, 150, 0));
 
         // --- Objectives: come back in, sit, tidy, pack, leave ---
@@ -236,18 +242,18 @@ public class BuildPaaralanScene5
         UnityEventTools.AddPersistentListener(upo.onCorrect, gleamUpo.Play);
 
         // Tidying takes everything off the desk at once.
-        var linis = MakeObjective("Linis", pLinis);
+        var ligpit = MakeObjective("Ligpit", pLigpit);
         foreach (GameObject lying in new[] { propAklat, propNotebook, propPencil })
         {
             if (lying != null)
-                UnityEventTools.AddBoolPersistentListener(linis.onCorrect, lying.SetActive, false);
+                UnityEventTools.AddBoolPersistentListener(ligpit.onCorrect, lying.SetActive, false);
         }
-        UnityEventTools.AddPersistentListener(linis.onCorrect, gleamLinis.Play);
+        UnityEventTools.AddPersistentListener(ligpit.onCorrect, gleamLigpit.Play);
 
-        var bag = MakeObjective("Bag", pBag);
+        var suot = MakeObjective("Suot", pSuot);
         if (propBag != null)
-            UnityEventTools.AddBoolPersistentListener(bag.onCorrect, propBag.SetActive, true);
-        UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
+            UnityEventTools.AddBoolPersistentListener(suot.onCorrect, propBag.SetActive, true);
+        UnityEventTools.AddPersistentListener(suot.onCorrect, gleamBag.Play);
 
         // He gets up to go, wearing the bag he just packed - so it comes off
         // the desk at the same moment. The result panel follows straight
@@ -262,7 +268,7 @@ public class BuildPaaralanScene5
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { pasok, upo, linis, bag, alis };
+        controller.objectives = new[] { pasok, upo, ligpit, suot, alis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
@@ -277,7 +283,7 @@ public class BuildPaaralanScene5
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 5 built and saved to " + ScenePath +
-                   ". Words: Pasok, Upo, Linis, Bag, Alis - Linis and Alis new. " +
+                   ". Words: Pasok, Upo, Ligpit, Bag, Alis - Ligpit and Alis new. " +
                    "This completes Level 2 and ENDS it, so re-run Build Paaralan Scene 4 " +
                    "as well - it fades into this scene instead of showing the result itself.");
     }

@@ -197,6 +197,19 @@ public class BuildPaaralanScene4
         // --- What lights up ---
         TimedOverlay gleamLabas = CreateGleamAt("Gleam_Labas", PlayLineX, FloorY + 1.2f, 2.6f);
         TimedOverlay gleamKain = CreateGleamAt("Gleam_Kain", BaonX, FloorY + BaonHeight * 0.5f, 1.3f);
+        // A drink beside the baon, so "Inom" has something of its own to
+        // light up rather than borrowing the lunch. item_baso is the same mug
+        // the Bahay and Parke scenes use.
+        GameObject propBaso = CreatePropOptional("Prop_Baso", "item_baso",
+                                                  BaonX + 0.95f, 0.52f, FloorY);
+        if (propBaso != null) propBaso.SetActive(true);
+        TimedOverlay gleamInom = CreateGleamAt("Gleam_Inom", BaonX + 0.95f,
+                                                FloorY + 0.26f, 1.2f);
+        // "Tapon" is clearing up after eating, so it lands on the spot the
+        // food was in. There is no bin drawn in this yard; one would be
+        // better, and this is honest until there is.
+        TimedOverlay gleamTapon = CreateGleamAt("Gleam_Tapon", BaonX,
+                                                 FloorY + BaonHeight * 0.5f, 1.6f);
         TimedOverlay gleamLaro = classmate != null
             ? CreateGleam("Gleam_Laro", classmate, 3.4f)
             : CreateGleamAt("Gleam_Laro", ClassmateX, FloorY + 1.4f, 3.4f);
@@ -225,9 +238,8 @@ public class BuildPaaralanScene4
 
         GameObject pLabas = CreatePromptUI(uiRoot.transform, "Prompt_Labas", "Labas", new Vector3(-330, 60, 0));
         GameObject pKain = CreatePromptUI(uiRoot.transform, "Prompt_Kain", "Kain", new Vector3(-160, -150, 0));
-        GameObject pLaro = CreatePromptUI(uiRoot.transform, "Prompt_Laro", "Laro", new Vector3(280, 80, 0));
-        GameObject pTawa = CreatePromptUI(uiRoot.transform, "Prompt_Tawa", "Tawa", new Vector3(-60, 110, 0));
-        GameObject pTulong = CreatePromptUI(uiRoot.transform, "Prompt_Tulong", "Tulong", new Vector3(120, -150, 0));
+        GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-20, -150, 0));
+        GameObject pTapon = CreatePromptUI(uiRoot.transform, "Prompt_Tapon", "Tapon", new Vector3(-160, -250, 0));
 
         // --- Objectives: go out, eat, play, laugh, help ---
         var labas = MakeObjective("Labas", pLabas);
@@ -238,24 +250,20 @@ public class BuildPaaralanScene4
         if (baon != null) UnityEventTools.AddBoolPersistentListener(kain.onCorrect, baon.SetActive, true);
         UnityEventTools.AddPersistentListener(kain.onCorrect, gleamKain.Play);
 
-        var laro = MakeObjective("Laro", pLaro);
-        UnityEventTools.AddPersistentListener(laro.onCorrect, gleamLaro.Play);
+        var inom = MakeObjective("Inom", pInom);
+        UnityEventTools.AddPersistentListener(inom.onCorrect, gleamInom.Play);
 
-        var tawa = MakeObjective("Tawa", pTawa);
-        UnityEventTools.AddPersistentListener(tawa.onCorrect, laugh.Apply);
-        UnityEventTools.AddPersistentListener(tawa.onCorrect, gleamTawa.Play);
-
-        // Helping takes the dropped book away - the one word here with a
-        // visible consequence rather than a glow.
-        var tulong = MakeObjective("Tulong", pTulong);
-        UnityEventTools.AddPersistentListener(tulong.onCorrect, gleamTulong.Play);
-        if (dropped != null)
-            UnityEventTools.AddBoolPersistentListener(tulong.onCorrect, dropped.SetActive, false);
+        // Clearing up. The food goes away with it, which is the only thing
+        // on screen that can show rubbish being thrown out.
+        var tapon = MakeObjective("Tapon", pTapon);
+        if (baon != null)
+            UnityEventTools.AddBoolPersistentListener(tapon.onCorrect, baon.SetActive, false);
+        UnityEventTools.AddPersistentListener(tapon.onCorrect, gleamTapon.Play);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { labas, kain, laro, tawa, tulong };
+        controller.objectives = new[] { labas, kain, inom, tapon };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

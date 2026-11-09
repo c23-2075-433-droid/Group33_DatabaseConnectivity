@@ -181,8 +181,11 @@ public class BuildParkeScene2
         TimedOverlay gleamAkyat = CreateGleamAt("Gleam_Akyat", LadderX, -0.90f, 1.2f);
         TimedOverlay gleamDausdos = CreateGleamAt("Gleam_Dausdos", ChuteX, -0.78f, 1.7f);
         TimedOverlay gleamSakay = CreateGleamAt("Gleam_Sakay", SwingX, -1.00f, 1.1f);
-        TimedOverlay gleamTulak = CreateGleamAt("Gleam_Tulak", SwingX, -1.00f, 1.7f);
-        TimedOverlay gleamTalon = CreateGleamAt("Gleam_Talon", GrassX, GroundY + 0.5f, 1.3f);
+        // "Padyak" takes the swing's gleam. Pedalling and pushing both
+        // happen on the ride, and this playground has nothing with pedals
+        // drawn into it - a trike or a pedal car would be better art for the
+        // word than a swing, and this is the honest staging until there is.
+        TimedOverlay gleamPadyak = CreateGleamAt("Gleam_Padyak", SwingX, -1.00f, 1.7f);
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -208,8 +211,7 @@ public class BuildParkeScene2
         GameObject pAkyat = CreatePromptUI(uiRoot.transform, "Prompt_Akyat", "Akyat", new Vector3(960, -60, 0));
         GameObject pDausdos = CreatePromptUI(uiRoot.transform, "Prompt_Dausdos", "Dausdos", new Vector3(580, -70, 0));
         GameObject pSakay = CreatePromptUI(uiRoot.transform, "Prompt_Sakay", "Sakay", new Vector3(-1000, -130, 0));
-        GameObject pTulak = CreatePromptUI(uiRoot.transform, "Prompt_Tulak", "Tulak", new Vector3(-1000, -40, 0));
-        GameObject pTalon = CreatePromptUI(uiRoot.transform, "Prompt_Talon", "Talon", new Vector3(-266, -90, 0));
+        GameObject pPadyak = CreatePromptUI(uiRoot.transform, "Prompt_Padyak", "Padyak", new Vector3(-1000, -40, 0));
 
         // --- Objectives: climb, slide, ride, push, jump ---
         var akyat = MakeObjective("Akyat", pAkyat);
@@ -227,22 +229,20 @@ public class BuildParkeScene2
         UnityEventTools.AddBoolPersistentListener(sakay.onCorrect, onSwing.SetActive, true);
         UnityEventTools.AddPersistentListener(sakay.onCorrect, gleamSakay.Play);
 
-        // Tulak keeps him on the swing - the push is what sets it moving, so
-        // taking him off it here would read as getting down again.
-        var tulak = MakeObjective("Tulak", pTulak);
-        UnityEventTools.AddPersistentListener(tulak.onCorrect, gleamTulak.Play);
-
-        // Back to the real player, who then actually leaves the ground.
-        var talon = MakeObjective("Talon", pTalon);
-        UnityEventTools.AddBoolPersistentListener(talon.onCorrect, onSwing.SetActive, false);
-        UnityEventTools.AddBoolPersistentListener(talon.onCorrect, playerGO.SetActive, true);
-        UnityEventTools.AddPersistentListener(talon.onCorrect, player.Jump);
-        UnityEventTools.AddPersistentListener(talon.onCorrect, gleamTalon.Play);
+        // The last word on the ride, so it also GETS HIM OFF IT. "Talon"
+        // used to do that - it was the jump down, and it swapped the swinging
+        // pose back for the real player. The restructure drops that word, and
+        // without moving the swap here Kylo would still be sitting on the
+        // swing when the scene ended and in every scene that follows.
+        var padyak = MakeObjective("Padyak", pPadyak);
+        UnityEventTools.AddPersistentListener(padyak.onCorrect, gleamPadyak.Play);
+        UnityEventTools.AddBoolPersistentListener(padyak.onCorrect, onSwing.SetActive, false);
+        UnityEventTools.AddBoolPersistentListener(padyak.onCorrect, playerGO.SetActive, true);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { akyat, dausdos, sakay, tulak, talon };
+        controller.objectives = new[] { akyat, dausdos, sakay, padyak };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
