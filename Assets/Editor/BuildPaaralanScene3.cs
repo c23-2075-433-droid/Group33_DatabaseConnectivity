@@ -58,9 +58,9 @@
 //
 //   Aklat    the textbook appears on the desk
 //   Basa     it lights up - he is reading it
-//   Sulat    DRAWN: he puts his hand on the desk, brings the pencil to the
-//            page, writes, and sits back. Built from Paaralan Scene 2's
-//            pencil poses, which are the same boy by construction.
+//   Sulat    DRAWN: he puts his hand on the desk, brings the pencil down,
+//            writes on the notebook with the point tracking across the
+//            page, lifts it and sits back.
 //   Basa     the textbook lights up - he is reading it
 //   Tanong   DRAWN: his hand rises off the desk, up past his head, holds
 //            there, and comes back down. Plays once - a hand going up is
@@ -214,8 +214,10 @@ public class BuildPaaralanScene3
         {
             "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
             "prop_lapis", "item_baso", "fx_gleam",
-            // Paaralan Scene 2's pencil poses, reused for "Sulat".
-            "place_frame_3_uniform", "lapis_frame_1_uniform", "lapis_frame_2_uniform",
+            // Paaralan Scene 2's pencil poses, the lead-in and tail of "Sulat".
+            "place_frame_3_uniform", "lapis_frame_2_uniform",
+            // Drawn for "Sulat" - the only poses with the pencil on the page.
+            "sulat_frame_1_uniform", "sulat_frame_2_uniform", "sulat_frame_3_uniform",
             // Drawn for "Tanong".
             "tanong_frame_1_uniform", "tanong_frame_2_uniform", "tanong_frame_3_uniform",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
@@ -306,50 +308,51 @@ public class BuildPaaralanScene3
 
         // --- "Sulat": the writing action, in four parts ---
         //
-        // BUILT ENTIRELY FROM POSES THAT ALREADY EXIST, and that is the point
-        // rather than a shortcut. A Canva strip was generated for this beat
-        // and thrown away: it fitted the canvas but came back off-model - a
-        // rounder face, a different hair silhouette, and a torso about 7%
-        // short, so forcing the arms down to the desk made the head 7% too
-        // big. Swapping between that and the real art mid-action changed who
-        // the character was, which is the one thing the animation rules say
-        // must never happen.
-        //
-        // Paaralan Scene 2's "Lapis" frames are the same boy by construction:
-        // same pipeline, same base sprite, crown on row 142 and hair within
-        // two pixels across all of them. Read in reverse they are a pencil
-        // coming DOWN to the page, which is exactly the preparation writing
-        // needs.
-        //
         //   lead-in   place_frame_3  hands come onto the desk
         //             lapis_frame_2  the pencil is in his hand, chest height
-        //             lapis_frame_1  the pencil reaches the page
-        //   loop      lapis_frame_1 <-> lapis_frame_2, the lift and return
-        //             between words. Slower than the lead-in: writing is not
-        //             frantic, and the swing is wide enough that at full
-        //             speed it waves rather than writes.
+        //   loop      sulat_frame_1..3, the pencil tracking across the page
         //   tail      lapis_frame_2  the pencil lifts away
         //             place_frame_3  hands rest on the desk
         //   idle      sitting_front_uniform
         //
-        // HONEST ABOUT WHAT THIS IS: lapis_frame_1 is the only drawing in the
-        // project with a pencil actually on the page, so the loop is a lift
-        // and return rather than a hand travelling across a line. It is real
-        // motion by the same character, which a redrawn boy would not be.
-        // Replace the loop with purpose-drawn frames when they exist and are
-        // on model - only loopFrames changes.
+        // WHY THE LOOP IS DRAWN ART AND THE REST IS NOT. The lead-in and tail
+        // are Paaralan Scene 2's pencil poses, which are the same boy by
+        // construction - same pipeline, same base sprite, crown on row 142
+        // and hair within two pixels of every other seated frame. Read in
+        // reverse they are a pencil coming down towards the page, which is
+        // the preparation writing needs, and they cost nothing.
+        //
+        // The loop could NOT be built that way, and the reason is geometry
+        // rather than taste. This sprite is cropped at the desk's far edge,
+        // -3.01, and the open notebook lies entirely BELOW that line, from
+        // -3.84 to -3.01. So every pencil pose in the project holds the point
+        // in mid-air above the top edge of the page - lapis_frame_1, the
+        // lowest of them, still clears the book by about half a unit. Cycling
+        // those frames gave a pencil waving over a notebook it never touched.
+        //
+        // sulat_frame_1..3 are drawn for this and for nothing else: the one
+        // thing they have that no other pose does is the PENCIL TIP ON THE
+        // BOTTOM EDGE OF THE CANVAS. That edge is -3.01, which is the
+        // notebook's far edge, so the point lands on the page. The three
+        // differ only in where along that edge the tip sits, which is what
+        // makes them a writing motion rather than a bob.
+        //
+        // It took three generations to get them. The first came back with a
+        // 6% short body, the second with the right pose but a hairstyle a
+        // tenth too large; Tools/check_pose_strip.py measured both and
+        // Tools/make_sulat_frames.py records what finally had to be pinned.
         PoseSequence sulatFrames = seatGO.AddComponent<PoseSequence>();
         sulatFrames.target = seatGO.GetComponent<SpriteRenderer>();
         sulatFrames.frames = new[]
         {
             LoadSpriteOptional("place_frame_3_uniform"),
             LoadSpriteOptional("lapis_frame_2_uniform"),
-            LoadSpriteOptional("lapis_frame_1_uniform"),
         };
         sulatFrames.loopFrames = new[]
         {
-            LoadSpriteOptional("lapis_frame_1_uniform"),
-            LoadSpriteOptional("lapis_frame_2_uniform"),
+            LoadSpriteOptional("sulat_frame_1_uniform"),
+            LoadSpriteOptional("sulat_frame_2_uniform"),
+            LoadSpriteOptional("sulat_frame_3_uniform"),
         };
         sulatFrames.loopCycles = 3;
         sulatFrames.tailFrames = new[]
@@ -359,7 +362,10 @@ public class BuildPaaralanScene3
         };
         sulatFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
         sulatFrames.framesPerSecond = 11f * Pace;
-        sulatFrames.loopFramesPerSecond = 7f * Pace;
+        // A little quicker than the lead-in. The three frames differ only by
+        // where the point is along one line, so the motion is small and needs
+        // the rate to carry it; too slow and it reads as three still poses.
+        sulatFrames.loopFramesPerSecond = 8f * Pace;
         // OFF, so nothing runs until the child says the word and the voice
         // recogniser accepts it. The seated Kylo is already on screen, so
         // playOnEnable here would fire the whole action the moment the scene

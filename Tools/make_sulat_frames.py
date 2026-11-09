@@ -1,48 +1,63 @@
-"""Cut writing frames for "Sulat" out of a generated strip.
+"""Cut the three "Sulat" writing frames out of one generated strip.
 
-READ THIS BEFORE RUNNING IT. The strip currently in Art/sulat_loop_raw.png was
-REJECTED, and the frames it produces are not in the project. The script is
-kept because the pipeline is right and a better generation should drop
-straight into it.
+WHAT THEY ARE, and why they had to be drawn at all. These are the loop body
+of the writing action - the lead-in and the tail come from Paaralan Scene 2's
+pencil poses, which cost nothing and are the same boy by construction.
 
-WHAT WENT WRONG, so the next prompt can avoid it. The generation was made from
-sitting_front_uniform as the design reference and came back close enough to
-fool a thumbnail, but wrong in three ways once fitted:
+The loop could not be built that way, for a reason of geometry rather than
+taste. The seated sprite is cropped at the desk's far edge, world -3.01, and
+the open notebook lies entirely BELOW that line, from -3.84 to -3.01. So
+every pencil pose already in the project holds the point in mid-air above the
+top edge of the page: lapis_frame_1, the lowest of them, still clears the
+book by about half a world unit. Cycling those gave a pencil waving over a
+notebook it never touched.
 
-  1. The body was drawn about 7% short relative to the head. Fitting by hair
-     cap, which is what fit_strip does and what keeps every other pose on
-     model, therefore left the arms 55 rows above the canvas bottom - and that
-     bottom edge IS the desk, so he floated with background under his elbows.
-  2. Fitting instead to BOTH the crown row and the desk edge closed the gap
-     but made the head 7-8% larger than the base sprite's.
-  3. Worse than either: it was not the same boy. Rounder face, wider jaw,
-     larger eyes, a different hair silhouette. Cutting between that and the
-     real art mid-action changes who the character is, which the project's
-     animation rules forbid outright. See Docs/AnimationStandard.md.
+The one thing these three have that no other pose does is THE PENCIL TIP ON
+THE BOTTOM EDGE OF THE CANVAS. That edge is -3.01, the notebook's far edge,
+so the point lands on the page. They differ only in where along that edge the
+tip sits, which is what makes them writing rather than bobbing.
 
-WHAT THE SCENE DOES INSTEAD. Paaralan Scene 3's "Sulat" is built from poses
-that already exist - place_frame_3 and lapis_frame_1..2, Scene 2's pencil
-poses. They are the same boy by construction: same pipeline, same base sprite,
-crown on row 142 and hair within two pixels across all of them. The trade is a
-loop that lifts and returns rather than a hand travelling across the page,
-because lapis_frame_1 is the only drawing in the project with a pencil
-actually on the paper.
+THREE GENERATIONS. Worth recording, because the same two faults will come
+back on the next pose:
 
-IF YOU REGENERATE. Pin the two things that failed:
-  - "the torso must be the same width and length as the reference, and his
-     forearms must reach the very bottom edge of the frame"
-  - pass pencil_ready_uniform as a SECOND reference alongside
-    sitting_front_uniform, so the hair and the pencil grip come from the
-    project's own art rather than being reinvented.
-Then download the full-size PNG from Canva Uploads - the API returns only a
-~200x112 thumbnail - save it over Art/sulat_loop_raw.png, and run this.
+  1. Short body. Fitting by hair cap left the arms 55 rows above the desk and
+     he floated; fitting to the desk made his head 7-8% too big. Rejected.
+  2. Right pose at last - the pencil finally reached the bottom edge - but a
+     big round puffy hairstyle instead of his tight flat-topped spikes. 323px
+     of hair against the real 277, which reads as reach -12%: a bigger head
+     leaves less room for body in the same frame. Rejected.
+  3. Accepted. Hair 251-252px, head width within 1%, colour drift 14-16
+     against a tolerance of 26.
 
-ON THE CROWN HEIGHTS. All three sit at +1.735, the same height as the seated
-pose and every other seated frame in Paaralan 2 and 3. His head does NOT move
-up or down while writing; only the arm does. A crown that drifted between
-frames would make the loop bob, and a bobbing loop is far more obvious than a
-single bad frame, because it repeats. Compare Tools/make_sit_frames.py, where
-the crown really does descend and the stepping-down is the point.
+WHAT FINALLY HAD TO BE PINNED, beyond the obvious:
+
+  - TWO references, sitting_front_uniform and lapis_frame_1_uniform, so the
+    hair and the pencil grip come from the project's own art.
+  - The hair explicitly: "close to his skull, a small neat flat-topped mop
+    with short spikes, roughly as tall as his forehead - NOT a big round
+    puffy mass". Asking for "the same hair as the reference" was not enough
+    twice running.
+  - Head size by comparison to something else: "shoulders at least twice as
+    wide as his head", "the head taking up only the top third".
+  - The pencil: "the tip must touch the very bottom edge of the image,
+    angled down about 45 degrees", and the left hand "flat and low at the
+    bottom edge, steadying the page".
+
+Fitted by hair cap, NOT flush to the bottom: these come back reaching 3.25
+heads against the base's 2.79, so they overshoot, and the excess is simply
+clipped below the desk line. Overshoot is harmless; short is not.
+
+ON THE CROWN HEIGHTS. All three sit at +1.735, the same as every other seated
+frame in Paaralan 2 and 3. He leans from the shoulders and the lean is drawn
+in, so moving the whole figure down as well would read as him sinking through
+the chair - and a crown that drifted would make the loop bob, which repeats
+and is therefore far more obvious than one bad frame.
+
+WHERE THE ART CAME FROM. Art/sulat_loop_raw.png is one Canva generation. The
+API returns only a ~200x112 thumbnail, so the full-size file is downloaded by
+hand out of Canva Uploads, which is why the raw lives in Art/. Check any
+replacement with Tools/check_pose_strip.py before using it; it refuses to
+judge a thumbnail.
 
 Writes  Assets/Sprites/sulat_frame_1..3_uniform.png
 
