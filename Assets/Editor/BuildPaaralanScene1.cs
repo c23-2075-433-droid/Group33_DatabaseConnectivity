@@ -1,7 +1,7 @@
 // Assets/Editor/BuildPaaralanScene1.cs
 //
 // One-click scene builder for Paaralan Scene 1 ("Arriving at School").
-// Teaches five words: Lakad, Bukas, Kumusta, Pasok, Takbo.
+// Teaches five words: Lakad, Bukas, Bati, Pasok, Takbo.
 //
 // This is Level 2's FIRST scene: it starts the run
 // (RunScoreCounter.resetOnStart) and fades into Scene 2, which ends it. The
@@ -131,7 +131,7 @@ public class BuildPaaralanScene1
         gateSwap.afterSprite = gateOpen;
 
         // --- The guard on the gate ---
-        // Kumusta needs someone to greet. Without him the child is told to
+        // Bati needs someone to greet. Without him the child is told to
         // say hello to an empty yard, which teaches the word in a vacuum.
         // Sized against Kylo: an adult at 3.6 units to his 3.5. A grown man is
         // not much taller than a child in this art style - the difference is
@@ -152,7 +152,7 @@ public class BuildPaaralanScene1
 
         // char_guard is the WAVING pose, and it is the only one that exists.
         // The greeting needs him standing still first, or he is already waving
-        // before the child has said anything and "Kumusta" changes nothing.
+        // before the child has said anything and "Bati" changes nothing.
         // char_guard_idle is that still pose; until it is drawn he starts the
         // scene waving and the swap is a no-op. Draw it on the same canvas
         // size as char_guard: CreateStanding sizes him from the sprite bounds,
@@ -210,7 +210,7 @@ public class BuildPaaralanScene1
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Kumusta" turns him to face the child and wave. A greeting has
+        // "Bati" turns him to face the child and wave. A greeting has
         // nothing to pick up and nothing to light up, so he is the feedback.
         GameObject greetGO = new GameObject("Pose_Greet");
         PoseSwitch greet = greetGO.AddComponent<PoseSwitch>();
@@ -363,7 +363,7 @@ public class BuildPaaralanScene1
         // above that rather than up in the treetops.
         GameObject pLakad   = CreatePromptUI(uiRoot.transform, "Prompt_Lakad",   "Lakad",   new Vector3(-760, 80, 0));
         GameObject pBukas   = CreatePromptUI(uiRoot.transform, "Prompt_Bukas",   "Bukas",   new Vector3(-420, 80, 0));
-        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(-80, 80, 0));
+        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-80, 80, 0));
         GameObject pPasok   = CreatePromptUI(uiRoot.transform, "Prompt_Pasok",   "Pasok",   new Vector3(260, 80, 0));
         GameObject pTakbo   = CreatePromptUI(uiRoot.transform, "Prompt_Takbo",   "Takbo",   new Vector3(600, 80, 0));
 
@@ -393,10 +393,10 @@ public class BuildPaaralanScene1
         // Both of them move: Kylo turns to wave, and the guard waves back.
         // A greeting answered by a figure that does not move reads as the
         // child talking to scenery.
-        var kumusta = MakeObjective("Kumusta", pKumusta);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, greet.Apply);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, guardSwap.Apply);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, guardGleam.Play);
+        var bati = MakeObjective("Bati", pBati);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, greet.Apply);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, guardSwap.Apply);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, guardGleam.Play);
 
         // He turns side-on again, then walks INTO the gate rather than past
         // it - up the frame and smaller, which is what the perspective asks.
@@ -413,7 +413,7 @@ public class BuildPaaralanScene1
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { lakad, bukas, kumusta, pasok, takbo };
+        controller.objectives = new[] { lakad, bukas, bati, pasok, takbo };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -437,13 +437,13 @@ public class BuildPaaralanScene1
 
         string missing = "";
         if (gateShut == null) missing += "\n  paaralan_gate_background_closed - the scene opens on an OPEN gate, so \"Bukas\" changes nothing.";
-        if (guardIdle == null) missing += "\n  char_guard_idle - the guard is waving before he is greeted, so \"Kumusta\" changes nothing.";
+        if (guardIdle == null) missing += "\n  char_guard_idle - the guard is waving before he is greeted, so \"Bati\" changes nothing.";
         if (backWalk == null) missing += "\n  back_walk_1/3_uniform_with_bag - Kylo walks into the school side-on, which reads as sliding rather than going away.";
         else if (backPass == null) missing += "\n  back_walk_2_uniform_with_bag - the legs-together frame. The walk is two strides with no in-between, so it reads as a shuffle.";
         if (backRunA == null || backRunB == null) missing += "\n  back_run_1/2_uniform_with_bag - \"Takbo\" uses the walk cycle taken faster, so it is quicker but not a different gait.";
 
         Debug.Log("[SALINLAHI] Paaralan Scene 1 built and saved to " + ScenePath +
-                   ". Words: Lakad, Bukas, Kumusta, Pasok, Takbo - walking up to the gate, " +
+                   ". Words: Lakad, Bukas, Bati, Pasok, Takbo - walking up to the gate, " +
                    "having it opened, greeting the guard, going in, running for class. " +
                    "It starts Level 2's run and fades into " + NextScene + ", which ends it " +
                    "and awards the Paaralan badge - so build Paaralan Scene 2 as well, or " +

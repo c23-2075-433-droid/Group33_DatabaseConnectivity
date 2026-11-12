@@ -434,5 +434,11 @@ word_uwi.wav,Word,All Levels,Level 3 Scene 5,-,Uwi,Go home,First taught in Level
 rachel_l1_s6_intro.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,It's time for school! Help Kylo get to the door and say goodbye to Nanay.,-,UNUSED - Scene 6 was never built. Alis is used in Chapter2_Level5_Uwian instead.,,Unused,0
 rachel_l1_s6_outro.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 6 - Leaving for School,Teacher Rachel,Great job! Kylo is ready for school. Let's go!,-,UNUSED - Scene 6 was never built.,,Unused,0
 rachel_l1_s5_bonus.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Can you find the kanin and itlog?,-,"UNUSED - Kanin and Itlog became spoken objectives in Chapter1_Level5_Almusal, not tap targets.",,Unused,0
+word_tapon.wav,Word,All Levels,Level 2 Scene 4,-,Tapon,Throw away,Clearing up after recess. Gloss added for the scene restructure; NOT YET RECORDED.,Tapon,Word,0
+word_ligpit.wav,Word,All Levels,Level 2 Scene 5,-,Ligpit,Tidy up,Packing away at the end of the school day. Replaces Linis. Gloss added for the scene restructure; NOT YET RECORDED.,Ligpit,Word,0
+word_suot.wav,Word,All Levels,Level 2 Scene 5,-,Suot,Wear / put on,Putting the bag on before leaving. Replaces Bag in this scene. Gloss added for the scene restructure; NOT YET RECORDED.,Suot,Word,0
+word_padyak.wav,Word,All Levels,Level 3 Scene 2,-,Padyak,Pedal,On the playground. Replaces Tulak and Talon. Gloss added for the scene restructure; NOT YET RECORDED.,Padyak,Word,0
+word_alok.wav,Word,All Levels,Level 3 Scene 4,-,Alok,Offer,Offering food at the picnic. Replaces Ibahagi. Gloss added for the scene restructure; NOT YET RECORDED.,Alok,Word,0
+word_apir.wav,Word,All Levels,Level 3 Scene 5,-,Apir,High five,Saying goodbye to friends. Gloss added for the scene restructure; NOT YET RECORDED.,Apir,Word,0
 word_tara.wav,Word (Unused),-,Not placed,-,Tara,Let's go,UNUSED - scripted for the unbuilt Scene 6; no scene asks for it.,Tara,Unused,0
-word_salamin.wav,Word (Unused),-,Not placed,-,Salamin,Mirror,UNUSED - dropped from Scene 4. The mirror stays in the bedroom as scenery.,Salamin,Unused,0
+word_salamin.wav,Word,All Levels,Level 1 Scene 4,-,Salamin,Mirror,Checking herself in the mirror before school. Back in use for the scene restructure; NOT YET RECORDED.,Salamin,Word,0

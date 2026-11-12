@@ -1,9 +1,20 @@
 // Assets/Editor/BuildParkeScene1.cs
 //
 // One-click scene builder for Parke Scene 1 ("Walking to the Park").
-// Teaches five words: Lakad, Takbo, Tingin, Tuwa, Pasok.
+// Teaches two words: Takbo, Pasok.
 //
-// Only Tingin and Tuwa are new. The other three are deliberate returns in a
+// A SHORT SCENE ON PURPOSE. The restructure cuts it to the two words that
+// move the child from the street into the park, and drops Lakad, Tingin and
+// Tuwa. Lakad was redundant here - Takbo already carries him to the gate,
+// and PlayerMovement stops him at the marker either way. Tingin and Tuwa
+// named a thing and a feeling in a scene whose job is arrival; both belong
+// to the playground and the friends, which are the next two scenes.
+//
+// Tuwa in particular is worth not losing sight of: it was the first word in
+// the game to name a FEELING rather than an object or an action, and the
+// celebrate pose drawn for it is still in the project.
+//
+// Only Tingin and Tuwa were new. The other three were deliberate returns in a
 // third setting - Lakad from the bedroom, Takbo from the schoolyard, Pasok
 // from the school gate - which is what the design document's reuse column is
 // for. Tuwa is also the first word in the game that names a FEELING rather
@@ -63,8 +74,6 @@ public class BuildParkeScene1
 
     private const float StartX = -7.00f;              // in from the left, past the bench
     private const float PlaygroundX = 2.20f;          // where "Takbo" stops him
-    private const float SlideX = 3.40f;               // the play structure, for Tingin
-    private const float SlideY = -2.00f;
 
     [MenuItem("Tools/SALINLAHI/Build Parke Scene 1")]
     public static void BuildScene()
@@ -142,17 +151,6 @@ public class BuildParkeScene1
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Tuwa" is a feeling, so it has to be carried by the character. He
-        // throws his arms up - the one pose in the set that reads as delight
-        // rather than as speech. The UNIFORM version of it, made by
-        // Tools/make_celebrate_uniform.py: the original celebrate pose is from
-        // before the uniform existed and still wears the green tee, so he
-        // changed clothes the moment he was pleased.
-        GameObject cheerGO = new GameObject("Pose_Tuwa");
-        PoseSwitch cheer = cheerGO.AddComponent<PoseSwitch>();
-        cheer.player = player;
-        cheer.standingSprite = LoadSprite("celebrate_uniform_with_bag");
-
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
         follow.offset = new Vector3(0f, 0f, -10f);
@@ -170,8 +168,6 @@ public class BuildParkeScene1
         CreateWall("Wall_Right", 9.3f);
 
         // --- What lights up ---
-        TimedOverlay gleamTingin = CreateGleamAt("Gleam_Tingin", SlideX, SlideY, 4.0f);
-        TimedOverlay gleamTuwa = CreateGleamAt("Gleam_Tuwa", PlaygroundX, FloorY + 1.6f, 3.2f);
         TimedOverlay gleamPasok = CreateGleamAt("Gleam_Pasok", 0.80f, -2.40f, 6.4f);
 
         // --- Word prompts ---
@@ -193,28 +189,15 @@ public class BuildParkeScene1
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-700, -170, 0));
         GameObject pTakbo = CreatePromptUI(uiRoot.transform, "Prompt_Takbo", "Takbo", new Vector3(-380, -170, 0));
-        GameObject pTingin = CreatePromptUI(uiRoot.transform, "Prompt_Tingin", "Tingin", new Vector3(330, -20, 0));
-        GameObject pTuwa = CreatePromptUI(uiRoot.transform, "Prompt_Tuwa", "Tuwa", new Vector3(220, -150, 0));
         GameObject pPasok = CreatePromptUI(uiRoot.transform, "Prompt_Pasok", "Pasok", new Vector3(60, -250, 0));
 
-        // --- Objectives: walk, run, look, be glad, go in ---
-        var lakad = MakeObjective("Lakad", pLakad);
-        UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
-
+        // --- Objectives: run there, go in ---
         // Takbo is a real run, not a relabelled walk: PlayerMovement moves and
         // animates faster for its duration, and stops at the marker rather
         // than after a fixed time.
         var takbo = MakeObjective("Takbo", pTakbo);
         UnityEventTools.AddPersistentListener(takbo.onCorrect, player.Takbo);
-
-        var tingin = MakeObjective("Tingin", pTingin);
-        UnityEventTools.AddPersistentListener(tingin.onCorrect, gleamTingin.Play);
-
-        var tuwa = MakeObjective("Tuwa", pTuwa);
-        UnityEventTools.AddPersistentListener(tuwa.onCorrect, cheer.Apply);
-        UnityEventTools.AddPersistentListener(tuwa.onCorrect, gleamTuwa.Play);
 
         // The whole lawn lights up rather than a walk - he is already standing
         // in the park by now, and the one walkTarget has been spent on Takbo.
@@ -224,7 +207,7 @@ public class BuildParkeScene1
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { lakad, takbo, tingin, tuwa, pasok };
+        controller.objectives = new[] { takbo, pasok };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -248,7 +231,7 @@ public class BuildParkeScene1
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Parke Scene 1 built and saved to " + ScenePath +
-                   ". Words: Lakad, Takbo, Tingin, Tuwa, Pasok - Tingin and Tuwa new. " +
+                   ". Words: Takbo, Pasok - a short arrival scene. " +
                    "It starts Level 3's run and fades into " + NextScene + ", which ends it - " +
                    "so build Parke Scene 2 as well, or the level runs into a scene that is " +
                    "not there.");

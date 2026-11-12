@@ -1,12 +1,12 @@
 // Assets/Editor/BuildParkeScene4.cs
 //
 // One-click scene builder for Parke Scene 4 ("Picnic").
-// Teaches five words: Upo, Kain, Ibahagi, Inom, Salamat.
+// Teaches five words: Upo, Kain, Alok, Inom, Salamat.
 //
-// Ibahagi and Salamat are new, and they are the two most interesting words in
+// Alok and Salamat are new, and they are the two most interesting words in
 // the game to stage. Every other word so far names a thing or a movement:
 // something appears, something lights up, somebody walks. These two name a
-// relationship between two people. Ibahagi is the only word in SALINLAHI that
+// relationship between two people. Alok is the only word in SALINLAHI that
 // puts food in front of SOMEBODY ELSE, and Salamat is the only one answered
 // by another character rather than by the player.
 //
@@ -17,7 +17,7 @@
 //
 //   Upo       both boys sit down on the banig
 //   Kain      Kylo's food appears in front of him
-//   Ibahagi   a second helping appears in front of his FRIEND - the sharing
+//   Alok   a second helping appears in front of his FRIEND - the sharing
 //   Inom      the cup appears
 //   Salamat   the friend lights up, thanking him
 //
@@ -64,7 +64,7 @@ public class BuildParkeScene4
     private const float BanigHeight = 1.70f;
 
     // On the mat between them. The shared helping sits on the friend's side -
-    // that offset is the whole of what "Ibahagi" means on screen.
+    // that offset is the whole of what "Alok" means on screen.
     private const float FoodX = -0.60f;
     private const float SharedFoodX = 0.30f;
     private const float CupX = -0.05f;
@@ -148,7 +148,7 @@ public class BuildParkeScene4
         // --- What lights up ---
         TimedOverlay gleamUpo = CreateGleamAt("Gleam_Upo", BanigX, FloorY + 0.5f, 3.4f);
         TimedOverlay gleamKain = CreateGleamAt("Gleam_Kain", FoodX, FoodBaseY + 0.25f, 1.2f);
-        TimedOverlay gleamIbahagi = CreateGleamAt("Gleam_Ibahagi", SharedFoodX, FoodBaseY + 0.25f, 1.5f);
+        TimedOverlay gleamAlok = CreateGleamAt("Gleam_Alok", SharedFoodX, FoodBaseY + 0.25f, 1.5f);
         TimedOverlay gleamInom = CreateGleamAt("Gleam_Inom", CupX, FoodBaseY + 0.25f, 1.1f);
         TimedOverlay gleamSalamat = CreateGleamAt("Gleam_Salamat", FriendX, SeatY + 1.3f, 2.6f);
 
@@ -173,7 +173,7 @@ public class BuildParkeScene4
 
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(-30, -210, 0));
         GameObject pKain = CreatePromptUI(uiRoot.transform, "Prompt_Kain", "Kain", new Vector3(-60, -290, 0));
-        GameObject pIbahagi = CreatePromptUI(uiRoot.transform, "Prompt_Ibahagi", "Ibahagi", new Vector3(30, -290, 0));
+        GameObject pAlok = CreatePromptUI(uiRoot.transform, "Prompt_Alok", "Alok", new Vector3(30, -290, 0));
         GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-5, -290, 0));
         GameObject pSalamat = CreatePromptUI(uiRoot.transform, "Prompt_Salamat", "Salamat", new Vector3(115, -150, 0));
 
@@ -191,9 +191,9 @@ public class BuildParkeScene4
 
         // The second helping appears on the friend's side of the mat. That
         // offset is the whole word: nothing else on screen says "shared".
-        var ibahagi = MakeObjective("Ibahagi", pIbahagi);
-        UnityEventTools.AddBoolPersistentListener(ibahagi.onCorrect, shared.SetActive, true);
-        UnityEventTools.AddPersistentListener(ibahagi.onCorrect, gleamIbahagi.Play);
+        var alok = MakeObjective("Alok", pAlok);
+        UnityEventTools.AddBoolPersistentListener(alok.onCorrect, shared.SetActive, true);
+        UnityEventTools.AddPersistentListener(alok.onCorrect, gleamAlok.Play);
 
         var inom = MakeObjective("Inom", pInom);
         UnityEventTools.AddBoolPersistentListener(inom.onCorrect, cup.SetActive, true);
@@ -207,7 +207,7 @@ public class BuildParkeScene4
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { upo, kain, ibahagi, inom, salamat };
+        controller.objectives = new[] { upo, kain, alok, inom, salamat };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -231,7 +231,7 @@ public class BuildParkeScene4
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Parke Scene 4 built and saved to " + ScenePath +
-                   ". Words: Upo, Kain, Ibahagi, Inom, Salamat - Ibahagi and Salamat new. " +
+                   ". Words: Upo, Kain, Alok, Inom, Salamat - Alok and Salamat new. " +
                    "It fades into " + NextScene + ", which ends the level - so build Parke " +
                    "Scene 5 as well, or the level runs into a scene that is not there.");
     }

@@ -169,7 +169,7 @@ public class BuildParkeScene3
         CreateWall("Wall_Right", 9.3f);
 
         // --- What lights up ---
-        TimedOverlay gleamKumusta = CreateGleamAt("Gleam_Kumusta", FriendX, FloorY + 1.6f, 3.4f);
+        TimedOverlay gleamPaalam = CreateGleamAt("Gleam_Paalam", FriendX, FloorY + 1.6f, 3.4f);
         TimedOverlay gleamNgiti = CreateGleamAt("Gleam_Ngiti", KyloX, FloorY + 2.4f, 2.2f);
         TimedOverlay gleamTanong = CreateGleamAt("Gleam_Tanong", FriendX, FloorY + 2.4f, 2.4f);
         TimedOverlay gleamLaro = CreateGleamAt("Gleam_Laro", (KyloX + FriendX) * 0.5f,
@@ -197,17 +197,18 @@ public class BuildParkeScene3
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(170, -60, 0));
+
         GameObject pNgiti = CreatePromptUI(uiRoot.transform, "Prompt_Ngiti", "Ngiti", new Vector3(-230, 30, 0));
         GameObject pTanong = CreatePromptUI(uiRoot.transform, "Prompt_Tanong", "Tanong", new Vector3(170, 40, 0));
         GameObject pLaro = CreatePromptUI(uiRoot.transform, "Prompt_Laro", "Laro", new Vector3(-30, 150, 0));
         GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-30, -20, 0));
+        GameObject pPaalam = CreatePromptUI(uiRoot.transform, "Prompt_Paalam", "Paalam", new Vector3(170, -60, 0));
 
-        // --- Objectives: greet, smile, ask, play, high-five ---
-        var kumusta = MakeObjective("Kumusta", pKumusta);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, greet.Apply);
-        UnityEventTools.AddPersistentListener(kumusta.onCorrect, gleamKumusta.Play);
-
+        // --- Objectives: greet, smile, ask, play, say goodbye ---
+        // Kumusta is gone. It and Bati were two words for the same thing in
+        // one scene - both ran greet.Apply - and the restructure keeps Bati,
+        // which is the word the rest of the game now uses for greeting.
+        //
         // Holds the greeting pose - see the note at the top about why there is
         // no smiling pose of its own.
         var ngiti = MakeObjective("Ngiti", pNgiti);
@@ -228,10 +229,16 @@ public class BuildParkeScene3
         UnityEventTools.AddBoolPersistentListener(bati.onCorrect, friend.SetActive, true);
         UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
 
+        // Leaving. The friend lights up one last time - the same gleam the
+        // greeting used, which is the right symmetry for hello and goodbye.
+        var paalam = MakeObjective("Paalam", pPaalam);
+        UnityEventTools.AddPersistentListener(paalam.onCorrect, greet.Apply);
+        UnityEventTools.AddPersistentListener(paalam.onCorrect, gleamPaalam.Play);
+
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { kumusta, ngiti, tanong, laro, bati };
+        controller.objectives = new[] { bati, ngiti, tanong, laro, paalam };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

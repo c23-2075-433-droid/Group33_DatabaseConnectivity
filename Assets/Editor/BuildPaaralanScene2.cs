@@ -255,6 +255,10 @@ public class BuildPaaralanScene2
 
     private const int OrderKylo = 0;
 
+    // Between Kylo and the things on the desk: it has to cover the bottom of
+    // him, and the notebook has to sit on top of it.
+    private const int OrderDeskFront = 10;
+
     // In front, which is what a thing lying on the desk nearer the camera
     // should be. This was briefly -1, to stop the book covering his hand -
     // but that cured the symptom and not the cause, and left him drawn across
@@ -318,6 +322,41 @@ public class BuildPaaralanScene2
                                 ViewWidth / bgSr.sprite.bounds.size.x);
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
+
+        // --- The desk, drawn IN FRONT of him ---
+        //
+        // The seated poses are cut off flat at the bottom of their canvas -
+        // fix_seated_hands.py does it deliberately, replacing his hands with
+        // the forearm cross-section so his arms run down "behind the desk".
+        // That only works if something covers the cut, and nothing did: Kylo
+        // draws at order 0 over the background, so the slice landed ON the
+        // painted wood. "Upo" showed his forearms ending in flat stumps, and
+        // "Lapis" showed the sliced shirt hem as two white slabs either side
+        // of his shorts. One cut, seen in two poses.
+        //
+        // There was nowhere to move him to. The slice sits at world -2.967
+        // and the desk's painted top edge runs between -2.92 and -3.00
+        // depending where it is measured, because the surface recedes. Lower
+        // him and the slice is drawn further down the wood; raise him and
+        // bare background shows underneath. He is in front of the desk
+        // either way.
+        //
+        // So the desk is cut out of THIS room's own painting by
+        // Tools/cut_klasrum_desk_front.py and laid over him. It matches by
+        // construction - same artwork, same perspective, same light - and it
+        // is written to the background's full canvas with everything above
+        // the desk transparent, so it takes the background's own transform
+        // and the two register pixel for pixel.
+        //
+        // NOT klasrum_desk_front, which is the old wide classroom's whole
+        // front row and cuts him off at the neck in this view.
+        GameObject deskFront = new GameObject("Foreground_Desk");
+        SpriteRenderer deskFrontSr = deskFront.AddComponent<SpriteRenderer>();
+        deskFrontSr.sprite = LoadSpriteOptional("klasrum_desk_front_near");
+        deskFrontSr.sortingLayerName = "Player";
+        deskFrontSr.sortingOrder = OrderDeskFront;
+        if (deskFrontSr.sprite == null) deskFront.SetActive(false);
+        else deskFront.transform.localScale = bg.transform.localScale;
 
 
         // --- Teacher Rachel, behind her desk at the front ---
@@ -570,13 +609,21 @@ public class BuildPaaralanScene2
         voiceCommand.player = player;
 
         // --- Something has to light up for every word that only names a thing ---
+        TimedOverlay gleamBati = CreateGleamAt("Gleam_Bati", StandX,
+                                                FloorY + PlayerHeight * 0.62f, 3.6f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
         TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilInHandX,
                                                 PencilInHandY, PencilInHandSize);
-        // The gleams sit above everything - above Kylo and above the props -
-        // so whatever they are marking is visible through them.
-        foreach (TimedOverlay fx in new[] { gleamKuha, gleamLapis })
+        // The gleams sit above everything - above Kylo, above the props and
+        // above the desk now drawn in front of him - so whatever they are
+        // marking is visible through them.
+        //
+        // EVERY gleam belongs in this list. CreateGleamAt leaves them on the
+        // "Props" layer, which sorts BELOW "Player", so one left out is drawn
+        // behind Kylo and behind the desk - gleamBati marks him greeting and
+        // was doing exactly that until it was added here.
+        foreach (TimedOverlay fx in new[] { gleamBati, gleamKuha, gleamLapis })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderGleam;
@@ -607,6 +654,7 @@ public class BuildPaaralanScene2
         // Only one is ever on screen at a time, so they can overlap each other
         // freely - each sits directly over the thing its word acts on.
         GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-700, 60, 0));
+        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-700, -60, 0));
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(260, 120, 0));
         GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(120, -150, 0));
         GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(420, -40, 0));
@@ -616,6 +664,15 @@ public class BuildPaaralanScene2
         // lockers, and is about crossing to his seat and getting ready.
         var lakad = MakeObjective("Lakad", pLakad);
         UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
+
+        // "Bati" HAS NOBODY TO GREET IN THIS ROOM. Teacher Rachel was cut
+        // from this view - she is a waist-up drawing made for the chalkboard
+        // shot and floats against the lockers - so the greeting lands on
+        // Kylo, who is the one doing it. It wants either a drawn wave or
+        // somebody drawn to greet; until then the word is taught and the
+        // staging is thin, and saying so is better than quietly dropping it.
+        var bati = MakeObjective("Bati", pBati);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
 
         // Kylo stays in profile, facing her, and SHE answers the greeting - she
         // is drawn mid-wave, so the gleam reads as the wave landing.
@@ -656,7 +713,7 @@ public class BuildPaaralanScene2
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { lakad, upo, kuha, lapis };
+        controller.objectives = new[] { lakad, bati, upo, kuha, lapis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
