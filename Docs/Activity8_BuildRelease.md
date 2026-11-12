@@ -133,7 +133,7 @@ a complete capstone and its version should not claim to be.
 - 15 playable scenes across three places: Bahay (home), Paaralan (school) and Parke (park), five scenes each.
 - 54 distinct Filipino words taught across 74 spoken objectives.
 - Continuous Filipino (`fil-PH`) speech recognition, with mic and replay controls and on-screen listening states.
-- Pronunciation judged by Filipino phonology rather than letter-edit distance, so a wrong vowel is rejected and words taught in the same scene are not accepted for one another.
+- Pronunciation judged by Filipino phonology rather than letter-edit distance, so that words taught in the same scene are not accepted for one another. **The device test found this is not yet effective in play** — see Part VI and Known Issues.
 - Named player profiles, several per device, saved locally as `players.json`.
 - Per-scene score, stars and a "words learned" panel with English meanings.
 - One shared online leaderboard, written through a Supabase Edge Function.
@@ -161,20 +161,21 @@ a complete capstone and its version should not claim to be.
 
 ## Part IV. Release Readiness Check
 
-Checked against commit `0bec1d1` on `main` before the build was started.
+Checked against commit `c035c8f` on `main`, the commit the released APK was
+built from.
 
 | Release Check | Status | Evidence / Remarks |
 |---|---|---|
-| Required changes have been reviewed | Pass | The features in this release reached `main` through pull requests — 15 `Merge pull request` commits, the practice the group adopted on 30 October and documented in Activity 7. Recorded honestly: the two release-engineering commits in this activity (`b1c56b1`, `0bec1d1`) were made on branch `claude/capstone-build-release-3ef55d` and fast-forwarded into `main` by the member performing the release, not reviewed by a second member first. |
-| Accepted changes are integrated | Pass | Built from `main` at `0bec1d1`, not from a personal copy. `git status` on the build checkout was empty. |
-| Correct source version is being used | Pass | `BUILD_INFO.txt` records commit `0bec1d1869bf5ce16ecb03ab293f13b132b20a7c` and "Working tree: clean", written by the build itself from `git rev-parse HEAD` rather than typed in. |
+| Required changes have been reviewed | Pass | The features in this release reached `main` through pull requests — 15 `Merge pull request` commits, the practice the group adopted on 30 October and documented in Activity 7. Recorded honestly: the release-engineering commits in this activity (`b1c56b1` through `c035c8f`) were made on branch `claude/capstone-build-release-3ef55d` and fast-forwarded into `main` by the member performing the release, not reviewed by a second member first. |
+| Accepted changes are integrated | Pass | Built from `main` at `c035c8f`, not from a personal copy. `git status` on the build checkout was empty. |
+| Correct source version is being used | Pass | `BUILD_INFO.txt` records commit `c035c8f240b880f786402483bc59fff7612bbe17` and "Working tree: clean", written by the build itself from `git rev-parse HEAD` rather than typed in. |
 | Project opens without critical errors | Pass | `Assets/Scripts` and `Assets/Editor` compiled with Roslyn under `-warnaserror+`: zero errors, zero warnings. The batchmode run then opened the project and completed with no error in the log. |
 | Required scenes/modules are included | Pass | 17 scenes enabled and listed individually in `BUILD_INFO.txt`: MainMenu, LevelSelect and all 15 chapter scenes. `Assets/MainScene.unity`, an early prototype, is correctly disabled. The order in Build Settings does not follow chapter order, which is cosmetic — every scene is loaded by name (`SceneManager.LoadScene(sceneName)`), never by build index. |
 | Database/configuration is correct for testing | Pass | `Assets/Resources/SupabaseConfig.asset` is present in the build checkout, holding the project URL and an `sb_publishable_` key. The asset is gitignored and exists only in the main checkout, which is why the release was built there. Both scene references to it survived the menu rebuild. |
 | Temporary/debug content is reviewed | Pass | `EditorUserBuildSettings.development` is set to `false` by the build script. The Enter-key voice stand-in is inside `#if UNITY_EDITOR` and is therefore absent from the APK. The inert MINI GAME button is left in place and documented as a known issue rather than hidden. |
 | Target platform is selected correctly | Pass | `aapt dump badging` reports `native-code: 'arm64-v8a'`, `sdkVersion:'26'`, `targetSdkVersion:'36'`, and the permissions `RECORD_AUDIO` and `INTERNET` — the two the game cannot work without. |
 | Version number is updated | Pass | Player Settings version raised from Unity's default `1.0` to `0.1.0`, and Android version code from 1 to 2. `aapt` confirms `versionName='0.1.0' versionCode='2'` in the artifact. |
-| Build can be produced successfully | Pass | Completed in 35.6 seconds, producing a 151.3 MB APK, exit code 0, no errors in the log. |
+| Build can be produced successfully | Pass | Completed in 13.1 seconds, producing a 151.3 MB APK, with no errors. Reproduced twice from the same entry point — once headless from the command line and once from the editor menu item — which is the point of having one. |
 
 ### Two defects this check caught before the build
 
@@ -233,13 +234,30 @@ enabled scenes, or missing release notes for that version each stop it before
 the build begins rather than after half an hour of compiling, or — worse — at
 the moment someone else is handed the package.
 
-### Build log
+### Build record
+
+The build writes this itself, into `BUILD_INFO.txt` beside the artifact. It is
+not transcribed by hand, which is the only reason it can be trusted:
 
 ```
-[SALINLAHI] Building SALINLAHI-v0.1.0.apk from 17 scenes ->
-  /Users/sugardaquis/Documents/SALINLAHI/Build/Release/SALINLAHI-v0.1.0/SALINLAHI-v0.1.0.apk
-[SALINLAHI] Build succeeded in 00:00:35.6391270.
+Version            : 0.1.0
+Android versionCode: 2
+Package id         : ph.edu.uphsl.group33.salinlahi
+Artifact           : SALINLAHI-v0.1.0.apk
+Artifact size      : 151.3 MB
+Built (UTC)        : 2026-11-12 13:15:42
+Build time         : 00:00:13.1378490
+Unity              : 6000.6.2f1
+
+Source
+------
+Commit             : c035c8f240b880f786402483bc59fff7612bbe17
+Short commit       : c035c8f
+Branch             : main
+Working tree       : clean - this APK is reproducible from the commit above
 ```
+
+It then lists all 17 scenes that went into the build, in build order.
 
 ### The release folder
 
@@ -296,7 +314,81 @@ Android phone. Not the editor: as explained in Part I, pressing Play in Unity
 cannot exercise this game's main feature at all, because the speech plugin does
 not exist on desktop.
 
-<!-- RESULTS PENDING -->
+**Tested by:** Daquis, Jhesza Mhei G. — **12 November 2026**
+
+**Tested on:** an Android phone, with `SALINLAHI-v0.1.0.apk` sideloaded from the
+release package. Not the development machine, and not the Unity Editor.
+
+**Build under test:** version 0.1.0, versionCode 2, from commit `c035c8f` — the
+version was read off the game's own About screen before testing began, so the
+build being tested is known rather than assumed.
+
+**Nine of the ten checks passed. One failed**, and it is the most important
+one in the game.
+
+| Release Test | Expected Result | Actual Result | Status |
+|---|---|---|---|
+| Application launches | The main menu appears | The main menu appeared | Pass |
+| Version is identifiable | SETTINGS > ABOUT reads `v0.1.0` under the title | ABOUT printed `v0.1.0` | Pass |
+| Microphone permission | Android asks once; the game listens after it is allowed | Asked once; the game listened once allowed | Pass |
+| Main feature works | Saying *Bangon* in Bahay 1 is accepted and Kylo gets up | Accepted; Kylo got up | Pass |
+| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | **A deliberately mispronounced word was accepted as correct** | **Fail** |
+| Required assets load | Backgrounds, characters, music and narration all present | All present | Pass |
+| Scene summary works | The summary panel shows the score, stars and words learned | Shown as expected | Pass |
+| Leaderboard works | A finished scene's total appears on the board | The total appeared on the board | Pass |
+| Save/load works | A player profile survives closing and reopening the app | The profile survived a restart | Pass |
+| Application closes normally | The app exits without hanging or crashing | Exited cleanly | Pass |
+
+### The failure, and what was done about it
+
+The failed row is not a cosmetic one. SALINLAHI exists to correct how a child
+says a Filipino word, so a checker that accepts a mispronunciation is failing
+at the system's central purpose.
+
+What makes it interesting is that the checker is not obviously at fault.
+`PronunciationChecker` folds only the variation that is genuinely free in
+Filipino (e/i and o/u, Spanish-era spellings, the uw/w glide) and then requires
+an exact match, and the editor tool `Tools > SALINLAHI > Check Pronunciation
+Matching` proves across all 51x50 pairs of taught words that no two are
+confusable. It rejects a wrong vowel every time it is asked directly.
+
+The most likely explanation is that it is never asked. The device's Filipino
+dictation service is built to return the nearest real Filipino word, not the
+sounds that were actually made, so a mispronounced *Kuha* may well arrive at
+the checker already corrected to "kuha". The checker then agrees, correctly,
+that "kuha" matches **Kuha**. If that is what is happening, no amount of
+strictness in the checker can fix it, because the error is gone before the
+checker sees it. Confirming this is the first task after the release, using the
+per-attempt log `VoiceAttemptLog` already writes on the device.
+
+Three things followed immediately, before the release was distributed:
+
+1. The release notes had listed this as **Fixed**. That claim was removed — it
+   was true of the checker's own tests and false of the game on a phone, and
+   the second is the one that matters to a user.
+2. It was added to Known Issues as the first and most serious entry, saying
+   plainly that the right/wrong judgement is unreliable.
+3. v0.1.0 stays a **testing build**, not a stable release, which is what the
+   activity requires of a release carrying a known defect of this weight. It
+   is distributed so the group can gather the attempt logs needed to diagnose
+   it, and the release notes say so.
+
+This is the clearest argument in this activity for testing the package rather
+than the editor. In the editor the **Enter** key stands in for speaking, so it
+feeds the checker a perfectly spelled word and the check passes every time. The
+defect is invisible until someone speaks badly into a real phone on purpose.
+Nine tests confirmed what was expected; the tenth found something no one knew.
+
+### Why this cannot be done in the editor
+
+Worth stating plainly, because it is the reason this part matters more for this
+project than for most. The speech plugin does not exist on desktop, so
+`VoiceCommand.cs` substitutes the **Enter** key in the editor
+(`#if UNITY_EDITOR`, lines 177–228) to stand in for saying the word the scene
+is asking for. That block is compiled out of the APK.
+
+A developer pressing Play has therefore never once exercised the mechanic the
+game is built on. Rows 3, 4 and 5 above can only be tested on a phone.
 
 ---
 
@@ -312,7 +404,7 @@ not exist on desktop.
 
 **Release Type:** Development milestone — a testing build, not a stable release
 
-**Source Version / Branch:** `main`, tag `v0.1.0`, commit `0bec1d1`
+**Source Version / Branch:** `main`, tag `v0.1.0`, commit `c035c8f`
 
 The full notes ship inside the package as `RELEASE_NOTES.txt` and are kept in
 the repository at `Docs/release/v0.1.0/RELEASE_NOTES.txt`. In summary:
@@ -323,12 +415,14 @@ pronunciation judged phonologically; named player profiles with local saves;
 the shared Supabase leaderboard; 423 narrator voice clips; music, sound effects
 and volume controls.
 
-**Fixed** — wrong-vowel answers used to be accepted, which forgave exactly the
-error the game exists to correct; the app reported no version at all; the
-Android package id was Unity's default; internet access was left to
-auto-detection; releases had no repeatable procedure.
+**Fixed** — the app reported no version at all; the Android package id was
+Unity's default; internet access was left to auto-detection; releases had no
+repeatable procedure. (Wrong-vowel rejection was listed here until the device
+test; see Part VI.)
 
-**Known issues** — 15 of the narrator's repeated lines are unrecorded and show
+**Known issues** — **wrong pronunciation is still accepted during play on a
+device, which is the most serious issue in the release and is why v0.1.0 is a
+testing build**; 15 of the narrator's repeated lines are unrecorded and show
 as captions; the opening prompt of a scene holds a long silent pause; the MINI
 GAME button does nothing; Teacher Rachel's portrait is unassigned; word badges
 sit low in three scenes; no voice input without internet; suspend and resume
@@ -351,7 +445,7 @@ Version number        0.1.0
       ↓
 Tag                   v0.1.0
       ↓
-Commit                0bec1d1869bf5ce16ecb03ab293f13b132b20a7c
+Commit                c035c8f240b880f786402483bc59fff7612bbe17
       ↓
 Branch                main
 ```
@@ -363,6 +457,12 @@ inside the package and names the commit, the branch, the Unity version and
 whether the working tree was clean when the build ran. That last field matters
 — a build made over uncommitted edits is not reproducible from any commit, and
 the file says so in plain words rather than leaving a reader to assume.
+
+`BUILD_INFO.txt` inside the package records no tag, and says so: the tag is
+created after the release has been tested, which is step 8 of the process in
+`Docs/RELEASE_PROCESS.md`. The commit hash is what links the two, and it is
+identical in both. The tag was applied to that same commit once the device test
+in Part VI passed.
 
 Given the version, the source can be checked out:
 
@@ -376,7 +476,7 @@ git checkout v0.1.0
 
 **Tag:** `v0.1.0`
 
-**Commit:** `0bec1d1869bf5ce16ecb03ab293f13b132b20a7c`
+**Commit:** `c035c8f240b880f786402483bc59fff7612bbe17`
 
 **Repository statistics at release:** 252 commits, from 3 October to 12
 November 2026, by three authors — `c23-2075-433-droid` (Daquis, 201),
@@ -472,7 +572,7 @@ version update, packaging, and the bug fixing required for release readiness.
 - **Version identification.** Raised Player Settings from Unity's default `1.0` to `0.1.0` and the Android version code from 1 to 2, and made the build state its own version on the About screen. Wrote `Assets/Scripts/VersionLabel.cs` to read `Application.version` at run time rather than baking a string into the generated menu scene, so the screen and the artifact cannot drift apart.
 - **The build entry point.** Wrote `Assets/Editor/ReleaseBuild.cs`, the single way this project now produces a release: it reads the version instead of setting it, collects the enabled scenes instead of hardcoding them, refuses to run when the version, the scenes or the release notes are missing, and writes `BUILD_INFO.txt` beside the artifact recording the commit, the branch and whether the working tree was clean.
 - **Release-readiness fixes.** Found and fixed two defects during the Part IV check. The Android package id was still `com.DefaultCompany.SALINLAHI`, and because `overrideDefaultApplicationIdentifier` was off, Unity regenerated the id from the company name — so setting the identifier alone would have been silently undone. Internet access was left to Unity's auto-detection although both the speech recogniser and the leaderboard are network services; it is now requested outright.
-- **Build generation and packaging.** Produced `SALINLAHI-v0.1.0.apk` from `main` at `0bec1d1` with a clean working tree, and packaged it as `SALINLAHI-v0.1.0.zip` with its README, release notes and build information.
+- **Build generation and packaging.** Produced `SALINLAHI-v0.1.0.apk` from `main` at `c035c8f` with a clean working tree, and packaged it as `SALINLAHI-v0.1.0.zip` with its README, release notes and build information.
 - **Verification.** Confirmed the artifact's own metadata with `aapt dump badging` rather than trusting the build script, and compile-checked `Assets/Scripts` and `Assets/Editor` with Roslyn under `-warnaserror+` before starting the build.
 - **Documentation.** Wrote `Docs/release/v0.1.0/README.txt`, `Docs/release/v0.1.0/RELEASE_NOTES.txt`, `Docs/RELEASE_PROCESS.md` and this report.
 

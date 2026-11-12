@@ -44,9 +44,11 @@ Voice
   Continuous listening through the device's Filipino (fil-PH) speech
     recognizer.
   Pronunciation judged by Filipino phonology rather than by letter-edit
-    distance, so a wrong vowel is rejected. Words the game teaches in the same
-    scene are no longer accepted for one another: Kain/Kanin, Tabo/Takbo,
+    distance. Words the game teaches in the same scene are no longer accepted
+    for one another in the checker's own tests: Kain/Kanin, Tabo/Takbo,
     Tawa/Tuwa, Bati/Bata and Kanan/Kanin all previously passed for each other.
+    NOTE: on a real device this is NOT yet delivering what it should - see
+    Known Issues, first entry.
   Known mishearings per word are accepted, so a recognizer quirk does not
     count against the child.
   Every attempt is logged on the device, so the accepted variants can be
@@ -76,9 +78,6 @@ Presentation
 FIXED
 -----
 
-  Wrong-vowel answers were accepted. The checker allowed an edit distance
-    scaled to word length, which forgave exactly the error the game exists to
-    correct, and let taught words pass for each other.
   The app reported no version at all. There is now a version in the About
     screen, read from the build itself, and a BUILD_INFO.txt beside every
     artifact naming the commit it came from.
@@ -92,6 +91,19 @@ FIXED
 
 KNOWN ISSUES
 ------------
+
+  WRONG PRONUNCIATION IS STILL ACCEPTED ON A DEVICE. This is the most serious
+    issue in the release and it affects the game's central purpose. The
+    pronunciation checker rejects wrong vowels in its own unit tests, but the
+    v0.1.0 device test found that a mispronounced word is still accepted
+    during play. The likely cause is that the device's Filipino dictation
+    service returns the nearest real Filipino word rather than the sounds the
+    child actually made, so the checker is handed an already-corrected word and
+    never sees the mistake. If that is confirmed, it cannot be fixed inside the
+    checker and needs a different recognition approach. Until then, treat the
+    right/wrong judgement as unreliable: the game still teaches and prompts the
+    vocabulary, but it does not yet reliably correct pronunciation.
+    This is why v0.1.0 is a testing build and not a stable release.
 
   15 of Teacher Rachel's repeated lines have no recording: the three framing
     lines ("Sabihin", "Ngayon", "Ulitin"), the listening cue, two hints, the
