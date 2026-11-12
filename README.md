@@ -1,10 +1,15 @@
-# SALINLAHI — Database Connectivity Prototype
+# SALINLAHI
 
-**Group 33 — Activity 5: Database Connectivity**
+**A Voice-Interactive Filipino Language Learning Game**
 
-A voice-interactive Filipino vocabulary learning game for children, extended
-with database connectivity so that each play session is saved to, retrieved
-from, and displayed back from an online database.
+**Group 33 — BSIT Capstone**
+
+A voice-interactive Filipino vocabulary learning game for Kinder–Grade 3
+pupils. The child says a Filipino word out loud and the game responds: speaking
+is the control, not a button on screen. Each session's score is kept on the
+device and totalled onto a shared online leaderboard.
+
+**Current release: v0.1.0.** See [Releases](#releases).
 
 ## Group Members
 
@@ -17,50 +22,60 @@ from, and displayed back from an online database.
 
 BSIT Capstone Project — University of Perpetual Help System Laguna
 
-## Prototype Direction
+## Basis
 
-**Capstone-Based Prototype (Option 1).** The prototype is built on our defended
-capstone title, SALINLAHI, rather than a separate guided game. The game already
-produces meaningful learning data — which Filipino words a child pronounced
-correctly — so adding database connectivity was a natural extension rather than
-an artificial add-on.
+This is our defended capstone title, not a separate guided exercise. The game
+produces real learning data — which Filipino words a child pronounced correctly
+— which is why database connectivity and the leaderboard were extensions of it
+rather than add-ons bolted to the side.
 
 ## Short Description
 
-The player guides a child character, Kylo, through her morning routine by
-**speaking Filipino words out loud**. The game listens through the device
-microphone, checks the pronunciation, and advances the story when the word is
-said correctly.
+The player guides a child character, Kylo, through a day by **speaking Filipino
+words out loud**. The game listens through the device microphone, checks the
+pronunciation, and advances the story when the word is said correctly.
 
-Level 1 ("Bahay — Umaga na!") asks the player to say, across two scenes:
+**15 playable scenes** across three places, five scenes each:
 
-1. **Bangon** — get up
-2. **Tayo** — stand up
-3. **Lakad** — walk
-4. **Kaliwa** / **Kanan** — left / right
-5. **Bukas** — open (the bathroom door)
-6. **Ilaw** — turn the light on
-7. **Tabo**, **Sabon**, **Sipilyo**, **Tuwalya** — dipper, soap, toothbrush, towel
-8. **Maligo**, **Suklay** — take a bath, comb
+| Place | Scenes |
+|---|---|
+| **Bahay** (home) | Umaga na, Banyo, Maligo, Damit, Almusal |
+| **Paaralan** (school) | Paaralan, Klasrum, Aralin, Recess, Uwian |
+| **Parke** (park) | Parke, Palaruan, Kaibigan, Piknik, Uwi |
 
-When the sequence is finished, the session result is saved to the database, and
-the most recent scores are retrieved and displayed on the completion panel.
+**54 distinct Filipino words** are taught across **74 spoken objectives** —
+among them Bangon, Tayo, Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tabo, Sabon,
+Sipilyo, Tuwalya, Maligo, Suklay, Damit, Medyas, Sapatos, Kunin, Kanin, Itlog,
+Kain, Inom, Bati, Pasok, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos,
+Talon, Kumusta, Ngiti, Salamat and Paalam. Each word drives one action.
+
+Pronunciation is judged by Filipino phonology rather than letter-edit distance,
+so a wrong vowel is rejected — saying *kaha* for **Kuha** counts as wrong, on
+purpose — and words taught in the same scene are not accepted for one another.
+
+At the end of a scene a summary panel shows the score, the stars and the words
+learned. Totals are pushed to the shared leaderboard from the main menu.
+
+The Palengke (market) level and a sixth Bahay scene are designed but not built,
+and are shown locked on the map.
 
 ## Tools and Technologies
 
 | Item | Used |
 |---|---|
-| Game engine | Unity 6 (6000.6.2f1), 2D URP |
+| Game engine | Unity 6 (6000.6.2f1), built-in render pipeline, 2D |
 | Language | C# |
 | Speech recognition | UnitySpeechToText (yasirkula) — device speech recognizer, `fil-PH` |
 | Database | Supabase (PostgreSQL) via its REST API |
+| Score API | Supabase Edge Function (Deno/TypeScript) — `supabase/functions/submit-score` |
+| Release target | Android 8.0+ (API 26), ARM64 |
 | HTTP client | `UnityWebRequest` (no third-party SDK) |
 | Editor | Visual Studio Code / Visual Studio |
 | Repository | GitHub |
 
 ## Database: What Is Saved and Retrieved
 
-Records go to a single Supabase table, `player_scores`:
+Per-session records go to the Supabase table `player_scores`:
 
 | Field | Type | Description |
 |---|---|---|
@@ -88,7 +103,29 @@ session's score plus the recent score list.
 | Record structure | [`Assets/Scripts/ScoreRecord.cs`](Assets/Scripts/ScoreRecord.cs) |
 | Connection settings | [`Assets/Scripts/SupabaseConfig.cs`](Assets/Scripts/SupabaseConfig.cs) |
 
-## How to Run the Prototype
+### The shared leaderboard
+
+The leaderboard is a second, separate path, and the only thing the game still
+sends to Supabase in normal play. It holds one row per player rather than one
+per session.
+
+| Piece | Where |
+|---|---|
+| Table and policies | [`supabase/migrations/20261112_leaderboard.sql`](supabase/migrations/20261112_leaderboard.sql) — `leaderboard`, `leaderboard_owner`, and the `leaderboard_rank` function |
+| Write path | [`supabase/functions/submit-score/index.ts`](supabase/functions/submit-score/index.ts), a Deno Edge Function |
+| Client | [`Assets/Scripts/LeaderboardClient.cs`](Assets/Scripts/LeaderboardClient.cs) — reads over REST, writes only through the function |
+| Display | [`Assets/Scripts/LeaderboardPanel.cs`](Assets/Scripts/LeaderboardPanel.cs) |
+
+The client is never trusted with a direct write to the leaderboard table. It
+calls the Edge Function, which issues a per-player token on first submit and
+checks it on every later one, so one player cannot overwrite another's row.
+A failed upload is retried the next time the main menu opens.
+
+Only four values leave the device: player id, nickname, total points and total
+stars. Which words a child got right or wrong stays on the phone.
+
+Setup is in [`Docs/SupabaseSetup.md`](Docs/SupabaseSetup.md).
+## How to Run It From Source
 
 ### 1. Open the project
 Open the folder in Unity **6000.6.2f1** via Unity Hub.
@@ -115,29 +152,22 @@ Credentials are **not** in this repository.
 See [`Assets/Resources/SupabaseConfig.example.txt`](Assets/Resources/SupabaseConfig.example.txt)
 for the expected values.
 
-### 4. Build and wire the scenes
-In Unity, run in order:
+### 4. Nothing to build by hand
 
-Only Scene 1, Scene 2, the main menu and the map are committed as `.unity`
-files. Scenes 3 and 4 are **built from their scripts**, so a fresh clone has to
-run these once, in order:
+All 17 scenes are committed as `.unity` files and already registered in Build
+Settings, so a fresh clone has nothing to generate. Earlier revisions of this
+file told you to run a list of `Tools > SALINLAHI > Build ... Scene` items;
+**do not** — those builders regenerate a scene from scratch, and running one
+now discards whatever is in the committed scene.
 
-1. **Tools → SALINLAHI → Add Exit Trigger To Level 1**
-2. **Tools → SALINLAHI → Add Run Score Counter To Level 1**
-3. **Tools → SALINLAHI → Build Bahay Scene 4**
-4. **Tools → SALINLAHI → Build Bahay Scene 3**
-5. **Tools → SALINLAHI → Build Bahay Scene 2**
-6. **Tools → SALINLAHI → Link Scene 1 To Scene 2**
-7. **Tools → SALINLAHI → Build Level Select Scene**
+The builders are still there, and are still how a scene gets changed: edit the
+builder in `Assets/Editor/`, re-run it, and commit the regenerated scene. That
+is why the scene diffs in this repository are large.
 
-Build the scenes back to front (4, then 3, then 2). Each one registers itself in
-Build Settings, and the scene before it fades into it by name — build them the
-other way round and the earlier scene has nowhere to go.
-
-Level 1 runs Scene 1 → 2 → 3 → 4. The scene that **ends** a level owns the
-database demo and shows the result; every other scene carries its own
-`RunScoreCounter`. Keep that rule when adding Scene 5, or its words will vanish
-from the score with nothing in the log to say so.
+One rule worth keeping. The scene that **ends** a level shows the result; every
+other scene carries its own `RunScoreCounter`, which adds that scene's attempts
+to [`RunScore`](Assets/Scripts/RunScore.cs). Add a counter to any new scene or
+its words go uncounted, with nothing in the log to say so.
 
 ### 5. Play
 Open `Assets/Scenes/MainMenu.unity` and press Play.
@@ -170,6 +200,37 @@ dressed. After Scene 4, the completion panel shows your score for the whole
 level and the recent records read back from Supabase.
 
 On **Android**, the real microphone is used instead — say the words out loud.
+
+## Releases
+
+**Current release: v0.1.0** (12 November 2026) — a development milestone, not a
+stable release. Android only.
+
+Which build you are holding is answered inside the game: main menu, the
+settings gear, then **ABOUT**. The version is printed under the title, read
+from the build itself at run time.
+
+| Document | What it is |
+|---|---|
+| [`Docs/RELEASE_PROCESS.md`](Docs/RELEASE_PROCESS.md) | How a release is produced, numbered, tested and tagged. Read this before building one. |
+| [`Docs/release/v0.1.0/RELEASE_NOTES.txt`](Docs/release/v0.1.0/RELEASE_NOTES.txt) | What is in v0.1.0, what is fixed, what is broken, what is missing |
+| [`Docs/release/v0.1.0/README.txt`](Docs/release/v0.1.0/README.txt) | Install and run instructions for a tester |
+
+To produce a release build: **Tools > SALINLAHI > Build Release APK**. It reads
+the version from Player Settings rather than setting it, collects the enabled
+scenes rather than hardcoding them, and refuses to run if the version, the
+scenes or that version's release notes are missing. The output is
+`Build/Release/SALINLAHI-v<version>/`, containing the APK alongside its README,
+release notes and a `BUILD_INFO.txt` naming the commit it came from.
+
+Build from this checkout, not from a git worktree:
+`Assets/Resources/SupabaseConfig.asset` is gitignored and exists only here, and
+a build without it has a dead leaderboard.
+
+Android only, deliberately — the speech recognizer is Android and iOS only, so
+a desktop build cannot be answered by speaking.
+
+Artifacts are never committed; `*.apk` and `Build/` are gitignored.
 
 ## Character Art: Two Sets
 
@@ -270,11 +331,14 @@ which every later frame was drawn against, so that only her mouth moves.
 | `char_rachel_l.png` | Open, tongue tip raised | **l** |
 | `char_rachel_blink.png` | Eyes closed, mouth unchanged | — |
 
-They are a mouth set for lip-sync, not an animation. Nothing reads them per
-sound yet: until the voice-over is recorded, `UIThemeTool` wires three of
-them - `e`, `o`, `ai`, smallest opening first - into the existing talking
-cycle so she is not frozen under her own subtitle, and `u`, `mbp`, `fv` and
-`l` simply sit in the folder waiting.
+They are a mouth set for lip-sync, and all seven shapes are now read per
+sound. `Assets/Resources/VisemeTracks.json` holds 423 tracks, one per recorded
+clip, and [`RachelPortraitAnimator`](Assets/Scripts/RachelPortraitAnimator.cs)
+walks the track against `VoiceNarrator.PlaybackTime`.
+
+The old three-shape cycle is kept as the fallback, and still earns its place: a
+line with no recording has no track, so it gets the cycle and mouths its caption
+instead of freezing under its own subtitle.
 
 The raw generations are kept in `Art/char_rachel_*_raw.png` exactly as they
 arrived. [`Tools/make_rachel_visemes.py`](Tools/make_rachel_visemes.py) turns
@@ -324,28 +388,42 @@ than treating them as missing art.
   `insert` and `select` on `player_scores` — there are deliberately no `update`
   or `delete` policies, so the game can add and read records but never modify or
   erase them.
+- The `leaderboard` table is **read-only** to the anon role. Writes go through
+  the `submit-score` Edge Function, which holds the service key server-side and
+  checks a per-player token, so a client cannot overwrite another player's row
+  even though its key is public.
 
 ## Known Limitations / Unfinished Parts
 
-- The **first three scenes of Level 1** are playable: the wake-up sequence, the
-  walk to the bathroom, and the bath. The remaining Bahay scenes (dressing,
-  breakfast, leaving) are designed but not yet built, and Paaralan, Parke and
-  Palengke are locked on the map.
-- Scene 3's **Maligo** is a water-and-suds overlay rather than an animation;
-  the character art has only standing and walking poses.
-- The result is saved once, at the end of the last scene, and covers the
-  whole level: [`RunScoreCounter`](Assets/Scripts/RunScoreCounter.cs) adds
-  each scene's attempts to [`RunScore`](Assets/Scripts/RunScore.cs), and
-  [`SessionScoreTracker`](Assets/Scripts/SessionScoreTracker.cs) saves that
-  total. Add a counter to any new scene or its words go uncounted.
-- **No voice-over audio yet.** The instruction-clip slots are wired and the full
-  recording script exists at [`Docs/VoiceOverScript.csv`](Docs/VoiceOverScript.csv),
-  but the audio files are not recorded, so the replay button logs a warning
-  instead of playing a clip.
-- Speech recognition only works on **Android/iOS**; the Editor uses the keyboard
-  fallback above.
-- Retrieved records are shown as plain text, not a formatted leaderboard.
-- Scores are global — there is no per-player filtering or login.
+As released in v0.1.0. The release notes carry the same list in tester's terms.
+
+- **The Palengke (market) level is not built**, nor is a sixth Bahay scene,
+  "Leaving for School" — its slot and its two narrator lines exist, the scene
+  does not. Both are shown locked on the map.
+- **20 of the 443 narrator lines are unrecorded**, and 15 of them are the lines
+  heard most often: the three framing lines ("Sabihin", "Ngayon", "Ulitin"),
+  the listening cue, two hints, the idle nudge, the mic-blocked line, and the
+  correct / incorrect / not-heard replies. A missing clip is not an error —
+  the caption is shown and the pause is held — so the game is playable but
+  quieter than intended.
+- **The opening prompt of a scene holds a long silent pause** before the child
+  is allowed to speak.
+- **The MINI GAME button does nothing.** It is drawn on the menu and
+  deliberately inert.
+- **Teacher Rachel's portrait is unassigned** (`UITheme.rachelPortrait`), so
+  her captions appear without her picture.
+- Word badges sit low on screen in Paaralan 2, Paaralan 5 and Parke 4.
+- **Nothing works offline.** Recognition is a network service
+  (`preferOfflineRecognition: false`) and the leaderboard is hosted.
+- **Speech recognition only works on Android/iOS**; the Editor uses the
+  keyboard fallback above, so pressing Play has never exercised the real
+  mechanic. This is why releases are tested on a phone.
+- Suspend and resume have not been tested on a phone at full speaker volume.
+- `Maligo` is a water-and-suds overlay rather than an animation; the character
+  art has only standing and walking poses.
+- The leaderboard has no per-player filtering, paging or login.
+- Testing and release share one Supabase project — there is no separate
+  staging database, so a test play-through writes a real row.
 
 ## References
 
