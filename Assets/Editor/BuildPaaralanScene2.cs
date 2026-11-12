@@ -255,6 +255,10 @@ public class BuildPaaralanScene2
 
     private const int OrderKylo = 0;
 
+    // Between Kylo and the things on the desk: it has to cover the bottom of
+    // him, and the notebook has to sit on top of it.
+    private const int OrderDeskFront = 10;
+
     // In front, which is what a thing lying on the desk nearer the camera
     // should be. This was briefly -1, to stop the book covering his hand -
     // but that cured the symptom and not the cause, and left him drawn across
@@ -318,6 +322,41 @@ public class BuildPaaralanScene2
                                 ViewWidth / bgSr.sprite.bounds.size.x);
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
+
+        // --- The desk, drawn IN FRONT of him ---
+        //
+        // The seated poses are cut off flat at the bottom of their canvas -
+        // fix_seated_hands.py does it deliberately, replacing his hands with
+        // the forearm cross-section so his arms run down "behind the desk".
+        // That only works if something covers the cut, and nothing did: Kylo
+        // draws at order 0 over the background, so the slice landed ON the
+        // painted wood. "Upo" showed his forearms ending in flat stumps, and
+        // "Lapis" showed the sliced shirt hem as two white slabs either side
+        // of his shorts. One cut, seen in two poses.
+        //
+        // There was nowhere to move him to. The slice sits at world -2.967
+        // and the desk's painted top edge runs between -2.92 and -3.00
+        // depending where it is measured, because the surface recedes. Lower
+        // him and the slice is drawn further down the wood; raise him and
+        // bare background shows underneath. He is in front of the desk
+        // either way.
+        //
+        // So the desk is cut out of THIS room's own painting by
+        // Tools/cut_klasrum_desk_front.py and laid over him. It matches by
+        // construction - same artwork, same perspective, same light - and it
+        // is written to the background's full canvas with everything above
+        // the desk transparent, so it takes the background's own transform
+        // and the two register pixel for pixel.
+        //
+        // NOT klasrum_desk_front, which is the old wide classroom's whole
+        // front row and cuts him off at the neck in this view.
+        GameObject deskFront = new GameObject("Foreground_Desk");
+        SpriteRenderer deskFrontSr = deskFront.AddComponent<SpriteRenderer>();
+        deskFrontSr.sprite = LoadSpriteOptional("klasrum_desk_front_near");
+        deskFrontSr.sortingLayerName = "Player";
+        deskFrontSr.sortingOrder = OrderDeskFront;
+        if (deskFrontSr.sprite == null) deskFront.SetActive(false);
+        else deskFront.transform.localScale = bg.transform.localScale;
 
 
         // --- Teacher Rachel, behind her desk at the front ---
