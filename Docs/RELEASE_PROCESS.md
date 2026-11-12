@@ -190,9 +190,17 @@ Until then, releases are `0.x` and are labelled development or testing builds.
 | Responsibility | Member |
 |---|---|
 | Release preparation, version update, build generation, packaging | Daquis, Jhesza Mhei G. |
-| Release testing on device | whoever did not build it |
-| Release notes | the member whose feature the release is named for |
-| Integration verification — that `main` holds what the notes claim | all three, at the pull request |
+| Release notes | whoever prepared the release |
+| Integration verification and repository configuration | Lacida, Kylo Bryan |
+| Release content — scenes, summary screens, interface wording | Manzanero, Kyla Samantha |
+| Release testing on a device | **ideally whoever did not build it** |
+
+That last row was not met for v0.1.0: the same member built the release and
+tested it. It is recorded here rather than quietly dropped, because a tester who
+built the thing knows which path through it works and is the least likely person
+to break it by accident. For 0.2.0 onward the device test goes to another
+member, and a release tested by someone outside the group entirely is one of the
+conditions for 1.0.0 above.
 
 ## Release history
 
