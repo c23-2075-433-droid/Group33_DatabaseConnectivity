@@ -91,9 +91,10 @@ public static class ProfileUIBuilder
     /// </summary>
     private static readonly Color Invisible = new Color(1f, 1f, 1f, 0f);
 
-    // Cream on wood, as everywhere else on this menu.
+    // Cream on wood, as everywhere else on this menu. The display face brings
+    // its own colour and stroke (VocabularyFont.Chalk), so this is only for
+    // the text that stays in the UI font.
     private static readonly Color Cream = new Color(1f, 0.92f, 0.78f);
-    private static readonly Color Ink = new Color(0.28f, 0.12f, 0.20f);
 
     public class Built
     {
@@ -120,8 +121,13 @@ public static class ProfileUIBuilder
         GameObject holder = CreateImage(canvas, HolderName, "ui_name_holder",
                                         HolderPosition, HolderSize);
         Button holderButton = MakeButton(holder);
+        // 59 is the size at which the name matches the "YOUR NAME" painted
+        // into the mockup: those capitals are 43px on the 2000px page, 41px at
+        // the size this is built, and the display face's capitals are 0.695 of
+        // its point size. It is a ceiling, not a setting - best fit takes a
+        // sixteen-character name back down on its own.
         Text nameLabel = CreateLabel(holder.transform, "Name", NamePosition, NameSize,
-                                     54, TextAnchor.MiddleCenter, Color.white, true);
+                                     59, TextAnchor.MiddleCenter, Color.white, true);
 
         // Above the holder so a second tap on it closes the signs, and above
         // the menu so nothing else can be pressed while they are down. Turned
@@ -200,7 +206,7 @@ public static class ProfileUIBuilder
                 new Vector2(SlotX, ProfileSlotY[i]), SlotSize);
             buttons[i] = MakeButton(slot);
             labels[i] = CreateLabel(slot.transform, "Name", Vector2.zero, SlotSize,
-                                    40, TextAnchor.MiddleCenter, Cream, false);
+                                    40, TextAnchor.MiddleCenter, Cream, true);
         }
 
         GameObject createSlot = CreateTransparentRect(board.transform, "CreateSlot",
@@ -255,6 +261,9 @@ public static class ProfileUIBuilder
             RectTransform rect = slot.GetComponent<RectTransform>();
             rect.anchoredPosition = new Vector2(SlotX, LeaderboardSlotY[i]);
             rect.sizeDelta = SlotSize;
+            // The one piece of text here left in the UI font. It is a column
+            // of names and scores rather than a line addressed to the child,
+            // and the display face is a heavy one to read six rows of.
             labels[i] = CreateLabel(slot.transform, "Text", new Vector2(18f, 0f),
                                     new Vector2(SlotSize.x - 56f, SlotSize.y),
                                     36, TextAnchor.MiddleLeft, Cream, false);
@@ -330,9 +339,16 @@ public static class ProfileUIBuilder
     /// A line of live text over painted art. Best-fit is on because the words
     /// are the one thing here that is not drawn at a known size - a child may
     /// type sixteen characters into a plaque drawn for eight.
+    ///
+    /// <paramref name="display"/> picks the face, and it is the same split the
+    /// level summary makes: a name addressed to the child is set in the
+    /// display face the lettering on these boards is drawn in
+    /// (VocabularyFont), while a column of names and scores stays in the UI
+    /// font, which is calmer to read down. The summary's own records strip is
+    /// the precedent - see SceneResultPanelBuilder.
     /// </summary>
     private static Text CreateLabel(Transform parent, string name, Vector2 position,
-        Vector2 size, int fontSize, TextAnchor alignment, Color color, bool outlined)
+        Vector2 size, int fontSize, TextAnchor alignment, Color color, bool display)
     {
         GameObject go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
@@ -351,13 +367,14 @@ public static class ProfileUIBuilder
         text.raycastTarget = false;
         text.text = "";
 
-        if (outlined)
+        if (display)
         {
-            // The lettering painted into this art is white with a dark edge.
-            // Matching it keeps the live name from looking pasted on.
-            Outline edge = go.AddComponent<Outline>();
-            edge.effectColor = Ink;
-            edge.effectDistance = new Vector2(3f, -3f);
+            // The face, the weight, the colour and the stroke in one call, so
+            // a name on this plaque letters the same way as a name on the
+            // summary board. It overrides the font, style and colour set
+            // above; what the caller passes still decides size and alignment,
+            // and the panels repaint the colour at runtime to pick a row out.
+            VocabularyFont.Apply(text);
         }
 
         RectTransform rect = go.GetComponent<RectTransform>();
