@@ -41,7 +41,9 @@ FOLD = {"\u2192": "->", "\u2190": "<-", "\u2713": "x", "\u2022": "-",
         # Vertical flow diagrams and file trees. Without these, every arrow in a
         # process diagram and every branch of a directory listing renders as a
         # black box, which is how the Activity 8 report first came out.
-        "\u2193": "v", "\u2191": "^",
+        # A lone "v" on its own line reads as a stray letter, not an arrow -
+        # especially above a line that starts with a word. A bar reads as flow.
+        "\u2193": "|", "\u2191": "|",
         "\u2500": "-", "\u2502": "|", "\u251c": "+", "\u2514": "+",
         "\u252c": "+", "\u2534": "+", "\u253c": "+", "\u2510": "+",
         "\u250c": "+", "\u2518": "+"}
