@@ -115,8 +115,12 @@ submission. No CLI needed — the dashboard can do it:
 3. Name it **`submit-score`**. The name has to match, because it is what the
    game's `SupabaseConfig.submitScoreFunction` points at.
 4. Replace the editor's contents with the whole of `index.ts` from this
-   repository.
+   repository. **Select all first** — the editor opens on a Hello World
+   template, and pasting without clearing it leaves the template in charge.
 5. **Deploy function** at the bottom. It takes 10–30 seconds.
+
+To change it afterwards, the **Code** tab on the function's page is the same
+editor, and the button there says **Deploy updates**.
 
 It needs nothing configured afterwards. `SUPABASE_URL` and the key that may
 write are both set by the Edge runtime on their own, and the function reads
@@ -151,7 +155,15 @@ function's page with method `POST` and a deliberately bad id:
 `{"ok":false,"error":"player_id must be a UUID."}` is the right answer. It
 proves the function is up, that it is running this code rather than a
 template, and that the platform let the call through — and it writes nothing.
-A `401` instead means the JWT setting above is still on.
+
+Two other replies mean something specific:
+
+* `{"message":"Hello undefined!"}` with a `200` — the Hello World template is
+  still deployed. The paste did not replace it. Go to the **Code** tab, select
+  all, paste again, **Deploy updates**.
+* `401` — the JWT setting above is still on. Note that the dashboard's own
+  **Test** panel supplies authorization for you, so it can return `200` on a
+  function the game would still be refused by; the game is the real test.
 
 ### How a player is identified, and what that is worth
 
