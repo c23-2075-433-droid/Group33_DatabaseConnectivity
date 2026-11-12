@@ -64,6 +64,99 @@ add and read records, never modify or erase existing ones.
 Unique identifier: `player_id`. Required before saving: `player_name`, `level`
 (the rest have database defaults).
 
+## 2b. The global leaderboard
+
+The leaderboard is the one thing SALINLAHI still keeps in Supabase. Everything
+a child learns — which words they practised, how many tries each took, which
+scenes they have played, how many stars each earned — lives in a JSON save file
+on the device (`PlayerProfileStore`, written to `Application.persistentDataPath`,
+which on Android is inside the app's own private storage). Four values go up,
+and only so that one board can show every player:
+
+| Column | Type | Description |
+|---|---|---|
+| `player_id` | uuid | The player's own id, made once on the device |
+| `nickname` | text | Display name. Changeable, and never the identity |
+| `total_points` | integer | Points accumulated across every run |
+| `total_stars` | integer | Stars accumulated across every scene |
+| `updated_at` | timestamptz | Last score update |
+
+### Run the SQL
+
+In **SQL Editor**, run `supabase/migrations/20261112_leaderboard.sql` from this
+repository. It is safe to run twice. It creates:
+
+* `leaderboard` — one row per player. `player_id` is the primary key, which is
+  what makes a duplicate record impossible: a nickname change is an *update* to
+  that row, never a second one.
+* `leaderboard_owner` — the hash of each player's submission token, in a table
+  of its own so it is not one careless `select *` away from being public.
+* `leaderboard_rank(p_player_id uuid)` — counts how many players are ahead of
+  one player, so someone outside the top of the board can still be shown their
+  place without the phone downloading every row.
+
+Row Level Security:
+
+* `leaderboard` has a **select** policy for `anon` and nothing else. There is
+  deliberately no insert, update or delete policy, so the game's key cannot
+  change the board however it is used.
+* `leaderboard_owner` has **no policy at all**, and RLS is on — so `anon`
+  cannot read or write a single row of it.
+* The only writer is the Edge Function below, which connects with the service
+  role and is therefore not subject to these policies.
+
+### Deploy the Edge Function
+
+`supabase/functions/submit-score/index.ts` is what validates and stores a
+submission. With the [Supabase CLI](https://supabase.com/docs/guides/cli):
+
+```bash
+supabase functions deploy submit-score --no-verify-jwt
+```
+
+`--no-verify-jwt` matters: the game sends the project's publishable key, which
+is not a JWT, so the platform's own JWT check would reject every call. The
+function does its own checking instead — see below. It reads `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` from the Edge runtime's own environment, so **the
+service-role key is never in Unity, never in the repository and never in a
+build**. Nothing needs to be pasted anywhere for this to work.
+
+(The same file can be pasted into **Edge Functions → Deploy a new function** in
+the dashboard if you would rather not install the CLI. Turn "Verify JWT" off.)
+
+### How a player is identified, and what that is worth
+
+There is no account and no password in SALINLAHI — children of this age should
+not be asked for one — so **the locally generated UUID is not authentication**
+and is not treated as one. It is an identifier, and identifiers are not secret.
+
+So the first submission for a player id *registers* it, and the function hands
+back a token. The game keeps that token in the local save file and presents it
+on every submission afterwards; the server stores only a SHA-256 of it. Knowing
+another child's `player_id` therefore buys nothing: without the token, the
+server refuses to change that row.
+
+What the server still cannot do is verify a score. Nothing in the cloud hears a
+child say "paa" into a microphone. What it can do is refuse the absurd, and it
+does:
+
+* `total_stars` cannot exceed what the game has stars to give.
+* `total_points` may only go up, and by at most 1000 in one submission —
+  roughly what a long offline stretch of play can honestly earn. A forged
+  submission can inch a score up; it cannot jump it to a million.
+* The same row cannot be rewritten more than once every five seconds.
+* Nicknames are stripped of control characters and capped at 16 characters,
+  the same limit the game's input field uses.
+
+### Offline
+
+Being offline is an ordinary state here, not an error: these are classroom
+tablets. Play never waits on the network, and nothing is lost. The profile
+records what the run earned, notes that it is ahead of what the server has been
+told, and `LeaderboardClient.PushIfNeeded()` tries again the next time the main
+menu opens with a connection. Opening the board with no connection says so in a
+line a child can read.
+
 ## 3. Add your local credentials (each member, once)
 
 Credentials are **not** in the repository — `Assets/Resources/SupabaseConfig.asset`
@@ -84,3 +177,9 @@ That's it — `SupabaseClient` reads from that asset at runtime.
 | Save returns `403` / empty error | RLS is on but the insert policy from step 2 wasn't created |
 | Fetch returns `[]` | No rows saved yet — play a level through to the end first |
 | Works in Editor, fails on Android | No internet on the device, or cleartext/HTTPS issue — Supabase is HTTPS so this is normally just connectivity |
+| Leaderboard says "not set up on this device" | No `SupabaseConfig.asset`, or its URL/key are blank |
+| Leaderboard opens empty | Nobody has finished a level yet, or the SQL in 2b has not been run |
+| Submissions return `401` | The function was deployed with JWT verification on — redeploy with `--no-verify-jwt` |
+| Submissions return `403` | The device's token does not own that `player_id`. Expected if the save file was copied between devices |
+| Submissions return `429` | Two submissions less than five seconds apart. Harmless; the next one lands |
+| Scores never reach the board | Open the main menu while online — that is when a pending submission is retried |

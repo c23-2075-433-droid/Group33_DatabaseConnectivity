@@ -147,6 +147,14 @@ public class SessionScoreTracker : MonoBehaviour
             remarks = correctAnswers + "/" + totalAttempts + " correct",
         };
 
+        // Everything this run earned goes onto the playing profile before
+        // RunScore is emptied: the points add to the child's running total and
+        // the words join their lasting learning record. That total is what the
+        // leaderboard shows - and it is pushed from the main menu rather than
+        // from here, so a level finished with no signal still counts and is
+        // sent the next time the menu opens. See LeaderboardClient.
+        PlayerProfileStore.RecordRun(RunScore.PointsFor(correctAnswers, totalAttempts), practised);
+
         // Playing again starts from zero rather than adding to this run.
         RunScore.Reset();
 

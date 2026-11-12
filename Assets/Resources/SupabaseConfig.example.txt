@@ -17,9 +17,18 @@ To create your own local copy:
 Fields
 ------
 
-  Project Url : https://YOUR-PROJECT-REF.supabase.co
-  Anon Key    : eyJhbGciOi...            (the "anon public" key, not the service_role key)
-  Table Name  : player_scores
+  Project Url          : https://YOUR-PROJECT-REF.supabase.co
+  Anon Key             : eyJhbGciOi...     (the "anon public" key, not the service_role key)
+  Table Name           : player_scores
+  Leaderboard Table    : leaderboard
+  Submit Score Function: submit-score
+  Rank Function        : leaderboard_rank
+
+The last three are the global leaderboard, and the defaults match the SQL and
+the Edge Function in this repository - leave them alone unless you renamed
+something. The game only ever READS the leaderboard table; every change to it
+goes through the Edge Function, which is the only thing holding a key that may
+write. See Docs/SupabaseSetup.md section 2b.
 
 IMPORTANT
 ---------
@@ -28,7 +37,8 @@ IMPORTANT
     it bypasses Row Level Security entirely.
   * The anon key is public by design; it ships inside the built app. The Row
     Level Security policies (see Docs/SupabaseSetup.md) are what actually
-    restrict what it can do - insert and read player_scores, nothing else.
+    restrict what it can do - insert and read player_scores, read the
+    leaderboard, and nothing else.
   * Do not commit SupabaseConfig.asset. It is already listed in .gitignore.
 
 Full setup instructions, including the SQL to create the table and policies:

@@ -11,50 +11,51 @@ using UnityEngine;
 ///
 /// Levels still earn badges. A level counts as complete once the player has
 /// unlocked something past its last step, which falls out of the same number.
+///
+/// The number itself, and each scene's star rating, now live on the playing
+/// profile rather than in PlayerPrefs - see PlayerProfileStore, which also
+/// carries an older PlayerPrefs save over the first time it runs. Nothing
+/// that calls this class had to change: the API is the one it always was.
 /// </summary>
 public static class LevelProgress
 {
-    private const string StepKey = "SALINLAHI_HighestUnlockedStep";
-
-    // Kept so an older save still starts the player somewhere sensible rather
-    // than at the beginning: whoever had reached level N keeps level N.
-    private const string LegacyLevelKey = "SALINLAHI_HighestUnlockedLevel";
-
     /// <summary>Index into JourneyMap.Steps of the furthest step unlocked.</summary>
     public static int HighestUnlockedStep
     {
         get
         {
-            if (PlayerPrefs.HasKey(StepKey)) return PlayerPrefs.GetInt(StepKey, 0);
+            PlayerProfile profile = PlayerProfileStore.Active;
+            if (profile.highestUnlockedStep >= 0) return profile.highestUnlockedStep;
 
-            // First run under the new map. An older save knows a level number;
-            // translate it into the first step of that level.
-            int legacyLevel = PlayerPrefs.GetInt(LegacyLevelKey, 1);
+            // Never recorded. A save old enough to predate the step count
+            // knows a level number instead; translate it into that level's
+            // first scene so nobody is sent back to the beginning.
+            int legacyLevel = PlayerPrefs.GetInt("SALINLAHI_HighestUnlockedLevel", 1);
             int step = FirstStepOfLevel(legacyLevel);
             HighestUnlockedStep = step;
             return step;
         }
         private set
         {
-            PlayerPrefs.SetInt(StepKey, Mathf.Clamp(value, 0, JourneyMap.Steps.Length - 1));
-            PlayerPrefs.Save();
+            PlayerProfileStore.Active.highestUnlockedStep =
+                Mathf.Clamp(value, 0, JourneyMap.Steps.Length - 1);
+            PlayerProfileStore.Save();
         }
     }
 
     public static bool IsStepUnlocked(int stepIndex) => stepIndex <= HighestUnlockedStep;
 
-    // How well each scene has been done, keyed by scene name. Kept apart from
-    // the step count on purpose: progress is one number about the journey,
-    // while this is a verdict on each scene, and a child who goes back and
-    // does better should keep the better one without the journey moving.
-    private const string StarsKeyPrefix = "SALINLAHI_Stars_";
+    // How well each scene has been done, kept per scene on the profile.
+    // Apart from the step count on purpose: progress is one number about the
+    // journey, while this is a verdict on each scene, and a child who goes
+    // back and does better should keep the better one without the journey
+    // moving.
 
     /// <summary>The best a scene can be done. The summary panel rates out of this.</summary>
     public const int MaxStars = 5;
 
     /// <summary>Best rating a scene has been finished with, 0..MaxStars, 0 if never.</summary>
-    public static int StarsFor(string sceneName) =>
-        string.IsNullOrEmpty(sceneName) ? 0 : PlayerPrefs.GetInt(StarsKeyPrefix + sceneName, 0);
+    public static int StarsFor(string sceneName) => PlayerProfileStore.StarsFor(sceneName);
 
     /// <summary>
     /// The same rating in however many stars a screen has room for.
@@ -78,11 +79,7 @@ public static class LevelProgress
     /// </summary>
     public static void RecordStars(string sceneName, int stars)
     {
-        if (string.IsNullOrEmpty(sceneName)) return;
-        stars = Mathf.Clamp(stars, 0, MaxStars);
-        if (stars <= StarsFor(sceneName)) return;
-        PlayerPrefs.SetInt(StarsKeyPrefix + sceneName, stars);
-        PlayerPrefs.Save();
+        PlayerProfileStore.RecordStars(sceneName, Mathf.Clamp(stars, 0, MaxStars));
     }
 
     /// <summary>True once every step of this level has been passed.</summary>
@@ -102,6 +99,8 @@ public static class LevelProgress
     /// </summary>
     public static void MarkSceneComplete(string sceneName)
     {
+        PlayerProfileStore.MarkSceneComplete(sceneName);
+
         int index = JourneyMap.IndexOfScene(sceneName);
         if (index < 0)
         {

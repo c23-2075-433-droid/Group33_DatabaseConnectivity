@@ -175,6 +175,19 @@ public class SupabaseClient : MonoBehaviour
 
     private void ApplyHeaders(UnityWebRequest request)
     {
+        ApplyHeaders(request, config);
+    }
+
+    /// <summary>
+    /// The two headers every Supabase call needs, given a config.
+    ///
+    /// Static and public because LeaderboardClient talks to the same project
+    /// over the same REST API, and the sb_publishable_ lesson below is one
+    /// nobody should have to learn twice.
+    /// </summary>
+    public static void ApplyHeaders(UnityWebRequest request, SupabaseConfig config)
+    {
+        if (config == null) return;
         request.SetRequestHeader("apikey", config.anonKey);
 
         // Legacy "anon" keys are JWTs (they start with "eyJ"), and PostgREST

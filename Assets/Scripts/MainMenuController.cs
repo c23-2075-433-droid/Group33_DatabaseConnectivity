@@ -1,10 +1,21 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Wires up the Main Menu screen: nickname entry, Adventure/Settings/About
-/// buttons. Attached to the menu's Canvas by BuildMainMenuScene.cs.
+/// Wires up the Main Menu screen: nickname entry, Adventure/Mini Game/
+/// Settings/About buttons. Attached to the menu's Canvas by
+/// BuildMainMenuScene.cs.
+///
+/// The nickname is asked for once, on the first launch after the game is
+/// installed, and never again - a returning child's profile is loaded and
+/// ADVENTURE takes them straight to the journey. Changing it afterwards is
+/// the nickname holder's job, through CHANGE PROFILE (PlayerProfileMenu).
+///
+/// This screen still owns the one nickname dialog there is. AskForNickname()
+/// is how anything else borrows it, which is why there is no second name-entry
+/// screen anywhere in the project.
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
@@ -24,15 +35,20 @@ public class MainMenuController : MonoBehaviour
     public MenuBlurBackdrop menuBlur;
 
     [Header("Buttons")]
-    [Tooltip("ADVENTURE - the story levels. This is the old PLAY button renamed, " +
-              "so it still opens the nickname dialog and then the journey map.")]
+    [Tooltip("ADVENTURE - the story levels. Opens the journey map straight away; " +
+              "the nickname is asked for once, on the first launch after install.")]
     public Button adventureButton;
-    [Tooltip("MINI GAMES - drawn and clickable, but deliberately does nothing yet. " +
+    [Tooltip("MINI GAME - drawn and clickable, but deliberately does nothing yet. " +
               "There are no mini games to open, and a button that loads a stub " +
               "screen would be a worse lie than one that sits still.")]
     public Button miniGamesButton;
     public Button settingsButton;
     public Button aboutButton;
+
+    [Header("Player")]
+    [Tooltip("The nickname holder in the top-right corner. Repainted after a first-run " +
+              "name is given. Leave empty and the menu simply has no holder.")]
+    public PlayerProfileMenu profileMenu;
 
     [Header("Panels")]
     [Tooltip("Shown when Settings is pressed, hidden otherwise.")]
@@ -61,13 +77,6 @@ public class MainMenuController : MonoBehaviour
 
     void Start()
     {
-        // Pre-fill with the last-used nickname, if any, so returning players
-        // don't have to retype it every time.
-        if (nicknameInput != null)
-        {
-            nicknameInput.text = NicknameManager.Nickname;
-        }
-
         if (adventureButton != null) adventureButton.onClick.AddListener(OnAdventurePressed);
         // miniGamesButton is left unwired on purpose - see its tooltip.
         if (settingsButton != null) settingsButton.onClick.AddListener(OnSettingsPressed);
@@ -76,7 +85,7 @@ public class MainMenuController : MonoBehaviour
         if (aboutCloseButton != null) aboutCloseButton.onClick.AddListener(() => aboutPanel.SetActive(false));
 
         if (nicknameOkayButton != null) nicknameOkayButton.onClick.AddListener(OnNicknameConfirmed);
-        if (nicknameCancelButton != null) nicknameCancelButton.onClick.AddListener(CloseNicknameDialog);
+        if (nicknameCancelButton != null) nicknameCancelButton.onClick.AddListener(OnNicknameCancelled);
         // Enter also confirms. onEndEdit fires on focus loss too, so only treat
         // it as a submit when Enter was actually pressed.
         if (nicknameInput != null) nicknameInput.onEndEdit.AddListener(OnNicknameEndEdit);
@@ -92,6 +101,28 @@ public class MainMenuController : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
         if (nicknamePanel != null) nicknamePanel.SetActive(false);
+
+        AskOnFirstRun();
+    }
+
+    /// <summary>
+    /// A fresh install has no profile with a name on it, so the child is asked
+    /// for one here and the answer is saved. Every launch after that finds the
+    /// name already there and this does nothing - which is the whole point:
+    /// the question is asked once, not every time ADVENTURE is pressed.
+    ///
+    /// Backing out leaves the profile unnamed, so the question comes back next
+    /// launch rather than trapping a child who pressed the wrong plate.
+    /// </summary>
+    private void AskOnFirstRun()
+    {
+        if (NicknameManager.HasNickname) return;
+
+        AskForNickname("", typed =>
+        {
+            NicknameManager.SetNickname(typed);
+            if (profileMenu != null) profileMenu.Refresh();
+        });
     }
 
     /// <summary>
@@ -138,18 +169,40 @@ public class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// Adventure does not start the game directly - it opens the nickname
-    /// dialog first, so each play session is saved under a real player name
-    /// instead of NicknameManager's fallback. OKAY starts the game; CANCEL
-    /// backs out.
+    /// ADVENTURE starts the game. It used to open the nickname dialog first,
+    /// because the name was asked for once per play session; it is asked once
+    /// per install now, so there is nothing left to stop for.
     /// </summary>
     private void OnAdventurePressed()
     {
+        StartGame();
+    }
+
+    // ---- the one nickname dialog ----
+
+    private Action<string> nicknameAccepted;
+    private Action nicknameCancelled;
+
+    /// <summary>
+    /// Opens the nickname dialog on behalf of whoever asked, and calls back
+    /// once the name is settled. The same dialog, the same "already taken"
+    /// check and the same plates, whether it is a first-run player being asked
+    /// their name or the WHO ARE YOU? board renaming a profile.
+    ///
+    /// <paramref name="accepted"/> is handed the name that was typed - it does
+    /// NOT save it, because what the name is for differs by caller: one makes
+    /// a profile, another renames one.
+    /// </summary>
+    public void AskForNickname(string initial, Action<string> accepted, Action cancelled = null)
+    {
+        nicknameAccepted = accepted;
+        nicknameCancelled = cancelled;
+
         if (nicknamePanel == null)
         {
-            // No dialog wired up (e.g. an older scene) - keep the original
-            // behaviour rather than trapping the player on the menu.
-            StartGame();
+            // No dialog in this scene (an older one, say). Better to take the
+            // name as it stands than to leave the caller waiting forever.
+            Settle(ref nicknameAccepted, initial);
             return;
         }
 
@@ -163,6 +216,8 @@ public class MainMenuController : MonoBehaviour
 
         if (nicknameInput != null)
         {
+            nicknameInput.text = initial ?? "";
+            nicknameInput.caretPosition = nicknameInput.text.Length;
             nicknameInput.Select();
             nicknameInput.ActivateInputField();
         }
@@ -177,21 +232,38 @@ public class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// OKAY no longer starts the game outright. The name goes to
-    /// NicknameAvailability first, which calls back only once it is settled -
-    /// so a taken name leaves the dialog open with a free one filled in, and
-    /// the child presses OKAY again. With no checker wired, this is the
-    /// straight-through behaviour it always had.
+    /// OKAY does not accept the name outright. It goes to NicknameAvailability
+    /// first, which calls back only once it is settled - so a taken name
+    /// leaves the dialog open with a free one filled in, and the child presses
+    /// OKAY again. With no checker wired, this is the straight-through
+    /// behaviour it always had.
     /// </summary>
     private void OnNicknameConfirmed()
     {
         if (nicknameAvailability == null)
         {
-            StartGame();
+            AcceptNickname();
             return;
         }
 
-        nicknameAvailability.Check(nicknameInput != null ? nicknameInput.text : "", StartGame);
+        nicknameAvailability.Check(nicknameInput != null ? nicknameInput.text : "", AcceptNickname);
+    }
+
+    private void AcceptNickname()
+    {
+        string typed = nicknameInput != null ? nicknameInput.text : "";
+        CloseNicknameDialog();
+        nicknameCancelled = null;
+        Settle(ref nicknameAccepted, typed);
+    }
+
+    private void OnNicknameCancelled()
+    {
+        CloseNicknameDialog();
+        nicknameAccepted = null;
+        Action backedOut = nicknameCancelled;
+        nicknameCancelled = null;
+        backedOut?.Invoke();
     }
 
     private void CloseNicknameDialog()
@@ -200,12 +272,17 @@ public class MainMenuController : MonoBehaviour
         if (menuBlur != null) menuBlur.SetBlurred(false);
     }
 
+    /// <summary>Clears the callback before running it, so a handler that opens
+    /// the dialog again is not immediately answered by its own request.</summary>
+    private static void Settle(ref Action<string> callback, string value)
+    {
+        Action<string> settled = callback;
+        callback = null;
+        settled?.Invoke(value);
+    }
+
     private void StartGame()
     {
-        // Blank input is fine - NicknameManager falls back to a default name.
-        string nickname = nicknameInput != null ? nicknameInput.text : "";
-        NicknameManager.SetNickname(nickname);
-
         // A fresh run teaches every word from scratch. Without this, someone
         // who played a level, came back to the menu and started again would
         // only ever get the short reminders.
