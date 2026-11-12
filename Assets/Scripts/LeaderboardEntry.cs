@@ -53,6 +53,20 @@ public class LeaderboardSubmissionResult
     public string error;
 }
 
+/// <summary>
+/// The argument the leaderboard_rank() function is called with.
+///
+/// A type for one string looks like ceremony, and it is not: the body used to
+/// be built by concatenation, which quietly trusts the id to contain no quote,
+/// brace or backslash. JsonUtility escapes whatever it is given, so a
+/// hand-edited save file cannot write its own JSON into the request.
+/// </summary>
+[Serializable]
+public class LeaderboardRankRequest
+{
+    public string p_player_id;
+}
+
 /// <summary>One row from the leaderboard_rank() function.</summary>
 [Serializable]
 public class LeaderboardRank

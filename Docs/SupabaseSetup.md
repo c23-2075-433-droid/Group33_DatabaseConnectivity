@@ -49,6 +49,16 @@ create policy "anon can read scores"
 Note there is deliberately **no update or delete policy** — the game can only
 add and read records, never modify or erase existing ones.
 
+> **Superseded by the Activity 9 security review.** The two policies above are
+> what the Activity 5 demonstration needed, and they are wider than the feature
+> is: `with check (true)` lets the game's public key insert *any* row — a score
+> of −500, a nickname of fifty thousand characters — and the table-wide select
+> returned every column of every child's row. Run
+> `supabase/migrations/20261112_player_scores_hardening.sql` after the SQL
+> above. It adds bounds on every column the game writes and narrows `anon` to
+> the four columns the summary panel actually shows. See Part V of
+> `Docs/Activity9_Security.md`.
+
 ### Field reference (for Part III of the report)
 
 | Field Name | Data Type | Description |
@@ -145,6 +155,29 @@ below is. (With the CLI the same thing is `verify_jwt = false` under
 `[functions.submit-score]` in `supabase/config.toml`, or
 `supabase functions deploy submit-score --no-verify-jwt`.)
 
+**Set the publishable-key secret.** With JWT verification off, the platform
+checks nothing about who is calling, and this is a public URL: a request with
+no key at all reaches the function (Activity 9 test T15). The token design
+holds under that — a stranger cannot change a row they have no token for — but
+*registering* a new player needs no token by definition, so without a gate a
+stranger can put rows on a board that children read.
+
+So the function checks the game's own key itself. On the function's page open
+**Secrets** (Edge Functions → Secrets) and add:
+
+| Name | Value |
+|---|---|
+| `SALINLAHI_PUBLISHABLE_KEY` | the same `sb_publishable_…` key the game's config asset holds |
+
+This is a gate, not authentication: the key ships inside the APK and anyone who
+unpacks one can read it. What it stops is traffic that never had the app.
+
+While the secret is unset the gate stays open and writes `{"event":"gate-open"}`
+to the function log on every call, so deploying the code cannot lock the game
+out of its own leaderboard. Setting the secret switches the check on. **If the
+project's publishable key is ever rotated, this secret has to be updated in the
+same sitting**, or every submission is refused with `401`.
+
 To check it is live without putting a row on the board, use **Test** on the
 function's page with method `POST` and a deliberately bad id:
 
@@ -220,7 +253,9 @@ That's it — `SupabaseClient` reads from that asset at runtime.
 | Works in Editor, fails on Android | No internet on the device, or cleartext/HTTPS issue — Supabase is HTTPS so this is normally just connectivity |
 | Leaderboard says "not set up on this device" | No `SupabaseConfig.asset`, or its URL/key are blank |
 | Leaderboard opens empty | Nobody has finished a level yet, or the SQL in 2b has not been run |
-| Submissions return `401` | The platform's JWT check rejected the key — turn JWT verification off for `submit-score` (see 2b) |
+| Submissions return `401` | Either the platform's JWT check rejected the key — turn JWT verification off for `submit-score` (see 2b) — or the function's own gate did: `SALINLAHI_PUBLISHABLE_KEY` is set to a key the game is no longer sending |
+| Saves return `400` with a constraint name | Working as intended: the hardening migration refused a value outside what the game can produce. The constraint name says which |
+| Saves or the summary panel return `403 permission denied for column` | A query asked for a column `anon` was not granted after the hardening migration. The panel's query is `select=player_name,score,attempts,created_at` |
 | Submissions return `404` | The function is not deployed, or its name is not `submit-score` |
 | Submissions return `403` | The device's token does not own that `player_id`. Expected if the save file was copied between devices |
 | Submissions return `429` | Two submissions less than five seconds apart. Harmless; the next one lands |

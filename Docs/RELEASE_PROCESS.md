@@ -23,6 +23,8 @@ Develop on a branch
       ↓
 Pull request → review → merge into main
       ↓
+Security check   Docs/Activity9_Security.md, Part VII checklist
+      ↓
 Decide the new version number  (see "Numbering")
       ↓
 Update Player Settings > Version, and Android versionCode
@@ -44,6 +46,30 @@ Publish          GitHub release, with the zipped package attached
 
 Work lands on `main` through a pull request, as established in Activity 7.
 Nothing is released from a branch.
+
+### 2b. Security check
+
+Added by the Activity 9 security review, and it sits here on purpose: between
+the merge and the version bump, where there is still time to fix what it finds
+without unpicking a release.
+
+Run, from the repository root:
+
+```
+Tools/secret_scan.sh --tracked      # no credential in what is about to ship
+Tools/test_security_rules.sh        # the input-validation rules still hold
+```
+
+Then work down the ten-line checklist in Part VII of
+`Docs/Activity9_Security.md`. A release does not get built with an unanswered
+line on it.
+
+Install the pre-commit hook once per clone so the first of those two runs on
+every commit rather than only here:
+
+```
+git config core.hooksPath Tools/githooks
+```
 
 ### 3. Decide the version number
 

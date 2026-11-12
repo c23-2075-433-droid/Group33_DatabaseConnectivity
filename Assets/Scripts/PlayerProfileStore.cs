@@ -30,6 +30,15 @@ public static class PlayerProfileStore
     /// <summary>Slots on the WHO ARE YOU? board, before the "create new" row.</summary>
     public const int MaxProfiles = 3;
 
+    /// <summary>Longest nickname kept - NicknameRules.MaxLength, named here
+    /// because the profile board and the menu both ask the store.</summary>
+    public const int MaxNicknameLength = NicknameRules.MaxLength;
+
+    /// <summary>Most stars one scene can be worth - LevelProgress.MaxStars,
+    /// which is what awards them. Named here because this class is where a
+    /// figure read from the save file is checked against it.</summary>
+    public const int MaxStarsPerScene = LevelProgress.MaxStars;
+
     private const string FileName = "players.json";
     private const int CurrentVersion = 1;
 
@@ -192,6 +201,12 @@ public static class PlayerProfileStore
     public static bool RecordStars(string sceneName, int stars)
     {
         if (string.IsNullOrEmpty(sceneName)) return false;
+
+        // Clamped here as well as in LevelProgress, which is the only caller
+        // today. A public method that writes to the save file should not be
+        // relying on its callers to have checked.
+        stars = stars < 0 ? 0 : (stars > MaxStarsPerScene ? MaxStarsPerScene : stars);
+
         PlayerProfile profile = Active;
         foreach (SceneStars entry in profile.sceneStars)
         {
@@ -320,15 +335,40 @@ public static class PlayerProfileStore
         Migrate();
     }
 
-    /// <summary>Fills in anything an older or hand-edited file left out, so the
-    /// rest of this class never has to test a list for null.</summary>
+    /// <summary>
+    /// Fills in anything an older or hand-edited file left out, so the rest of
+    /// this class never has to test a list for null.
+    ///
+    /// "Hand-edited" is the word that matters. This file is plain JSON in the
+    /// app's storage, so everything read from it is input and is treated as
+    /// input: an id that is not a UUID is replaced rather than carried into a
+    /// request, and a nickname is put through the same cleaning as one that was
+    /// just typed.
+    /// </summary>
     private static void Repair()
     {
         if (book.players == null) book.players = new List<PlayerProfile>();
         foreach (PlayerProfile p in book.players)
         {
-            if (string.IsNullOrEmpty(p.playerId)) p.playerId = Guid.NewGuid().ToString();
-            if (p.nickname == null) p.nickname = "";
+            // A missing id gets one; so does an id of the wrong shape. The
+            // replacement cannot cost a leaderboard row, because a row can
+            // only ever have been registered under a real UUID - the function
+            // refuses anything else - so the token alongside it was never
+            // valid either and goes with it.
+            if (!PlayerProfile.IsValidId(p.playerId))
+            {
+                if (!string.IsNullOrEmpty(p.playerId))
+                {
+                    Debug.LogWarning("PlayerProfileStore: a profile's id was not a UUID; " +
+                                      "giving it a new one.");
+                    p.leaderboardToken = "";
+                    p.syncedPoints = -1;
+                    p.syncedStars = -1;
+                    p.syncedNickname = "";
+                }
+                p.playerId = Guid.NewGuid().ToString();
+            }
+            p.nickname = Clean(p.nickname);
             if (p.completedScenes == null) p.completedScenes = new List<string>();
             if (p.sceneStars == null) p.sceneStars = new List<SceneStars>();
             if (p.wordsLearned == null) p.wordsLearned = new List<string>();
@@ -336,6 +376,19 @@ public static class PlayerProfileStore
             if (p.almanacEntries == null) p.almanacEntries = new List<string>();
             if (p.leaderboardToken == null) p.leaderboardToken = "";
             if (p.syncedNickname == null) p.syncedNickname = "";
+
+            // Totals are counts of things that happened. A negative one is not
+            // a small save-file error to pass along: it is what a tampered file
+            // looks like, and it would be submitted to the board as fact.
+            if (p.totalPoints < 0) p.totalPoints = 0;
+            if (p.sceneStars != null)
+            {
+                foreach (SceneStars entry in p.sceneStars)
+                {
+                    if (entry.stars < 0) entry.stars = 0;
+                    if (entry.stars > MaxStarsPerScene) entry.stars = MaxStarsPerScene;
+                }
+            }
         }
     }
 
@@ -392,8 +445,17 @@ public static class PlayerProfileStore
                    ", " + profile.sceneStars.Count + " scene(s) rated.");
     }
 
-    private static string Clean(string nickname) =>
-        string.IsNullOrWhiteSpace(nickname) ? "" : nickname.Trim();
+    /// <summary>
+    /// A nickname reduced to what the game will actually keep: no control
+    /// characters, no runs of whitespace, and no longer than the input field
+    /// allows. The rules live in NicknameRules, which is also where the test
+    /// in Tools/test_security_rules.sh asserts against them, and they are the
+    /// same three the submit-score function applies server-side.
+    ///
+    /// Applied to a name read from the save file as well as to one just typed.
+    /// The file is input too.
+    /// </summary>
+    private static string Clean(string nickname) => NicknameRules.Clean(nickname);
 
     private static string Now() =>
         DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");

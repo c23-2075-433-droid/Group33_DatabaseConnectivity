@@ -114,6 +114,24 @@ public class PlayerProfile
     {
         return string.IsNullOrWhiteSpace(nickname) ? NicknameManager.DefaultNickname : nickname;
     }
+
+    /// <summary>
+    /// True when this looks like the UUID the game made, and not something
+    /// else that ended up in the save file.
+    ///
+    /// The id is written by Create() and never typed, so in ordinary play this
+    /// is always true. It is checked anyway because the file it is read from is
+    /// ordinary JSON on the device and can be hand-edited: the save file is
+    /// input, not something the game knows. Everything the id is then used for
+    /// - the row the leaderboard keys on, the argument the rank function is
+    /// asked for - is better off refusing a value of the wrong shape than
+    /// passing it on and finding out what the other end does with it.
+    /// </summary>
+    public bool HasValidId() => IsValidId(playerId);
+
+    /// <summary>The UUID shape Create() writes: 8-4-4-4-12 hex digits.
+    /// NicknameRules holds the check so a test can run it without Unity.</summary>
+    public static bool IsValidId(string id) => NicknameRules.IsValidPlayerId(id);
 }
 
 /// <summary>One scene's best star rating. A pair, because JsonUtility cannot

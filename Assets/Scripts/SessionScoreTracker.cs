@@ -186,7 +186,12 @@ public class SessionScoreTracker : MonoBehaviour
         {
             if (!success)
             {
-                SetText(recordsText, "Could not save result.\n" + error);
+                // The reason is in the log, not on the panel: see
+                // SupabaseClient.Log. What a child needs to know is that the
+                // run still counted, which it did - RecordRun() above saved it
+                // to this device before the network was ever involved.
+                SetText(recordsText, "Your result is saved on this device.\n" +
+                                      "We will send it when you are online.");
                 return;
             }
             FetchAndDisplayRecords();
@@ -203,7 +208,7 @@ public class SessionScoreTracker : MonoBehaviour
         {
             if (error != null)
             {
-                SetText(recordsText, "Saved, but could not load recent scores.\n" + error);
+                SetText(recordsText, "Saved! Recent scores could not be loaded right now.");
                 return;
             }
             SetText(recordsText, FormatRecords(records));

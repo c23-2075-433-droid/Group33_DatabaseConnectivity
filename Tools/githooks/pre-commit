@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs Tools/secret_scan.sh over the staged change before every commit.
+# Install once per clone:  git config core.hooksPath Tools/githooks
+exec "$(git rev-parse --show-toplevel)/Tools/secret_scan.sh" --staged

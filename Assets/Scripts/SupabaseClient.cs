@@ -15,6 +15,13 @@ using UnityEngine.Networking;
 ///
 /// Credentials come from a git-ignored SupabaseConfig asset, never from
 /// hardcoded strings - see SupabaseConfig.cs.
+///
+/// Two kinds of message come out of here, and they are not the same kind. The
+/// string handed to a callback is for a child to read: it says a save did not
+/// work, and nothing about why. The response code, the transport error and the
+/// body Supabase sent back go to the log, where a developer with the device in
+/// front of them can read them. A panel in a classroom is not the place to
+/// print which endpoint answered 401 and what it said about the key.
 /// </summary>
 public class SupabaseClient : MonoBehaviour
 {
@@ -93,14 +100,15 @@ public class SupabaseClient : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                string msg = "Save failed (" + request.responseCode + "): " + request.error +
-                              " | " + request.downloadHandler.text;
-                Debug.LogError("SupabaseClient: " + msg);
-                onDone?.Invoke(false, msg);
+                Log("Save failed", request);
+                onDone?.Invoke(false, "Could not save your result right now.");
             }
             else
             {
-                Debug.Log("SupabaseClient: saved record -> " + request.downloadHandler.text);
+                // The row that came back is not logged. It is this child's
+                // name and score, and the log is the one place it would be
+                // written outside the app's own storage.
+                Debug.Log("SupabaseClient: result saved.");
                 onDone?.Invoke(true, null);
             }
         }
@@ -109,7 +117,15 @@ public class SupabaseClient : MonoBehaviour
     private IEnumerator FetchRoutine(int limit, Action<List<ScoreRecord>, string> onDone)
     {
         // PostgREST query: newest first, capped to `limit` rows.
-        string url = config.TableEndpoint + "?select=*&order=created_at.desc&limit=" + Mathf.Max(1, limit);
+        //
+        // The columns are named rather than "*". The panel shows a name, a
+        // score out of the attempts made and a date, so that is what is asked
+        // for; player_id and level are not shown and are not fetched. A
+        // request that cannot ask for a column cannot leak it, and this list is
+        // also the honest statement of what one child is shown about another.
+        string url = config.TableEndpoint +
+                      "?select=player_name,score,attempts,created_at" +
+                      "&order=created_at.desc&limit=" + Mathf.Max(1, limit);
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
@@ -119,10 +135,8 @@ public class SupabaseClient : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                string msg = "Fetch failed (" + request.responseCode + "): " + request.error +
-                              " | " + request.downloadHandler.text;
-                Debug.LogError("SupabaseClient: " + msg);
-                onDone?.Invoke(null, msg);
+                Log("Fetch failed", request);
+                onDone?.Invoke(null, "Could not load recent scores right now.");
                 yield break;
             }
 
@@ -152,10 +166,8 @@ public class SupabaseClient : MonoBehaviour
             {
                 // A warning, not an error: the caller lets the player through
                 // when this fails, so it is not a broken game.
-                string msg = "Name lookup failed (" + request.responseCode + "): " + request.error +
-                              " | " + request.downloadHandler.text;
-                Debug.LogWarning("SupabaseClient: " + msg);
-                onDone?.Invoke(null, msg);
+                Log("Name lookup failed", request);
+                onDone?.Invoke(null, "Could not check that name right now.");
                 yield break;
             }
 
@@ -168,7 +180,7 @@ public class SupabaseClient : MonoBehaviour
                 if (!string.IsNullOrEmpty(row.player_name)) names.Add(row.player_name);
             }
 
-            Debug.Log("SupabaseClient: " + names.Count + " existing name(s) begin with \"" + stem + "\".");
+            Debug.Log("SupabaseClient: " + names.Count + " existing name(s) match that stem.");
             onDone?.Invoke(names, null);
         }
     }
@@ -176,6 +188,22 @@ public class SupabaseClient : MonoBehaviour
     private void ApplyHeaders(UnityWebRequest request)
     {
         ApplyHeaders(request, config);
+    }
+
+    /// <summary>
+    /// Writes what actually went wrong to the log, and only to the log: the
+    /// status code, the transport error and the body Supabase replied with.
+    ///
+    /// None of this reaches a callback, because every callback here ends up on
+    /// a panel in front of a child. A 401 with a key hint in it, or a Postgres
+    /// message naming a column and a constraint, tells an attacker where to
+    /// push and tells a six-year-old nothing at all.
+    /// </summary>
+    private static void Log(string what, UnityWebRequest request)
+    {
+        Debug.LogWarning("SupabaseClient: " + what + " (" + request.responseCode + "): " +
+                          request.error + " | " +
+                          (request.downloadHandler != null ? request.downloadHandler.text : ""));
     }
 
     /// <summary>

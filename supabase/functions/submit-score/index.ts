@@ -35,6 +35,11 @@
 // one does: the platform's check was never what protected a row. The token
 // below is.
 //
+// Turning that setting off means the platform checks nothing, so this function
+// also checks the game's own publishable key itself - see keyAccepted(). That
+// is a gate against traffic that never had the app, not authentication: the key
+// ships inside the APK. The token above is still what owns a row.
+//
 // The service key exists only here, on the server. It is never in Unity,
 // never in the repository and never in a build.
 
@@ -72,8 +77,29 @@ const json = (body: unknown, status = 200) =>
     headers: { "Content-Type": "application/json" },
   });
 
-const refuse = (reason: string, status = 400) =>
-  json({ ok: false, error: reason }, status);
+const refuse = (reason: string, status = 400) => {
+  // Every refusal is written to the function's log before it is sent.
+  //
+  // Nothing watched this before, which meant a flood of forged submissions and
+  // an ordinary afternoon looked exactly alike from outside: both were silence.
+  // These lines are what make a pattern visible in the Supabase dashboard's
+  // function logs - a hundred "token does not own this player" in a minute is
+  // somebody working through player ids, and it should be possible to see that.
+  //
+  // What is logged is the reason and the status, never the token and never the
+  // nickname. A player id is logged as its first eight characters: enough to
+  // tell repeated attempts on one row from attempts spread across many,
+  // without writing children's identifiers into a log in full.
+  console.warn(JSON.stringify({ event: "refused", status, reason }));
+  return json({ ok: false, error: reason }, status);
+};
+
+/** A player id, shortened for the log. Enough to group by, not enough to use. */
+const shortId = (id: string) => (id.length >= 8 ? id.slice(0, 8) + "…" : "?");
+
+/** Something worth seeing in the log that is not a refusal. */
+const note = (event: string, fields: Record<string, unknown> = {}) =>
+  console.log(JSON.stringify({ event, ...fields }));
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -120,10 +146,46 @@ function wholeNumber(value: unknown, ceiling: number): number | null {
   return value;
 }
 
+/**
+ * Whether this request carries the game's own publishable key.
+ *
+ * Turning off "Verify JWT with legacy secret" is what lets a project on
+ * sb_publishable_ keys call this function at all (see the note at the top), and
+ * the cost of it is that the platform then checks nothing: the endpoint answers
+ * anybody on the internet. The token design holds up under that - a stranger
+ * cannot change a row they have no token for, and the live tests in
+ * Docs/Activity9_Security.md show it refusing exactly that - but the
+ * registration branch below needs no token by definition, so with no gate at
+ * all a stranger can put rows on a board that children read.
+ *
+ * So the key the game sends is checked here. It is a gate and not
+ * authentication, and the difference matters: the key ships inside the APK and
+ * anyone who unpacks one can read it. What it stops is unauthenticated traffic
+ * that never had the app - which is what arrives at a public URL.
+ *
+ * Set it as a function secret named SALINLAHI_PUBLISHABLE_KEY (Edge Functions →
+ * Secrets in the dashboard). While it is unset the gate is open and says so in
+ * the log, so deploying this code cannot lock the game out of its own
+ * leaderboard; setting the secret is what switches the check on.
+ */
+function keyAccepted(request: Request): boolean {
+  const expected = Deno.env.get("SALINLAHI_PUBLISHABLE_KEY");
+  if (!expected) {
+    note("gate-open", {
+      detail: "SALINLAHI_PUBLISHABLE_KEY is not set; the key is not being checked.",
+    });
+    return true;
+  }
+  const sent = request.headers.get("apikey") ??
+    (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
+  return sameSecret(sent, expected);
+}
+
 // -------------------------------------------------------------------- entry
 
 Deno.serve(async (request: Request) => {
   if (request.method !== "POST") return refuse("Use POST.", 405);
+  if (!keyAccepted(request)) return refuse("This request did not come from the game.", 401);
 
   let body: Record<string, unknown>;
   try {
@@ -186,6 +248,9 @@ Deno.serve(async (request: Request) => {
       return refuse("Could not register this player.", 500);
     }
 
+    // A registration is the one write that needs no token, so it is the one
+    // worth being able to count afterwards.
+    note("registered", { player: shortId(playerId), points, stars });
     return json({ ok: true, token: issued, rank: await rankOf(db, playerId) });
   }
 
@@ -204,7 +269,15 @@ Deno.serve(async (request: Request) => {
 
   if (currentError || !current) return refuse("Could not read the current score.", 500);
 
+  // An unparseable timestamp is not a reason to wave a submission through:
+  // without a readable "last updated" there is no window to measure, and the
+  // rate limit is the only thing standing between one row and a tight loop.
+  // Postgres always answers with an ISO timestamp, so this is the branch that
+  // should never run - which is exactly why it should not silently allow.
   const since = (Date.now() - Date.parse(current.updated_at)) / 1000;
+  if (!Number.isFinite(since)) {
+    return refuse("Could not read when this score was last saved.", 500);
+  }
   if (since < MIN_SECONDS_BETWEEN_UPDATES) {
     return refuse("Too many updates. Try again in a moment.", 429);
   }
@@ -231,6 +304,12 @@ Deno.serve(async (request: Request) => {
 
   if (updateError) return refuse("Could not save the score.", 500);
 
+  note("updated", {
+    player: shortId(playerId),
+    points: nextPoints,
+    stars: nextStars,
+    gained: nextPoints - current.total_points,
+  });
   return json({ ok: true, rank: await rankOf(db, playerId) });
 });
 
