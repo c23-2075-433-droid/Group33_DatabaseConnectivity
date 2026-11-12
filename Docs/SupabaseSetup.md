@@ -108,21 +108,36 @@ Row Level Security:
 ### Deploy the Edge Function
 
 `supabase/functions/submit-score/index.ts` is what validates and stores a
-submission. With the [Supabase CLI](https://supabase.com/docs/guides/cli):
+submission. No CLI needed — the dashboard can do it:
 
-```bash
-supabase functions deploy submit-score --no-verify-jwt
-```
+1. **Edge Functions** in the left sidebar.
+2. **Deploy a new function** → **Via Editor**.
+3. Name it **`submit-score`**. The name has to match, because it is what the
+   game's `SupabaseConfig.submitScoreFunction` points at.
+4. Replace the editor's contents with the whole of `index.ts` from this
+   repository.
+5. **Deploy function** at the bottom. It takes 10–30 seconds.
 
-`--no-verify-jwt` matters: the game sends the project's publishable key, which
-is not a JWT, so the platform's own JWT check would reject every call. The
-function does its own checking instead — see below. It reads `SUPABASE_URL` and
-`SUPABASE_SERVICE_ROLE_KEY` from the Edge runtime's own environment, so **the
-service-role key is never in Unity, never in the repository and never in a
-build**. Nothing needs to be pasted anywhere for this to work.
+It needs nothing configured afterwards. `SUPABASE_URL` and the key that may
+write are both set by the Edge runtime on their own, and the function reads
+whichever key scheme the project is on — `SUPABASE_SERVICE_ROLE_KEY` on older
+projects, the `default` entry of `SUPABASE_SECRET_KEYS` on newer ones. **The
+service key is never in Unity, never in the repository and never in a build.**
 
-(The same file can be pasted into **Edge Functions → Deploy a new function** in
-the dashboard if you would rather not install the CLI. Turn "Verify JWT" off.)
+JWT verification can be left at its default. The platform accepts the
+project's publishable or anon key on the `apikey` header, which is what the
+game sends, and the token described below is what actually decides whether a
+row may be changed — none of the function's own checks ever relied on the
+platform's. If a call does come back `401`, turn verification off for this one
+function: in the dashboard's settings for it, or with `verify_jwt = false`
+under `[functions.submit-score]` in `supabase/config.toml` if you are using
+the CLI (`supabase functions deploy submit-score --no-verify-jwt`).
+
+To check it is live, use **Test** on the function's page: method `POST`, body
+`{"player_id":"00000000-0000-0000-0000-000000000000","nickname":"test",`
+`"total_points":0,"total_stars":0,"token":""}`. A reply of
+`{"ok":true,"token":"…"}` means it works — delete that test row from
+`leaderboard` afterwards.
 
 ### How a player is identified, and what that is worth
 
@@ -179,7 +194,8 @@ That's it — `SupabaseClient` reads from that asset at runtime.
 | Works in Editor, fails on Android | No internet on the device, or cleartext/HTTPS issue — Supabase is HTTPS so this is normally just connectivity |
 | Leaderboard says "not set up on this device" | No `SupabaseConfig.asset`, or its URL/key are blank |
 | Leaderboard opens empty | Nobody has finished a level yet, or the SQL in 2b has not been run |
-| Submissions return `401` | The function was deployed with JWT verification on — redeploy with `--no-verify-jwt` |
+| Submissions return `401` | The platform's JWT check rejected the key — turn JWT verification off for `submit-score` (see 2b) |
+| Submissions return `404` | The function is not deployed, or its name is not `submit-score` |
 | Submissions return `403` | The device's token does not own that `player_id`. Expected if the save file was copied between devices |
 | Submissions return `429` | Two submissions less than five seconds apart. Harmless; the next one lands |
 | Scores never reach the board | Open the main menu while online — that is when a pending submission is retried |

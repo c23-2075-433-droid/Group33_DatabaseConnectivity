@@ -23,16 +23,20 @@
 //   few milliseconds. That bounds what a forged submission is worth without
 //   pretending to a certainty that is not available.
 //
-// Deploy with JWT verification off - the game sends the project's publishable
-// key, which is not a JWT, and the token above is what actually guards a row:
+// Deploying: the dashboard's editor is enough, and nothing about this
+// function needs JWT verification turned off. The platform accepts the
+// project's publishable or anon key on the apikey header, which is what the
+// game sends; it is the token below, not that header, that decides whether a
+// row may be changed. If a deployment ever does answer 401, turn verification
+// off for this one function - in the dashboard's settings for it, or with
+// `verify_jwt = false` under [functions.submit-score] in supabase/config.toml
+// - and nothing here changes, because none of the checks below ever relied on
+// the platform's.
 //
-//   supabase functions deploy submit-score --no-verify-jwt
-//
-// SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by the Edge runtime.
-// The service-role key exists only here, on the server. It is never in Unity,
+// The service key exists only here, on the server. It is never in Unity,
 // never in the repository and never in a build.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 // ----------------------------------------------------------------- limits
 
@@ -139,11 +143,9 @@ Deno.serve(async (request: Request) => {
 
   const token = typeof body.token === "string" ? body.token : "";
 
-  const db = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    { auth: { persistSession: false } },
-  );
+  const db = createClient(Deno.env.get("SUPABASE_URL")!, serviceKey(), {
+    auth: { persistSession: false },
+  });
 
   const { data: owner, error: ownerError } = await db
     .from("leaderboard_owner")
@@ -229,6 +231,25 @@ Deno.serve(async (request: Request) => {
 
   return json({ ok: true, rank: await rankOf(db, playerId) });
 });
+
+/**
+ * The key that may write this table, from whichever scheme the project is on.
+ *
+ * Both are set by the Edge runtime with nothing to configure. Newer projects
+ * carry SUPABASE_SECRET_KEYS, a JSON dictionary whose "default" entry is the
+ * one that bypasses RLS; older ones carry SUPABASE_SERVICE_ROLE_KEY as a
+ * plain string. Reading both means this function does not care which kind of
+ * project it is deployed to.
+ */
+function serviceKey(): string {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+  try {
+    return JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}")["default"] ?? "";
+  } catch {
+    return "";
+  }
+}
 
 /** Where this player now stands. A failure here is not worth refusing over. */
 async function rankOf(
