@@ -33,6 +33,8 @@
 //   walk_frame_1..4_uniform_with_bag, talking_uniform_with_bag,
 //   ui_arrow, ui_word_badge, badge_paaralan
 //   paaralan_gate_background_closed, char_guard_idle   (optional, see above)
+//   paaralan_gate_frame_1..3 - the gate part-open, cut from the two above by
+//                              Tools/make_gate_frames.py
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
@@ -125,10 +127,38 @@ public class BuildPaaralanScene1
             bg.transform.localScale = new Vector3(s, s, 1f);
         }
 
-        SpriteSwap gateSwap = bg.AddComponent<SpriteSwap>();
-        gateSwap.target = bgSr;
-        gateSwap.beforeSprite = gateShut;
-        gateSwap.afterSprite = gateOpen;
+        // --- The gate SWINGS, rather than being replaced ---
+        //
+        // It used to be a SpriteSwap: shut in one frame, open in the next,
+        // with nothing in between. Three in-between backgrounds now sit
+        // between them, made by Tools/make_gate_frames.py.
+        //
+        // They cost no new art. The two backgrounds were generated
+        // separately, so 18% of their pixels differ and they look like two
+        // pictures - but differencing them shows the strong differences are
+        // confined to the gate panels, cols 476..1302, and everything else
+        // differs only along thin edges, which is registration noise. It is
+        // the same scene, so the panels can be cut from the shut one and
+        // squashed towards their hinges over the open one. A panel swinging
+        // away from the camera foreshortens towards its hinge, so that IS
+        // the movement, and whatever it stops covering is the courtyard,
+        // already painted behind it.
+        //
+        // The run ends on the open background itself, which is where the
+        // scene already expected to be.
+        PoseSequence gateFrames = bg.AddComponent<PoseSequence>();
+        gateFrames.target = bgSr;
+        gateFrames.frames = new[]
+        {
+            LoadSpriteOptional("paaralan_gate_frame_1"),
+            LoadSpriteOptional("paaralan_gate_frame_2"),
+            LoadSpriteOptional("paaralan_gate_frame_3"),
+        };
+        gateFrames.destinationSprite = gateOpen;
+        // Slower than a character's frames. A gate this size is heavy, and
+        // three frames at 11fps would be a flicker rather than a swing.
+        gateFrames.framesPerSecond = 6f;
+        gateFrames.playOnEnable = false;
 
         // --- The guard on the gate ---
         // Bati needs someone to greet. Without him the child is told to
@@ -206,6 +236,11 @@ public class BuildPaaralanScene1
         entrance.transform.position = new Vector3(SchoolEntranceX, FloorY, 0f);
         player.walkTarget = entrance.transform;
         player.walkTargetThreshold = 0.35f;
+
+        // He is never completely still while the scene waits for a word.
+        // This is the idle state the brief asks for: no walking until the
+        // player speaks, but not a frozen picture either.
+        playerGO.AddComponent<IdleBreath>();
 
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
@@ -387,7 +422,7 @@ public class BuildPaaralanScene1
         // together without a second pose for him to be drawn in.
         var bukas = MakeObjective("Bukas", pBukas);
         UnityEventTools.AddPersistentListener(bukas.onCorrect, guardGleam.Play);
-        UnityEventTools.AddPersistentListener(bukas.onCorrect, gateSwap.Apply);
+        UnityEventTools.AddPersistentListener(bukas.onCorrect, gateFrames.Play);
         UnityEventTools.AddPersistentListener(bukas.onCorrect, gateGleam.Play);
 
         // Both of them move: Kylo turns to wave, and the guard waves back.
