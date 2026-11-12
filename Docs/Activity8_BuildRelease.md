@@ -161,20 +161,21 @@ a complete capstone and its version should not claim to be.
 
 ## Part IV. Release Readiness Check
 
-Checked against commit `0bec1d1` on `main` before the build was started.
+Checked against commit `c035c8f` on `main`, the commit the released APK was
+built from.
 
 | Release Check | Status | Evidence / Remarks |
 |---|---|---|
-| Required changes have been reviewed | Pass | The features in this release reached `main` through pull requests — 15 `Merge pull request` commits, the practice the group adopted on 30 October and documented in Activity 7. Recorded honestly: the two release-engineering commits in this activity (`b1c56b1`, `0bec1d1`) were made on branch `claude/capstone-build-release-3ef55d` and fast-forwarded into `main` by the member performing the release, not reviewed by a second member first. |
-| Accepted changes are integrated | Pass | Built from `main` at `0bec1d1`, not from a personal copy. `git status` on the build checkout was empty. |
-| Correct source version is being used | Pass | `BUILD_INFO.txt` records commit `0bec1d1869bf5ce16ecb03ab293f13b132b20a7c` and "Working tree: clean", written by the build itself from `git rev-parse HEAD` rather than typed in. |
+| Required changes have been reviewed | Pass | The features in this release reached `main` through pull requests — 15 `Merge pull request` commits, the practice the group adopted on 30 October and documented in Activity 7. Recorded honestly: the release-engineering commits in this activity (`b1c56b1` through `c035c8f`) were made on branch `claude/capstone-build-release-3ef55d` and fast-forwarded into `main` by the member performing the release, not reviewed by a second member first. |
+| Accepted changes are integrated | Pass | Built from `main` at `c035c8f`, not from a personal copy. `git status` on the build checkout was empty. |
+| Correct source version is being used | Pass | `BUILD_INFO.txt` records commit `c035c8f240b880f786402483bc59fff7612bbe17` and "Working tree: clean", written by the build itself from `git rev-parse HEAD` rather than typed in. |
 | Project opens without critical errors | Pass | `Assets/Scripts` and `Assets/Editor` compiled with Roslyn under `-warnaserror+`: zero errors, zero warnings. The batchmode run then opened the project and completed with no error in the log. |
 | Required scenes/modules are included | Pass | 17 scenes enabled and listed individually in `BUILD_INFO.txt`: MainMenu, LevelSelect and all 15 chapter scenes. `Assets/MainScene.unity`, an early prototype, is correctly disabled. The order in Build Settings does not follow chapter order, which is cosmetic — every scene is loaded by name (`SceneManager.LoadScene(sceneName)`), never by build index. |
 | Database/configuration is correct for testing | Pass | `Assets/Resources/SupabaseConfig.asset` is present in the build checkout, holding the project URL and an `sb_publishable_` key. The asset is gitignored and exists only in the main checkout, which is why the release was built there. Both scene references to it survived the menu rebuild. |
 | Temporary/debug content is reviewed | Pass | `EditorUserBuildSettings.development` is set to `false` by the build script. The Enter-key voice stand-in is inside `#if UNITY_EDITOR` and is therefore absent from the APK. The inert MINI GAME button is left in place and documented as a known issue rather than hidden. |
 | Target platform is selected correctly | Pass | `aapt dump badging` reports `native-code: 'arm64-v8a'`, `sdkVersion:'26'`, `targetSdkVersion:'36'`, and the permissions `RECORD_AUDIO` and `INTERNET` — the two the game cannot work without. |
 | Version number is updated | Pass | Player Settings version raised from Unity's default `1.0` to `0.1.0`, and Android version code from 1 to 2. `aapt` confirms `versionName='0.1.0' versionCode='2'` in the artifact. |
-| Build can be produced successfully | Pass | Completed in 35.6 seconds, producing a 151.3 MB APK, exit code 0, no errors in the log. |
+| Build can be produced successfully | Pass | Completed in 13.1 seconds, producing a 151.3 MB APK, with no errors. Reproduced twice from the same entry point — once headless from the command line and once from the editor menu item — which is the point of having one. |
 
 ### Two defects this check caught before the build
 
@@ -233,13 +234,30 @@ enabled scenes, or missing release notes for that version each stop it before
 the build begins rather than after half an hour of compiling, or — worse — at
 the moment someone else is handed the package.
 
-### Build log
+### Build record
+
+The build writes this itself, into `BUILD_INFO.txt` beside the artifact. It is
+not transcribed by hand, which is the only reason it can be trusted:
 
 ```
-[SALINLAHI] Building SALINLAHI-v0.1.0.apk from 17 scenes ->
-  /Users/sugardaquis/Documents/SALINLAHI/Build/Release/SALINLAHI-v0.1.0/SALINLAHI-v0.1.0.apk
-[SALINLAHI] Build succeeded in 00:00:35.6391270.
+Version            : 0.1.0
+Android versionCode: 2
+Package id         : ph.edu.uphsl.group33.salinlahi
+Artifact           : SALINLAHI-v0.1.0.apk
+Artifact size      : 151.3 MB
+Built (UTC)        : 2026-11-12 13:15:42
+Build time         : 00:00:13.1378490
+Unity              : 6000.6.2f1
+
+Source
+------
+Commit             : c035c8f240b880f786402483bc59fff7612bbe17
+Short commit       : c035c8f
+Branch             : main
+Working tree       : clean - this APK is reproducible from the commit above
 ```
+
+It then lists all 17 scenes that went into the build, in build order.
 
 ### The release folder
 
@@ -296,7 +314,37 @@ Android phone. Not the editor: as explained in Part I, pressing Play in Unity
 cannot exercise this game's main feature at all, because the speech plugin does
 not exist on desktop.
 
-<!-- RESULTS PENDING -->
+The APK was installed from the release package onto an Android phone and run
+through the checks below. **The result columns are left blank until the device
+run is done** — they are filled in from what the phone actually does, not
+written in advance.
+
+| Release Test | Expected Result | Actual Result | Status |
+|---|---|---|---|
+| Application launches | The main menu appears | | |
+| Version is identifiable | SETTINGS > ABOUT reads `v0.1.0` under the title | | |
+| Microphone permission | Android asks once; the game listens after it is allowed | | |
+| Main feature works | Saying *Bangon* in Bahay 1 is accepted and Kylo gets up | | |
+| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | | |
+| Required assets load | Backgrounds, characters, music and narration all present | | |
+| Scene summary works | The summary panel shows the score, stars and words learned | | |
+| Leaderboard works | A finished scene's total appears on the board | | |
+| Save/load works | A player profile survives closing and reopening the app | | |
+| Application closes normally | The app exits without hanging or crashing | | |
+
+A failed row is recorded as failed and moved into Known Issues, or it stops the
+release. It is never left to look like a pass.
+
+### Why this cannot be done in the editor
+
+Worth stating plainly, because it is the reason this part matters more for this
+project than for most. The speech plugin does not exist on desktop, so
+`VoiceCommand.cs` substitutes the **Enter** key in the editor
+(`#if UNITY_EDITOR`, lines 177–228) to stand in for saying the word the scene
+is asking for. That block is compiled out of the APK.
+
+A developer pressing Play has therefore never once exercised the mechanic the
+game is built on. Rows 3, 4 and 5 above can only be tested on a phone.
 
 ---
 
@@ -312,7 +360,7 @@ not exist on desktop.
 
 **Release Type:** Development milestone — a testing build, not a stable release
 
-**Source Version / Branch:** `main`, tag `v0.1.0`, commit `0bec1d1`
+**Source Version / Branch:** `main`, tag `v0.1.0`, commit `c035c8f`
 
 The full notes ship inside the package as `RELEASE_NOTES.txt` and are kept in
 the repository at `Docs/release/v0.1.0/RELEASE_NOTES.txt`. In summary:
@@ -351,7 +399,7 @@ Version number        0.1.0
       ↓
 Tag                   v0.1.0
       ↓
-Commit                0bec1d1869bf5ce16ecb03ab293f13b132b20a7c
+Commit                c035c8f240b880f786402483bc59fff7612bbe17
       ↓
 Branch                main
 ```
@@ -376,7 +424,7 @@ git checkout v0.1.0
 
 **Tag:** `v0.1.0`
 
-**Commit:** `0bec1d1869bf5ce16ecb03ab293f13b132b20a7c`
+**Commit:** `c035c8f240b880f786402483bc59fff7612bbe17`
 
 **Repository statistics at release:** 252 commits, from 3 October to 12
 November 2026, by three authors — `c23-2075-433-droid` (Daquis, 201),
@@ -472,7 +520,7 @@ version update, packaging, and the bug fixing required for release readiness.
 - **Version identification.** Raised Player Settings from Unity's default `1.0` to `0.1.0` and the Android version code from 1 to 2, and made the build state its own version on the About screen. Wrote `Assets/Scripts/VersionLabel.cs` to read `Application.version` at run time rather than baking a string into the generated menu scene, so the screen and the artifact cannot drift apart.
 - **The build entry point.** Wrote `Assets/Editor/ReleaseBuild.cs`, the single way this project now produces a release: it reads the version instead of setting it, collects the enabled scenes instead of hardcoding them, refuses to run when the version, the scenes or the release notes are missing, and writes `BUILD_INFO.txt` beside the artifact recording the commit, the branch and whether the working tree was clean.
 - **Release-readiness fixes.** Found and fixed two defects during the Part IV check. The Android package id was still `com.DefaultCompany.SALINLAHI`, and because `overrideDefaultApplicationIdentifier` was off, Unity regenerated the id from the company name — so setting the identifier alone would have been silently undone. Internet access was left to Unity's auto-detection although both the speech recogniser and the leaderboard are network services; it is now requested outright.
-- **Build generation and packaging.** Produced `SALINLAHI-v0.1.0.apk` from `main` at `0bec1d1` with a clean working tree, and packaged it as `SALINLAHI-v0.1.0.zip` with its README, release notes and build information.
+- **Build generation and packaging.** Produced `SALINLAHI-v0.1.0.apk` from `main` at `c035c8f` with a clean working tree, and packaged it as `SALINLAHI-v0.1.0.zip` with its README, release notes and build information.
 - **Verification.** Confirmed the artifact's own metadata with `aapt dump badging` rather than trusting the build script, and compile-checked `Assets/Scripts` and `Assets/Editor` with Roslyn under `-warnaserror+` before starting the build.
 - **Documentation.** Wrote `Docs/release/v0.1.0/README.txt`, `Docs/release/v0.1.0/RELEASE_NOTES.txt`, `Docs/RELEASE_PROCESS.md` and this report.
 
