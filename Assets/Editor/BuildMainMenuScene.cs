@@ -2,17 +2,28 @@
 //
 // One-click scene builder for the SALINLAHI main menu, assembled from the
 // team's Canva assets (Assets/Sprites/):
-//   menu_classroom_bg, menu_title, btn_adventure, btn_minigames,
-//   btn_settings, btn_about
+//   menu_classroom_bg, menu_title, menu_books, ui_name_holder,
+//   btn_adventure, btn_minigames, btn_settings, btn_about
 //
 // Positions/sizes were measured from the composed Canva mockup, kept at
 // Art/menu_layout_new_reference.png (2000x1125), and scaled by 0.96 to the
 // 1920x1080 canvas used here. To tweak anything, move the object's
 // RectTransform in the Scene view - no code changes needed.
 //
-// Includes the "Enter Nickname" popup opened by Adventure (see
-// NicknameDialogBuilder.cs), which feeds NicknameManager and therefore the
-// player_name on saved database records.
+// Two pieces are new to this layout and are not buttons in the same way:
+//
+//   the stack of books, bottom left, which is decoration. It has no Button
+//   and does not even take a raycast. It is there for an Almanac that does
+//   not exist yet, and a plate that does nothing when a child presses it is a
+//   worse promise than one that is plainly not a plate.
+//
+//   the nickname holder, top right, which shows who is playing and drops two
+//   signs out from under it when tapped - CHANGE PROFILE and LEADERBOARDS.
+//   See ProfileUIBuilder.cs, which also builds the two boards they open.
+//
+// Includes the "Enter Nickname" popup (see NicknameDialogBuilder.cs). It is no
+// longer opened by Adventure: the name is asked for once, on the first launch
+// after the game is installed, and after that only through CHANGE PROFILE.
 //
 // Also puts MainMenu first in Build Settings so the game boots into it,
 // followed by the LevelSelect journey map and then Chapter 1 Level 1.
@@ -34,15 +45,26 @@ public class BuildMainMenuScene
     private const string FirstLevelPath = "Assets/Scenes/Chapter1_Level1_UmagaNa.unity";
 
     /// <summary>All four menu plates are cut from one sheet, so they share a size:
-    /// 611x223 on the mockup page, scaled by 0.96 onto the 1920x1080 canvas.</summary>
-    private static readonly Vector2 ButtonSize = new Vector2(587, 214);
+    /// 499x186 on the mockup page, scaled by 0.96 onto the 1920x1080 canvas.</summary>
+    private static readonly Vector2 ButtonSize = new Vector2(479.0f, 178.6f);
+
+    /// <summary>The column of buttons down the right: where the top one sits,
+    /// and how far apart they are. Both measured off the mockup.</summary>
+    private const float ButtonColumnX = 499.2f;
+    private const float FirstButtonY = 204.5f;
+    private const float ButtonPitch = 194.2f;
+
+    private static readonly Vector2 TitlePosition = new Vector2(-361.9f, 232.8f);
+    private static readonly Vector2 TitleSize = new Vector2(910.1f, 401.3f);
+    private static readonly Vector2 BooksPosition = new Vector2(-754.6f, -364.3f);
+    private static readonly Vector2 BooksSize = new Vector2(203.5f, 208.3f);
 
     /// <summary>Everything this screen draws. Each also has a soft twin,
     /// <name>_blur, written by Tools/import_main_menu_art.py, which
     /// MenuBlurBackdrop swaps in while a dialog is open.</summary>
     private static readonly string[] MenuSprites =
     {
-        "menu_classroom_bg", "menu_title",
+        "menu_classroom_bg", "menu_title", "menu_books", "ui_name_holder",
         "btn_adventure", "btn_minigames", "btn_settings", "btn_about",
     };
 
@@ -103,16 +125,36 @@ public class BuildMainMenuScene
         //     the leftmost leaf off the edge of the page, so the rect sits
         //     outside the canvas by the same margin rather than pulling the
         //     whole logo in to fit. ---
-        GameObject title = CreateImage(canvasT, "Title", "menu_title", new Vector2(-394, 291), new Vector2(1190, 500), true);
+        GameObject title = CreateImage(canvasT, "Title", "menu_title", TitlePosition, TitleSize, true);
         title.GetComponent<Image>().raycastTarget = false;
+
+        // --- The stack of books, bottom left. Decoration, and deliberately
+        //     not a button: no Button component, and no raycast at all, so a
+        //     press lands on the menu behind it rather than on something that
+        //     looks pressable and is not. It is where an Almanac would go. ---
+        GameObject books = CreateImage(canvasT, "Books", "menu_books", BooksPosition, BooksSize, true);
+        books.GetComponent<Image>().raycastTarget = false;
 
         // --- Buttons: one column down the right, evenly spaced, all four the
         //     same plate. Heights follow the sprite's own ratio so
         //     preserveAspect has nothing left to shrink. ---
-        GameObject adventureBtn = CreateSpriteButton(canvasT, "AdventureButton", "btn_adventure", new Vector2(517, 358), ButtonSize);
-        GameObject miniGamesBtn = CreateSpriteButton(canvasT, "MiniGamesButton", "btn_minigames", new Vector2(517, 119), ButtonSize);
-        GameObject settingsBtn = CreateSpriteButton(canvasT, "SettingsButton", "btn_settings", new Vector2(517, -120), ButtonSize);
-        GameObject aboutBtn = CreateSpriteButton(canvasT, "AboutButton", "btn_about", new Vector2(517, -358), ButtonSize);
+        GameObject adventureBtn = MenuButton(canvasT, "AdventureButton", "btn_adventure", 0);
+        GameObject miniGamesBtn = MenuButton(canvasT, "MiniGamesButton", "btn_minigames", 1);
+        GameObject settingsBtn = MenuButton(canvasT, "SettingsButton", "btn_settings", 2);
+        GameObject aboutBtn = MenuButton(canvasT, "AboutButton", "btn_about", 3);
+
+        // --- The controller and the out-of-focus backdrop come next, because
+        //     the profile menu below needs both. Neither draws anything, so
+        //     adding them here does not change what sits in front of what. ---
+        MainMenuController controller = canvasGO.AddComponent<MainMenuController>();
+        MenuBlurBackdrop blur = BuildBlurBackdrop(canvasGO);
+
+        // --- The nickname holder, the signs under it, and the WHO ARE YOU? and
+        //     LEADERBOARDS boards. Built before the dialogs below so that the
+        //     nickname popup, which CHANGE PROFILE opens, comes out in front of
+        //     the board that opened it. ---
+        ProfileUIBuilder.Built profile =
+            ProfileUIBuilder.Build(canvasT, controller, blur, BuildLeaderboardClient());
 
         // --- Settings and About popups, in the same bamboo style as the
         //     nickname dialog (see SettingsAboutDialogBuilder). Both start
@@ -120,13 +162,13 @@ public class BuildMainMenuScene
         SettingsAboutDialogBuilder.Dialog settingsDialog = SettingsAboutDialogBuilder.BuildSettings(canvasT);
         SettingsAboutDialogBuilder.Dialog aboutDialog = SettingsAboutDialogBuilder.BuildAbout(canvasT);
 
-        // --- "Enter Nickname" popup, opened by Adventure, so saved records carry a
-        //     real player name instead of NicknameManager's "Bata" fallback. ---
+        // --- "Enter Nickname" popup. Opened once, on the first launch after
+        //     the game is installed, and after that only by CHANGE PROFILE -
+        //     there is one nickname screen in this project and this is it. ---
         NicknameDialogBuilder.Dialog nicknameDialog = NicknameDialogBuilder.Build(canvasT);
 
         // --- Wire controller (SOUND is a toggle in the settings board now,
         //     so there is no separate mute icon on the menu itself) ---
-        MainMenuController controller = canvasGO.AddComponent<MainMenuController>();
         controller.nicknamePanel = nicknameDialog.root;
         controller.nicknameInput = nicknameDialog.input;
         controller.nicknameOkayButton = nicknameDialog.okay;
@@ -134,7 +176,8 @@ public class BuildMainMenuScene
         // Same wiring the patcher does, so a fresh rebuild does not quietly
         // drop the "already taken" check that Add Nickname Dialog adds.
         controller.nicknameAvailability = NicknameCheckBuilder.Build(nicknameDialog);
-        controller.menuBlur = BuildBlurBackdrop(canvasGO);
+        controller.menuBlur = blur;
+        controller.profileMenu = profile.menu;
         controller.adventureButton = adventureBtn.GetComponent<Button>();
         // Wired so the Inspector shows the plate, though the controller
         // deliberately hangs nothing off its click yet.
@@ -181,6 +224,41 @@ public class BuildMainMenuScene
     }
 
     // ---------- helpers ----------
+
+    /// <summary>One plate of the right-hand column, by its place in it.</summary>
+    private static GameObject MenuButton(Transform canvas, string name, string sprite, int row)
+    {
+        return CreateSpriteButton(canvas, name, sprite,
+            new Vector2(ButtonColumnX, FirstButtonY - ButtonPitch * row), ButtonSize);
+    }
+
+    /// <summary>
+    /// The leaderboard's own client, on the same "Database" object the
+    /// nickname check uses and reading the same git-ignored config asset.
+    ///
+    /// It is a separate component from SupabaseClient because the two talk to
+    /// the project in different ways: the old one inserts play records
+    /// straight into a table, while this one may only read the board and has
+    /// to go through an Edge Function to change it. See LeaderboardClient.
+    /// </summary>
+    private static LeaderboardClient BuildLeaderboardClient()
+    {
+        GameObject host = GameObject.Find(NicknameCheckBuilder.HostName);
+        if (host == null) host = new GameObject(NicknameCheckBuilder.HostName);
+
+        LeaderboardClient client = host.GetComponent<LeaderboardClient>();
+        if (client == null) client = host.AddComponent<LeaderboardClient>();
+        client.config = AssetDatabase.LoadAssetAtPath<SupabaseConfig>(
+            "Assets/Resources/SupabaseConfig.asset");
+
+        if (client.config == null)
+        {
+            Debug.LogWarning("[SALINLAHI] No SupabaseConfig asset, so the leaderboard will say " +
+                              "it is not set up. Everything else on the menu works. Run " +
+                              "Tools > SALINLAHI > Create Supabase Config.");
+        }
+        return client;
+    }
 
     /// <summary>
     /// Pairs every menu sprite with its soft twin so MenuBlurBackdrop can

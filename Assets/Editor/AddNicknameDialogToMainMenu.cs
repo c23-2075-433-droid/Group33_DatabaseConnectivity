@@ -3,10 +3,14 @@
 // Adds the "Enter Nickname" popup to the ALREADY-BUILT main menu scene
 // without regenerating it, so manual tweaks to the menu are preserved.
 //
-// Replaces the earlier inline name plank: pressing Adventure now opens a
-// modal dialog (the hanging board, OKAY / CANCEL) instead of going straight
-// to the journey map. Any leftover NicknameInput/NicknameLabel objects from
-// that older version are removed.
+// Replaces the earlier inline name plank with a modal dialog (the hanging
+// board, OKAY / CANCEL). Any leftover NicknameInput/NicknameLabel objects
+// from that older version are removed.
+//
+// The dialog is no longer opened by Adventure. The name is asked for once, on
+// the first launch after the game is installed, and after that only through
+// CHANGE PROFILE on the nickname holder - which this patcher does NOT add.
+// A scene that needs the holder as well wants Build Main Menu Scene.
 //
 // It does not set up MenuBlurBackdrop - a scene old enough to need patching
 // has no soft sprites paired up for it. The field is optional, so the menu
