@@ -356,7 +356,23 @@ public class BuildPaaralanScene2
         deskFrontSr.sortingLayerName = "Player";
         deskFrontSr.sortingOrder = OrderDeskFront;
         if (deskFrontSr.sprite == null) deskFront.SetActive(false);
-        else deskFront.transform.localScale = bg.transform.localScale;
+        else
+        {
+            deskFront.transform.localScale = bg.transform.localScale;
+            // OFF UNTIL HE SITS DOWN. The strip is opaque from the desk's top
+            // edge to the bottom of the frame, so anything standing in those
+            // columns loses its legs behind it - and the walk ends at x -0.51
+            // with his shoulder reaching +0.88, which is inside them. He was
+            // arriving at his chair cut off at the hip.
+            //
+            // Clipping the strip sideways would also work, but only just: the
+            // seated poses' bottom edges start at +0.99 and the standing one
+            // reaches +0.88, so the boundary would have about five pixels of
+            // room either side. This needs no such luck. The strip exists to
+            // hide the seated poses' flat cut, and there is no seated pose on
+            // screen until "Upo", so it is switched on with one.
+            deskFront.SetActive(false);
+        }
 
 
         // --- Teacher Rachel, behind her desk at the front ---
@@ -684,6 +700,10 @@ public class BuildPaaralanScene2
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
+        // The desk comes forward with him - see where it is built for why it
+        // is not on before this.
+        if (deskFrontSr.sprite != null)
+            UnityEventTools.AddBoolPersistentListener(upo.onCorrect, deskFront.SetActive, true);
 
         // "Kuha" is him pulling the notepad OUT of the bag - the notepad is
         // in his hand in that drawing, so nothing lands on the desk yet. The
