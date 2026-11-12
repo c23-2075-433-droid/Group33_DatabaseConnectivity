@@ -58,6 +58,7 @@ public class AddSettingsAboutToMainMenu
                    ".\n  Settings: the drawn board, with SOUND and MUSIC toggles and the " +
                    "SOUND EFFECTS and MS. RACHEL sliders. Its rows, icons and labels are " +
                    "painted into the art, so the panel carries no text of its own." +
-                   "\n  About: unchanged - bamboo panel, OKAY button, Fredoka UI font.");
+                   "\n  About: bamboo panel, OKAY button, Fredoka UI font, and the build version " +
+                   "under the title (filled in at run time by VersionLabel).");
     }
 }

@@ -1,0 +1,146 @@
+SALINLAHI - RELEASE NOTES
+=========================
+
+Project      : SALINLAHI - A Voice-Interactive Filipino Language Learning Game
+Version      : 0.1.0
+Release Date : 12 November 2026
+Release Type : Development milestone (testing build, not a stable release)
+Platform     : Android 8.0+ (minSdk 26), ARM64
+Artifact     : SALINLAHI-v0.1.0.apk  (versionCode 2)
+Package id   : ph.edu.uphsl.group33.salinlahi
+Built with   : Unity 6000.6.2f1
+
+Source version / branch / changeset
+  Branch : main
+  Commit : recorded in BUILD_INFO.txt beside this file, written by the build
+           itself rather than typed in by hand
+  Tag    : v0.1.0
+
+Why 0.1.0. The group has produced APKs before - SALINLAHI_VoiceTest.apk, _v2,
+_v3 and the Mid-Act7 SALINLAHI.apk - but none carried a version number, none
+was tested as a package, and none can now be tied to a commit. This is release
+number one under a controlled process, so it takes the first number. The
+feature set is larger than a "first build" would suggest; the version counts
+releases, not features.
+
+
+INCLUDED IN THIS VERSION
+------------------------
+
+Gameplay
+  15 playable scenes across three places: Bahay (home, 5), Paaralan (school,
+    5) and Parke (park, 5).
+  54 distinct Filipino words taught across 74 spoken objectives - among them
+    Bangon, Tayo, Lakad, Kaliwa, Kanan, Tabo, Sabon, Sipilyo, Tuwalya,
+    Maligo, Suklay, Damit, Medyas, Sapatos, Kanin, Itlog, Kain, Inom, Bati,
+    Pasok, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos, Talon, Kumusta,
+    Ngiti, Salamat and Paalam.
+  Each word drives one action - standing up, walking, turning, opening a door,
+    switching on a light, taking an object, bathing, dressing, climbing,
+    sliding, jumping, greeting a friend, sharing food, going home.
+  Levels unlock in order along a journey map.
+
+Voice
+  Continuous listening through the device's Filipino (fil-PH) speech
+    recognizer.
+  Pronunciation judged by Filipino phonology rather than by letter-edit
+    distance, so a wrong vowel is rejected. Words the game teaches in the same
+    scene are no longer accepted for one another: Kain/Kanin, Tabo/Takbo,
+    Tawa/Tuwa, Bati/Bata and Kanan/Kanin all previously passed for each other.
+  Known mishearings per word are accepted, so a recognizer quirk does not
+    count against the child.
+  Every attempt is logged on the device, so the accepted variants can be
+    tuned from real playtest data.
+  Mic and replay buttons, with listening / correct / try-again / mic-blocked
+    states shown on screen.
+
+Progress and scoring
+  Named player profiles, several per device, saved locally as players.json.
+  Nickname entry with availability checking and suggestions.
+  Per-scene score, stars and a "words learned" panel with English meanings.
+
+Leaderboard
+  One shared online board, written through a Supabase Edge Function
+    (submit-score) and read back over REST.
+  Only four values leave the device: player id, nickname, total points and
+    total stars. Learning data and voice attempts stay on the phone.
+  A failed upload is retried the next time the main menu opens.
+
+Presentation
+  423 recorded Teacher Rachel voice-over clips, in the group's own voices.
+  Music per place, sound effects, and separate master / effects / narration /
+    music volume controls with mute.
+  Main menu with profile card, settings and about popups.
+
+
+FIXED
+-----
+
+  Wrong-vowel answers were accepted. The checker allowed an edit distance
+    scaled to word length, which forgave exactly the error the game exists to
+    correct, and let taught words pass for each other.
+  The app reported no version at all. There is now a version in the About
+    screen, read from the build itself, and a BUILD_INFO.txt beside every
+    artifact naming the commit it came from.
+  The Android package id was still the Unity default,
+    com.DefaultCompany.SALINLAHI.
+  Internet access is now requested explicitly in the manifest rather than
+    left to Unity's auto-detection, which the hosted leaderboard depends on.
+  Releases had no repeatable procedure. One build entry point now produces the
+    package - see Docs/RELEASE_PROCESS.md.
+
+
+KNOWN ISSUES
+------------
+
+  15 of Teacher Rachel's repeated lines have no recording: the three framing
+    lines ("Sabihin", "Ngayon", "Ulitin"), the listening cue, two hints, the
+    idle nudge, the mic-blocked line, and the correct / incorrect / not-heard
+    replies. These are the lines heard most often. The written caption is
+    shown and the pause is held, so the game stays playable but is quieter
+    than intended.
+  The opening prompt of a scene holds a long silent pause before the child is
+    allowed to speak.
+  The MINI GAME button on the main menu is drawn but does nothing.
+  Teacher Rachel's portrait image is not assigned, so her captions appear
+    without her picture.
+  Word badges sit low on the screen in Paaralan 2, Paaralan 5 and Parke 4.
+  No voice input without an internet connection; offline recognition is off.
+  Suspend and resume behaviour has not been tested on a phone with the
+    speaker at full volume.
+  The game cannot be answered by voice on desktop at all; the speech plugin is
+    Android and iOS only. A desktop build is not released for this reason.
+
+
+NOT YET INCLUDED
+----------------
+
+  The Palengke (market) level - designed, shown locked on the map, not built.
+  The sixth Bahay scene, "Leaving for School" - its slot and its two
+    voice-over lines exist; the scene does not.
+  The words Tara and Salamin are recorded but not taught in any scene yet.
+  A mini-game.
+  Per-player filtering and paging on the leaderboard.
+  The usability and usefulness evaluation with real pupils.
+
+
+INSTALLATION / RUNNING INSTRUCTIONS
+-----------------------------------
+
+See README.txt in this folder. In short:
+
+  1. Uninstall any older SALINLAHI build first - the package name changed.
+  2. Copy SALINLAHI-v0.1.0.apk to an Android 8.0+ device and open it.
+  3. Allow installation from this source, then allow the microphone.
+  4. Stay online, turn the volume up, and say the Filipino word on screen.
+
+Confirm the build by opening SETTINGS > ABOUT; it should read v0.1.0.
+
+
+NEXT VERSION
+------------
+
+  A bug fix on top of this release becomes 0.1.1.
+  The next working feature - most likely the Palengke level or the remaining
+  15 narrator recordings - becomes 0.2.0.
+  The conditions for 1.0.0 are written down in Docs/RELEASE_PROCESS.md.

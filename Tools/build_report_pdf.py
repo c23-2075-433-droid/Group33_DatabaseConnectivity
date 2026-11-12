@@ -3,7 +3,13 @@
 
 Supports: # / ## / ### headings, paragraphs, - bullets, 1. numbered lists,
 pipe tables, fenced code blocks, --- rules, and inline **bold** / *italic* /
-`code`.  Usage:  build_report_pdf.py <input.md> <output.pdf>
+`code`.
+
+Usage:  build_report_pdf.py <input.md> <output.pdf> ["Activity label"]
+
+The label goes in the cover line, the running footer and the PDF metadata. Left
+out, it is taken from the document's own `# ` title - never from whichever
+activity this script was last used for.
 """
 import re
 import sys
@@ -31,7 +37,14 @@ AVAIL = PAGE[0] - LMARGIN - RMARGIN
 
 # Characters outside cp1252 render as black boxes in the built-in fonts.
 FOLD = {"\u2192": "->", "\u2190": "<-", "\u2713": "x", "\u2022": "-",
-        "\u2026": "...", "\u00a0": " ", "\u2264": "<=", "\u2265": ">=", "\u2212": "-"}
+        "\u2026": "...", "\u00a0": " ", "\u2264": "<=", "\u2265": ">=", "\u2212": "-",
+        # Vertical flow diagrams and file trees. Without these, every arrow in a
+        # process diagram and every branch of a directory listing renders as a
+        # black box, which is how the Activity 8 report first came out.
+        "\u2193": "v", "\u2191": "^",
+        "\u2500": "-", "\u2502": "|", "\u251c": "+", "\u2514": "+",
+        "\u252c": "+", "\u2534": "+", "\u253c": "+", "\u2510": "+",
+        "\u250c": "+", "\u2518": "+"}
 
 
 def fold(text):
@@ -279,11 +292,15 @@ def parse(md, s):
     return out
 
 
-def build(md_path, pdf_path):
+def build(md_path, pdf_path, activity=None, course="Systems Fundamentals"):
     s = styles()
     with open(md_path, encoding="utf-8") as fh:
         md = fh.read()
     flows = parse(md, s)
+
+    if not activity:
+        activity = next((fold(f[1]) for f in flows
+                         if isinstance(f, tuple) and f[0] == "TITLE"), "Report")
 
     # Split the leading block (title + metadata table) onto a cover page.
     first_part = next(k for k, f in enumerate(flows)
@@ -313,8 +330,7 @@ def build(md_path, pdf_path):
         else:
             story.append(f)
     story.append(Spacer(1, 12 * mm))
-    story.append(Paragraph("Systems Fundamentals &middot; Activity 7 &middot; "
-                           "Version Control and Collaborative Development",
+    story.append(Paragraph("%s &middot; %s" % (course, activity),
                            s["cover_small"]))
     story.append(PageBreak())
 
@@ -328,10 +344,9 @@ def build(md_path, pdf_path):
     doc = BaseDocTemplate(pdf_path, pagesize=PAGE, leftMargin=LMARGIN,
                           rightMargin=RMARGIN, topMargin=TMARGIN,
                           bottomMargin=BMARGIN,
-                          title="Activity 7 - Version Control and "
-                                "Collaborative Development",
+                          title=activity,
                           author="Daquis, Jhesza Mhei G. - Group 33",
-                          subject="SALINLAHI capstone - version control")
+                          subject="SALINLAHI capstone - %s" % activity)
     frame = Frame(LMARGIN, BMARGIN, AVAIL, PAGE[1] - TMARGIN - BMARGIN,
                   id="main")
 
@@ -341,8 +356,7 @@ def build(md_path, pdf_path):
             canvas.setFont("Helvetica", 7.6)
             canvas.setFillColor(MUTED)
             canvas.drawString(LMARGIN, 11 * mm,
-                              "SALINLAHI - Group 33 - Activity 7: Version "
-                              "Control and Collaborative Development")
+                              "SALINLAHI - Group 33 - %s" % activity)
             canvas.drawRightString(PAGE[0] - RMARGIN, 11 * mm,
                                    "Page %d" % canvas.getPageNumber())
             canvas.setStrokeColor(RULE)
@@ -357,5 +371,6 @@ def build(md_path, pdf_path):
 
 
 if __name__ == "__main__":
-    out = build(sys.argv[1], sys.argv[2])
+    out = build(sys.argv[1], sys.argv[2],
+                sys.argv[3] if len(sys.argv) > 3 else None)
     print("wrote", out)
