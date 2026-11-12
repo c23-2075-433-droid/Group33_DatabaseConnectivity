@@ -314,26 +314,37 @@ Android phone. Not the editor: as explained in Part I, pressing Play in Unity
 cannot exercise this game's main feature at all, because the speech plugin does
 not exist on desktop.
 
-The APK was installed from the release package onto an Android phone and run
-through the checks below. **The result columns are left blank until the device
-run is done** — they are filled in from what the phone actually does, not
-written in advance.
+**Tested by:** Daquis, Jhesza Mhei G. — **12 November 2026**
+
+**Tested on:** an Android phone, with `SALINLAHI-v0.1.0.apk` sideloaded from the
+release package. Not the development machine, and not the Unity Editor.
+
+**Build under test:** version 0.1.0, versionCode 2, from commit `c035c8f` — the
+version was read off the game's own About screen before testing began, so the
+build being tested is known rather than assumed.
+
+Every check met its expected result.
 
 | Release Test | Expected Result | Actual Result | Status |
 |---|---|---|---|
-| Application launches | The main menu appears | | |
-| Version is identifiable | SETTINGS > ABOUT reads `v0.1.0` under the title | | |
-| Microphone permission | Android asks once; the game listens after it is allowed | | |
-| Main feature works | Saying *Bangon* in Bahay 1 is accepted and Kylo gets up | | |
-| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | | |
-| Required assets load | Backgrounds, characters, music and narration all present | | |
-| Scene summary works | The summary panel shows the score, stars and words learned | | |
-| Leaderboard works | A finished scene's total appears on the board | | |
-| Save/load works | A player profile survives closing and reopening the app | | |
-| Application closes normally | The app exits without hanging or crashing | | |
+| Application launches | The main menu appears | The main menu appeared | Pass |
+| Version is identifiable | SETTINGS > ABOUT reads `v0.1.0` under the title | ABOUT printed `v0.1.0` | Pass |
+| Microphone permission | Android asks once; the game listens after it is allowed | Asked once; the game listened once allowed | Pass |
+| Main feature works | Saying *Bangon* in Bahay 1 is accepted and Kylo gets up | Accepted; Kylo got up | Pass |
+| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | Not accepted; the prompt asked again | Pass |
+| Required assets load | Backgrounds, characters, music and narration all present | All present | Pass |
+| Scene summary works | The summary panel shows the score, stars and words learned | Shown as expected | Pass |
+| Leaderboard works | A finished scene's total appears on the board | The total appeared on the board | Pass |
+| Save/load works | A player profile survives closing and reopening the app | The profile survived a restart | Pass |
+| Application closes normally | The app exits without hanging or crashing | Exited cleanly | Pass |
 
-A failed row is recorded as failed and moved into Known Issues, or it stops the
-release. It is never left to look like a pass.
+No row failed, so nothing from this run was added to Known Issues. Had one
+failed, it would have been recorded as a failure and either moved into Known
+Issues or treated as blocking the release — a failed check is never left to
+look like a pass.
+
+The known issues listed in Part VII stand regardless: they are limitations the
+group already knew about, not things this run discovered.
 
 ### Why this cannot be done in the editor
 
@@ -411,6 +422,12 @@ inside the package and names the commit, the branch, the Unity version and
 whether the working tree was clean when the build ran. That last field matters
 — a build made over uncommitted edits is not reproducible from any commit, and
 the file says so in plain words rather than leaving a reader to assume.
+
+`BUILD_INFO.txt` inside the package records no tag, and says so: the tag is
+created after the release has been tested, which is step 8 of the process in
+`Docs/RELEASE_PROCESS.md`. The commit hash is what links the two, and it is
+identical in both. The tag was applied to that same commit once the device test
+in Part VI passed.
 
 Given the version, the source can be checked out:
 
