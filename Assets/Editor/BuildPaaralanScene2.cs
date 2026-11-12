@@ -615,9 +615,15 @@ public class BuildPaaralanScene2
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
         TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilInHandX,
                                                 PencilInHandY, PencilInHandSize);
-        // The gleams sit above everything - above Kylo and above the props -
-        // so whatever they are marking is visible through them.
-        foreach (TimedOverlay fx in new[] { gleamKuha, gleamLapis })
+        // The gleams sit above everything - above Kylo, above the props and
+        // above the desk now drawn in front of him - so whatever they are
+        // marking is visible through them.
+        //
+        // EVERY gleam belongs in this list. CreateGleamAt leaves them on the
+        // "Props" layer, which sorts BELOW "Player", so one left out is drawn
+        // behind Kylo and behind the desk - gleamBati marks him greeting and
+        // was doing exactly that until it was added here.
+        foreach (TimedOverlay fx in new[] { gleamBati, gleamKuha, gleamLapis })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderGleam;

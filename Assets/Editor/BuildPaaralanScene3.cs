@@ -449,7 +449,11 @@ public class BuildPaaralanScene3
                                                  SitFeetY + SeatedHeight * 0.72f, 2.8f);
 
         // The desk props sit above the desk layer, so their gleams must too.
-        foreach (TimedOverlay fx in new[] { gleamAklat, gleamBasa, gleamSulat })
+        // EVERY gleam, not just the ones on the desk. CreateGleamAt leaves
+        // them on the "Props" layer, which sorts BELOW "Player", so any left
+        // out is drawn behind Kylo and behind the desk in front of him -
+        // gleamSagot lands on Kylo himself and would have been invisible.
+        foreach (TimedOverlay fx in new[] { gleamAklat, gleamBasa, gleamSulat, gleamSagot })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderDeskProps + 1;
