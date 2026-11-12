@@ -30,11 +30,13 @@
 //
 // Sprites expected in Assets/Sprites/:
 //   paaralan_gate_background, char_guard, fx_gleam, standing_uniform_with_bag,
-//   walk_frame_1..4_uniform_with_bag, talking_uniform_with_bag,
+//   walk_frame_1..4_uniform_with_bag,
 //   ui_arrow, ui_word_badge, badge_paaralan
 //   paaralan_gate_background_closed, char_guard_idle   (optional, see above)
 //   paaralan_gate_frame_1..3 - the gate part-open, cut from the two above by
 //                              Tools/make_gate_frames.py
+//   bati_frame_1..3_uniform_with_bag - the wave going up, by
+//                              Tools/make_bati_frames.py
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
@@ -245,12 +247,41 @@ public class BuildPaaralanScene1
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Bati" turns him to face the child and wave. A greeting has
-        // nothing to pick up and nothing to light up, so he is the feedback.
+        // --- "Bati": the wave, DRAWN rather than switched ---
+        //
+        // It used to be a PoseSwitch to talking_uniform_with_bag - standing
+        // in one frame, hand already up in the next. Three drawn frames now
+        // raise it: hip, chest, open wave at head height, then the same two
+        // in reverse to bring it down, ending back on the standing pose the
+        // brief asks him to return to.
+        //
+        // IT DRIVES standingSprite, NOT THE RENDERER, and that is not a
+        // detail. PlayerMovement rewrites its renderer from standingSprite on
+        // every frame it is not moving, so a sequence writing to the renderer
+        // would be overwritten before a single frame was seen. PoseSwitch has
+        // always worked this way; PoseSequence can now do the same.
         GameObject greetGO = new GameObject("Pose_Greet");
-        PoseSwitch greet = greetGO.AddComponent<PoseSwitch>();
-        greet.player = player;
-        greet.standingSprite = LoadSprite("talking_uniform_with_bag");
+        PoseSequence greetFrames = greetGO.AddComponent<PoseSequence>();
+        greetFrames.player = player;
+        greetFrames.frames = new[]
+        {
+            LoadSpriteOptional("bati_frame_1_uniform_with_bag"),
+            LoadSpriteOptional("bati_frame_2_uniform_with_bag"),
+            LoadSpriteOptional("bati_frame_3_uniform_with_bag"),
+        };
+        // The wave held, not a repeating motion - a hand going up is one of
+        // the actions the rules name as playing once.
+        greetFrames.loopFrames = new[] { LoadSpriteOptional("bati_frame_3_uniform_with_bag") };
+        greetFrames.loopCycles = 3;
+        greetFrames.loopFramesPerSecond = 4f;
+        greetFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("bati_frame_2_uniform_with_bag"),
+            LoadSpriteOptional("bati_frame_1_uniform_with_bag"),
+        };
+        greetFrames.destinationSprite = LoadSprite("standing_uniform_with_bag");
+        greetFrames.framesPerSecond = 9f;
+        greetFrames.playOnEnable = false;
 
         // The guard lights up when he is greeted, so the child can see the
         // hello land on someone rather than just watching Kylo wave.
@@ -429,7 +460,7 @@ public class BuildPaaralanScene1
         // A greeting answered by a figure that does not move reads as the
         // child talking to scenery.
         var bati = MakeObjective("Bati", pBati);
-        UnityEventTools.AddPersistentListener(bati.onCorrect, greet.Apply);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, greetFrames.Play);
         UnityEventTools.AddPersistentListener(bati.onCorrect, guardSwap.Apply);
         UnityEventTools.AddPersistentListener(bati.onCorrect, guardGleam.Play);
 

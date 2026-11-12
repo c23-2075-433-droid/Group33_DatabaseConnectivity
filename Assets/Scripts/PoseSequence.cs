@@ -54,8 +54,22 @@ using UnityEngine.Events;
 /// </summary>
 public class PoseSequence : MonoBehaviour
 {
-    [Tooltip("The renderer to animate. Defaults to this object's own.")]
+    [Tooltip("The renderer to animate. Defaults to this object's own. " +
+             "Ignored when player is set.")]
     public SpriteRenderer target;
+
+    [Tooltip("Set this for a STANDING character and the frames are written " +
+             "to PlayerMovement.standingSprite instead of straight to a " +
+             "renderer.\n\nThis is not a convenience. PlayerMovement rewrites " +
+             "its renderer from standingSprite on EVERY frame it is not " +
+             "moving, so a sequence driving the renderer directly is " +
+             "overwritten before anyone sees it - the character simply does " +
+             "not animate. Driving standingSprite instead puts the frames " +
+             "where PlayerMovement will read them, which is also how the " +
+             "older PoseSwitch has always worked.\n\nLeave empty for a pose " +
+             "with no PlayerMovement on it, such as the seated Kylo or the " +
+             "school gate.")]
+    public PlayerMovement player;
 
     [Tooltip("The lead-in: the starting pose and the preparation movement. " +
              "Do NOT repeat the destination here - it is set once the whole " +
@@ -132,6 +146,23 @@ public class PoseSequence : MonoBehaviour
     private Sprite fallback;
     private bool running;
 
+    /// <summary>
+    /// Puts a frame on screen, through whichever route this pose uses - the
+    /// character's idle sprite when one is set, the renderer otherwise.
+    /// </summary>
+    private void Show(Sprite s)
+    {
+        if (player != null) player.standingSprite = s;
+        else if (target != null) target.sprite = s;
+    }
+
+    /// <summary>What is showing now, for a sequence with no destination.</summary>
+    private Sprite Current()
+    {
+        if (player != null) return player.standingSprite;
+        return target != null ? target.sprite : null;
+    }
+
     /// <summary>True while an action is playing, for a caller that must wait.</summary>
     public bool IsPlaying { get { return running; } }
 
@@ -143,8 +174,8 @@ public class PoseSequence : MonoBehaviour
     /// <summary>Runs the whole action and lands on the idle pose.</summary>
     public void Play()
     {
-        if (target == null) target = GetComponent<SpriteRenderer>();
-        if (target == null) return;
+        if (player == null && target == null) target = GetComponent<SpriteRenderer>();
+        if (player == null && target == null) return;
 
         // TAKE THE RENDERER OFF ANY OTHER ACTION FIRST.
         //
@@ -170,14 +201,14 @@ public class PoseSequence : MonoBehaviour
         // Read the fallback now rather than caching it in Awake: a previous
         // beat may have changed the sprite since, and this has to land on what
         // is current, not on what was first.
-        fallback = destinationSprite != null ? destinationSprite : target.sprite;
+        fallback = destinationSprite != null ? destinationSprite : Current();
 
         if (!HasAnyFrames() || !isActiveAndEnabled)
         {
             // No art, or switched off and unable to run a coroutine. Either
             // way the destination is still owed, and so is anything waiting on
             // fireOnFrame - without that, a prop never appears at all.
-            target.sprite = fallback;
+            Show(fallback);
             onFrameReached?.Invoke();
             onFinished?.Invoke();
             return;
@@ -240,7 +271,7 @@ public class PoseSequence : MonoBehaviour
         for (int i = 0; i < Count(frames); i++)
         {
             if (frames[i] == null) continue;   // a missing drawing skips, it does not stall
-            target.sprite = frames[i];
+            Show(frames[i]);
             if (i == fireOnFrame) onFrameReached?.Invoke();
             yield return new WaitForSeconds(hold);
         }
@@ -257,7 +288,7 @@ public class PoseSequence : MonoBehaviour
                 for (int i = 0; i < loopFrames.Length; i++)
                 {
                     if (loopFrames[i] == null) continue;
-                    target.sprite = loopFrames[i];
+                    Show(loopFrames[i]);
                     yield return new WaitForSeconds(loopHold);
                 }
                 if (stopRequested) break;
@@ -268,12 +299,12 @@ public class PoseSequence : MonoBehaviour
         for (int i = 0; i < Count(tailFrames); i++)
         {
             if (tailFrames[i] == null) continue;
-            target.sprite = tailFrames[i];
+            Show(tailFrames[i]);
             yield return new WaitForSeconds(hold);
         }
 
         // --- the idle pose ---
-        target.sprite = fallback;
+        Show(fallback);
         running = false;
         onFinished?.Invoke();
     }
@@ -286,6 +317,6 @@ public class PoseSequence : MonoBehaviour
     {
         StopAllCoroutines();
         running = false;
-        if (target != null && fallback != null) target.sprite = fallback;
+        if (fallback != null && (player != null || target != null)) Show(fallback);
     }
 }
