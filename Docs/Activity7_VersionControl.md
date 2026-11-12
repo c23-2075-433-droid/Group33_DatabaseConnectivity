@@ -343,8 +343,17 @@ words-learned panels into all fifteen scenes.
 | Change descriptions | *Build the Paaralan gate and classroom scenes*; *Make Kylo walk to his desk, and sit down at it* |
 | Relevant files | `Assets/Scenes/Chapter2_Level1_Paaralan.unity`, `Assets/Scenes/Chapter2_Level2_Klasrum.unity`, their two builder scripts, `WalkIntoScene.cs`, `SpriteSwap.cs`, `IdleBreath.cs`, `PoseSettle.cs`, the teacher and guard sprites, the back-view walk frames and sitting poses |
 | Pull request | #11, merged as `2705335` on 5 November 2026 |
-| Traceable author | `Kylo Bryan Lacida <lacidakylo@gmail.com>` on `origin/salinlahi-local-main`. **His authorship does not appear on `main`:** the two histories cannot be merged (Part VII), so his files were carried across in `ddf78af`, which is authored by Daquis. The branch is kept on the remote precisely so his authorship stays provable. |
-| Final status | Merged as files; authorship traceable only on `origin/salinlahi-local-main` |
+| Traceable author | `Kylo Bryan Lacida <lacidakylo@gmail.com>` on `origin/salinlahi-local-main`. **For this transplanted work his authorship does not appear on `main`:** the two histories cannot be merged (Part VII), so his files were carried across in `ddf78af`, which is authored by Daquis. The branch is kept on the remote precisely so his authorship stays provable. |
+| Final status | Merged as files; authorship for this phase traceable only on `origin/salinlahi-local-main` |
+
+**A second phase, from 8 November.** Working inside this repository rather than
+his own, the same member has since authored **40 non-merge commits on `main`**
+under his own name and email — the Paaralan animation system (`PoseSequence.cs`,
+`Docs/AnimationStandard.md`, 17 art-fitting tools in `Tools/`) and the word-list
+restructure across all fourteen scenes. `git shortlog -sne main` lists him
+directly. The contrast between the two phases is the clearest evidence in this
+report of what the workflow is for: identical effort, and only one of them is
+visible to the history.
 
 ---
 
@@ -724,11 +733,71 @@ and none resolve to his.
 The history is the evidence, and only what is recorded counts. Our hardest
 problem was not a conflict inside a file — it was a teammate building in a
 Unity project he had started separately, so Git found no common ancestor and
-his work had to be transplanted file by file with 170 GUIDs rewritten. His name
-is still not on `main` because of it. Nothing about the code caused that; the
-workflow did. I also learned that a commit message is written for the next
+his work had to be transplanted file by file with 170 GUIDs rewritten, and his
+name is on none of it. Nothing about the code caused that; the workflow did.
+He has worked inside this repository since, and 40 commits now carry his name,
+which is the whole argument in one line. I also learned that a commit message is written for the next
 reader, and that merging my own pull requests is not review. For the rest of
 the capstone: one repository, one `main`, a branch per task, scenes claimed
 before they are edited, and a reviewer who is not me.
 
 *(Approximately 120 words.)*
+
+---
+
+| Field | Entry |
+|---|---|
+| **Student Name** | Manzanero, Kyla Samantha |
+| **Group Number** | 33 |
+| **Version-Control Platform Used** | Git + GitHub |
+| **Username / Account** | `Kyla Samantha Manzanero`, `manzanerokyla@gmail.com` |
+| **Branch Name** | `main` — her work ran from 11 to 29 October, before the group adopted pull requests on 30 October |
+| **Assigned Task** | Build two of the game's three levels end to end — Paaralan and Parke, five scenes each — and rebuild the level-summary screen from the group's UI kit |
+| **Commit Hash** | `45f1f99` (*Build Paaralan: classroom, lesson, recess and dismissal*, 28 files, +22,573), with `7b6d75f`, `639908b`, `523a602` and 7 others — 11 commits, 212 distinct files, +82,564 / −22,158 |
+| **Relevant File or Component** | `Assets/Editor/BuildPaaralanScene1–5.cs` and `BuildParkeScene1–5.cs`; `Assets/Editor/SceneResultPanelBuilder.cs`; `Assets/Scripts/NicknameAvailability.cs`, `NicknameSuggester.cs`, `SupabaseClient.cs`; the summary UI sprites and their `Tools/cut_summary_*.py` builders |
+| **Pull Request Reference** | None. These commits were pushed directly to `main` before the pull-request workflow existed; the first pull request on this repository is #1, merged 30 October |
+| **Reviewer** | None at the time. She later acted as reviewer on PR #3 (Daquis) |
+| **Final Status** | Merged (on `main`) |
+
+### What I learned
+
+Ten of the game's fifteen scenes are mine, and almost none of that work can
+be pointed at as a review. I pushed straight to `main` for three weeks because
+it was faster, and it was — right up to the first time two of us had edited
+the same scene and Git had no branch to tell the versions apart. I also learned
+that a 24,000-line commit is not reviewable by anyone, including me a week
+later: *Build Parke, the third and last level* is one commit and should have
+been five. What I would keep is building scenes from editor scripts rather than
+by hand, because a generated scene can be rebuilt after a merge goes wrong. What
+I would change is branching from the first day, not the thirtieth.
+
+*(Approximately 125 words.)*
+
+---
+
+| Field | Entry |
+|---|---|
+| **Student Name** | Lacida, Kylo Bryan |
+| **Group Number** | 33 |
+| **Version-Control Platform Used** | Git + GitHub |
+| **Username / Account** | `Kylo Bryan Lacida`, `lacidakylo@gmail.com` |
+| **Branch Name** | Two phases: `salinlahi-local-main`, his own separate project history, integrated through `claude/paaralan-from-groupmate`; then `main` directly from 8 November, once he was working inside the group repository |
+| **Assigned Task** | The Paaralan level's character animation — replace every instant pose change with a drawn sequence, and build the tooling that cuts generated art to match the existing character |
+| **Commit Hash** | `e515e2f` (*Animate Paaralan Scene 2, and put Kylo back in his own shirt*, which introduced `PoseSequence.cs`), with `64a8c92` and `390be73` from the earlier phase — **40 non-merge commits on `main`**, 135 distinct files, +49,193 / −36,971 |
+| **Relevant File or Component** | `Assets/Scripts/PoseSequence.cs` (new), `WalkIntoScene.cs`, `SceneObjectiveController.cs`; `Assets/Editor/BuildPaaralanScene1–5.cs`; `Docs/AnimationStandard.md` (new); 17 new art-fitting tools in `Tools/`, including `fit_seated_pose.py`, `check_pose_strip.py` and `make_gate_frames.py`; `.gitattributes` |
+| **Pull Request Reference** | PR #11 — `claude/paaralan-from-groupmate` → `main`, merged as `2705335`, 5 November 2026, for the transplanted phase. The 40 later commits were pushed directly to `main` |
+| **Reviewer** | Daquis, Jhesza Mhei G. (PR #11). None for the direct commits |
+| **Final Status** | Merged. Authorship for the second phase is traceable on `main` under his own name and email; for the first phase it is traceable only on `origin/salinlahi-local-main`, for the reason given in Part VII |
+
+### What I learned
+
+I started building in a Unity project of my own instead of cloning the group's,
+and that one decision cost more than any bug I have fixed. The two histories
+share no commit — no common ancestor at all, 168 on my side and 146 on theirs —
+so Git could not merge them and never will. My work had to be carried across
+file by file with 170 GUIDs rewritten, and my name is not on `main` for any of
+it. Since 8 November I have worked in the group repository and 40 commits carry
+my name. The lesson is not about Git commands. It is that a repository is the
+team's shared history, and work done outside it is work the history cannot see.
+
+*(Approximately 125 words.)*
