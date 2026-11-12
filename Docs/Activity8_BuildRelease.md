@@ -133,7 +133,7 @@ a complete capstone and its version should not claim to be.
 - 15 playable scenes across three places: Bahay (home), Paaralan (school) and Parke (park), five scenes each.
 - 54 distinct Filipino words taught across 74 spoken objectives.
 - Continuous Filipino (`fil-PH`) speech recognition, with mic and replay controls and on-screen listening states.
-- Pronunciation judged by Filipino phonology rather than letter-edit distance, so a wrong vowel is rejected and words taught in the same scene are not accepted for one another.
+- Pronunciation judged by Filipino phonology rather than letter-edit distance, so that words taught in the same scene are not accepted for one another. **The device test found this is not yet effective in play** — see Part VI and Known Issues.
 - Named player profiles, several per device, saved locally as `players.json`.
 - Per-scene score, stars and a "words learned" panel with English meanings.
 - One shared online leaderboard, written through a Supabase Edge Function.
@@ -323,7 +323,8 @@ release package. Not the development machine, and not the Unity Editor.
 version was read off the game's own About screen before testing began, so the
 build being tested is known rather than assumed.
 
-Every check met its expected result.
+**Nine of the ten checks passed. One failed**, and it is the most important
+one in the game.
 
 | Release Test | Expected Result | Actual Result | Status |
 |---|---|---|---|
@@ -331,20 +332,52 @@ Every check met its expected result.
 | Version is identifiable | SETTINGS > ABOUT reads `v0.1.0` under the title | ABOUT printed `v0.1.0` | Pass |
 | Microphone permission | Android asks once; the game listens after it is allowed | Asked once; the game listened once allowed | Pass |
 | Main feature works | Saying *Bangon* in Bahay 1 is accepted and Kylo gets up | Accepted; Kylo got up | Pass |
-| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | Not accepted; the prompt asked again | Pass |
+| Wrong pronunciation rejected | A wrong vowel is not accepted; the prompt asks again | **A deliberately mispronounced word was accepted as correct** | **Fail** |
 | Required assets load | Backgrounds, characters, music and narration all present | All present | Pass |
 | Scene summary works | The summary panel shows the score, stars and words learned | Shown as expected | Pass |
 | Leaderboard works | A finished scene's total appears on the board | The total appeared on the board | Pass |
 | Save/load works | A player profile survives closing and reopening the app | The profile survived a restart | Pass |
 | Application closes normally | The app exits without hanging or crashing | Exited cleanly | Pass |
 
-No row failed, so nothing from this run was added to Known Issues. Had one
-failed, it would have been recorded as a failure and either moved into Known
-Issues or treated as blocking the release — a failed check is never left to
-look like a pass.
+### The failure, and what was done about it
 
-The known issues listed in Part VII stand regardless: they are limitations the
-group already knew about, not things this run discovered.
+The failed row is not a cosmetic one. SALINLAHI exists to correct how a child
+says a Filipino word, so a checker that accepts a mispronunciation is failing
+at the system's central purpose.
+
+What makes it interesting is that the checker is not obviously at fault.
+`PronunciationChecker` folds only the variation that is genuinely free in
+Filipino (e/i and o/u, Spanish-era spellings, the uw/w glide) and then requires
+an exact match, and the editor tool `Tools > SALINLAHI > Check Pronunciation
+Matching` proves across all 51x50 pairs of taught words that no two are
+confusable. It rejects a wrong vowel every time it is asked directly.
+
+The most likely explanation is that it is never asked. The device's Filipino
+dictation service is built to return the nearest real Filipino word, not the
+sounds that were actually made, so a mispronounced *Kuha* may well arrive at
+the checker already corrected to "kuha". The checker then agrees, correctly,
+that "kuha" matches **Kuha**. If that is what is happening, no amount of
+strictness in the checker can fix it, because the error is gone before the
+checker sees it. Confirming this is the first task after the release, using the
+per-attempt log `VoiceAttemptLog` already writes on the device.
+
+Three things followed immediately, before the release was distributed:
+
+1. The release notes had listed this as **Fixed**. That claim was removed — it
+   was true of the checker's own tests and false of the game on a phone, and
+   the second is the one that matters to a user.
+2. It was added to Known Issues as the first and most serious entry, saying
+   plainly that the right/wrong judgement is unreliable.
+3. v0.1.0 stays a **testing build**, not a stable release, which is what the
+   activity requires of a release carrying a known defect of this weight. It
+   is distributed so the group can gather the attempt logs needed to diagnose
+   it, and the release notes say so.
+
+This is the clearest argument in this activity for testing the package rather
+than the editor. In the editor the **Enter** key stands in for speaking, so it
+feeds the checker a perfectly spelled word and the check passes every time. The
+defect is invisible until someone speaks badly into a real phone on purpose.
+Nine tests confirmed what was expected; the tenth found something no one knew.
 
 ### Why this cannot be done in the editor
 
@@ -382,12 +415,14 @@ pronunciation judged phonologically; named player profiles with local saves;
 the shared Supabase leaderboard; 423 narrator voice clips; music, sound effects
 and volume controls.
 
-**Fixed** — wrong-vowel answers used to be accepted, which forgave exactly the
-error the game exists to correct; the app reported no version at all; the
-Android package id was Unity's default; internet access was left to
-auto-detection; releases had no repeatable procedure.
+**Fixed** — the app reported no version at all; the Android package id was
+Unity's default; internet access was left to auto-detection; releases had no
+repeatable procedure. (Wrong-vowel rejection was listed here until the device
+test; see Part VI.)
 
-**Known issues** — 15 of the narrator's repeated lines are unrecorded and show
+**Known issues** — **wrong pronunciation is still accepted during play on a
+device, which is the most serious issue in the release and is why v0.1.0 is a
+testing build**; 15 of the narrator's repeated lines are unrecorded and show
 as captions; the opening prompt of a scene holds a long silent pause; the MINI
 GAME button does nothing; Teacher Rachel's portrait is unassigned; word badges
 sit low in three scenes; no voice input without internet; suspend and resume
