@@ -1,0 +1,72 @@
+# SALINLAHI - Group 33
+#
+# Two separate concerns live in this file. The merge section, which is ACTIVE,
+# changes how Unity's own text files are combined when two members edit the
+# same scene. The LFS section, which is NOT, would change how binaries are
+# stored - and the comment there records why it is not switched on yet.
+#
+# ======================================================================
+# Unity SmartMerge - scene, prefab and asset merges        [ACTIVE]
+# ======================================================================
+# A .unity file is YAML, so Git merges it line by line and can produce a file
+# that parses cleanly but describes a scene nobody built - two members move
+# different objects, and the result quietly loses one of them.
+# UnityYAMLMerge understands the format and merges by object instead.
+#
+# The driver is a path to an executable, so it cannot live in this file -
+# each member registers it once on their own machine, pointing at their own
+# Unity install. On this project's editor version that is:
+#
+#     git config merge.unityyamlmerge.name "Unity SmartMerge"
+#     git config merge.unityyamlmerge.driver "'D:/Unity/6000.6.2f1/Editor/Data/Tools/UnityYAMLMerge.exe' merge -p --force --fallback ondemand %O %B %A %A"
+#     git config merge.unityyamlmerge.recursive binary
+#
+# Until it is registered Git falls back to its normal merge, so a machine
+# that has not run those three lines is no worse off than before this file
+# existed - it simply does not get the better merge.
+*.unity  merge=unityyamlmerge
+*.asset  merge=unityyamlmerge
+*.prefab merge=unityyamlmerge
+
+# Unity's formats are text and must stay diffable. Marking them explicitly
+# also keeps line endings consistent across the three machines on this
+# project, which is what stops a scene showing as wholly rewritten when it
+# was opened on a different one.
+*.unity text
+*.asset text
+*.meta  text
+
+# ======================================================================
+# Git LFS - large binary assets                      [NOT SWITCHED ON]
+# ======================================================================
+# The case for it is real. The tracked project is about 443 MB and binaries
+# are almost all of it - 425 .wav at 272.8 MB, 356 .png at 157.2 MB - and
+# plain Git stores a complete new copy of a binary on every change, so
+# re-exporting one 30 MB music track five times adds 150 MB permanently.
+#
+# The three rules that would do it are written below, commented out. They
+# are commented out because switching them on NOW, in this repository, makes
+# things worse rather than better, and that was measured rather than guessed:
+#
+#   Turning them on marks all 807 binaries already in the project as
+#   modified, because Git compares the working file against the stored blob
+#   THROUGH the new filter. Committing that converts the whole 443 MB into
+#   LFS objects in a single commit - while every original blob stays in the
+#   history, where it already is. The repository gets BIGGER, and 443 MB of
+#   new LFS objects does not fit in GitHub's 1 GB free LFS allowance.
+#
+#   Shrinking the history instead needs `git lfs migrate import --everything`,
+#   which rewrites every commit and changes every hash. On a repository three
+#   people are working in, with open branches, that is a coordinated
+#   operation for a quiet week, not a convenience.
+#
+# So the honest state is: appropriate for this project, worth doing, and
+# correctly done either at the start of a project or during a planned
+# migration - neither of which is now. Every member must also have run
+# `git lfs install` before the first LFS file is pulled, or they receive a
+# 130-byte text pointer named foo.png and Unity imports it as a broken
+# texture.
+#
+# *.wav  filter=lfs diff=lfs merge=lfs -text
+# *.png  filter=lfs diff=lfs merge=lfs -text
+# *.ttf  filter=lfs diff=lfs merge=lfs -text

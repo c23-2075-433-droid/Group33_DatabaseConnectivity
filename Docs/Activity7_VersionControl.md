@@ -122,13 +122,13 @@ The five background music tracks are the largest single files at 30.5 MB each
 `music_journey.wav`, `music_menu.wav`) — 151 MB for `Assets/Resources/Music`
 alone.
 
-**Git LFS is not currently in use**; there is no `.gitattributes` in the
-repository. Assessment: it is appropriate here and the group should adopt it.
-Plain Git stores a complete new copy of a binary file on every change, so
-re-exporting one 30 MB music track five times adds 150 MB to the history
-permanently. No single file approaches GitHub's 100 MB hard limit, so nothing
-is broken today, but the repository is already near the 1 GB size GitHub asks
-projects to stay under. The intended configuration:
+**Git LFS is not currently in use.** Assessment: it is appropriate for a
+project shaped like this one, and the rules below are the configuration it
+would take. Plain Git stores a complete new copy of a binary file on every
+change, so re-exporting one 30 MB music track five times adds 150 MB to the
+history permanently. No single file approaches GitHub's 100 MB hard limit, so
+nothing is broken today, but the repository is already near the 1 GB size
+GitHub asks projects to stay under. The configuration:
 
 ```
 # .gitattributes
@@ -142,14 +142,42 @@ projects to stay under. The intended configuration:
 *.meta  text
 ```
 
-A second `.gitattributes` entry worth adding regardless of LFS is Unity's YAML
-merge driver, which merges two members' scene edits semantically instead of
-line by line:
+**Those three rules are written into `.gitattributes` but left commented
+out, and the reason is worth recording, because it was measured rather than
+assumed.** Enabling them marks all 807 binaries already in the project as
+modified — Git compares each working file against its stored blob *through*
+the new filter, so every one of them differs. Committing that converts the
+whole 443 MB into LFS objects in a single commit, while each original blob
+stays in the history where it already is: the repository gets **bigger**, and
+443 MB of new LFS objects does not fit GitHub's 1 GB free LFS allowance.
+Shrinking the history instead needs `git lfs migrate import --everything`,
+which rewrites every commit and changes every hash — a coordinated operation
+for a quiet week, not something to run on a repository three people have open
+branches in. LFS is correctly adopted at the start of a project or during a
+planned migration, and this repository is at neither point.
+
+A second `.gitattributes` entry, worth adding regardless of LFS and **active
+in the repository now**, is Unity's YAML merge driver. A `.unity` file is
+YAML, so Git merges it line by line and can produce a file that parses
+cleanly but describes a scene nobody built — two members move different
+objects and the result quietly loses one of them. UnityYAMLMerge merges by
+object instead:
 
 ```
 *.unity  merge=unityyamlmerge
 *.asset  merge=unityyamlmerge
 *.prefab merge=unityyamlmerge
+```
+
+The driver is a path to an executable, so it cannot be committed. Each member
+registers it once on their own machine, pointing at their own Unity install;
+until they do, Git falls back to its normal merge, so an unregistered machine
+is no worse off than before:
+
+```
+git config merge.unityyamlmerge.name "Unity SmartMerge"
+git config merge.unityyamlmerge.driver "'<Unity>/Editor/Data/Tools/UnityYAMLMerge.exe' merge -p --force --fallback ondemand %O %B %A %A"
+git config merge.unityyamlmerge.recursive binary
 ```
 
 ### How another member obtains a usable copy
