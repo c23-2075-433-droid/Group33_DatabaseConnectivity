@@ -85,7 +85,7 @@ public static class SettingsAboutDialogBuilder
         return d;
     }
 
-    /// <summary>About popup: the capstone credits and an OKAY button, unchanged.</summary>
+    /// <summary>About popup: the build's version, the capstone credits and an OKAY button.</summary>
     public static Dialog BuildAbout(Transform canvas)
     {
         Vector2 board = new Vector2(PanelWidth, PanelWidth / AboutAspect);
@@ -95,6 +95,17 @@ public static class SettingsAboutDialogBuilder
 
         CreateText(panel, "Title", "About", new Vector2(0, h * 0.27f),
             new Vector2(PanelWidth * 0.7f, h * 0.14f), 58, FontStyle.Bold);
+
+        // The version sits in the gap between the title and the credits, which
+        // is the only clear band on this board: the credits run to about
+        // -0.2h and OKAY starts at -0.3h, so there is nothing below them to
+        // use. A tester reading a bug report can now name the build it came
+        // from. The number itself is filled in at run time by VersionLabel, so
+        // it tracks Player Settings rather than whenever this builder last ran.
+        Text version = CreateText(panel, "Version", "v" + Application.version,
+            new Vector2(0, h * 0.198f), new Vector2(PanelWidth * 0.5f, h * 0.06f),
+            26, FontStyle.Bold);
+        version.gameObject.AddComponent<VersionLabel>();
 
         CreateText(panel, "AboutBody",
             "A game for learning Filipino words by speaking them out loud.\n\n" +
