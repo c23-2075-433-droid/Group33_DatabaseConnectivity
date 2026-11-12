@@ -1,13 +1,17 @@
 // Assets/Editor/BuildParkeScene3.cs
 //
 // One-click scene builder for Parke Scene 3 ("Meeting New Friends").
-// Teaches five words: Kumusta, Ngiti, Tanong, Sali, Bati.
+// Teaches five words: Bati, Ngiti, Tanong, Sali, Paalam.
 //
-// Ngiti and Bati are new. Kumusta, Tanong and Sali return from the school
-// gate, the vocabulary lesson and recess - and they return CHANGED, which is
-// the point of them being here. Kumusta at the gate was said to a guard on
-// duty; here it is said to a stranger his own age. Tanong in the lesson was
-// putting a hand up; here it is asking somebody their name.
+// Ngiti and Sali are new. Bati, Tanong and Paalam return from the school
+// gate, the vocabulary lesson and the end of the school day - and they
+// return CHANGED, which is the point of them being here. Bati at the gate
+// was said to a guard on duty; here it is said to a stranger his own age.
+// Tanong in the lesson was putting a hand up; here it is asking somebody
+// their name.
+//
+// Kumusta used to lead this scene and is gone: it and Bati were two words
+// for the same thing in one room, both running greet.Apply.
 //
 // A MIDDLE SCENE OF LEVEL 3. Scene 2 fades into this one; this one fades into
 // Scene 4, the picnic, which ends the level.
@@ -19,11 +23,11 @@
 //
 // WHAT EACH WORD DOES:
 //
-//   Kumusta   Kylo turns to greet him; the other boy lights up
+//   Bati      Kylo turns to greet him; the other boy lights up
 //   Ngiti     Kylo lights up, still in the greeting pose - he is smiling
 //   Tanong    the other boy lights up: he is the one being asked
-//   Sali      BOTH throw their arms up - they are playing
-//   Bati      both settle back, and the space between them lights up
+//   Sali      BOTH throw their arms up - he has joined the game
+//   Paalam    both settle back, and the space between them lights up
 //
 // Ngiti is the weakest of the five and it is worth being plain about why. A
 // smile is a face, and the character set has no face that is only a smile -
@@ -264,7 +268,7 @@ public class BuildParkeScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Parke Scene 3 built and saved to " + ScenePath +
-                   ". Words: Kumusta, Ngiti, Tanong, Sali, Bati - Ngiti and Bati new. " +
+                   ". Words: Bati, Ngiti, Tanong, Sali, Paalam - Ngiti and Sali new. " +
                    "It fades into " + NextScene + ", which ends the level - so build Parke " +
                    "Scene 4 as well, or the level runs into a scene that is not there.");
     }

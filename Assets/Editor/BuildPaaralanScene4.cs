@@ -213,6 +213,14 @@ public class BuildPaaralanScene4
         // better, and this is honest until there is.
         TimedOverlay gleamTapon = CreateGleamAt("Gleam_Tapon", BaonX,
                                                  FloorY + BaonHeight * 0.5f, 1.6f);
+
+        // "Hugas" lands ON Kylo, and CreateGleamAt leaves a gleam on the
+        // "Props" layer, which this project sorts BELOW "Player". Left there
+        // it would be drawn behind the boy it is pointing at. The others all
+        // mark things on the ground or the food, which are on Props too, so
+        // they are fine where they are.
+        gleamHugas.overlay.sortingLayerName = "Player";
+        gleamHugas.overlay.sortingOrder = 40;
         TimedOverlay gleamLaro = classmate != null
             ? CreateGleam("Gleam_Laro", classmate, 3.4f)
             : CreateGleamAt("Gleam_Laro", ClassmateX, FloorY + 1.4f, 3.4f);

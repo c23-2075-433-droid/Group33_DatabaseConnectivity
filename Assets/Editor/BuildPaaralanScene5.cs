@@ -207,7 +207,11 @@ public class BuildPaaralanScene5
             ? CreateGleam("Gleam_Alis", teacher, 2.4f)
             : CreateGleamAt("Gleam_Alis", TeacherX, TeacherHipY + TeacherHeight * 0.5f, 2.4f);
 
-        foreach (TimedOverlay fx in new[] { gleamLigpit, gleamBag })
+        // gleamUpo joins them: it lands on the seated Kylo, and a gleam left
+        // on the "Props" layer sorts BELOW "Player" and is drawn behind him.
+        // Long-standing rather than new - it has marked his chair from behind
+        // him since this scene was written.
+        foreach (TimedOverlay fx in new[] { gleamUpo, gleamLigpit, gleamBag })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderDeskProps + 1;

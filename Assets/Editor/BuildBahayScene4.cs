@@ -192,6 +192,11 @@ public class BuildBahayScene4
         // It wants a mirror drawn into the room and the gleam moved onto it;
         // until then this is the honest staging rather than the finished one.
         TimedOverlay gleamSalamin = CreateGleam("Gleam_Salamin", playerGO, 3.4f);
+        // It lands ON Kylo, and CreateGleam leaves a gleam on the "Props"
+        // layer, which this project sorts BELOW "Player". Left there it would
+        // be drawn behind the boy it is pointing at.
+        gleamSalamin.overlay.sortingLayerName = "Player";
+        gleamSalamin.overlay.sortingOrder = 40;
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
