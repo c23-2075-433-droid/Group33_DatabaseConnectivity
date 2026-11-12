@@ -40,6 +40,10 @@
 //   guard_frame_1..3 - the guard waving back, by
 //                              Tools/make_guard_frames.py. These REPLACE
 //                              char_guard and char_guard_idle here.
+//   guard_push_1..3  - the guard pushing the gate open, by
+//                              Tools/make_guard_push_frames.py
+//   pasok_turn_uniform_with_bag - the three-quarter view between his profile
+//                              and his back, by Tools/make_pasok_turn_frame.py
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
@@ -229,6 +233,35 @@ public class BuildPaaralanScene1
         guardFrames.framesPerSecond = 9f;
         guardFrames.playOnEnable = false;
 
+        // --- The guard OPENS the gate, rather than it opening itself ---
+        //
+        // "Bukas" swung the gate with nobody touching it, which the brief
+        // rules out as plainly as it rules out replacing the shut gate with
+        // an open one. He stands at x 3.10, right beside the right-hand
+        // panel, so his is the natural reach.
+        //
+        // THE GATE STARTS ON THE FRAME HIS PALM ARRIVES. fireOnFrame is 1 -
+        // guard_push_2, the one with his hand flat against the panel - and
+        // the gate's own sequence is started from onFrameReached. Earlier and
+        // the gate moves before he touches it; later and he pushes air.
+        //
+        // The push frames are drawn with an open hand reaching into empty
+        // space and no gate in them, so the gate stays the separate thing it
+        // already is and the two can be timed against each other.
+        PoseSequence guardPush = guard.AddComponent<PoseSequence>();
+        guardPush.target = guardSr;
+        guardPush.frames = new[]
+        {
+            LoadSpriteOptional("guard_push_1"),
+            LoadSpriteOptional("guard_push_2"),
+            LoadSpriteOptional("guard_push_3"),
+        };
+        guardPush.tailFrames = new[] { LoadSpriteOptional("guard_push_1") };
+        guardPush.destinationSprite = LoadSpriteOptional("guard_frame_1");
+        guardPush.framesPerSecond = 7f;
+        guardPush.playOnEnable = false;
+        guardPush.fireOnFrame = 1;
+
         // --- Player, arriving at the gate on the left ---
         // Not further left than this: the flowering bushes along the left wall
         // are painted nearer the camera than the pavement, so a character out
@@ -326,11 +359,33 @@ public class BuildPaaralanScene1
         TimedOverlay gateGleam = CreateGleam("Gleam_Bukas", gateSpot, 4.60f);
 
         // "Pasok" turns him side-on again before he walks in.
-        GameObject walkPoseGO = new GameObject("Pose_Walk");
-        PoseSwitch facingWalk = walkPoseGO.AddComponent<PoseSwitch>();
-        facingWalk.player = player;
-        facingWalk.standingSprite = LoadSprite("standing_uniform_with_bag");
-        facingWalk.walkFrames = UniformWalkFrames();
+        // --- "Pasok": he TURNS before he walks in ---
+        //
+        // This was a PoseSwitch: side profile in one frame, back-facing walk
+        // in the next, a quarter turn with nothing between.
+        // pasok_turn_uniform_with_bag is the view in the middle - shoulders
+        // angled away, most of the backpack showing, a sliver of cheek past
+        // the side of his head.
+        //
+        // Only the middle frame is new. The two ends of the turn already
+        // exist as standing_uniform_with_bag and back_walk_1, and they were
+        // generated alongside it so the generation could be judged against
+        // art we already have.
+        //
+        // It drives standingSprite rather than the renderer, for the same
+        // reason the greeting does: PlayerMovement rewrites its renderer
+        // from standingSprite on every idle frame. When the turn finishes it
+        // hands over to WalkIntoScene, which takes the renderer for itself
+        // and cycles the back-facing frames - so the turn plays, then he
+        // walks away, rather than both at once.
+        GameObject turnPoseGO = new GameObject("Pose_Turn");
+        PoseSequence turnFrames = turnPoseGO.AddComponent<PoseSequence>();
+        turnFrames.player = player;
+        turnFrames.frames = new[] { LoadSpriteOptional("pasok_turn_uniform_with_bag") };
+        turnFrames.destinationSprite = LoadSpriteOptional("pasok_turn_uniform_with_bag");
+        // A quarter turn is quick, but one frame at eleven is a flicker.
+        turnFrames.framesPerSecond = 4f;
+        turnFrames.playOnEnable = false;
 
         // --- Going IN, which on this painting is away from the camera ---
         //
@@ -483,8 +538,12 @@ public class BuildPaaralanScene1
         // to open it. Lighting both at the same moment is what ties the two
         // together without a second pose for him to be drawn in.
         var bukas = MakeObjective("Bukas", pBukas);
+        // The guard reaches; the GATE is started by his hand landing, from
+        // guardPush.onFrameReached rather than from the word, so the panels
+        // never move before he touches them.
         UnityEventTools.AddPersistentListener(bukas.onCorrect, guardGleam.Play);
-        UnityEventTools.AddPersistentListener(bukas.onCorrect, gateFrames.Play);
+        UnityEventTools.AddPersistentListener(bukas.onCorrect, guardPush.Play);
+        UnityEventTools.AddPersistentListener(guardPush.onFrameReached, gateFrames.Play);
         UnityEventTools.AddPersistentListener(bukas.onCorrect, gateGleam.Play);
 
         // Both of them move: Kylo turns to wave, and the guard waves back.
@@ -497,9 +556,12 @@ public class BuildPaaralanScene1
 
         // He turns side-on again, then walks INTO the gate rather than past
         // it - up the frame and smaller, which is what the perspective asks.
+        // He turns first, and the walk starts when the turn finishes rather
+        // than alongside it - otherwise WalkIntoScene takes the renderer on
+        // the same frame and the turn is never seen.
         var pasok = MakeObjective("Pasok", pPasok);
-        UnityEventTools.AddPersistentListener(pasok.onCorrect, facingWalk.Apply);
-        UnityEventTools.AddPersistentListener(pasok.onCorrect, enter.Begin);
+        UnityEventTools.AddPersistentListener(pasok.onCorrect, turnFrames.Play);
+        UnityEventTools.AddPersistentListener(turnFrames.onFinished, enter.Begin);
 
         // Takbo is a real run, not a relabelled walk - but it is now a run
         // further INTO the scene, to the foot of the school steps. The legs
@@ -539,6 +601,8 @@ public class BuildPaaralanScene1
         if (backWalk == null) missing += "\n  back_walk_1/3_uniform_with_bag - Kylo walks into the school side-on, which reads as sliding rather than going away.";
         else if (backPass == null) missing += "\n  back_walk_2_uniform_with_bag - the legs-together frame. The walk is two strides with no in-between, so it reads as a shuffle.";
         if (backRunA == null || backRunB == null) missing += "\n  back_run_1/2_uniform_with_bag - \"Takbo\" uses the walk cycle taken faster, so it is quicker but not a different gait.";
+        if (LoadSpriteOptional("pasok_turn_uniform_with_bag") == null)
+            missing += "\n  pasok_turn_uniform_with_bag - \"Pasok\" turns him from his profile straight to his back in one frame. Run Tools/make_pasok_turn_frame.py.";
 
         Debug.Log("[SALINLAHI] Paaralan Scene 1 built and saved to " + ScenePath +
                    ". Words: Lakad, Bukas, Bati, Pasok, Takbo - walking up to the gate, " +
