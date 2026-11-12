@@ -40,6 +40,8 @@
 //   guard_frame_1..3 - the guard waving back, by
 //                              Tools/make_guard_frames.py. These REPLACE
 //                              char_guard and char_guard_idle here.
+//   guard_push_1..3  - the guard pushing the gate open, by
+//                              Tools/make_guard_push_frames.py
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
@@ -228,6 +230,35 @@ public class BuildPaaralanScene1
         guardFrames.destinationSprite = LoadSpriteOptional("guard_frame_1");
         guardFrames.framesPerSecond = 9f;
         guardFrames.playOnEnable = false;
+
+        // --- The guard OPENS the gate, rather than it opening itself ---
+        //
+        // "Bukas" swung the gate with nobody touching it, which the brief
+        // rules out as plainly as it rules out replacing the shut gate with
+        // an open one. He stands at x 3.10, right beside the right-hand
+        // panel, so his is the natural reach.
+        //
+        // THE GATE STARTS ON THE FRAME HIS PALM ARRIVES. fireOnFrame is 1 -
+        // guard_push_2, the one with his hand flat against the panel - and
+        // the gate's own sequence is started from onFrameReached. Earlier and
+        // the gate moves before he touches it; later and he pushes air.
+        //
+        // The push frames are drawn with an open hand reaching into empty
+        // space and no gate in them, so the gate stays the separate thing it
+        // already is and the two can be timed against each other.
+        PoseSequence guardPush = guard.AddComponent<PoseSequence>();
+        guardPush.target = guardSr;
+        guardPush.frames = new[]
+        {
+            LoadSpriteOptional("guard_push_1"),
+            LoadSpriteOptional("guard_push_2"),
+            LoadSpriteOptional("guard_push_3"),
+        };
+        guardPush.tailFrames = new[] { LoadSpriteOptional("guard_push_1") };
+        guardPush.destinationSprite = LoadSpriteOptional("guard_frame_1");
+        guardPush.framesPerSecond = 7f;
+        guardPush.playOnEnable = false;
+        guardPush.fireOnFrame = 1;
 
         // --- Player, arriving at the gate on the left ---
         // Not further left than this: the flowering bushes along the left wall
@@ -483,8 +514,12 @@ public class BuildPaaralanScene1
         // to open it. Lighting both at the same moment is what ties the two
         // together without a second pose for him to be drawn in.
         var bukas = MakeObjective("Bukas", pBukas);
+        // The guard reaches; the GATE is started by his hand landing, from
+        // guardPush.onFrameReached rather than from the word, so the panels
+        // never move before he touches them.
         UnityEventTools.AddPersistentListener(bukas.onCorrect, guardGleam.Play);
-        UnityEventTools.AddPersistentListener(bukas.onCorrect, gateFrames.Play);
+        UnityEventTools.AddPersistentListener(bukas.onCorrect, guardPush.Play);
+        UnityEventTools.AddPersistentListener(guardPush.onFrameReached, gateFrames.Play);
         UnityEventTools.AddPersistentListener(bukas.onCorrect, gateGleam.Play);
 
         // Both of them move: Kylo turns to wave, and the guard waves back.
