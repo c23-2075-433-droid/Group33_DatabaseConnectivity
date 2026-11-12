@@ -124,20 +124,34 @@ whichever key scheme the project is on — `SUPABASE_SERVICE_ROLE_KEY` on older
 projects, the `default` entry of `SUPABASE_SECRET_KEYS` on newer ones. **The
 service key is never in Unity, never in the repository and never in a build.**
 
-JWT verification can be left at its default. The platform accepts the
-project's publishable or anon key on the `apikey` header, which is what the
-game sends, and the token described below is what actually decides whether a
-row may be changed — none of the function's own checks ever relied on the
-platform's. If a call does come back `401`, turn verification off for this one
-function: in the dashboard's settings for it, or with `verify_jwt = false`
-under `[functions.submit-score]` in `supabase/config.toml` if you are using
-the CLI (`supabase functions deploy submit-score --no-verify-jwt`).
+**Turn JWT verification off.** On the function's page, open **Settings** and
+switch off **Verify JWT with legacy secret**, then **Save changes**.
 
-To check it is live, use **Test** on the function's page: method `POST`, body
-`{"player_id":"00000000-0000-0000-0000-000000000000","nickname":"test",`
-`"total_points":0,"total_stars":0,"token":""}`. A reply of
-`{"ok":true,"token":"…"}` means it works — delete that test row from
-`leaderboard` afterwards.
+That setting requires a JWT signed by the project's *legacy* secret in the
+`Authorization` header. A legacy `anon` key is one and satisfies it; an
+`sb_publishable_…` key is not a JWT at all, so a project on the newer key
+scheme gets `401` on every call with this left on. SupabaseClient only sends
+an `Authorization` header when the key is a JWT, for the PostgREST reason
+documented there, so with a publishable key it sends none.
+
+Turning it off costs nothing here, and it is what the dashboard itself
+recommends for a function that does its own checking — which this one does.
+The platform's check was never what protected a row; the token described
+below is. (With the CLI the same thing is `verify_jwt = false` under
+`[functions.submit-score]` in `supabase/config.toml`, or
+`supabase functions deploy submit-score --no-verify-jwt`.)
+
+To check it is live without putting a row on the board, use **Test** on the
+function's page with method `POST` and a deliberately bad id:
+
+```json
+{"player_id":"not-a-uuid","nickname":"test","total_points":0,"total_stars":0,"token":""}
+```
+
+`{"ok":false,"error":"player_id must be a UUID."}` is the right answer. It
+proves the function is up, that it is running this code rather than a
+template, and that the platform let the call through — and it writes nothing.
+A `401` instead means the JWT setting above is still on.
 
 ### How a player is identified, and what that is worth
 

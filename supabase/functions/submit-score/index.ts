@@ -23,15 +23,17 @@
 //   few milliseconds. That bounds what a forged submission is worth without
 //   pretending to a certainty that is not available.
 //
-// Deploying: the dashboard's editor is enough, and nothing about this
-// function needs JWT verification turned off. The platform accepts the
-// project's publishable or anon key on the apikey header, which is what the
-// game sends; it is the token below, not that header, that decides whether a
-// row may be changed. If a deployment ever does answer 401, turn verification
-// off for this one function - in the dashboard's settings for it, or with
-// `verify_jwt = false` under [functions.submit-score] in supabase/config.toml
-// - and nothing here changes, because none of the checks below ever relied on
-// the platform's.
+// Deploying: the dashboard's editor is enough, and the one setting that has
+// to be changed is "Verify JWT with legacy secret", on the function's
+// Settings tab. Turn it OFF.
+//
+// It requires a JWT signed by the project's legacy secret in the
+// Authorization header. A legacy anon key is one; an sb_publishable_ key is
+// not a JWT at all, and that is what the game ships - so with the setting on,
+// a project on the newer keys answers 401 to everything. Off is also what the
+// dashboard recommends for a function that does its own checking, which this
+// one does: the platform's check was never what protected a row. The token
+// below is.
 //
 // The service key exists only here, on the server. It is never in Unity,
 // never in the repository and never in a build.
