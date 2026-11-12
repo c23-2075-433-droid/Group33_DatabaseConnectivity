@@ -397,6 +397,13 @@ public class SceneObjectiveController : MonoBehaviour
         // seconds and this runs every time a word is answered.
         PoseSequence[] poses = FindObjectsByType<PoseSequence>(FindObjectsSortMode.None);
 
+        // And the third kind: a walk the scene drives itself. Paaralan Scene
+        // 1's "Pasok" hands Kylo to a WalkIntoScene, which disables
+        // PlayerMovement and moves the transform for a second and a half - so
+        // neither of the two above sees anything, and "Takbo" went up while
+        // he was still in the gateway.
+        WalkIntoScene[] entries = FindObjectsByType<WalkIntoScene>(FindObjectsSortMode.None);
+
         float waited = 0f;
 
         // The other half of the same problem: "Bangon" starts a sit-up
@@ -405,7 +412,7 @@ public class SceneObjectiveController : MonoBehaviour
         // and Rachel started introducing it, while Kylo was still half out of
         // bed. That one reports itself through PlayerMovement.IsPosing rather
         // than a PoseSequence, so both have to be asked.
-        while (waited < maxActionWait && (IsActing() || IsPosePlaying(poses)))
+        while (waited < maxActionWait && (IsActing() || IsPosePlaying(poses) || IsEntering(entries)))
         {
             waited += Time.deltaTime;
             yield return null;
@@ -437,6 +444,14 @@ public class SceneObjectiveController : MonoBehaviour
         if (poses == null) return false;
         foreach (PoseSequence p in poses)
             if (p != null && p.IsPlaying) return true;
+        return false;
+    }
+
+    private static bool IsEntering(WalkIntoScene[] entries)
+    {
+        if (entries == null) return false;
+        foreach (WalkIntoScene e in entries)
+            if (e != null && e.IsMoving) return true;
         return false;
     }
 

@@ -50,6 +50,14 @@ public class WalkIntoScene : MonoBehaviour
 
     private bool moving;
 
+    /// <summary>
+    /// True while he is walking away. SceneObjectiveController waits on this
+    /// before it moves the signpost on, the same way it waits on a
+    /// PoseSequence: "Pasok" is him walking through the gate, so the next word
+    /// should not appear while he is still in the gateway.
+    /// </summary>
+    public bool IsMoving { get { return moving; } }
+
     /// <summary>Wire this to the word's objective in SceneObjectiveController.</summary>
     public void Begin()
     {
