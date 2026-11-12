@@ -499,26 +499,17 @@ binaries per release becomes unusable to clone.
 The process is written up in full at `Docs/RELEASE_PROCESS.md`, which is the
 document the group keeps using. Its shape:
 
-```
+```flow
 Develop on a branch
-      ↓
-Pull request → review → merge into main
-      ↓
+Pull request, review, merge into main
 Determine the new version number
-      ↓
 Update Player Settings version, and the Android version code
-      ↓
 Write the release notes, before building
-      ↓
-Build            Tools > SALINLAHI > Build Release APK
-      ↓
+Build - Tools > SALINLAHI > Build Release APK
 Test the packaged APK on a device
-      ↓
 Record every test result
-      ↓
-Tag the source   git tag -a v<version>
-      ↓
-Publish          GitHub release with the zipped package attached
+Tag the source - git tag -a v<version>
+Publish - GitHub release with the zipped package attached
 ```
 
 Two rules the group added from what this release taught us. Build from the main
