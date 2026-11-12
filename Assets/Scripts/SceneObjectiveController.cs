@@ -398,7 +398,14 @@ public class SceneObjectiveController : MonoBehaviour
         PoseSequence[] poses = FindObjectsByType<PoseSequence>(FindObjectsSortMode.None);
 
         float waited = 0f;
-        while (waited < maxActionWait && (IsWalking() || IsPosePlaying(poses)))
+
+        // The other half of the same problem: "Bangon" starts a sit-up
+        // (WakeUpSequence), over in about a second but exactly the kind of
+        // thing this wait exists for - without it the next word was asked,
+        // and Rachel started introducing it, while Kylo was still half out of
+        // bed. That one reports itself through PlayerMovement.IsPosing rather
+        // than a PoseSequence, so both have to be asked.
+        while (waited < maxActionWait && (IsActing() || IsPosePlaying(poses)))
         {
             waited += Time.deltaTime;
             yield return null;
@@ -410,9 +417,14 @@ public class SceneObjectiveController : MonoBehaviour
         ShowObjective(currentIndex);
     }
 
-    private bool IsWalking()
+    /// <summary>
+    /// True while the character itself is still mid-action - walking after
+    /// "Lakad", or holding a pose the way "Bangon" does. IsActionPlaying is
+    /// IsVoiceWalking or IsPosing, so this covers both.
+    /// </summary>
+    private bool IsActing()
     {
-        return playerMovement != null && playerMovement.IsVoiceWalking;
+        return playerMovement != null && playerMovement.IsActionPlaying;
     }
 
     /// <summary>

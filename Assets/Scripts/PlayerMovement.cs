@@ -45,6 +45,14 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Sprite shown while the character is standing (Tayo) / default idle.")]
     public Sprite standingSprite;
 
+    [Tooltip("How far the sitting pose settles into the bed, in world units, " +
+             "once its bottom edge has been matched to the lying pose. His feet " +
+             "reach lower in the sitting art than his backside does, so matching " +
+             "bottom edges alone leaves him perched with his seat off the " +
+             "mattress. Raise this to sink him further into the bed, lower it " +
+             "to lift him back out.")]
+    public float sittingPoseSeatDrop = 0.43f;
+
     [Header("Walk Cycle")]
     [Tooltip("Walk-cycle frames, in order, played on a loop while the character is moving. " +
              "Leave empty to just hold on standingSprite while walking (no animation).")]
@@ -106,8 +114,52 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public bool IsVoiceWalking => voiceWalkTimer > 0f;
 
+    /// <summary>
+    /// True while a pose is being animated into place rather than simply
+    /// switched - the sit-up WakeUpSequence plays for "Bangon". Set by whoever
+    /// is doing the animating, through SetPosing.
+    /// </summary>
+    public bool IsPosing { get; private set; }
+
+    /// <summary>
+    /// True while ANY action a spoken word started is still playing out,
+    /// whether that is movement or a pose being animated.
+    ///
+    /// This is the one SceneObjectiveController waits on. The distinction
+    /// matters because the two kinds of action look nothing alike to this
+    /// script - a walk is a timer this file owns, a sit-up is a coroutine in
+    /// another component - and the sequencer should not have to know which
+    /// kind the word it just heard started.
+    /// </summary>
+    public bool IsActionPlaying => IsVoiceWalking || IsPosing;
+
+    /// <summary>
+    /// Held true by WakeUpSequence for the length of the sit-up, so the next
+    /// word is not asked over the top of it. Anything that animates a pose on
+    /// this character should do the same.
+    /// </summary>
+    public void SetPosing(bool posing) => IsPosing = posing;
+
+    /// <summary>
+    /// Raised after the wake stage changes, with the stage just entered.
+    ///
+    /// Bangon() and TayoUp() are already the single place each of those words
+    /// lands - they are what the objective's onCorrect event calls, and they
+    /// return early unless the stage before was the right one. So this fires
+    /// exactly once per real transition and never for a wrong answer, which is
+    /// what WakeUpSequence needs in order to stop the snoring and start the
+    /// sit-up without a second copy of the "was that correct?" question.
+    /// </summary>
+    public event System.Action<WakeStage> OnWakeStageChanged;
+
     private int currentWalkFrame = 0;
     private float walkFrameTimer = 0f;
+
+    // Where the scene author put the character while he is still in bed. The
+    // sitting-up pose is measured off this, and standing goes back to it before
+    // physics takes over, so the authored position stays the single place the
+    // bed pose is tuned from.
+    private float bedPoseY;
 
     // Tracks which wake-up stage the player is in, so movement/jump input can be
     // ignored until the player has actually stood up (can't walk while lying down).
@@ -119,6 +171,8 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        bedPoseY = transform.position.y;
 
         // Level 1 opens with the character lying down asleep.
         if (spriteRenderer != null && lyingDownSprite != null)
@@ -329,10 +383,19 @@ public class PlayerMovement : MonoBehaviour
         currentWakeStage = WakeStage.SittingUp;
         if (spriteRenderer != null)
         {
-            if (sittingUpSprite != null) spriteRenderer.sprite = sittingUpSprite;
+            if (sittingUpSprite != null)
+            {
+                SwapPoseKeepingFeetDown(sittingUpSprite);
+                transform.position += Vector3.down * sittingPoseSeatDrop;
+            }
             spriteRenderer.flipX = false; // undo the lying-down mirror
         }
         Debug.Log("PlayerMovement: Bangon triggered - now sitting up.");
+
+        // Last, so anything listening sees a character already on the sitting
+        // pose. WakeUpSequence animates that pose up off the mattress from
+        // here, and it cannot animate a sprite that has not been set yet.
+        OnWakeStageChanged?.Invoke(currentWakeStage);
     }
 
     /// <summary>
@@ -344,6 +407,13 @@ public class PlayerMovement : MonoBehaviour
         if (currentWakeStage != WakeStage.SittingUp) return; // must Bangon first
 
         currentWakeStage = WakeStage.Standing;
+
+        // Undo the lift Bangon() applied, so he hands over to physics from the
+        // same height he always did and drops to the floor instead of falling
+        // the full height of the sitting art.
+        Vector3 p = transform.position;
+        transform.position = new Vector3(p.x, bedPoseY, p.z);
+
         if (spriteRenderer != null)
         {
             if (standingSprite != null) spriteRenderer.sprite = standingSprite;
@@ -355,6 +425,42 @@ public class PlayerMovement : MonoBehaviour
         if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
 
         Debug.Log("PlayerMovement: Tayo triggered - now standing, movement unlocked.");
+
+        OnWakeStageChanged?.Invoke(currentWakeStage);
+    }
+
+    /// <summary>
+    /// Swaps in a wake-up pose while keeping the BOTTOM edge of the art where
+    /// it already was, instead of its centre.
+    ///
+    /// Every pose pivots on its own centre, and the sitting art is far taller
+    /// than the lying art (5 units against 2.5). Assigning the sprite on its
+    /// own therefore hangs all that extra height below the pivot: Kylo slid
+    /// about a unit down through the mattress on "Bangon" and ended up sitting
+    /// in mid-air in front of the bed frame. Shifting up by half the height
+    /// difference puts the bottom of the art back on the same mattress line
+    /// his sleeping pose was resting on.
+    ///
+    /// That is the straight match; the caller then settles him by
+    /// sittingPoseSeatDrop, because in the sitting art his feet reach lower
+    /// than his backside and only the feet would be touching the bed.
+    /// </summary>
+    private void SwapPoseKeepingFeetDown(Sprite next)
+    {
+        if (spriteRenderer == null || next == null) return;
+
+        float before = PoseHeight(spriteRenderer.sprite);
+        spriteRenderer.sprite = next;
+        float after = PoseHeight(next);
+
+        transform.position += Vector3.up * (after - before) * 0.5f;
+    }
+
+    /// <summary>A pose's drawn height in world units, scale included.</summary>
+    private float PoseHeight(Sprite pose)
+    {
+        if (pose == null) return 0f;
+        return pose.bounds.size.y * Mathf.Abs(transform.lossyScale.y);
     }
 
     /// <summary>
