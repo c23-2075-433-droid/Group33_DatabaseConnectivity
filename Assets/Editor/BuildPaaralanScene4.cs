@@ -18,11 +18,12 @@
 //
 // WHAT EACH WORD DOES:
 //
+//   Hugas    he washes before eating - it lands on him, there being no
+//            tap or basin drawn in this yard
 //   Labas    he walks out into the yard
 //   Kain     his baon appears, and lights up
-//   Laro     the classmate lights up - they are playing
-//   Tawa     Kylo switches to his laughing pose
-//   Tulong   a dropped book on the ground lights up, then is gone - picked up
+//   Inom     a drink beside the baon lights up
+//   Tapon    the food goes, cleared away after eating
 //
 // THE CLASSMATE IS A RECOLOUR of Kylo, made by Tools/make_classmate.py: brown
 // hair, maroon PE shorts, mirrored. Three of these five words are about
@@ -161,14 +162,6 @@ public class BuildPaaralanScene4
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // "Tawa" turns him to face the player, laughing. Unlike Scene 2, the
-        // front-facing pose is the RIGHT one here: a laugh is shared with
-        // whoever is watching, and his friend is beside him, not in front.
-        GameObject laughGO = new GameObject("Pose_Laugh");
-        PoseSwitch laugh = laughGO.AddComponent<PoseSwitch>();
-        laugh.player = player;
-        laugh.standingSprite = LoadSprite("talking_uniform");
-
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
         follow.offset = new Vector3(0f, 0f, -10f);
@@ -221,12 +214,13 @@ public class BuildPaaralanScene4
         // they are fine where they are.
         gleamHugas.overlay.sortingLayerName = "Player";
         gleamHugas.overlay.sortingOrder = 40;
-        TimedOverlay gleamLaro = classmate != null
-            ? CreateGleam("Gleam_Laro", classmate, 3.4f)
-            : CreateGleamAt("Gleam_Laro", ClassmateX, FloorY + 1.4f, 3.4f);
-        TimedOverlay gleamTawa = CreateGleamAt("Gleam_Tawa", PlayLineX, FloorY + 1.6f, 3.0f);
-        TimedOverlay gleamTulong = CreateGleamAt("Gleam_Tulong", DroppedBookX,
-                                                  FloorY + DroppedBookHeight * 0.5f, 1.4f);
+
+        // Laro, Tawa and Tulong left the word list, and their gleams went
+        // with them rather than staying as three overlays nothing can ever
+        // play. The CLASSMATE and the DROPPED BOOK stay: they are what makes
+        // this read as a playground at recess rather than an empty yard, and
+        // the book is still worth noticing even with no word for picking it
+        // up.
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
