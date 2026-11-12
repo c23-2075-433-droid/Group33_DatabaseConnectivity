@@ -195,6 +195,9 @@ public class BuildPaaralanScene4
         if (dropped != null) dropped.SetActive(true);
 
         // --- What lights up ---
+        // "Hugas" is washing before he eats. No tap or basin is drawn in
+        // this yard, so it lands on Kylo, who is the one washing.
+        TimedOverlay gleamHugas = CreateGleam("Gleam_Hugas", playerGO, 3.2f);
         TimedOverlay gleamLabas = CreateGleamAt("Gleam_Labas", PlayLineX, FloorY + 1.2f, 2.6f);
         TimedOverlay gleamKain = CreateGleamAt("Gleam_Kain", BaonX, FloorY + BaonHeight * 0.5f, 1.3f);
         // A drink beside the baon, so "Inom" has something of its own to
@@ -236,12 +239,16 @@ public class BuildPaaralanScene4
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
+        GameObject pHugas = CreatePromptUI(uiRoot.transform, "Prompt_Hugas", "Hugas", new Vector3(-330, 170, 0));
         GameObject pLabas = CreatePromptUI(uiRoot.transform, "Prompt_Labas", "Labas", new Vector3(-330, 60, 0));
         GameObject pKain = CreatePromptUI(uiRoot.transform, "Prompt_Kain", "Kain", new Vector3(-160, -150, 0));
         GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-20, -150, 0));
         GameObject pTapon = CreatePromptUI(uiRoot.transform, "Prompt_Tapon", "Tapon", new Vector3(-160, -250, 0));
 
         // --- Objectives: go out, eat, play, laugh, help ---
+        var hugas = MakeObjective("Hugas", pHugas);
+        UnityEventTools.AddPersistentListener(hugas.onCorrect, gleamHugas.Play);
+
         var labas = MakeObjective("Labas", pLabas);
         UnityEventTools.AddPersistentListener(labas.onCorrect, player.WalkForward);
         UnityEventTools.AddPersistentListener(labas.onCorrect, gleamLabas.Play);
@@ -263,7 +270,7 @@ public class BuildPaaralanScene4
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { labas, kain, inom, tapon };
+        controller.objectives = new[] { hugas, labas, kain, inom, tapon };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

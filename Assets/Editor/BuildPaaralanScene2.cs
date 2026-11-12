@@ -627,6 +627,12 @@ public class BuildPaaralanScene2
         // --- Something has to light up for every word that only names a thing ---
         TimedOverlay gleamBati = CreateGleamAt("Gleam_Bati", StandX,
                                                 FloorY + PlayerHeight * 0.62f, 3.6f);
+        // "Kinig" is listening, which has no object at all. It lands on his
+        // head, seated, which is at least where the listening happens. Like
+        // Bati it wants a drawn pose - an ear turned, a head lifted - and
+        // until there is one the staging is thin and says so.
+        TimedOverlay gleamKinig = CreateGleamAt("Gleam_Kinig", SitX,
+                                                 SitFeetY + SeatedHeight * 0.80f, 2.6f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
                                                 NotebookBaseY + NotebookHeight * 0.5f, 1.2f);
         TimedOverlay gleamLapis = CreateGleamAt("Gleam_Lapis", PencilInHandX,
@@ -639,7 +645,7 @@ public class BuildPaaralanScene2
         // "Props" layer, which sorts BELOW "Player", so one left out is drawn
         // behind Kylo and behind the desk - gleamBati marks him greeting and
         // was doing exactly that until it was added here.
-        foreach (TimedOverlay fx in new[] { gleamBati, gleamKuha, gleamLapis })
+        foreach (TimedOverlay fx in new[] { gleamBati, gleamKinig, gleamKuha, gleamLapis })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderGleam;
@@ -669,18 +675,25 @@ public class BuildPaaralanScene2
         // teaching, so it has to point at what the word means.
         // Only one is ever on screen at a time, so they can overlap each other
         // freely - each sits directly over the thing its word acts on.
-        GameObject pLakad = CreatePromptUI(uiRoot.transform, "Prompt_Lakad", "Lakad", new Vector3(-700, 60, 0));
-        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-700, -60, 0));
+        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-700, 60, 0));
+        GameObject pKinig = CreatePromptUI(uiRoot.transform, "Prompt_Kinig", "Kinig", new Vector3(260, 10, 0));
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(260, 120, 0));
         GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(120, -150, 0));
         GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(420, -40, 0));
 
-        // --- Objectives: open the door, greet, sit, unpack ---
-        // Four words now. The scene begins with Kylo already inside, by the
-        // lockers, and is about crossing to his seat and getting ready.
-        var lakad = MakeObjective("Lakad", pLakad);
-        UnityEventTools.AddPersistentListener(lakad.onCorrect, player.WalkForward);
-
+        // --- Objectives: greet, sit, listen, unpack ---
+        // The scene begins with Kylo already inside, by the lockers, and is
+        // about crossing to his seat and getting ready.
+        //
+        // "LAKAD" IS GONE AND BATI DOES THE WALKING. Lakad was the word that
+        // carried him across the room; dropping it without moving the walk
+        // would leave him at the lockers and have "Upo" teleport him into a
+        // chair on the far side. So WalkForward hangs off the greeting, which
+        // is now the first word. He has a walkTarget, so he walks until he
+        // arrives rather than for a fixed time, and the objective controller
+        // will not ask the next word until he has - which is what keeps the
+        // sitting from happening halfway across.
+        //
         // "Bati" HAS NOBODY TO GREET IN THIS ROOM. Teacher Rachel was cut
         // from this view - she is a waist-up drawing made for the chalkboard
         // shot and floats against the lockers - so the greeting lands on
@@ -688,6 +701,7 @@ public class BuildPaaralanScene2
         // somebody drawn to greet; until then the word is taught and the
         // staging is thin, and saying so is better than quietly dropping it.
         var bati = MakeObjective("Bati", pBati);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, player.WalkForward);
         UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
 
         // Kylo stays in profile, facing her, and SHE answers the greeting - she
@@ -704,6 +718,10 @@ public class BuildPaaralanScene2
         // is not on before this.
         if (deskFrontSr.sprite != null)
             UnityEventTools.AddBoolPersistentListener(upo.onCorrect, deskFront.SetActive, true);
+
+        // Settled in his chair, before he unpacks.
+        var kinig = MakeObjective("Kinig", pKinig);
+        UnityEventTools.AddPersistentListener(kinig.onCorrect, gleamKinig.Play);
 
         // "Kuha" is him pulling the notepad OUT of the bag - the notepad is
         // in his hand in that drawing, so nothing lands on the desk yet. The
@@ -733,7 +751,7 @@ public class BuildPaaralanScene2
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { lakad, bati, upo, kuha, lapis };
+        controller.objectives = new[] { bati, upo, kinig, kuha, lapis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at

@@ -179,12 +179,10 @@ public class BuildParkeScene5
         // way the greeting did.
         TimedOverlay gleamApir = CreateGleamAt("Gleam_Apir", (StartX + FriendX) * 0.5f,
                                                 FloorY + 2.0f, 2.8f);
-        // A last drink before going home. item_baso is the mug the rest of
-        // the game uses.
-        GameObject propBaso = CreateProp("Prop_Baso", "item_baso",
-                                          StartX + 1.30f, 0.55f, FloorY, 4);
-        TimedOverlay gleamInom = CreateGleamAt("Gleam_Inom", StartX + 1.30f,
-                                                FloorY + 0.28f, 1.3f);
+        // No drink here any more. "Inom" was in this scene for one draft and
+        // the validated list takes it out - it is already taught twice in
+        // this level, at the picnic and at breakfast, and a third asking on
+        // the way home was the weakest of the three. The mug goes with it.
         TimedOverlay gleamUwi = CreateGleamAt("Gleam_Uwi", GateX, -1.80f, 3.6f);
 
         // --- Word prompts ---
@@ -208,7 +206,6 @@ public class BuildParkeScene5
 
         GameObject pPaalam = CreatePromptUI(uiRoot.transform, "Prompt_Paalam", "Paalam", new Vector3(-450, -60, 0));
         GameObject pApir = CreatePromptUI(uiRoot.transform, "Prompt_Apir", "Apir", new Vector3(-200, -120, 0));
-        GameObject pInom = CreatePromptUI(uiRoot.transform, "Prompt_Inom", "Inom", new Vector3(-50, -250, 0));
         GameObject pUwi = CreatePromptUI(uiRoot.transform, "Prompt_Uwi", "Uwi", new Vector3(720, -110, 0));
 
         // --- Objectives: wave, walk, look back, be tired, go home ---
@@ -218,11 +215,6 @@ public class BuildParkeScene5
 
         var apir = MakeObjective("Apir", pApir);
         UnityEventTools.AddPersistentListener(apir.onCorrect, gleamApir.Play);
-
-        var inom = MakeObjective("Inom", pInom);
-        if (propBaso != null)
-            UnityEventTools.AddBoolPersistentListener(inom.onCorrect, propBaso.SetActive, false);
-        UnityEventTools.AddPersistentListener(inom.onCorrect, gleamInom.Play);
 
         // Holds his standing pose - see the note at the top about there being
         // no tired one.
@@ -239,7 +231,7 @@ public class BuildParkeScene5
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { paalam, apir, inom, uwi };
+        controller.objectives = new[] { paalam, apir, uwi };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();

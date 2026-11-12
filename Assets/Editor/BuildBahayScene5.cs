@@ -1,7 +1,13 @@
 // Assets/Editor/BuildBahayScene5.cs
 //
 // One-click scene builder for Bahay Scene 5 ("Eating Breakfast").
-// Teaches three words: Upo, Kain, Inom.
+// Teaches five words: Hugas, Upo, Kain, Inom, Linis.
+//
+// Hugas and Linis bracket the meal: washing his hands before he sits, and
+// clearing up after he has eaten. Neither has an object of its own drawn
+// into this kitchen - there is no sink and no cloth - so each lands on the
+// thing it is about: Hugas on Kylo, who is the one washing, and Linis on
+// the emptied plates.
 //
 // Kanin and Itlog are no longer spoken objectives. The restructure keeps
 // them as bonus vocabulary to be TAPPED rather than said - "Can you find the
@@ -216,7 +222,12 @@ public class BuildBahayScene5
 
         // Something has to light up when a word only names a thing.
         TimedOverlay gleamBaso  = CreateGleam("Gleam_Baso",  propBaso,  2.0f);
-        foreach (TimedOverlay fx in new[] { gleamBaso })
+        // "Hugas" is washing his hands, and there is no sink drawn in this
+        // kitchen, so it lands on him. "Linis" is clearing up, so it lands on
+        // the plates he has just emptied.
+        TimedOverlay gleamHugas = CreateGleam("Gleam_Hugas", standGO, 3.2f);
+        TimedOverlay gleamLinis = CreateGleam("Gleam_Linis", emptyKanin, 2.6f);
+        foreach (TimedOverlay fx in new[] { gleamBaso, gleamHugas, gleamLinis })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderFood + 1;
@@ -242,11 +253,18 @@ public class BuildBahayScene5
 
         // Canvas units are world units x100. Each prompt sits above the thing
         // it names; "Upo" sits over the chair Kylo is about to use.
+        GameObject pHugas = CreatePromptUI(uiRoot.transform, "Prompt_Hugas", "Hugas", new Vector3(520, 120, 0));
         GameObject pUpo   = CreatePromptUI(uiRoot.transform, "Prompt_Upo",   "Upo",   new Vector3(520, 250, 0));
         GameObject pKain  = CreatePromptUI(uiRoot.transform, "Prompt_Kain",  "Kain",  new Vector3(-20, 300, 0));
         GameObject pInom  = CreatePromptUI(uiRoot.transform, "Prompt_Inom",  "Inom",  new Vector3(190, -235, 0));
+        GameObject pLinis = CreatePromptUI(uiRoot.transform, "Prompt_Linis", "Linis", new Vector3(-20, -340, 0));
 
         // --- Objectives, in order ---
+        // Hands first, while he is still standing - the gleam is on the
+        // standing pose, so this has to come before "Upo" switches it off.
+        var hugas = MakeObjective("Hugas", pHugas);
+        UnityEventTools.AddPersistentListener(hugas.onCorrect, gleamHugas.Play);
+
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
@@ -267,7 +285,12 @@ public class BuildBahayScene5
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { upo, kain, inom };
+        // Clearing up comes last, and only makes sense after "Kain" has
+        // swapped the full plates for the empty ones it lights.
+        var linis = MakeObjective("Linis", pLinis);
+        UnityEventTools.AddPersistentListener(linis.onCorrect, gleamLinis.Play);
+
+        controller.objectives = new[] { hugas, upo, kain, inom, linis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
@@ -282,7 +305,7 @@ public class BuildBahayScene5
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 5 built and saved to " + ScenePath +
-                   ". Words: Upo, Kain, Inom. Kanin and Itlog are now tap-to-name bonus " +
+                   ". Words: Hugas, Upo, Kain, Inom, Linis. Kanin and Itlog are now tap-to-name bonus " +
                    "vocabulary rather than spoken objectives, and that interaction is not " +
                    "built yet - the food itself is still on the plate. Level 1 now ends here, " +
                    "so re-run Build Bahay Scene 4 as well - it fades into this scene " +

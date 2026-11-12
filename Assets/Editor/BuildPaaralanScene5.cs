@@ -1,7 +1,13 @@
 // Assets/Editor/BuildPaaralanScene5.cs
 //
 // One-click scene builder for Paaralan Scene 5 ("Afternoon Class & Dismissal").
-// Teaches five words: Pasok, Upo, Ligpit, Suot, Alis.
+// Teaches five words: Upo, Kunin, Ligpit, Paalam, Alis.
+//
+// "Pasok" is gone - the scene opens with Kylo already back in the room, so
+// a word for coming in had nothing left to do. "Suot" became "Kunin": the
+// bag is taken rather than worn, and Kunin is the word the rest of the game
+// uses for taking something. "Paalam" is new here, said to the room on the
+// way out, and it reuses the gleam that marked the door.
 //
 // Two of them are renames rather than new staging. "Ligpit" (clean) became
 // "Ligpit" (tidy up), which is the more exact word for packing away at the
@@ -226,16 +232,13 @@ public class BuildPaaralanScene5
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        GameObject pPasok = CreatePromptUI(uiRoot.transform, "Prompt_Pasok", "Pasok", new Vector3(830, 190, 0));
+        GameObject pPaalam = CreatePromptUI(uiRoot.transform, "Prompt_Paalam", "Paalam", new Vector3(830, 190, 0));
         GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(-520, -60, 0));
         GameObject pLigpit = CreatePromptUI(uiRoot.transform, "Prompt_Ligpit", "Ligpit", new Vector3(-490, -280, 0));
-        GameObject pSuot = CreatePromptUI(uiRoot.transform, "Prompt_Suot", "Suot", new Vector3(-430, -350, 0));
+        GameObject pKunin = CreatePromptUI(uiRoot.transform, "Prompt_Kunin", "Kunin", new Vector3(-430, -350, 0));
         GameObject pAlis = CreatePromptUI(uiRoot.transform, "Prompt_Alis", "Alis", new Vector3(260, 150, 0));
 
-        // --- Objectives: come back in, sit, tidy, pack, leave ---
-        var pasok = MakeObjective("Pasok", pPasok);
-        UnityEventTools.AddPersistentListener(pasok.onCorrect, gleamPasok.Play);
-
+        // --- Objectives: sit, take the bag, tidy, say goodbye, leave ---
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
@@ -250,10 +253,16 @@ public class BuildPaaralanScene5
         }
         UnityEventTools.AddPersistentListener(ligpit.onCorrect, gleamLigpit.Play);
 
-        var suot = MakeObjective("Suot", pSuot);
+        var kunin = MakeObjective("Kunin", pKunin);
         if (propBag != null)
-            UnityEventTools.AddBoolPersistentListener(suot.onCorrect, propBag.SetActive, true);
-        UnityEventTools.AddPersistentListener(suot.onCorrect, gleamBag.Play);
+            UnityEventTools.AddBoolPersistentListener(kunin.onCorrect, propBag.SetActive, true);
+        UnityEventTools.AddPersistentListener(kunin.onCorrect, gleamBag.Play);
+
+        // Said to the room on the way out. It takes the gleam that used to
+        // mark the door for "Pasok", which is the right place for a goodbye
+        // and keeps that gleam from going to waste.
+        var paalam = MakeObjective("Paalam", pPaalam);
+        UnityEventTools.AddPersistentListener(paalam.onCorrect, gleamPasok.Play);
 
         // He gets up to go, wearing the bag he just packed - so it comes off
         // the desk at the same moment. The result panel follows straight
@@ -268,7 +277,7 @@ public class BuildPaaralanScene5
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { pasok, upo, ligpit, suot, alis };
+        controller.objectives = new[] { upo, kunin, ligpit, paalam, alis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
