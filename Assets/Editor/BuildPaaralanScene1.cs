@@ -37,6 +37,9 @@
 //                              Tools/make_gate_frames.py
 //   bati_frame_1..3_uniform_with_bag - the wave going up, by
 //                              Tools/make_bati_frames.py
+//   guard_frame_1..3 - the guard waving back, by
+//                              Tools/make_guard_frames.py. These REPLACE
+//                              char_guard and char_guard_idle here.
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
@@ -170,7 +173,7 @@ public class BuildPaaralanScene1
         // build and uniform, not height - and anything more beside the near
         // pillar made him taller than the gate itself, which is where 3.9
         // against the old background went wrong.
-        GameObject guard = CreateStanding("Char_Guard", "char_guard", 3.10f, 3.60f);
+        GameObject guard = CreateStanding("Char_Guard", "guard_frame_1", 3.10f, 3.60f);
 
         // Turned to face Kylo. char_guard is drawn facing RIGHT - the cap brim
         // and the waving hand both point that way - and he stands to the RIGHT
@@ -182,21 +185,49 @@ public class BuildPaaralanScene1
         SpriteRenderer guardSr = guard.GetComponent<SpriteRenderer>();
         guardSr.flipX = true;
 
-        // char_guard is the WAVING pose, and it is the only one that exists.
-        // The greeting needs him standing still first, or he is already waving
-        // before the child has said anything and "Bati" changes nothing.
-        // char_guard_idle is that still pose; until it is drawn he starts the
-        // scene waving and the swap is a no-op. Draw it on the same canvas
-        // size as char_guard: CreateStanding sizes him from the sprite bounds,
-        // so a different canvas would change his height.
-        Sprite guardIdle = LoadSpriteOptional("char_guard_idle");
-        Sprite guardWave = LoadSprite("char_guard");
-        if (guardIdle != null) guardSr.sprite = guardIdle;
-
-        SpriteSwap guardSwap = guard.AddComponent<SpriteSwap>();
-        guardSwap.target = guardSr;
-        guardSwap.beforeSprite = guardIdle;
-        guardSwap.afterSprite = guardWave;
+        // --- The guard's wave, DRAWN rather than switched ---
+        //
+        // It used to be a SpriteSwap between char_guard_idle and char_guard:
+        // arms down in one frame, hand already up in the next. Kylo's wave is
+        // drawn, so the man he was waving at popped while he did it.
+        //
+        // ALL THREE FRAMES ARE NEW, and that was a choice rather than an
+        // oversight. char_guard_idle and char_guard look like one drawing
+        // with the arm moved and are not: searching every offset for the best
+        // alignment of their legs and torso tops out at 0.66 overlap, so
+        // there is no arm to cut out and swing the way the gate panels are
+        // swung. Keeping them as the endpoints with one generated frame
+        // between would give original, generated, original - a pop at each
+        // join, worse than the single snap it replaces. Three frames of one
+        // drawing animate cleanly instead. He appears in this scene and
+        // nowhere else, so nothing else sees the change.
+        //
+        // guard_frame_1 is his resting pose and the scene opens on it, so
+        // CreateStanding above is given that rather than the waving sprite.
+        // The frames are written at char_guard's own 551x1425 canvas shape -
+        // CreateStanding scales by bounds.size.y, so a different canvas would
+        // change his height. flipX above turns the whole renderer, so every
+        // frame faces Kylo without any of them needing to know.
+        PoseSequence guardFrames = guard.AddComponent<PoseSequence>();
+        guardFrames.target = guardSr;
+        guardFrames.frames = new[]
+        {
+            LoadSpriteOptional("guard_frame_1"),
+            LoadSpriteOptional("guard_frame_2"),
+            LoadSpriteOptional("guard_frame_3"),
+        };
+        // The wave held, not a repeating motion.
+        guardFrames.loopFrames = new[] { LoadSpriteOptional("guard_frame_3") };
+        guardFrames.loopCycles = 3;
+        guardFrames.loopFramesPerSecond = 4f;
+        guardFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("guard_frame_2"),
+            LoadSpriteOptional("guard_frame_1"),
+        };
+        guardFrames.destinationSprite = LoadSpriteOptional("guard_frame_1");
+        guardFrames.framesPerSecond = 9f;
+        guardFrames.playOnEnable = false;
 
         // --- Player, arriving at the gate on the left ---
         // Not further left than this: the flowering bushes along the left wall
@@ -461,7 +492,7 @@ public class BuildPaaralanScene1
         // child talking to scenery.
         var bati = MakeObjective("Bati", pBati);
         UnityEventTools.AddPersistentListener(bati.onCorrect, greetFrames.Play);
-        UnityEventTools.AddPersistentListener(bati.onCorrect, guardSwap.Apply);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, guardFrames.Play);
         UnityEventTools.AddPersistentListener(bati.onCorrect, guardGleam.Play);
 
         // He turns side-on again, then walks INTO the gate rather than past
@@ -503,7 +534,8 @@ public class BuildPaaralanScene1
 
         string missing = "";
         if (gateShut == null) missing += "\n  paaralan_gate_background_closed - the scene opens on an OPEN gate, so \"Bukas\" changes nothing.";
-        if (guardIdle == null) missing += "\n  char_guard_idle - the guard is waving before he is greeted, so \"Bati\" changes nothing.";
+        if (LoadSpriteOptional("guard_frame_1") == null)
+            missing += "\n  guard_frame_1..3 - the guard cannot wave back, so \"Bati\" lands on nobody. Run Tools/make_guard_frames.py.";
         if (backWalk == null) missing += "\n  back_walk_1/3_uniform_with_bag - Kylo walks into the school side-on, which reads as sliding rather than going away.";
         else if (backPass == null) missing += "\n  back_walk_2_uniform_with_bag - the legs-together frame. The walk is two strides with no in-between, so it reads as a shuffle.";
         if (backRunA == null || backRunB == null) missing += "\n  back_run_1/2_uniform_with_bag - \"Takbo\" uses the walk cycle taken faster, so it is quicker but not a different gait.";
