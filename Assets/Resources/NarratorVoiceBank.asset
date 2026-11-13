@@ -166,18 +166,6 @@ MonoBehaviour:
     text: Wonderful! Kylo is clean from head to toe.
     gloss: 
     clip: {fileID: 8300000, guid: 134340ebf598242caaf172e5f3841950, type: 3}
-  - id: rachel_l1_s3_suklay_story
-    text: Kylo is clean, but his hair is sticking up in every direction.
-    gloss: 
-    clip: {fileID: 8300000, guid: 3f37f9e04bcc24de6b167925d38e2ec3, type: 3}
-  - id: rachel_l1_s3_suklay_ask
-    text: "Tidy it up for him \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: 6eb312b8c253b456186d0ee73c8482b2, type: 3}
-  - id: rachel_l1_s3_suklay_done
-    text: Very nice! Kylo's hair is neat and smooth.
-    gloss: 
-    clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
   - id: rachel_l1_s3_sipilyo_story
     text: Kylo's teeth need cleaning too, before breakfast and before school.
     gloss: 
@@ -190,6 +178,18 @@ MonoBehaviour:
     text: Well done! Kylo is brushing his teeth.
     gloss: 
     clip: {fileID: 8300000, guid: 306dfb27ee929452ab8e06829c838570, type: 3}
+  - id: rachel_l1_s3_suklay_story
+    text: Kylo is clean, but his hair is sticking up in every direction.
+    gloss: 
+    clip: {fileID: 8300000, guid: 3f37f9e04bcc24de6b167925d38e2ec3, type: 3}
+  - id: rachel_l1_s3_suklay_ask
+    text: "Tidy it up for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 8300000, guid: 6eb312b8c253b456186d0ee73c8482b2, type: 3}
+  - id: rachel_l1_s3_suklay_done
+    text: Very nice! Kylo's hair is neat and smooth.
+    gloss: 
+    clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
   - id: rachel_l1_s3_outro
     text: All clean! Now Kylo needs to get dressed for school.
     gloss: 
@@ -1718,6 +1718,42 @@ MonoBehaviour:
     text: Can you find the kanin and itlog?
     gloss: 
     clip: {fileID: 0}
+  - id: word_tapon
+    text: Tapon
+    gloss: Throw away
+    clip: {fileID: 0}
+  - id: word_ligpit
+    text: Ligpit
+    gloss: Tidy up
+    clip: {fileID: 0}
+  - id: word_suot
+    text: Suot
+    gloss: Wear / put on
+    clip: {fileID: 0}
+  - id: word_padyak
+    text: Padyak
+    gloss: Pedal
+    clip: {fileID: 0}
+  - id: word_alok
+    text: Alok
+    gloss: Offer
+    clip: {fileID: 0}
+  - id: word_apir
+    text: Apir
+    gloss: High five
+    clip: {fileID: 0}
+  - id: word_hugas
+    text: Hugas
+    gloss: Wash
+    clip: {fileID: 0}
+  - id: word_kinig
+    text: Kinig
+    gloss: Listen
+    clip: {fileID: 0}
+  - id: word_sali
+    text: Sali
+    gloss: Join in
+    clip: {fileID: 0}
   - id: word_tara
     text: Tara
     gloss: Let's go
@@ -1726,6 +1762,34 @@ MonoBehaviour:
     text: Salamin
     gloss: Mirror
     clip: {fileID: 0}
+  - id: rachel_l1_s2_tabo_ask
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 42b877e306fed4510b660434e9dfd14c, type: 3}
+  - id: rachel_l1_s2_tabo_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: f41655052805547f59d00d2ecd5b7e50, type: 3}
+  - id: rachel_l1_s2_tabo_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: d34135bb06d1f4e0e9d023817dff81c5, type: 3}
+  - id: rachel_l1_s2_tuwalya_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 5715b0126e566482ebdb27d941aeeb3b, type: 3}
+  - id: rachel_l1_s3_kaliwa_ask
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 1a26beae8f2994031b0719e17b3166e5, type: 3}
+  - id: rachel_l1_s3_kaliwa_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 9f44fcd0987d24bd19856268257ec6b1, type: 3}
+  - id: rachel_l1_s3_kaliwa_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 299dcba3a4f4c428585e733d0afd2e1c, type: 3}
   - id: rachel_l2_s2_bukas_ask
     text: 
     gloss: 
@@ -1750,3 +1814,15 @@ MonoBehaviour:
     text: 
     gloss: 
     clip: {fileID: 8300000, guid: f36757b9509bb46eea13fe51629a3919, type: 3}
+  - id: rachel_word_tabo_recall
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 6edb129d03e054ac984c55ded73778f1, type: 3}
+  - id: rachel_word_tabo_teach
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 14413dce8a375423f8ed4c3a6e303536, type: 3}
+  - id: word_tabo
+    text: TABO
+    gloss: 
+    clip: {fileID: 8300000, guid: 88f10fabf96844168a3f9f63ee790604, type: 3}

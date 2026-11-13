@@ -211,12 +211,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.I)) SimulateSpeech("ilaw");
         else if (Input.GetKeyDown(KeyCode.U)) SimulateSpeech("kunin");
         // Scene 3, the washing routine: towel and soap, the bath itself,
-        // then hair and teeth. (No "tabo" - the dipper is not a word.)
+        // then teeth and hair. (No "tabo" - the dipper is not a word.)
         else if (Input.GetKeyDown(KeyCode.W)) SimulateSpeech("tuwalya");
         else if (Input.GetKeyDown(KeyCode.S)) SimulateSpeech("sabon");
         else if (Input.GetKeyDown(KeyCode.M)) SimulateSpeech("maligo");
-        else if (Input.GetKeyDown(KeyCode.C)) SimulateSpeech("suklay");
         else if (Input.GetKeyDown(KeyCode.P)) SimulateSpeech("sipilyo");
+        else if (Input.GetKeyDown(KeyCode.C)) SimulateSpeech("suklay");
         // Scene 4, getting dressed. ("Kunin" is U, above.)
         else if (Input.GetKeyDown(KeyCode.D)) SimulateSpeech("damit");
         else if (Input.GetKeyDown(KeyCode.Z)) SimulateSpeech("medyas");
