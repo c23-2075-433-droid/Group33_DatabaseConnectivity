@@ -52,9 +52,12 @@
 // because it rests on top of the table. All three share the Player sorting
 // layer and are ordered by sortingOrder, so no new sorting layer is needed.
 //
-// Sitting down moves the same front-facing pose down by 1.4 units rather than
-// swapping sprites - from the far side of a table, standing and sitting differ
-// in how much of him clears the table edge, nothing else.
+// Sitting down moves the same front-facing pose down rather than swapping
+// sprites - from the far side of a table, standing and sitting differ in how
+// much of him clears the table edge, nothing else. PoseSettle now lowers him
+// the last half unit so he lands on the chair instead of starting on it, and
+// a PoseSequence is wired for the three drawn in-betweens this scene still
+// needs; see the note beside it for why Paaralan Scene 2's cannot be reused.
 //
 // This is now the LAST playable scene of Level 1, so the level's result is
 // saved and shown here - Scene 4 fades into this one instead. When Scene 6 is
@@ -172,6 +175,48 @@ public class BuildBahayScene5
         seatSr.sortingLayerName = "Player";
         seatSr.sortingOrder = OrderKylo;
         seatGO.SetActive(false);                   // "Upo" turns him on
+
+        // ...and when it does, he should LOWER into the chair rather than
+        // appear in it. Rule 1 of Docs/AnimationStandard.md: no instant pose
+        // changes.
+        //
+        // The drawn descent is wired but not yet drawn. Paaralan Scene 2 has
+        // its three "Upo" in-betweens (sit_frame_1..3_uniform) and they do
+        // not fit here: they are a near-portrait for the close desk shot and
+        // have no backpack, while this scene is a full figure across a table
+        // with the bag still on. So this scene needs its own three, plus a
+        // seated pose to rest on - four drawings, framed to match
+        // talking_uniform_with_bag. Until they exist, LoadSpriteOptional
+        // returns null for each and PoseSequence skips a missing drawing
+        // instead of stalling, so the scene behaves exactly as it did.
+        PoseSequence sitFrames = seatGO.AddComponent<PoseSequence>();
+        sitFrames.target = seatSr;
+        sitFrames.frames = new[]
+        {
+            LoadSpriteOptional("sit_frame_1_uniform_with_bag"),
+            LoadSpriteOptional("sit_frame_2_uniform_with_bag"),
+            LoadSpriteOptional("sit_frame_3_uniform_with_bag"),
+        };
+        // Sitting happens once - it is on the standard's play-once list - so
+        // loopFrames stays empty and it runs straight through.
+        sitFrames.destinationSprite = LoadSpriteOptional("sitting_uniform_with_bag");
+        sitFrames.framesPerSecond = 9f;
+        sitFrames.playOnEnable = true;    // "Upo" switches this object on
+
+        // The cheap nine-tenths, and the only part that works TODAY. The
+        // seated pose arrives half a unit high and settles, so he drops onto
+        // the chair instead of being already on it.
+        //
+        // No driftFrom, deliberately. He stands at x 5.2 and the chair is at
+        // -0.2, and Paaralan Scene 2 slides that gap while its drawn frames
+        // play over the top. Here there are no frames yet, and the seated
+        // sprite is the STANDING drawing lowered - so a slide would be a
+        // standing boy gliding across the kitchen, which is worse than the
+        // cut it replaces. Add "sit.driftFrom = SitX - StandX;" at the same
+        // time as the drawings, not before.
+        PoseSettle sit = seatGO.AddComponent<PoseSettle>();
+        sit.dropFrom = 0.5f;
+        sit.duration = 0.4f;
 
         // --- The table, drawn in front of him so he sits behind it ---
         GameObject table = new GameObject("Foreground_Table");
@@ -445,6 +490,16 @@ public class BuildBahayScene5
 
         root.SetActive(false);
         return root;
+    }
+
+    /// <summary>
+    /// A sprite that may not have been drawn yet. Silent when missing, unlike
+    /// LoadSprite - the sit frames are wired ahead of the art on purpose, and
+    /// a warning per frame per build would be noise rather than news.
+    /// </summary>
+    private static Sprite LoadSpriteOptional(string spriteFile)
+    {
+        return AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + spriteFile + ".png");
     }
 
     private static Sprite LoadSprite(string spriteFile)
