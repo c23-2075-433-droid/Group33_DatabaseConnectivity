@@ -17,10 +17,9 @@
 // around it. They moved, and so did their objects, back to the positions
 // the artwork paints them at.
 //
-// Kaliwa is gone. It walked Kylo to the water jar, and the restructure
-// leaves this scene with no walking word - but the step itself remains,
-// wired to Maligo, so the bath still starts at the water rather than from
-// across the room.
+// Kaliwa is gone, and so is the walk it used to do. Nothing moves Kylo in
+// this scene any more: he stands where the scene puts him, gathers what he
+// needs and bathes on the spot.
 //
 // Tabo is gone too - the word and the object both. The water jar is still
 // painted into the bathroom and the bath still happens at it; there is just
@@ -40,7 +39,10 @@
 //
 // Sprites expected in Assets/Sprites/:
 //   bathroom_background, item_sabon, item_suklay, item_baso,
-//   item_sipilyo, item_tuwalya, fx_bath, standing_towel,
+//   item_sipilyo, item_tuwalya, fx_bath,
+//   standing_towel_messy if it has been drawn, else talking_towel,
+//   standing_towel_combed, optional - "Suklay" only changes his hair if
+//   it exists,
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -174,12 +176,45 @@ public class BuildBahayScene3
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // Out of the bath and into a towel. He does not walk again in this
-        // scene, so only the standing pose needs a towel version.
+        // Out of the bath and into a towel, turned to face the player.
+        //
+        // talking_towel, not standing_towel: it is the FRONT-FACING towel
+        // art, and it is already Kylo's standing pose for the whole of
+        // Scene 4, where he walks into the bedroom still wearing it. Using
+        // it here means he comes out of the bath looking exactly as he does
+        // in the scene that follows, instead of turning side-on for one
+        // scene and back to the player for the next. The side-on
+        // standing_towel is what the bath used to leave him in, and it is
+        // the reason he spent the rest of this scene facing away.
+        //
+        // standing_towel_messy wins if it is ever drawn: the same front
+        // pose with his arms down at his sides instead of raised mid-
+        // sentence, and his hair stuck up in every direction from the
+        // water. Rachel says exactly that a word later - "Kylo is clean,
+        // but his hair is sticking up in every direction" - and right now
+        // the art does not back her up. Dropping that file into
+        // Assets/Sprites is all it takes; no code change, just a rebuild.
         GameObject towelGO = new GameObject("Pose_Towel");
         PoseSwitch towel = towelGO.AddComponent<PoseSwitch>();
         towel.player = player;
-        towel.standingSprite = LoadSprite("standing_towel");
+        towel.standingSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
+
+        // ...and the comb puts it back down again. This one is optional in
+        // a stronger sense: with no art there is simply no pose switch, so
+        // "Suklay" goes back to only taking the comb off the shelf. It is
+        // the one word in the scene that currently changes nothing about
+        // Kylo, which is what makes the messy hair worth drawing - the
+        // before only reads as a before if there is an after.
+        Sprite combedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            SpriteFolder + "standing_towel_combed.png");
+        PoseSwitch combed = null;
+        if (combedSprite != null)
+        {
+            GameObject combedGO = new GameObject("Pose_TowelCombed");
+            combed = combedGO.AddComponent<PoseSwitch>();
+            combed.player = player;
+            combed.standingSprite = combedSprite;
+        }
 
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
@@ -227,10 +262,6 @@ public class BuildBahayScene3
         // --- Objectives, in the order of the routine ---
         // Getting ready, then the bath, then tidying up afterwards.
         //
-        // "Kaliwa" is gone: the restructure makes this scene the washing
-        // routine itself, with no walking word in it. Maligo still walks him
-        // to the water jar, so the bath does not happen from across the room
-        // - the step did not disappear, only the word for it.
 
         // 1-2. What he needs before he can start. The towel comes off its
         // hook first because it is the thing he will be wearing at the end.
@@ -240,11 +271,14 @@ public class BuildBahayScene3
         var sabon = MakeObjective("Sabon", pSabon);
         UnityEventTools.AddPersistentListener(sabon.onCorrect, useSabon.PickUp);
 
-        // 3. The bath itself: he crosses to the water jar and the water
-        // washes over the screen. He comes out of it in the towel he took
-        // two words ago, which is why that word had to come first.
+        // 3. The bath itself. He does NOT walk anywhere for it: he is
+        // already standing in the room with his towel and his soap, and the
+        // water washes over the whole screen wherever he is. The walk was
+        // left over from when "Kaliwa" sent him to the jar and the tabo was
+        // the thing he picked up there - with both of those gone, crossing
+        // the room buys nothing and turns him to face away from the player
+        // for the rest of the scene.
         var maligo = MakeObjective("Maligo", pMaligo);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, player.WalkLeft);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
 
@@ -254,6 +288,8 @@ public class BuildBahayScene3
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
+        if (combed != null)
+            UnityEventTools.AddPersistentListener(suklay.onCorrect, combed.Apply);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
@@ -366,6 +402,20 @@ public class BuildBahayScene3
 
         root.SetActive(false);   // SceneObjectiveController shows the first one
         return root;
+    }
+
+    /// <summary>
+    /// The preferred sprite, or a stand-in while it is still being drawn.
+    /// Same idea as CharacterPoses.Barefoot: a pose that has not been drawn
+    /// yet leaves the scene playable instead of leaving the player invisible.
+    /// </summary>
+    private static Sprite LoadSpriteOr(string preferred, string fallback)
+    {
+        Sprite first = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + preferred + ".png");
+        if (first != null) return first;
+
+        Debug.Log("[SALINLAHI] No " + preferred + " yet - using " + fallback + ".");
+        return LoadSprite(fallback);
     }
 
     private static Sprite LoadSprite(string spriteFile)
