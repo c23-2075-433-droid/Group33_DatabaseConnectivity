@@ -166,18 +166,6 @@ MonoBehaviour:
     text: Wonderful! Kylo is clean from head to toe.
     gloss: 
     clip: {fileID: 8300000, guid: 134340ebf598242caaf172e5f3841950, type: 3}
-  - id: rachel_l1_s3_suklay_story
-    text: Kylo is clean, but his hair is sticking up in every direction.
-    gloss: 
-    clip: {fileID: 8300000, guid: 3f37f9e04bcc24de6b167925d38e2ec3, type: 3}
-  - id: rachel_l1_s3_suklay_ask
-    text: "Tidy it up for him \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: 6eb312b8c253b456186d0ee73c8482b2, type: 3}
-  - id: rachel_l1_s3_suklay_done
-    text: Very nice! Kylo's hair is neat and smooth.
-    gloss: 
-    clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
   - id: rachel_l1_s3_sipilyo_story
     text: Kylo's teeth need cleaning too, before breakfast and before school.
     gloss: 
@@ -190,6 +178,18 @@ MonoBehaviour:
     text: Well done! Kylo is brushing his teeth.
     gloss: 
     clip: {fileID: 8300000, guid: 306dfb27ee929452ab8e06829c838570, type: 3}
+  - id: rachel_l1_s3_suklay_story
+    text: Kylo is clean, but his hair is sticking up in every direction.
+    gloss: 
+    clip: {fileID: 8300000, guid: 3f37f9e04bcc24de6b167925d38e2ec3, type: 3}
+  - id: rachel_l1_s3_suklay_ask
+    text: "Tidy it up for him \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 8300000, guid: 6eb312b8c253b456186d0ee73c8482b2, type: 3}
+  - id: rachel_l1_s3_suklay_done
+    text: Very nice! Kylo's hair is neat and smooth.
+    gloss: 
+    clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
   - id: rachel_l1_s3_outro
     text: All clean! Now Kylo needs to get dressed for school.
     gloss: 

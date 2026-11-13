@@ -2,11 +2,11 @@
 //
 // One-click scene builder for Bahay Scene 3 ("Maligo" - taking a bath).
 // Teaches five words, in the order the routine actually happens:
-// Tuwalya, Sabon, Maligo, Suklay, Sipilyo.
+// Tuwalya, Sabon, Maligo, Sipilyo, Suklay.
 //
 // THE WORDS FOLLOW THE STORY. Kylo fetches the two things he needs first -
 // his towel and the soap - then bathes, and only once he is clean and dry
-// does he comb his hair and brush his teeth. Saying "Maligo" in the middle
+// does he brush his teeth and comb his hair. Saying "Maligo" in the middle
 // rather than at the top is the whole point of the order: the bath is
 // something the first two words prepare for and the last two follow on
 // from, instead of an opening move with four errands hung off it.
@@ -248,16 +248,16 @@ public class BuildBahayScene3
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
 
-        // 4-5. Clean and dry, and now he can see to his hair and his teeth.
-        var suklay = MakeObjective("Suklay", pSuklay);
-        UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
-
+        // 4-5. Clean and dry, and now he can see to his teeth and his hair.
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, useSipilyo.PickUp);
 
+        var suklay = MakeObjective("Suklay", pSuklay);
+        UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
+
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { tuwalya, sabon, maligo, suklay, sipilyo };
+        controller.objectives = new[] { tuwalya, sabon, maligo, sipilyo, suklay };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -281,7 +281,7 @@ public class BuildBahayScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 3 built and saved to " + ScenePath +
-                   ". Words, in story order: Tuwalya, Sabon, Maligo, Suklay, Sipilyo - get ready, " +
+                   ". Words, in story order: Tuwalya, Sabon, Maligo, Sipilyo, Suklay - get ready, " +
                    "bathe, then tidy up. No tabo: the word and the dipper are both gone. Its last word fades on into " +
                    NextScene + " - build that scene too, or the level stops at a black screen.");
     }

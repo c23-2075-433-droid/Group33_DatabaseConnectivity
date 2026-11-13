@@ -45,7 +45,7 @@ pronunciation, and advances the story when the word is said correctly.
 
 **49 distinct Filipino words** are taught across **66 spoken objectives** —
 among them Bangon, Tayo, Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tuwalya, Sabon,
-Maligo, Suklay, Sipilyo, Damit, Medyas, Sapatos, Kunin, Kain, Inom, Bati,
+Maligo, Sipilyo, Suklay, Damit, Medyas, Sapatos, Kunin, Kain, Inom, Bati,
 Pasok, Takbo, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos, Sakay, Ngiti,
 Salamat and Paalam. Each word drives one action.
 
@@ -180,7 +180,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `Enter` | **whatever word the scene is currently asking for** |
 | `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
-| `W` / `S` / `M` / `C` / `P` | "Tuwalya" / "Sabon" / "Maligo" / "Suklay" / "Sipilyo" (Scene 3, in order) |
+| `W` / `S` / `M` / `P` / `C` | "Tuwalya" / "Sabon" / "Maligo" / "Sipilyo" / "Suklay" (Scene 3, in order) |
 | `D` / `Z` / `F` / `V` | "Damit" / "Medyas" / "Sapatos" / "Bag" (Scene 4) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4) |
 | `Q` / `E` / `G` | "Kumusta" / "Pasok" / "Takbo" (Paaralan Scene 1) |
@@ -317,8 +317,8 @@ background painting, so a spoken word can take one away:
 |---|---|
 | `item_tuwalya.png` | **Tuwalya** (towel) |
 | `item_sabon.png` | **Sabon** (soap) |
-| `item_suklay.png` | **Suklay** (comb) |
 | `item_sipilyo.png` | **Sipilyo** (toothbrush) |
+| `item_suklay.png` | **Suklay** (comb) |
 | `item_baso.png` | Baso (cup) — scenery, the toothbrush stands in it |
 | `item_tabo.png` | unused — the dipper left the word list |
 

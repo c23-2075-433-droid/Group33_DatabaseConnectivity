@@ -36,8 +36,8 @@ Say each word on its own, clearly, with a pause after it.
 | 5 | **Tuwalya** | Towel |
 | 6 | **Sabon** | Soap |
 | 7 | **Maligo** | Take a bath |
-| 8 | **Suklay** | Comb |
-| 9 | **Sipilyo** | Toothbrush |
+| 8 | **Sipilyo** | Toothbrush |
+| 9 | **Suklay** | Comb |
 | 10 | **Damit** | Clothes / uniform |
 | 11 | **Medyas** | Socks |
 | 12 | **Sapatos** | Shoes |
