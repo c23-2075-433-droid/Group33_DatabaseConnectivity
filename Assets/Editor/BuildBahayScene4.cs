@@ -5,11 +5,22 @@
 //
 // Reuses the bedroom, so it needs no new background. The bedroom's furniture
 // is painted INTO bedroom_background.png - bed, dresser, nightstand and door
-// are not separate objects - so everything the child names is laid out on the
-// floor in front of it. That also means the room has no mirror of its own;
-// The bedroom's furniture is painted INTO bedroom_background.png - bed,
-// dresser, nightstand and door are not separate objects - so everything the
-// child names is laid out on the floor in front of it.
+// are not separate objects - so everything the child names is a sprite laid
+// on top of that painting. That also means the room has no mirror of its own.
+//
+// THE CLOTHES ARE ON THE BED, THE REST ON THE FLOOR. Rachel's line here is
+// "His uniform is folded on the bed", and everything used to be laid out on
+// the floorboards, including the uniform - so the one line of English in the
+// scene described something the child could see was not there. The uniform
+// and the socks now sit on the painted blanket, at the world positions the
+// bed occupies (see BedDamit/BedMedyas below); the shoes and the bag stay on
+// the floor, where shoes and bags go.
+//
+// The uniform sprite is prop_damit_folded, drawn by Tools/make_folded_uniform.py
+// rather than cut out of the dresser. The cut-out one is a shirt on a coat
+// hanger: it cannot be laid down flat, and it is a collared button-up, which
+// is not what Kylo wears - his uniform is a white crew-neck tee and navy
+// shorts, and the folded sprite is drawn from those.
 //
 // Kylo faces the player here rather than standing side-on, so the child can
 // see him being dressed. The walk frames stay side-on, since he only turns to
@@ -36,9 +47,9 @@
 // scene ended the level and carried the database demo itself.
 //
 // Sprites expected in Assets/Sprites/:
-//   bedroom_background, talking_towel, prop_damit, prop_medyas, prop_sapatos,
-//   prop_bag, fx_gleam, standing(_with_bag), walk_frame_1..4(_with_bag),
-//   ui_arrow, ui_word_badge
+//   bedroom_background, talking_towel, prop_damit_folded, prop_medyas,
+//   prop_sapatos, prop_bag, fx_gleam, standing(_with_bag),
+//   walk_frame_1..4(_with_bag), ui_arrow_point, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 4
 
@@ -61,6 +72,28 @@ public class BuildBahayScene4
     // before changing any of this.
     private const float BgScale = 1.9458f;
     private const float FloorY = -3.32f;              // the painted floorboards
+
+    // Where the painted bed is, in world units. Measured off
+    // bedroom_background.png: it imports at 169 pixels per unit and is drawn
+    // at BgScale from the centre of the screen, so one background pixel is
+    // BgScale / 169 = 0.01151 world units, and the blanket's flat top runs
+    // from about x -6.8 to -4.7. Both of these sit on it.
+    private const float BedDamitX = -6.217f;
+    private const float BedDamitY = -1.105f;
+    private const float BedDamitH = 1.05f;
+    private const float BedMedyasX = -4.974f;
+    private const float BedMedyasY = -1.497f;
+    private const float BedMedyasH = 0.62f;
+
+    // The word prompts, copied from Bahay Scene 3 - see the long note on
+    // CreatePromptUI below for why the arrow had to change. PromptLift is how
+    // far above an object's TOP EDGE its badge floats, in canvas units (world
+    // units x100), and it is what it is because the arrow has to fit in the
+    // gap underneath.
+    private const float PromptLift = 110f;
+    private const float ArrowSize = 76f;              // the arrow's long side
+    private const float ArrowReach = 16f;             // how far the jab travels
+    private const float ArrowClear = 18f;             // tip-to-object gap at rest
 
     // The character art, which imports at 120 - see BuildBahayScene2.
     private const float SpritePPU = 120f;
@@ -96,11 +129,19 @@ public class BuildBahayScene4
         bgSr.sortingOrder = 0;
         bg.transform.localScale = new Vector3(BgScale, BgScale, 1f);
 
-        // --- The things laid out on the floor ---
-        // Each is sized by the world height it should stand, not by a scale
+        // --- The things he has to find ---
+        // Each is sized by the world height it should be, not by a scale
         // factor, so it comes out right whatever resolution the art is.
-        GameObject propDamit   = CreateProp("Prop_Damit",   "prop_damit",   -6.0f, 1.85f);
-        GameObject propMedyas  = CreateProp("Prop_Medyas",  "prop_medyas",  -3.8f, 0.85f);
+        //
+        // The uniform and the socks are folded on the bed, because that is
+        // what Rachel says. They are smaller than the floor props: a shoe
+        // seen on the floorboards and a folded shirt seen lying on a blanket
+        // are not the same size on screen, and sizing them like the floor
+        // props made the bed look like a shop display.
+        GameObject propDamit   = CreatePropAt("Prop_Damit",  "prop_damit_folded",
+                                              BedDamitX, BedDamitY, BedDamitH);
+        GameObject propMedyas  = CreatePropAt("Prop_Medyas", "prop_medyas",
+                                              BedMedyasX, BedMedyasY, BedMedyasH);
         GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -2.0f, 0.95f);
         GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      0.2f, 2.10f);
 
@@ -217,12 +258,25 @@ public class BuildBahayScene4
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        // Each prompt sits above the thing it names.
-        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-600, -60, 0));
-        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-380, -150, 0));
-        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-200, -140, 0));
-        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin", new Vector3(360, 60, 0));
-        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(20, -30, 0));
+        // Each prompt sits PromptLift above the top of the thing it names,
+        // rather than at a height picked by eye, so the arrow underneath it
+        // always has the same gap to point across. Over() does that sum.
+        //
+        // ONLY THE THINGS HE HAS TO FIND GET AN ARROW. Damit, Medyas,
+        // Sapatos and Bag are objects in the room; Salamin is not - the room
+        // has no mirror, so that word lands on Kylo himself and there is
+        // nothing for an arrow to point at. An arrow on everything is an
+        // arrow nobody looks at.
+        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",
+                                             Over(BedDamitX, BedDamitY + BedDamitH / 2f), true);
+        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",
+                                             Over(BedMedyasX, BedMedyasY + BedMedyasH / 2f), true);
+        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos",
+                                             Over(-2.0f, FloorY + 0.95f), true);
+        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin",
+                                             new Vector3(360, 60, 0), false);
+        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",
+                                             Over(0.2f, FloorY + 2.10f), true);
 
         // --- Objectives, in the order you would actually get dressed ---
         var damit = MakeObjective("Damit", pDamit);
@@ -310,6 +364,37 @@ public class BuildBahayScene4
         return go;
     }
 
+    /// <summary>
+    /// A prop at a place of its own rather than standing on the floor - the
+    /// clothes folded on the bed. Same sizing rule as CreateProp: the world
+    /// height it should be, not a scale factor.
+    /// </summary>
+    private static GameObject CreatePropAt(string name, string spriteFile,
+                                           float x, float y, float worldHeight)
+    {
+        GameObject go = new GameObject(name);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = LoadSprite(spriteFile);
+        sr.sortingLayerName = "Props";
+        sr.sortingOrder = 5;
+
+        float s = 1f;
+        if (sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            s = worldHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(s, s, 1f);
+        go.transform.position = new Vector3(x, y, 0f);
+        return go;
+    }
+
+    /// <summary>
+    /// Where a word badge goes for an object whose top edge is at topY:
+    /// PromptLift above it, in canvas units, which are world units x100.
+    /// </summary>
+    private static Vector3 Over(float x, float topY)
+    {
+        return new Vector3(x * 100f, topY * 100f + PromptLift, 0f);
+    }
+
     private static PickUpItem AddPickUp(GameObject item)
     {
         PickUpItem pick = item.AddComponent<PickUpItem>();
@@ -357,7 +442,8 @@ public class BuildBahayScene4
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 
-    private static GameObject CreatePromptUI(Transform parent, string name, string word, Vector3 localPos)
+    private static GameObject CreatePromptUI(Transform parent, string name, string word,
+                                             Vector3 localPos, bool withArrow)
     {
         GameObject root = new GameObject(name, typeof(RectTransform));
         root.transform.SetParent(parent, false);
@@ -386,13 +472,46 @@ public class BuildBahayScene4
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
+        if (!withArrow)
+        {
+            root.SetActive(false);
+            return root;
+        }
+
+        // The arrow points DOWN, from under the badge at the object.
+        //
+        // It used to sit above the badge pointing up, which pointed at the
+        // ceiling: every badge in this scene floats above the thing it names,
+        // so up is away from it. That is the same fix Bahay Scene 3 already
+        // had, and this scene is where it matters most - after the move to
+        // the bed the uniform and the socks are no longer in the row of
+        // things on the floor, so a child who cannot read the badge has no
+        // way to guess where to look.
+        //
+        // ui_arrow_point rather than ui_arrow: a solid cartoon arrow with a
+        // shadow, which reads against a painted blanket. The old one is a
+        // thin chevron. It is drawn pointing RIGHT, hence the quarter turn,
+        // and preserveAspect because it is not square.
+        //
+        // And it moves - see ArrowBob.
         GameObject arrowGO = new GameObject("Arrow", typeof(RectTransform));
         arrowGO.transform.SetParent(root.transform, false);
         Image arrowImg = arrowGO.AddComponent<Image>();
-        arrowImg.sprite = LoadSprite("ui_arrow");
+        arrowImg.sprite = LoadSprite("ui_arrow_point");
+        arrowImg.preserveAspect = true;
         RectTransform arrowRect = arrowGO.GetComponent<RectTransform>();
-        arrowRect.sizeDelta = new Vector2(50, 50);
-        arrowRect.anchoredPosition = new Vector2(0, 55);
+        arrowRect.sizeDelta = new Vector2(ArrowSize, ArrowSize);
+        // Hangs in the gap between badge and object, and at full stretch its
+        // tip stops just short of the object rather than covering it: the tip
+        // at rest is PromptLift - ArrowReach - ArrowClear below the badge,
+        // and the jab spends ArrowReach of that.
+        arrowRect.anchoredPosition = new Vector2(
+            0, -(PromptLift - ArrowReach - ArrowClear) + ArrowSize / 2f);
+        arrowRect.localRotation = Quaternion.Euler(0, 0, -90);
+
+        ArrowBob bob = arrowGO.AddComponent<ArrowBob>();
+        bob.direction = Vector2.down;
+        bob.distance = ArrowReach;
 
         root.SetActive(false);
         return root;
