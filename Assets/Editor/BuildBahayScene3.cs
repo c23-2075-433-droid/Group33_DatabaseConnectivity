@@ -42,7 +42,7 @@
 //   item_sipilyo, item_tuwalya, fx_bath,
 //   standing_towel_messy, talking_towel,
 //   standing_towel_combed if it has ever been drawn - "Suklay" falls back
-//   to talking_towel without it, sipilyo_frame_1..4,
+//   to talking_towel without it, sipilyo_frame_1..6,
 //
 // Sounds expected in Assets/Resources/Sfx/:
 //   brush_teeth - made by Tools/make_brush_sfx.py
@@ -222,13 +222,14 @@ public class BuildBahayScene3
         // standingSprite every frame it is not moving, so a sequence driving
         // the renderer directly is overwritten before anyone sees it.
         //
-        // The loop alternates the brush between the two sides of his mouth,
-        // which is the only reason it reads as brushing rather than as a
-        // held pose. Two frames at four a second is two strokes a second.
+        // The loop is the brushing motion itself - the brush travelling
+        // across his teeth and then tilting up and down - not his hand
+        // swapping sides of his mouth. Four positions: left, right, upper
+        // teeth, lower teeth, with the brush in the same hand throughout.
         //
         // The numbers add up to the length of the sound deliberately:
         //   lead-in   2 frames / 4 fps = 0.50 s   he lifts the brush
-        //   loop      2 x 8   / 4 fps = 4.00 s   eight strokes
+        //   loop      4 x 4   / 4 fps = 4.00 s   eight strokes
         //   tail      1 frame / 4 fps = 0.25 s   he lowers it
         //                              = 4.75 s, which is brush_teeth.wav.
         // Change one and change the other, or he goes on brushing in silence.
@@ -238,10 +239,16 @@ public class BuildBahayScene3
         brush.playOnEnable = false;
         brush.framesPerSecond = 4f;
         brush.loopFramesPerSecond = 4f;
-        brush.loopCycles = 8;
+        brush.loopCycles = 4;
         brush.frames = new[] { LoadSprite("sipilyo_frame_1"), LoadSprite("sipilyo_frame_2") };
-        brush.loopFrames = new[] { LoadSprite("sipilyo_frame_2"), LoadSprite("sipilyo_frame_4") };
-        brush.tailFrames = new[] { LoadSprite("sipilyo_frame_3") };
+        brush.loopFrames = new[]
+        {
+            LoadSprite("sipilyo_frame_2"),   // brush at the left of his mouth
+            LoadSprite("sipilyo_frame_3"),   // across to the right
+            LoadSprite("sipilyo_frame_4"),   // tilted up, upper teeth
+            LoadSprite("sipilyo_frame_5"),   // tilted down, lower teeth
+        };
+        brush.tailFrames = new[] { LoadSprite("sipilyo_frame_6") };
         brush.destinationSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
 
         // The bristles. Static SoundEffects.Play cannot be a persistent
