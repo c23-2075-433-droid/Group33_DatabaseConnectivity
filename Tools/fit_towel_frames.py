@@ -26,6 +26,15 @@ Usage, from the repository root:
 
 writes Assets/Sprites/sipilyo_frame_1.png, _2, _3 ... one per figure found,
 each with a .meta copied from the base so it imports at 120 pixels per unit.
+
+A third argument names a different base to normalise against:
+
+    python3 Tools/fit_towel_frames.py Art/x_raw.png x standing_barefoot
+
+When a base is named that way it is NOT re-canvased - standing_barefoot is
+in a dozen scenes and resizing it to suit one new pose would move Kylo in
+all of them. The canvas is the base's own size instead, and anything that
+does not fit is reported rather than silently cropped.
 """
 import os
 import re
@@ -98,15 +107,18 @@ def write_meta(png_path, template):
 
 
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         raise SystemExit(__doc__)
     raw, stem = sys.argv[1], sys.argv[2]
+    base_path = (os.path.join(OUT_DIR, sys.argv[3] + '.png')
+                 if len(sys.argv) == 4 else BASE)
+    lock_base = len(sys.argv) == 4
 
-    base = Image.open(BASE).convert('RGBA')
+    base = Image.open(base_path).convert('RGBA')
     b_crown, b_bottom, b_cx = hair_cap(base)
     b_hair = b_bottom - b_crown
     print('base %s  hair %dpx, crown row %d, head column %d'
-          % (os.path.basename(BASE), b_hair, b_crown, b_cx))
+          % (os.path.basename(base_path), b_hair, b_crown, b_cx))
 
     strip = Image.open(raw).convert('RGB')
     spans = split_columns(strip)
@@ -139,6 +151,11 @@ def main():
     half = max(max(cx, im.width - cx) for im, _, cx, _ in poses)
     half = max(half, b_cx, base.width - b_cx) + 2
     width, height = half * 2, base.height
+    # A wider canvas does not move him. Every frame puts the head column on
+    # the canvas centre, and the sprite pivot is that same centre, so his
+    # head lands in the same world position whatever the width - which is
+    # what lets a pose carrying a towel be wider than the plain one without
+    # the swap shifting him sideways.
     print('shared canvas %dx%d (base was %dx%d)'
           % (width, height, base.width, base.height))
 
@@ -147,13 +164,13 @@ def main():
         frame = place(im, crown, cx, width, height, b_crown)
         out = os.path.join(OUT_DIR, '%s_%d.png' % (stem, i))
         frame.save(out)
-        write_meta(out, BASE)
+        write_meta(out, base_path)
         outs.append((out, frame, scale))
 
     # The base moves onto the same canvas, or it would be the one sprite in
     # the set that jumps when the animation hands back to it. Same path, so
     # it keeps its GUID and no scene reference moves.
-    if width != base.width:
+    if width != base.width and not lock_base:
         rebased = place(base, b_crown, b_cx, width, height, b_crown)
         rebased.save(BASE)
         print('%s re-canvased to %dx%d' % (BASE, width, height))

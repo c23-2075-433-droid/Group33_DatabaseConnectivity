@@ -39,6 +39,7 @@
 //
 // Sprites expected in Assets/Sprites/:
 //   ui_arrow_point - the prompt arrow, bold enough to see,
+//   standing_towel_carried - him with it over his shoulder,
 //   bathroom_background, item_sabon, item_suklay, item_baso,
 //   item_sipilyo, item_tuwalya, fx_bath,
 //   standing_towel_messy, talking_towel,
@@ -70,6 +71,8 @@ public class BuildBahayScene3
     private const float FloorY = -2.98f;
     private const float SpritePPU = 120f;             // the character art, not the backgrounds
     private const float PlayerScale = 0.83f;
+    private const float PlayerX = -3.2f;
+
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
 
@@ -138,6 +141,7 @@ public class BuildBahayScene3
         PickUpItem useTuwalya = itemTuwalya.AddComponent<PickUpItem>();
         useTuwalya.itemInScene = itemTuwalya;
 
+
         // --- Water and suds, for the moment the bath happens ---
         GameObject fxGO = new GameObject("FX_Bath");
         SpriteRenderer fxSr = fxGO.AddComponent<SpriteRenderer>();
@@ -168,7 +172,7 @@ public class BuildBahayScene3
         // --- Player, starting across the room from the water jar ---
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-3.2f, PlayerFeetY, 0f);
+        playerGO.transform.position = new Vector3(PlayerX, PlayerFeetY, 0f);
         playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
@@ -191,6 +195,20 @@ public class BuildBahayScene3
 
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
+
+        // Saying "Tuwalya" gives him the towel rather than deleting it:
+        // the one on the wall goes and he is drawn carrying it, folded over
+        // his shoulder. That also sets the bath up - he already has what he
+        // needs before he gets in.
+        //
+        // A DRAWN POSE, not the wall towel shrunk onto him. That was tried
+        // and it cannot work: item_tuwalya is a towel hanging from a HOOK,
+        // gathered to a point at the top, so placed on a shoulder it reads
+        // as a bib pinned at the neck. The fold has to be drawn.
+        GameObject carriedGO = new GameObject("Pose_TowelCarried");
+        PoseSwitch carried = carriedGO.AddComponent<PoseSwitch>();
+        carried.player = player;
+        carried.standingSprite = LoadSpriteOr("standing_towel_carried", "standing");
 
         // Out of the bath and into a towel, turned to face the player.
         //
@@ -345,6 +363,7 @@ public class BuildBahayScene3
         // hook first because it is the thing he will be wearing at the end.
         var tuwalya = MakeObjective("Tuwalya", pTuwalya);
         UnityEventTools.AddPersistentListener(tuwalya.onCorrect, useTuwalya.PickUp);
+        UnityEventTools.AddPersistentListener(tuwalya.onCorrect, carried.Apply);
 
         var sabon = MakeObjective("Sabon", pSabon);
         UnityEventTools.AddPersistentListener(sabon.onCorrect, useSabon.PickUp);
