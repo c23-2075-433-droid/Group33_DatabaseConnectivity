@@ -30,23 +30,23 @@ what it skipped.
 Run from the repository root:  python3 Tools/place_uniform_on_bed.py
 """
 from PIL import Image
-import io, re, sys
+import io, os, re, sys
 
 SCENE = "Assets/Scenes/Chapter1_Level4_Damit.unity"
-FOLDED_META = "Assets/Sprites/prop_damit_folded.png.meta"
-FOLDED_PNG = "Assets/Sprites/prop_damit_folded.png"
-MEDYAS_PNG = "Assets/Sprites/prop_medyas.png"
+SPRITES = "Assets/Sprites"
+DAMIT_SPRITE = "prop_damit_folded"
+MEDYAS_SPRITE = "prop_medyas_folded"
 
 ARROW_POINT_GUID = "0d4391b2493d474a99ed476ba313b781"   # ui_arrow_point.png
 ARROWBOB_GUID = "d6955ecfe9e654af191fd7b44a9a0047"      # ArrowBob.cs
 IMAGE_GUID = "fe87c0e1cc204ed48ad3b37840f39efc"         # UnityEngine.UI.Image
 PPU = 100.0                                             # what these props import at
 
-# Where the clothes go, and how big. Same values as BuildBahayScene4, which
-# explains why: both sit in the middle of the mattress's top surface, clear
-# of the front edge where the blanket starts hanging down the side.
-DAMIT = (-6.217, -0.898, 1.05)
-MEDYAS = (-5.008, -1.036, 0.75)
+# Where the clothes go, and how big. Not chosen but MEASURED: these are what
+# Tools/cut_folded_uniform.py printed for the two sprites it cut out of the
+# painted art, so putting them here puts them back where they were painted.
+DAMIT = (-6.148, -0.787, 0.817)
+MEDYAS = (-5.087, -0.926, 0.585)
 
 PROMPT_LIFT = 110.0
 ARROW_SIZE = 76.0
@@ -237,13 +237,20 @@ def point_arrow(scene, prompt_name, x, top_y):
     print("  %-14s arrow points down and jabs" % prompt_name)
 
 
-def main():
+def sprite(name):
+    """A sprite's png path and the guid Unity knows it by."""
+    png = os.path.join(SPRITES, name + ".png")
     guid = re.search(r"^guid: ([0-9a-f]{32})$",
-                     io.open(FOLDED_META, encoding="utf-8").read(), re.M).group(1)
+                     io.open(png + ".meta", encoding="utf-8").read(), re.M).group(1)
+    return png, guid
 
+
+def main():
     scene = Scene(SCENE)
-    place_prop(scene, "Prop_Damit", DAMIT[0], DAMIT[1], DAMIT[2], FOLDED_PNG, guid)
-    place_prop(scene, "Prop_Medyas", MEDYAS[0], MEDYAS[1], MEDYAS[2], MEDYAS_PNG)
+    png, guid = sprite(DAMIT_SPRITE)
+    place_prop(scene, "Prop_Damit", DAMIT[0], DAMIT[1], DAMIT[2], png, guid)
+    png, guid = sprite(MEDYAS_SPRITE)
+    place_prop(scene, "Prop_Medyas", MEDYAS[0], MEDYAS[1], MEDYAS[2], png, guid)
     for name, (x, top) in PROMPTS.items():
         point_arrow(scene, name, x, top)
 

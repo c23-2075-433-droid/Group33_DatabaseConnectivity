@@ -16,11 +16,13 @@
 // bed occupies (see BedDamit/BedMedyas below); the shoes and the bag stay on
 // the floor, where shoes and bags go.
 //
-// The uniform sprite is prop_damit_folded, drawn by Tools/make_folded_uniform.py
-// rather than cut out of the dresser. The cut-out one is a shirt on a coat
-// hanger: it cannot be laid down flat, and it is a collared button-up, which
-// is not what Kylo wears - his uniform is a white crew-neck tee and navy
-// shorts, and the folded sprite is drawn from those.
+// prop_damit_folded and prop_medyas_folded are both cut out of
+// Art/bed_clothes_raw.png by Tools/cut_folded_uniform.py - this room with
+// the clothes painted onto the bed. They are cut rather than drawn because
+// a drawn prop has to earn the painted room's lighting and perspective from
+// scratch, and these are painted into it already. The old prop_damit is a
+// shirt on a coat hanger, which cannot be laid down flat, and prop_medyas
+// is a pair of socks standing upright, which is not how socks lie on a bed.
 //
 // Kylo faces the player here rather than standing side-on, so the child can
 // see him being dressed. The walk frames stay side-on, since he only turns to
@@ -47,8 +49,8 @@
 // scene ended the level and carried the database demo itself.
 //
 // Sprites expected in Assets/Sprites/:
-//   bedroom_background, talking_towel, prop_damit_folded, prop_medyas,
-//   prop_sapatos, prop_bag, fx_gleam, standing(_with_bag),
+//   bedroom_background, talking_towel, prop_damit_folded,
+//   prop_medyas_folded, prop_sapatos, prop_bag, fx_gleam, standing(_with_bag),
 //   walk_frame_1..4(_with_bag), ui_arrow_point, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 4
@@ -73,31 +75,22 @@ public class BuildBahayScene4
     private const float BgScale = 1.9458f;
     private const float FloorY = -3.32f;              // the painted floorboards
 
-    // Where the painted bed is, in world units, and where on it these two go.
+    // Where the clothes sit on the painted bed, in world units.
     //
-    // Measured off bedroom_background.png: it imports at 169 pixels per unit
-    // and is drawn at BgScale from the centre of the screen, so one
-    // background pixel is BgScale / 169 = 0.01151 world units.
+    // These are not chosen - they are MEASURED. Both sprites are cut out of
+    // Art/bed_clothes_raw.png, which is this room with the clothes painted
+    // onto the bed, and Tools/cut_folded_uniform.py prints the world centre
+    // and height of whatever it cut. Putting them back at those numbers puts
+    // them exactly where they were painted, which is the only placement that
+    // is guaranteed to sit on the mattress rather than over its front edge.
     //
-    // WHAT MATTERS HERE IS THE MATTRESS'S FRONT EDGE. The bed is painted in
-    // perspective: its top surface is a band about 125 background pixels
-    // deep, from the back edge against the wall at y 488 down to the front
-    // edge at y 609-615, and BELOW that line the blanket hangs down the side
-    // of the bed. Anything whose bottom crosses that line is drawn on the
-    // hanging part, which reads as stuck to the front of the bed rather than
-    // lying on it - the socks were 20 pixels over it and looked like they
-    // were sliding off. Both of these now sit in the middle of the band,
-    // with 15-20 pixels of blanket showing in front of them.
-    //
-    //   uniform   centre (300, 550) in background pixels
-    //   socks     centre (405, 562), just forward of it and to the right,
-    //             clear of the painted footboard post at x 445
-    private const float BedDamitX = -6.217f;
-    private const float BedDamitY = -0.898f;
-    private const float BedDamitH = 1.05f;
-    private const float BedMedyasX = -5.008f;
-    private const float BedMedyasY = -1.036f;
-    private const float BedMedyasH = 0.75f;
+    // Re-cut the art and these may move; the tool prints the new ones.
+    private const float BedDamitX = -6.148f;
+    private const float BedDamitY = -0.787f;
+    private const float BedDamitH = 0.817f;
+    private const float BedMedyasX = -5.087f;
+    private const float BedMedyasY = -0.926f;
+    private const float BedMedyasH = 0.585f;
 
     // The word prompts, copied from Bahay Scene 3 - see the long note on
     // CreatePromptUI below for why the arrow had to change. PromptLift is how
@@ -154,7 +147,7 @@ public class BuildBahayScene4
         // props made the bed look like a shop display.
         GameObject propDamit   = CreatePropAt("Prop_Damit",  "prop_damit_folded",
                                               BedDamitX, BedDamitY, BedDamitH);
-        GameObject propMedyas  = CreatePropAt("Prop_Medyas", "prop_medyas",
+        GameObject propMedyas  = CreatePropAt("Prop_Medyas", "prop_medyas_folded",
                                               BedMedyasX, BedMedyasY, BedMedyasH);
         GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -2.0f, 0.95f);
         GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      0.2f, 2.10f);
