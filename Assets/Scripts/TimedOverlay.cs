@@ -32,8 +32,25 @@ public class TimedOverlay : MonoBehaviour
     [Tooltip("Seconds to fade back out.")]
     public float fadeOutDuration = 0.9f;
 
+    [Tooltip("Runs the moment the overlay is at full strength, BEFORE it " +
+             "starts clearing - so anything wired here changes while it is " +
+             "hidden behind the effect.\n\nThis is what makes the bath a " +
+             "transition rather than two things happening at once: wire the " +
+             "pose change here and Kylo goes in dry and comes out in a " +
+             "towel, instead of changing in plain sight and THEN having " +
+             "water wash over him.")]
+    // Both of these are constructed here rather than left to Unity, and
+    // that is not tidiness. A builder wires them with
+    // UnityEventTools.AddPersistentListener, which throws on a null event -
+    // and a throw inside a scene builder leaves a half-built, unsaved
+    // "Untitled" scene behind, which looks like the scene broke rather than
+    // like a missing initialiser. Every event the builders wire is
+    // initialised for the same reason: PoseSequence.onFinished,
+    // onFrameReached, SceneObjectiveController.onAllObjectivesComplete.
+    public UnityEvent onPeak = new UnityEvent();
+
     [Tooltip("Runs once the overlay has cleared.")]
-    public UnityEvent onFinished;
+    public UnityEvent onFinished = new UnityEvent();
 
     private Coroutine playing;
 
@@ -56,6 +73,7 @@ public class TimedOverlay : MonoBehaviour
     private IEnumerator PlayRoutine()
     {
         yield return Fade(CurrentAlpha(), peakAlpha, fadeInDuration);
+        onPeak?.Invoke();
         if (holdDuration > 0f) yield return new WaitForSeconds(holdDuration);
         yield return Fade(peakAlpha, 0f, fadeOutDuration);
         playing = null;

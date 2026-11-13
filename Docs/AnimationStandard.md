@@ -82,12 +82,13 @@ Counted from the builders, not estimated:
 
 - **70 word-actions** across 14 gameplay scenes
 - **49 distinct words**
-- **4 of them animated** — Lakad, Upo, Kuha, Lapis, all in Paaralan Scene 2
+- **5 of them animated** — Lakad, Upo, Kuha, Lapis in Paaralan Scene 2;
+  Sipilyo in Bahay 3
 
 | scene | words | drawn frames? |
 |---|---|---|
 | Bahay 2 | Lakad Kaliwa Kanan Bukas Ilaw | no |
-| Bahay 3 | Tuwalya Sabon Maligo Sipilyo Suklay | no — snaps |
+| Bahay 3 | Tuwalya Sabon Maligo **Sipilyo** Suklay | Sipilyo only |
 | Bahay 4 | Damit Medyas Sapatos Bag Kunin | no |
 | Bahay 5 | Upo Kanin Itlog Kain Inom | no |
 | Paaralan 1 | Lakad Bukas Kumusta Pasok Takbo | no — snaps |

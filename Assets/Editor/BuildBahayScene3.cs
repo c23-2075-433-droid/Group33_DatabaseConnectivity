@@ -17,10 +17,9 @@
 // around it. They moved, and so did their objects, back to the positions
 // the artwork paints them at.
 //
-// Kaliwa is gone. It walked Kylo to the water jar, and the restructure
-// leaves this scene with no walking word - but the step itself remains,
-// wired to Maligo, so the bath still starts at the water rather than from
-// across the room.
+// Kaliwa is gone, and so is the walk it used to do. Nothing moves Kylo in
+// this scene any more: he stands where the scene puts him, gathers what he
+// needs and bathes on the spot.
 //
 // Tabo is gone too - the word and the object both. The water jar is still
 // painted into the bathroom and the bath still happens at it; there is just
@@ -39,8 +38,16 @@
 // is where the level now ends and where the result is saved and shown.
 //
 // Sprites expected in Assets/Sprites/:
+//   ui_arrow_point - the prompt arrow, bold enough to see,
+//   standing_towel_carried - him with it over his shoulder,
 //   bathroom_background, item_sabon, item_suklay, item_baso,
-//   item_sipilyo, item_tuwalya, fx_bath, standing_towel,
+//   item_sipilyo, item_tuwalya, fx_bath,
+//   standing_towel_messy, talking_towel,
+//   standing_towel_combed if it has ever been drawn - "Suklay" falls back
+//   to talking_towel without it, sipilyo_frame_1..6,
+//
+// Sounds expected in Assets/Resources/Sfx/:
+//   brush_teeth - made by Tools/make_brush_sfx.py
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -64,8 +71,17 @@ public class BuildBahayScene3
     private const float FloorY = -2.98f;
     private const float SpritePPU = 120f;             // the character art, not the backgrounds
     private const float PlayerScale = 0.83f;
+    private const float PlayerX = -3.2f;
+
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
+
+    // How far above an object's top edge its word badge floats, in canvas
+    // units (world units x100). Big enough that the arrow fits underneath.
+    private const float PromptLift = 110f;
+    private const float ArrowSize = 76f;      // the arrow's long side
+    private const float ArrowReach = 16f;     // how far the jab travels
+    private const float ArrowClear = 18f;     // tip-to-object gap at rest
 
     // Where the level carries on once the bath is done.
     private const string NextScene = "Chapter1_Level4_Damit";
@@ -125,6 +141,7 @@ public class BuildBahayScene3
         PickUpItem useTuwalya = itemTuwalya.AddComponent<PickUpItem>();
         useTuwalya.itemInScene = itemTuwalya;
 
+
         // --- Water and suds, for the moment the bath happens ---
         GameObject fxGO = new GameObject("FX_Bath");
         SpriteRenderer fxSr = fxGO.AddComponent<SpriteRenderer>();
@@ -145,12 +162,17 @@ public class BuildBahayScene3
 
         TimedOverlay bathFx = fxGO.AddComponent<TimedOverlay>();
         bathFx.overlay = fxSr;
-        bathFx.peakAlpha = 0.85f;
+        // 0.95 rather than 0.85, because the pose change now happens behind
+        // this at its peak and 0.85 leaves enough of him showing to see it.
+        bathFx.peakAlpha = 0.95f;
+
+        PlaySoundEffect bathSound = fxGO.AddComponent<PlaySoundEffect>();
+        bathSound.id = "bath_water";   // 2.6s, the same length as the fade
 
         // --- Player, starting across the room from the water jar ---
         GameObject playerGO = new GameObject("player_character");
         playerGO.tag = "Player";
-        playerGO.transform.position = new Vector3(-3.2f, PlayerFeetY, 0f);
+        playerGO.transform.position = new Vector3(PlayerX, PlayerFeetY, 0f);
         playerGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
 
         SpriteRenderer playerSr = playerGO.AddComponent<SpriteRenderer>();
@@ -174,12 +196,101 @@ public class BuildBahayScene3
         VoiceCommand voiceCommand = playerGO.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // Out of the bath and into a towel. He does not walk again in this
-        // scene, so only the standing pose needs a towel version.
+        // Saying "Tuwalya" gives him the towel rather than deleting it:
+        // the one on the wall goes and he is drawn carrying it, folded over
+        // his shoulder. That also sets the bath up - he already has what he
+        // needs before he gets in.
+        //
+        // A DRAWN POSE, not the wall towel shrunk onto him. That was tried
+        // and it cannot work: item_tuwalya is a towel hanging from a HOOK,
+        // gathered to a point at the top, so placed on a shoulder it reads
+        // as a bib pinned at the neck. The fold has to be drawn.
+        GameObject carriedGO = new GameObject("Pose_TowelCarried");
+        PoseSwitch carried = carriedGO.AddComponent<PoseSwitch>();
+        carried.player = player;
+        carried.standingSprite = LoadSpriteOr("standing_towel_carried", "standing");
+
+        // Out of the bath and into a towel, turned to face the player.
+        //
+        // talking_towel, not standing_towel: it is the FRONT-FACING towel
+        // art, and it is already Kylo's standing pose for the whole of
+        // Scene 4, where he walks into the bedroom still wearing it. Using
+        // it here means he comes out of the bath looking exactly as he does
+        // in the scene that follows, instead of turning side-on for one
+        // scene and back to the player for the next. The side-on
+        // standing_towel is what the bath used to leave him in, and it is
+        // the reason he spent the rest of this scene facing away.
+        //
+        // standing_towel_messy is the front pose with his arms down at his
+        // sides instead of raised mid-sentence, and his hair stuck up in
+        // every direction from the water - which is what Rachel says a
+        // word later: "Kylo is clean, but his hair is sticking up in every
+        // direction."
         GameObject towelGO = new GameObject("Pose_Towel");
         PoseSwitch towel = towelGO.AddComponent<PoseSwitch>();
         towel.player = player;
-        towel.standingSprite = LoadSprite("standing_towel");
+        towel.standingSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
+
+        // ...and the comb puts it back down again, which is what makes the
+        // messy hair work: a before only reads as a before if there is an
+        // after, and "Suklay" was otherwise the one word in the scene that
+        // changed nothing about Kylo.
+        //
+        // With no combed art drawn this lands on talking_towel - his hair
+        // neat again, but his hands back up. That is a deliberate trade.
+        // It keeps Rachel honest ("Kylo's hair is neat and smooth") without
+        // another drawing, and it leaves him in the exact pose Scene 4
+        // opens him in, so the hand-off between the two scenes is seamless.
+        // The arms are the price; standing_towel_combed removes it if it
+        // is ever drawn.
+        // "Sipilyo" is DRAWN rather than snapped - the first action in this
+        // scene that obeys the animation standard's rule 1. He lifts the
+        // brush to his mouth, brushes, and lowers it again, landing back on
+        // the pose he came out of the bath in, because his hair is not
+        // combed until the next word.
+        //
+        // player, not target: PlayerMovement rewrites its renderer from
+        // standingSprite every frame it is not moving, so a sequence driving
+        // the renderer directly is overwritten before anyone sees it.
+        //
+        // The loop is the brushing motion itself - the brush travelling
+        // across his teeth and then tilting up and down - not his hand
+        // swapping sides of his mouth. Four positions: left, right, upper
+        // teeth, lower teeth, with the brush in the same hand throughout.
+        //
+        // The numbers add up to the length of the sound deliberately:
+        //   lead-in   2 frames / 4 fps = 0.50 s   he lifts the brush
+        //   loop      4 x 4   / 4 fps = 4.00 s   eight strokes
+        //   tail      1 frame / 4 fps = 0.25 s   he lowers it
+        //                              = 4.75 s, which is brush_teeth.wav.
+        // Change one and change the other, or he goes on brushing in silence.
+        GameObject brushGO = new GameObject("Pose_Sipilyo");
+        PoseSequence brush = brushGO.AddComponent<PoseSequence>();
+        brush.player = player;
+        brush.playOnEnable = false;
+        brush.framesPerSecond = 4f;
+        brush.loopFramesPerSecond = 4f;
+        brush.loopCycles = 4;
+        brush.frames = new[] { LoadSprite("sipilyo_frame_1"), LoadSprite("sipilyo_frame_2") };
+        brush.loopFrames = new[]
+        {
+            LoadSprite("sipilyo_frame_2"),   // brush at the left of his mouth
+            LoadSprite("sipilyo_frame_3"),   // across to the right
+            LoadSprite("sipilyo_frame_4"),   // tilted up, upper teeth
+            LoadSprite("sipilyo_frame_5"),   // tilted down, lower teeth
+        };
+        brush.tailFrames = new[] { LoadSprite("sipilyo_frame_6") };
+        brush.destinationSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
+
+        // The bristles. Static SoundEffects.Play cannot be a persistent
+        // UnityEvent listener, so the scene gets a component that can be.
+        PlaySoundEffect brushSound = brushGO.AddComponent<PlaySoundEffect>();
+        brushSound.id = "brush_teeth";
+
+        GameObject combedGO = new GameObject("Pose_TowelCombed");
+        PoseSwitch combed = combedGO.AddComponent<PoseSwitch>();
+        combed.player = player;
+        combed.standingSprite = LoadSpriteOr("standing_towel_combed", "talking_towel");
 
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
@@ -217,43 +328,72 @@ public class BuildBahayScene3
         }
 
         // Canvas units are world units x100, so each badge sits over the
-        // object it names - the same positions Bahay 2 used for them.
-        GameObject pMaligo  = CreatePromptUI(uiRoot.transform, "Prompt_Maligo",  "Maligo",  new Vector3(-700, 300, 0));
-        GameObject pSabon   = CreatePromptUI(uiRoot.transform, "Prompt_Sabon",   "Sabon",   new Vector3( 156, 185, 0));
-        GameObject pSuklay  = CreatePromptUI(uiRoot.transform, "Prompt_Suklay",  "Suklay",  new Vector3( 275, 200, 0));
-        GameObject pSipilyo = CreatePromptUI(uiRoot.transform, "Prompt_Sipilyo", "Sipilyo", new Vector3( 422, 255, 0));
-        GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 390, 0));
+        // object it names.
+        //
+        // Each one is now PromptLift above the TOP of its object rather than
+        // just clear of it. The old spacing left 62 to 87 units between the
+        // badge and the object, and an arrow big enough for a child to see
+        // is taller than that - which is why the first attempt landed on
+        // top of the soap and hid the thing it was pointing at. The arrow
+        // has to fit in the gap, so the gap is what changed.
+        //
+        // ONLY THE THINGS HE HAS TO FIND GET AN ARROW. Sabon, Sipilyo and
+        // Tuwalya are small objects on a busy painted wall, and a child who
+        // cannot read the badge has no way to know which one is meant. The
+        // other two do not have that problem: Maligo is an action rather
+        // than an object, and the comb is not something the child has to
+        // hunt for by the time Suklay comes round. An arrow on everything
+        // is an arrow nobody looks at.
+        //
+        // Object tops, measured from the sprites: Sabon 119, Sipilyo 193,
+        // Tuwalya 326. The three with arrows are lifted to PromptLift above
+        // those so the arrow has room underneath; the other two keep the
+        // heights they were painted to.
+        GameObject pMaligo  = CreatePromptUI(uiRoot.transform, "Prompt_Maligo",  "Maligo",  new Vector3(-700, 300, 0), false);
+        GameObject pSabon   = CreatePromptUI(uiRoot.transform, "Prompt_Sabon",   "Sabon",   new Vector3( 156, 119 + PromptLift, 0), true);
+        GameObject pSuklay  = CreatePromptUI(uiRoot.transform, "Prompt_Suklay",  "Suklay",  new Vector3( 275, 200, 0), false);
+        GameObject pSipilyo = CreatePromptUI(uiRoot.transform, "Prompt_Sipilyo", "Sipilyo", new Vector3( 422, 193 + PromptLift, 0), true);
+        GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 326 + PromptLift, 0), true);
 
         // --- Objectives, in the order of the routine ---
         // Getting ready, then the bath, then tidying up afterwards.
         //
-        // "Kaliwa" is gone: the restructure makes this scene the washing
-        // routine itself, with no walking word in it. Maligo still walks him
-        // to the water jar, so the bath does not happen from across the room
-        // - the step did not disappear, only the word for it.
 
         // 1-2. What he needs before he can start. The towel comes off its
         // hook first because it is the thing he will be wearing at the end.
         var tuwalya = MakeObjective("Tuwalya", pTuwalya);
         UnityEventTools.AddPersistentListener(tuwalya.onCorrect, useTuwalya.PickUp);
+        UnityEventTools.AddPersistentListener(tuwalya.onCorrect, carried.Apply);
 
         var sabon = MakeObjective("Sabon", pSabon);
         UnityEventTools.AddPersistentListener(sabon.onCorrect, useSabon.PickUp);
 
-        // 3. The bath itself: he crosses to the water jar and the water
-        // washes over the screen. He comes out of it in the towel he took
-        // two words ago, which is why that word had to come first.
+        // 3. The bath itself. He does NOT walk anywhere for it: he is
+        // already standing in the room with his towel and his soap, and the
+        // water washes over the whole screen wherever he is. The walk was
+        // left over from when "Kaliwa" sent him to the jar and the tabo was
+        // the thing he picked up there - with both of those gone, crossing
+        // the room buys nothing and turns him to face away from the player
+        // for the rest of the scene.
         var maligo = MakeObjective("Maligo", pMaligo);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, player.WalkLeft);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, bathSound.Play);
+        // The pose change hangs off the overlay's PEAK, not off the word.
+        // Wired to the word it fired instantly: Kylo popped into a towel in
+        // plain sight and THEN water washed over him, which is two things
+        // happening rather than one thing happening. Behind the water he
+        // goes in dry and comes out dressed, which is what a transition is.
+        UnityEventTools.AddPersistentListener(bathFx.onPeak, towel.Apply);
 
         // 4-5. Clean and dry, and now he can see to his teeth and his hair.
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, useSipilyo.PickUp);
+        UnityEventTools.AddPersistentListener(sipilyo.onCorrect, brush.Play);
+        UnityEventTools.AddPersistentListener(sipilyo.onCorrect, brushSound.Play);
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
+        UnityEventTools.AddPersistentListener(suklay.onCorrect, combed.Apply);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
@@ -327,7 +467,8 @@ public class BuildBahayScene3
     }
 
     /// <summary>Arrow + badge + word label, matching the other scenes.</summary>
-    private static GameObject CreatePromptUI(Transform parent, string name, string word, Vector3 localPos)
+    private static GameObject CreatePromptUI(Transform parent, string name, string word,
+                                             Vector3 localPos, bool withArrow)
     {
         GameObject root = new GameObject(name, typeof(RectTransform));
         root.transform.SetParent(parent, false);
@@ -356,16 +497,62 @@ public class BuildBahayScene3
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
+        if (!withArrow)
+        {
+            root.SetActive(false);
+            return root;
+        }
+
+        // The arrow points DOWN, from under the badge at the object.
+        //
+        // It used to sit above the badge pointing up, which pointed at the
+        // ceiling: every badge in this scene already floats above the thing
+        // it names, by 0.6 to 0.9 world units, so up is away from it.
+        //
+        // ui_arrow_point rather than ui_arrow: a solid cartoon arrow with a
+        // shadow, which a child can see against a painted bathroom wall.
+        // The old one is a thin chevron. It is drawn pointing RIGHT, hence
+        // the quarter turn clockwise, and preserveAspect because it is not
+        // square and a square sizeDelta would squash it.
+        //
+        // And it moves - see ArrowBob. This is the only part of the prompt
+        // that is any use to a child who cannot read the badge, which in
+        // this game is most of them.
         GameObject arrowGO = new GameObject("Arrow", typeof(RectTransform));
         arrowGO.transform.SetParent(root.transform, false);
         Image arrowImg = arrowGO.AddComponent<Image>();
-        arrowImg.sprite = LoadSprite("ui_arrow");
+        arrowImg.sprite = LoadSprite("ui_arrow_point");
+        arrowImg.preserveAspect = true;
         RectTransform arrowRect = arrowGO.GetComponent<RectTransform>();
-        arrowRect.sizeDelta = new Vector2(50, 50);
-        arrowRect.anchoredPosition = new Vector2(0, 55);
+        arrowRect.sizeDelta = new Vector2(ArrowSize, ArrowSize);
+        // Hangs in the gap between badge and object, and at full stretch its
+        // tip stops just short of the object rather than covering it. That
+        // is the whole arithmetic: tip at rest is PromptLift - ArrowReach -
+        // ArrowClear below the badge, and the jab spends ArrowReach of it.
+        arrowRect.anchoredPosition = new Vector2(
+            0, -(PromptLift - ArrowReach - ArrowClear) + ArrowSize / 2f);
+        arrowRect.localRotation = Quaternion.Euler(0, 0, -90);
+
+        ArrowBob bob = arrowGO.AddComponent<ArrowBob>();
+        bob.direction = Vector2.down;
+        bob.distance = ArrowReach;
 
         root.SetActive(false);   // SceneObjectiveController shows the first one
         return root;
+    }
+
+    /// <summary>
+    /// The preferred sprite, or a stand-in while it is still being drawn.
+    /// Same idea as CharacterPoses.Barefoot: a pose that has not been drawn
+    /// yet leaves the scene playable instead of leaving the player invisible.
+    /// </summary>
+    private static Sprite LoadSpriteOr(string preferred, string fallback)
+    {
+        Sprite first = AssetDatabase.LoadAssetAtPath<Sprite>(SpriteFolder + preferred + ".png");
+        if (first != null) return first;
+
+        Debug.Log("[SALINLAHI] No " + preferred + " yet - using " + fallback + ".");
+        return LoadSprite(fallback);
     }
 
     private static Sprite LoadSprite(string spriteFile)

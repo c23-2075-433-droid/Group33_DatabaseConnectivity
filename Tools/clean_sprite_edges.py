@@ -39,6 +39,15 @@ DEPTH = 8          # how far the colour is carried into the transparency
 # Everything the main-menu redesign added or recut. Grouped by the script
 # that writes it, so a new piece lands next to its siblings.
 NAMES = [
+    # Bahay 3. The bathroom items were cut out of the painting and still
+    # have the room's own white sitting under their transparency, which did
+    # not matter while they were only ever drawn at the size they were cut
+    # at - and started mattering the moment the towel was shrunk onto
+    # Kylo's shoulder, where it arrived inside a pale box.
+    'item_tuwalya', 'item_sabon', 'item_suklay', 'item_sipilyo', 'item_baso',
+    'standing_towel_messy', 'ui_arrow_point',
+    'sipilyo_frame_1', 'sipilyo_frame_2', 'sipilyo_frame_3',
+    'sipilyo_frame_4', 'sipilyo_frame_5', 'sipilyo_frame_6',
     # import_main_menu_art.py
     'menu_classroom_bg', 'btn_adventure', 'btn_minigames', 'btn_settings', 'btn_about',
     'menu_classroom_bg_blur', 'menu_title_blur', 'btn_adventure_blur',
