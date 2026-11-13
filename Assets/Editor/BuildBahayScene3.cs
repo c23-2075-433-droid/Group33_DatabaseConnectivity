@@ -38,6 +38,7 @@
 // is where the level now ends and where the result is saved and shown.
 //
 // Sprites expected in Assets/Sprites/:
+//   ui_arrow_point - the prompt arrow, bold enough to see,
 //   bathroom_background, item_sabon, item_suklay, item_baso,
 //   item_sipilyo, item_tuwalya, fx_bath,
 //   standing_towel_messy, talking_towel,
@@ -442,20 +443,26 @@ public class BuildBahayScene3
         //
         // It used to sit above the badge pointing up, which pointed at the
         // ceiling: every badge in this scene already floats above the thing
-        // it names, so up is away. ui_arrow is drawn as an upward chevron,
-        // hence the half turn.
+        // it names, by 0.6 to 0.9 world units, so up is away from it.
         //
-        // It is also bigger than it was and it moves. This is the only part
-        // of the prompt a child who cannot read can use, and a small still
-        // chevron on a painted bathroom wall is close to invisible.
+        // ui_arrow_point rather than ui_arrow: a solid cartoon arrow with a
+        // shadow, which a child can see against a painted bathroom wall.
+        // The old one is a thin chevron. It is drawn pointing RIGHT, hence
+        // the quarter turn clockwise, and preserveAspect because it is not
+        // square and a square sizeDelta would squash it.
+        //
+        // And it moves - see ArrowBob. This is the only part of the prompt
+        // that is any use to a child who cannot read the badge, which in
+        // this game is most of them.
         GameObject arrowGO = new GameObject("Arrow", typeof(RectTransform));
         arrowGO.transform.SetParent(root.transform, false);
         Image arrowImg = arrowGO.AddComponent<Image>();
-        arrowImg.sprite = LoadSprite("ui_arrow");
+        arrowImg.sprite = LoadSprite("ui_arrow_point");
+        arrowImg.preserveAspect = true;
         RectTransform arrowRect = arrowGO.GetComponent<RectTransform>();
-        arrowRect.sizeDelta = new Vector2(70, 70);
-        arrowRect.anchoredPosition = new Vector2(0, -58);
-        arrowRect.localRotation = Quaternion.Euler(0, 0, 180);
+        arrowRect.sizeDelta = new Vector2(96, 96);
+        arrowRect.anchoredPosition = new Vector2(0, -70);
+        arrowRect.localRotation = Quaternion.Euler(0, 0, -90);
 
         ArrowBob bob = arrowGO.AddComponent<ArrowBob>();
         bob.direction = Vector2.down;
