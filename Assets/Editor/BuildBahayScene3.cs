@@ -1,21 +1,31 @@
 // Assets/Editor/BuildBahayScene3.cs
 //
 // One-click scene builder for Bahay Scene 3 ("Maligo" - taking a bath).
-// Teaches five words: Maligo, Sabon, Suklay, Sipilyo, Tuwalya.
+// Teaches five words, in the order the routine actually happens:
+// Tuwalya, Sabon, Maligo, Suklay, Sipilyo.
 //
-// THE WHOLE WASHING ROUTINE IS HERE NOW. Sabon, Sipilyo and Tuwalya used to
-// be said in Scene 2, which is the scene about finding the bathroom and
-// putting the light on; naming soap and a toothbrush there meant the words
-// happened before the bath rather than during it. They moved, and so did
-// their objects, back to the positions the artwork paints them at.
+// THE WORDS FOLLOW THE STORY. Kylo fetches the two things he needs first -
+// his towel and the soap - then bathes, and only once he is clean and dry
+// does he comb his hair and brush his teeth. Saying "Maligo" in the middle
+// rather than at the top is the whole point of the order: the bath is
+// something the first two words prepare for and the last two follow on
+// from, instead of an opening move with four errands hung off it.
+//
+// Sabon, Sipilyo and Tuwalya used to be said in Scene 2, which is the scene
+// about finding the bathroom and putting the light on; naming soap and a
+// toothbrush there meant the words happened before the bath rather than
+// around it. They moved, and so did their objects, back to the positions
+// the artwork paints them at.
 //
 // Kaliwa is gone. It walked Kylo to the water jar, and the restructure
 // leaves this scene with no walking word - but the step itself remains,
 // wired to Maligo, so the bath still starts at the water rather than from
 // across the room.
 //
-// Tabo left the game's word list entirely. The jar is still here and Maligo
-// still uses it up; it is just no longer a word the child has to say.
+// Tabo is gone too - the word and the object both. The water jar is still
+// painted into the bathroom and the bath still happens at it; there is just
+// no dipper sitting on its lid any more, and nothing the child has to name
+// to use it.
 //
 // Reuses the bathroom Scene 2 ends in, so it needs no new background. The
 // objects are placed back where the artwork had them; saying a word uses
@@ -29,8 +39,8 @@
 // is where the level now ends and where the result is saved and shown.
 //
 // Sprites expected in Assets/Sprites/:
-//   bathroom_background, item_tabo, item_suklay, item_baso, fx_bath,
-//   standing_towel,
+//   bathroom_background, item_sabon, item_suklay, item_baso,
+//   item_sipilyo, item_tuwalya, fx_bath, standing_towel,
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -97,7 +107,8 @@ public class BuildBahayScene3
         // ones they are painted at - both scenes draw the same
         // bathroom_background at the same BgScale, so they transfer exactly
         // and the room looks unchanged until something is used.
-        GameObject itemTabo = CreateItem("Item_Tabo", "item_tabo", new Vector2(-7.056f, 0.738f), 5);
+        // No Item_Tabo: the dipper left with its word. Everything else is
+        // where the painting puts it.
         GameObject itemSabon = CreateItem("Item_Sabon", "item_sabon", new Vector2(1.556f, 1.025f), 5);
         GameObject itemSuklay = CreateItem("Item_Suklay", "item_suklay", new Vector2(2.750f, 0.988f), 5);
         // The brush stands in the cup, so the cup has to draw over it.
@@ -105,8 +116,6 @@ public class BuildBahayScene3
         CreateItem("Item_Baso", "item_baso", new Vector2(3.931f, 1.188f), 5);
         GameObject itemTuwalya = CreateItem("Item_Tuwalya", "item_tuwalya", new Vector2(7.262f, 1.019f), 5);
 
-        PickUpItem useTabo = itemTabo.AddComponent<PickUpItem>();
-        useTabo.itemInScene = itemTabo;
         PickUpItem useSabon = itemSabon.AddComponent<PickUpItem>();
         useSabon.itemInScene = itemSabon;
         PickUpItem useSuklay = itemSuklay.AddComponent<PickUpItem>();
@@ -216,34 +225,39 @@ public class BuildBahayScene3
         GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 390, 0));
 
         // --- Objectives, in the order of the routine ---
+        // Getting ready, then the bath, then tidying up afterwards.
+        //
         // "Kaliwa" is gone: the restructure makes this scene the washing
         // routine itself, with no walking word in it. Maligo still walks him
-        // to the water jar first, so the bath does not start from across the
-        // room - the step did not disappear, only the word for it.
-        //
-        // "Maligo" is the bath itself: the tabo is used up and water washes
-        // over the screen.
-        var maligo = MakeObjective("Maligo", pMaligo);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, player.WalkLeft);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, useTabo.PickUp);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
+        // to the water jar, so the bath does not happen from across the room
+        // - the step did not disappear, only the word for it.
+
+        // 1-2. What he needs before he can start. The towel comes off its
+        // hook first because it is the thing he will be wearing at the end.
+        var tuwalya = MakeObjective("Tuwalya", pTuwalya);
+        UnityEventTools.AddPersistentListener(tuwalya.onCorrect, useTuwalya.PickUp);
 
         var sabon = MakeObjective("Sabon", pSabon);
         UnityEventTools.AddPersistentListener(sabon.onCorrect, useSabon.PickUp);
 
+        // 3. The bath itself: he crosses to the water jar and the water
+        // washes over the screen. He comes out of it in the towel he took
+        // two words ago, which is why that word had to come first.
+        var maligo = MakeObjective("Maligo", pMaligo);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, player.WalkLeft);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
+
+        // 4-5. Clean and dry, and now he can see to his hair and his teeth.
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
 
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, useSipilyo.PickUp);
 
-        var tuwalya = MakeObjective("Tuwalya", pTuwalya);
-        UnityEventTools.AddPersistentListener(tuwalya.onCorrect, useTuwalya.PickUp);
-
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { maligo, sabon, suklay, sipilyo, tuwalya };
+        controller.objectives = new[] { tuwalya, sabon, maligo, suklay, sipilyo };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -267,8 +281,8 @@ public class BuildBahayScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 3 built and saved to " + ScenePath +
-                   ". Words: Maligo, Sabon, Suklay, Sipilyo, Tuwalya - the whole washing " +
-                   "routine, with Sabon, Sipilyo and Tuwalya moved in from Scene 2. Its last word fades on into " +
+                   ". Words, in story order: Tuwalya, Sabon, Maligo, Suklay, Sipilyo - get ready, " +
+                   "bathe, then tidy up. No tabo: the word and the dipper are both gone. Its last word fades on into " +
                    NextScene + " - build that scene too, or the level stops at a black screen.");
     }
 

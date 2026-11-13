@@ -43,11 +43,11 @@ pronunciation, and advances the story when the word is said correctly.
 | **Paaralan** (school) | Paaralan, Klasrum, Aralin, Recess, Uwian |
 | **Parke** (park) | Parke, Palaruan, Kaibigan, Piknik, Uwi |
 
-**54 distinct Filipino words** are taught across **74 spoken objectives** —
-among them Bangon, Tayo, Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tabo, Sabon,
-Sipilyo, Tuwalya, Maligo, Suklay, Damit, Medyas, Sapatos, Kunin, Kanin, Itlog,
-Kain, Inom, Bati, Pasok, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos,
-Talon, Kumusta, Ngiti, Salamat and Paalam. Each word drives one action.
+**49 distinct Filipino words** are taught across **66 spoken objectives** —
+among them Bangon, Tayo, Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tuwalya, Sabon,
+Maligo, Suklay, Sipilyo, Damit, Medyas, Sapatos, Kunin, Kain, Inom, Bati,
+Pasok, Takbo, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos, Sakay, Ngiti,
+Salamat and Paalam. Each word drives one action.
 
 Pronunciation is judged by Filipino phonology rather than letter-edit distance,
 so a wrong vowel is rejected — saying *kaha* for **Kuha** counts as wrong, on
@@ -180,8 +180,7 @@ keyboard shortcuts simulate recognized speech through the exact same code path:
 | `Enter` | **whatever word the scene is currently asking for** |
 | `B` / `T` / `L` | "Bangon" / "Tayo" / "Lakad" (Scene 1) |
 | `K` / `N` / `O` / `I` | "Kaliwa" / "Kanan" / "Bukas" / "Ilaw" (Scene 2) |
-| `A` / `S` / `P` / `W` | "Tabo" / "Sabon" / "Sipilyo" / "Tuwalya" (Scene 2) |
-| `M` / `C` | "Maligo" / "Suklay" (Scene 3) |
+| `W` / `S` / `M` / `C` / `P` | "Tuwalya" / "Sabon" / "Maligo" / "Suklay" / "Sipilyo" (Scene 3, in order) |
 | `D` / `Z` / `F` / `V` | "Damit" / "Medyas" / "Sapatos" / "Bag" (Scene 4) |
 | `U` | "Kunin" (take — picks the school bag up, Scene 4) |
 | `Q` / `E` / `G` | "Kumusta" / "Pasok" / "Takbo" (Paaralan Scene 1) |
@@ -291,11 +290,12 @@ background painting, so a spoken word can take one away:
 
 | Sprite | Word it serves |
 |---|---|
-| `item_tabo.png` | **Tabo** (dipper) |
-| `item_sabon.png` | **Sabon** (soap) |
-| `item_sipilyo.png` | **Sipilyo** (toothbrush) |
 | `item_tuwalya.png` | **Tuwalya** (towel) |
-| `item_suklay.png`, `item_baso.png` | Suklay (comb), Baso (cup) — for later scenes |
+| `item_sabon.png` | **Sabon** (soap) |
+| `item_suklay.png` | **Suklay** (comb) |
+| `item_sipilyo.png` | **Sipilyo** (toothbrush) |
+| `item_baso.png` | Baso (cup) — scenery, the toothbrush stands in it |
+| `item_tabo.png` | unused — the dipper left the word list |
 
 They were cut out of the original painting by
 [`Tools/cut_bathroom_items.py`](Tools/cut_bathroom_items.py), and the gaps
@@ -306,11 +306,21 @@ they left were repainted by
 reproduces the original to a mean difference of 0.4 / 255, so the room looks
 unchanged until something is picked up.
 
-Tabo, Sabon, Sipilyo and Tuwalya are spoken objectives in Scene 2, after the
-light is on: saying one takes that object off the shelf or wall, through
-[`PickUpItem`](Assets/Scripts/PickUpItem.cs). They have no voice-over yet, so
-the on-screen prompt carries them. Suklay and Baso stay as scenery — combing
-belongs with getting dressed in Scene 4.
+All four are spoken objectives in **Scene 3**, where the washing actually
+happens: saying one takes that object off the shelf or wall, through
+[`PickUpItem`](Assets/Scripts/PickUpItem.cs). Scene 2's job is only to get
+Kylo into the bathroom and the light on, so it furnishes the room and picks
+nothing up. The cup stays as scenery.
+
+The dipper is the exception. `item_tabo.png` is no longer placed in either
+scene: **Tabo** was dropped as a word, and the bath happens at the water jar
+without the child having to name the thing it is poured with. That sprite
+was also the only thing hiding the one hole `fill_bathroom_background.py`
+could not close — the dipper straddles the wall and the curved lid, and the
+per-row repair that works on a flat shelf does not work on an ellipse.
+[`Tools/erase_tabo.py`](Tools/erase_tabo.py) finishes it: the tiles are
+copied three tile-widths across so the grout lines up, and the lid is
+rebuilt in ellipse coordinates from its own mirror image.
 
 ## Teacher Rachel's Portrait
 

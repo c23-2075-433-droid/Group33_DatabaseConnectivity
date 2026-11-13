@@ -107,7 +107,10 @@ public class BuildBahayScene2
         // gaps repainted by Tools/fill_bathroom_background.py, so these
         // positions are exactly where they were painted and the room looks
         // unchanged until something is picked up.
-        CreateBathroomItem(bathroom.transform, "Item_Tabo",    "item_tabo",    new Vector2(-7.056f, 0.738f), 5);
+        // No Item_Tabo. The dipper left the word list, and the jar is now
+        // painted closed in bathroom_background.png (Tools/erase_tabo.py),
+        // so putting the sprite back here would be the only tabo left in the
+        // game - visible in this scene and gone from the next one.
         CreateBathroomItem(bathroom.transform, "Item_Sabon",   "item_sabon",   new Vector2( 1.556f, 1.025f), 5);
         CreateBathroomItem(bathroom.transform, "Item_Suklay",  "item_suklay",  new Vector2( 2.750f, 0.988f), 5);
         // The brush stands in the cup, so the cup has to draw over it.

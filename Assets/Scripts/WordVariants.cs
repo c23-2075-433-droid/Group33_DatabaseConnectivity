@@ -49,12 +49,13 @@ public static class WordVariants
         new Dictionary<string, string[]>(System.StringComparer.OrdinalIgnoreCase)
     {
         // --- Bahay: waking up, the bathroom, getting dressed, breakfast ---
+        // No "Tabo": the dipper was dropped from the word list, and this
+        // table is keyed by the words the game actually teaches.
         { "Bangon",  new[] { "ba ngon", "bangun", "bangong" } },
         { "Tayo",    new[] { "ta yo", "tayu", "thai yo" } },
         { "Lakad",   new[] { "la kad", "lacad", "lagad" } },
         { "Bukas",   new[] { "bu kas", "bucas", "books" } },
         { "Ilaw",    new[] { "i love", "i law", "elao", "hello" } },
-        { "Tabo",    new[] { "ta bo", "taboo", "tabu" } },
         { "Sabon",   new[] { "sa bon", "sabun", "savon" } },
         { "Sipilyo", new[] { "sipilio", "si pilyo", "sepilyo", "cipilio" } },
         { "Tuwalya", new[] { "twalya", "tualya", "tuwalia", "to walya" } },

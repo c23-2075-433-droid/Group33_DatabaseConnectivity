@@ -210,14 +210,13 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.O)) SimulateSpeech("bukas");
         else if (Input.GetKeyDown(KeyCode.I)) SimulateSpeech("ilaw");
         else if (Input.GetKeyDown(KeyCode.U)) SimulateSpeech("kunin");
-        // The four things in the bathroom (Scene 2, after the light is on).
-        else if (Input.GetKeyDown(KeyCode.A)) SimulateSpeech("tabo");
-        else if (Input.GetKeyDown(KeyCode.S)) SimulateSpeech("sabon");
-        else if (Input.GetKeyDown(KeyCode.P)) SimulateSpeech("sipilyo");
+        // Scene 3, the washing routine: towel and soap, the bath itself,
+        // then hair and teeth. (No "tabo" - the dipper is not a word.)
         else if (Input.GetKeyDown(KeyCode.W)) SimulateSpeech("tuwalya");
-        // Scene 3, the bath.
+        else if (Input.GetKeyDown(KeyCode.S)) SimulateSpeech("sabon");
         else if (Input.GetKeyDown(KeyCode.M)) SimulateSpeech("maligo");
         else if (Input.GetKeyDown(KeyCode.C)) SimulateSpeech("suklay");
+        else if (Input.GetKeyDown(KeyCode.P)) SimulateSpeech("sipilyo");
         // Scene 4, getting dressed. ("Kunin" is U, above.)
         else if (Input.GetKeyDown(KeyCode.D)) SimulateSpeech("damit");
         else if (Input.GetKeyDown(KeyCode.Z)) SimulateSpeech("medyas");

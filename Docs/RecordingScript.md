@@ -1,6 +1,6 @@
 # Recording script — Filipino words and cues
 
-Generated from `Docs/VoiceOverScript.csv`. 50 words and 15 cue lines, all of which need a human voice.
+Generated from `Docs/VoiceOverScript.csv`. 49 words and 15 cue lines, all of which need a human voice.
 
 ## Why these and not the rest
 
@@ -23,7 +23,7 @@ python3 Tools/voice_changer.py --words
 
 ---
 
-## Part 1 — the 50 words
+## Part 1 — the 49 words
 
 Say each word on its own, clearly, with a pause after it.
 
@@ -33,52 +33,51 @@ Say each word on its own, clearly, with a pause after it.
 | 2 | **Kanan** | Right |
 | 3 | **Bukas** | Open |
 | 4 | **Ilaw** | Light (turn on) |
-| 5 | **Tabo** | Dipper |
-| 6 | **Maligo** | Take a bath |
-| 7 | **Sabon** | Soap |
+| 5 | **Tuwalya** | Towel |
+| 6 | **Sabon** | Soap |
+| 7 | **Maligo** | Take a bath |
 | 8 | **Suklay** | Comb |
 | 9 | **Sipilyo** | Toothbrush |
-| 10 | **Tuwalya** | Towel |
-| 11 | **Damit** | Clothes / uniform |
-| 12 | **Medyas** | Socks |
-| 13 | **Sapatos** | Shoes |
-| 14 | **Bag** | Bag |
-| 15 | **Kunin** | Take / get |
-| 16 | **Upo** | Sit down |
-| 17 | **Kanin** | Rice |
-| 18 | **Itlog** | Egg |
-| 19 | **Kain** | Eat |
-| 20 | **Inom** | Drink |
-| 21 | **Kumusta** | Hello / how are you |
-| 22 | **Pasok** | Enter |
-| 23 | **Takbo** | Run |
-| 24 | **Kuha** | Get / take |
-| 25 | **Lapis** | Pencil |
-| 26 | **Aklat** | Book |
-| 27 | **Basa** | Read |
-| 28 | **Sulat** | Write |
-| 29 | **Tanong** | Ask / question |
-| 30 | **Sagot** | Answer |
-| 31 | **Labas** | Go outside |
-| 32 | **Laro** | Play |
-| 33 | **Tawa** | Laugh |
-| 34 | **Tulong** | Help |
-| 35 | **Linis** | Clean up |
-| 36 | **Alis** | Leave / go |
-| 37 | **Paalam** | Goodbye |
-| 38 | **Tingin** | Look |
-| 39 | **Tuwa** | Joy / delight |
-| 40 | **Akyat** | Climb |
-| 41 | **Dausdos** | Slide |
-| 42 | **Sakay** | Ride |
-| 43 | **Tulak** | Push |
-| 44 | **Talon** | Jump |
-| 45 | **Ngiti** | Smile |
-| 46 | **Bati** | Greet |
-| 47 | **Ibahagi** | Share |
-| 48 | **Salamat** | Thank you |
-| 49 | **Pagod** | Tired |
-| 50 | **Uwi** | Go home |
+| 10 | **Damit** | Clothes / uniform |
+| 11 | **Medyas** | Socks |
+| 12 | **Sapatos** | Shoes |
+| 13 | **Bag** | Bag |
+| 14 | **Kunin** | Take / get |
+| 15 | **Upo** | Sit down |
+| 16 | **Kanin** | Rice |
+| 17 | **Itlog** | Egg |
+| 18 | **Kain** | Eat |
+| 19 | **Inom** | Drink |
+| 20 | **Kumusta** | Hello / how are you |
+| 21 | **Pasok** | Enter |
+| 22 | **Takbo** | Run |
+| 23 | **Kuha** | Get / take |
+| 24 | **Lapis** | Pencil |
+| 25 | **Aklat** | Book |
+| 26 | **Basa** | Read |
+| 27 | **Sulat** | Write |
+| 28 | **Tanong** | Ask / question |
+| 29 | **Sagot** | Answer |
+| 30 | **Labas** | Go outside |
+| 31 | **Laro** | Play |
+| 32 | **Tawa** | Laugh |
+| 33 | **Tulong** | Help |
+| 34 | **Linis** | Clean up |
+| 35 | **Alis** | Leave / go |
+| 36 | **Paalam** | Goodbye |
+| 37 | **Tingin** | Look |
+| 38 | **Tuwa** | Joy / delight |
+| 39 | **Akyat** | Climb |
+| 40 | **Dausdos** | Slide |
+| 41 | **Sakay** | Ride |
+| 42 | **Tulak** | Push |
+| 43 | **Talon** | Jump |
+| 44 | **Ngiti** | Smile |
+| 45 | **Bati** | Greet |
+| 46 | **Ibahagi** | Share |
+| 47 | **Salamat** | Thank you |
+| 48 | **Pagod** | Tired |
+| 49 | **Uwi** | Go home |
 
 ---
 

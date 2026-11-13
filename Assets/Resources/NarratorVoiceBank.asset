@@ -122,54 +122,6 @@ MonoBehaviour:
     text: Perfect! The bathroom is bright and warm now.
     gloss: 
     clip: {fileID: 8300000, guid: 2e1dd346ec8034d0088272395c23d9e6, type: 3}
-  - id: rachel_l1_s2_tabo_story
-    text: Kylo can see the water jar now, with a blue dipper resting on top.
-    gloss: 
-    clip: {fileID: 8300000, guid: d34135bb06d1f4e0e9d023817dff81c5, type: 3}
-  - id: rachel_l1_s2_tabo_ask
-    text: Help him lift it down! Say {word}!
-    gloss: 
-    clip: {fileID: 8300000, guid: 42b877e306fed4510b660434e9dfd14c, type: 3}
-  - id: rachel_l1_s2_tabo_done
-    text: Nice! Kylo is holding the tabo in his hands.
-    gloss: 
-    clip: {fileID: 8300000, guid: f41655052805547f59d00d2ecd5b7e50, type: 3}
-  - id: rachel_l1_s2_sabon_story
-    text: Water alone will not get Kylo clean. He needs something that makes bubbles.
-    gloss: 
-    clip: {fileID: 8300000, guid: 70dd3de6028fa4183be92d08ca598c59, type: 3}
-  - id: rachel_l1_s2_sabon_ask
-    text: "Help him reach for it \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: 706fd8b14ae7c4e97a42e4b910755da9, type: 3}
-  - id: rachel_l1_s2_sabon_done
-    text: Great! Kylo has the soap ready for his bath.
-    gloss: 
-    clip: {fileID: 8300000, guid: 01b002a69bf67431395c110c28c1b64c, type: 3}
-  - id: rachel_l1_s2_sipilyo_story
-    text: Kylo's teeth need cleaning too, before breakfast and before school.
-    gloss: 
-    clip: {fileID: 8300000, guid: 5a6d56480716e47019e41c5bbddd4cd4, type: 3}
-  - id: rachel_l1_s2_sipilyo_ask
-    text: Hand him the right one by saying {word}!
-    gloss: 
-    clip: {fileID: 8300000, guid: 698a47053d24846c38b2b965e52d9550, type: 3}
-  - id: rachel_l1_s2_sipilyo_done
-    text: Well done! Kylo is brushing his teeth.
-    gloss: 
-    clip: {fileID: 8300000, guid: 306dfb27ee929452ab8e06829c838570, type: 3}
-  - id: rachel_l1_s2_tuwalya_story
-    text: When Kylo finishes washing, he will be soaking wet from head to toe.
-    gloss: 
-    clip: {fileID: 8300000, guid: 11b093294565e4e679103c3453bc21aa, type: 3}
-  - id: rachel_l1_s2_tuwalya_ask
-    text: "Get him something to dry with \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: dc3996af59da24175add99677723fe6b, type: 3}
-  - id: rachel_l1_s2_tuwalya_done
-    text: Excellent! Kylo has everything he needs now.
-    gloss: 
-    clip: {fileID: 8300000, guid: 5715b0126e566482ebdb27d941aeeb3b, type: 3}
   - id: rachel_l1_s2_outro
     text: Everything is ready. Now Kylo can take his bath.
     gloss: 
@@ -178,18 +130,30 @@ MonoBehaviour:
     text: The bathroom is ready, and so is Kylo.
     gloss: 
     clip: {fileID: 8300000, guid: 0347c1f766cad4b9bbdb0a4a5cb86476, type: 3}
-  - id: rachel_l1_s3_kaliwa_story
-    text: Kylo is by the door. The water jar is on the other side of the room.
+  - id: rachel_l1_s3_tuwalya_story
+    text: When Kylo finishes washing, he will be soaking wet from head to toe.
     gloss: 
-    clip: {fileID: 8300000, guid: 299dcba3a4f4c428585e733d0afd2e1c, type: 3}
-  - id: rachel_l1_s3_kaliwa_ask
-    text: Send him that way with {word}!
+    clip: {fileID: 8300000, guid: 11b093294565e4e679103c3453bc21aa, type: 3}
+  - id: rachel_l1_s3_tuwalya_ask
+    text: "Get him something to dry with \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: 1a26beae8f2994031b0719e17b3166e5, type: 3}
-  - id: rachel_l1_s3_kaliwa_done
-    text: Good! Kylo has moved over to the water jar.
+    clip: {fileID: 8300000, guid: dc3996af59da24175add99677723fe6b, type: 3}
+  - id: rachel_l1_s3_tuwalya_done
+    text: Good! Kylo has his towel ready for afterwards.
     gloss: 
-    clip: {fileID: 8300000, guid: 9f44fcd0987d24bd19856268257ec6b1, type: 3}
+    clip: {fileID: 0}
+  - id: rachel_l1_s3_sabon_story
+    text: Water alone will not get Kylo clean. He needs something that makes bubbles.
+    gloss: 
+    clip: {fileID: 8300000, guid: 70dd3de6028fa4183be92d08ca598c59, type: 3}
+  - id: rachel_l1_s3_sabon_ask
+    text: "Help him reach for it \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 8300000, guid: 706fd8b14ae7c4e97a42e4b910755da9, type: 3}
+  - id: rachel_l1_s3_sabon_done
+    text: Great! Kylo has the soap ready for his bath.
+    gloss: 
+    clip: {fileID: 8300000, guid: 01b002a69bf67431395c110c28c1b64c, type: 3}
   - id: rachel_l1_s3_maligo_story
     text: The water is cool and the soap is ready. This is Kylo's favourite part.
     gloss: 
@@ -214,6 +178,18 @@ MonoBehaviour:
     text: Very nice! Kylo's hair is neat and smooth.
     gloss: 
     clip: {fileID: 8300000, guid: 120180142534f427bad9d6731dbbf76d, type: 3}
+  - id: rachel_l1_s3_sipilyo_story
+    text: Kylo's teeth need cleaning too, before breakfast and before school.
+    gloss: 
+    clip: {fileID: 8300000, guid: 5a6d56480716e47019e41c5bbddd4cd4, type: 3}
+  - id: rachel_l1_s3_sipilyo_ask
+    text: Hand him the right one by saying {word}!
+    gloss: 
+    clip: {fileID: 8300000, guid: 698a47053d24846c38b2b965e52d9550, type: 3}
+  - id: rachel_l1_s3_sipilyo_done
+    text: Well done! Kylo is brushing his teeth.
+    gloss: 
+    clip: {fileID: 8300000, guid: 306dfb27ee929452ab8e06829c838570, type: 3}
   - id: rachel_l1_s3_outro
     text: All clean! Now Kylo needs to get dressed for school.
     gloss: 
@@ -1102,14 +1078,6 @@ MonoBehaviour:
     text: Remember, 'Ilaw' means the light.
     gloss: Light (turn on)
     clip: {fileID: 8300000, guid: 73faff73581ef4acc9c94bf8c7bf74f0, type: 3}
-  - id: rachel_word_tabo_teach
-    text: A 'Tabo' is a dipper, the little cup for scooping water at bath time.
-    gloss: Dipper
-    clip: {fileID: 8300000, guid: 14413dce8a375423f8ed4c3a6e303536, type: 3}
-  - id: rachel_word_tabo_recall
-    text: Remember, a 'Tabo' is the water dipper.
-    gloss: Dipper
-    clip: {fileID: 8300000, guid: 6edb129d03e054ac984c55ded73778f1, type: 3}
   - id: rachel_word_maligo_teach
     text: In Filipino, 'Maligo' means to take a bath.
     gloss: Take a bath
@@ -1558,10 +1526,6 @@ MonoBehaviour:
     text: Ilaw
     gloss: Light (turn on)
     clip: {fileID: 8300000, guid: 1ac7e3f5ae0e347cc856503b7bc37608, type: 3}
-  - id: word_tabo
-    text: Tabo
-    gloss: Dipper
-    clip: {fileID: 8300000, guid: 88f10fabf96844168a3f9f63ee790604, type: 3}
   - id: word_maligo
     text: Maligo
     gloss: Take a bath
