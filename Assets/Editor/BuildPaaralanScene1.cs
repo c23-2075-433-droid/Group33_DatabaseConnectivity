@@ -40,13 +40,18 @@
 //   guard_frame_1..3 - the guard waving back, by
 //                              Tools/make_guard_frames.py. These REPLACE
 //                              char_guard and char_guard_idle here.
-//   guard_push_1..3  - the guard pushing the gate open, by
+//   guard_push_1..6  - the guard pushing the gate open, by
 //                              Tools/make_guard_push_frames.py
 //   pasok_turn_uniform_with_bag - the three-quarter view between his profile
 //                              and his back, by Tools/make_pasok_turn_frame.py
 //   back_walk_1/2/3_uniform_with_bag, back_run_1/2_uniform_with_bag
 //     the back-view cycles for walking and running into the school; all
 //     optional, and the log line says what is missing and how it degrades
+//   celebrate_uniform_with_bag - the "hooray" he does once he is through,
+//                              already drawn for Parke Scene 1's "Tuwa"
+//
+// Sound expected in Assets/Resources/Sfx/:
+//   school_bell - the bell he beat, by Tools/make_bell_sfx.py
 //
 // Run via: Tools > SALINLAHI > Build Paaralan Scene 1
 
@@ -189,6 +194,27 @@ public class BuildPaaralanScene1
         SpriteRenderer guardSr = guard.GetComponent<SpriteRenderer>();
         guardSr.flipX = true;
 
+        // --- He breathes too, for the same reason Kylo does ---
+        //
+        // Kylo has had this since the scene was built: a scene that waits for
+        // a word with nothing moving on it reads as a frozen picture, or a
+        // hung game. The guard stood beside him perfectly still through all
+        // of it, which made the one who was NOT moving the one you noticed.
+        //
+        // With no PlayerMovement on him this breathes unconditionally, which
+        // is what IdleBreath is for on a character who is scenery rather than
+        // the player. It writes only the transform, and his wave and his
+        // push write only the SPRITE, so the two never contend - unlike
+        // Kylo's walk, where exactly that clash had to be untangled.
+        //
+        // Slower and shallower than Kylo's. He is a grown man on duty, not a
+        // child waiting to be spoken to, and at 3.6 units a breath as deep as
+        // the boy's reads as a shrug. The phase is randomised inside
+        // IdleBreath, so the two of them are never in lockstep anyway.
+        IdleBreath guardBreath = guard.AddComponent<IdleBreath>();
+        guardBreath.depth = 0.008f;
+        guardBreath.cyclesPerSecond = 0.24f;
+
         // --- The guard's wave, DRAWN rather than switched ---
         //
         // It used to be a SpriteSwap between char_guard_idle and char_guard:
@@ -240,10 +266,30 @@ public class BuildPaaralanScene1
         // an open one. He stands at x 3.10, right beside the right-hand
         // panel, so his is the natural reach.
         //
-        // THE GATE STARTS ON THE FRAME HIS PALM ARRIVES. fireOnFrame is 1 -
-        // guard_push_2, the one with his hand flat against the panel - and
-        // the gate's own sequence is started from onFrameReached. Earlier and
-        // the gate moves before he touches it; later and he pushes air.
+        // SIX FRAMES, NOT THREE, and the shape below is why. The first
+        // version was one flat run of three, and two of them were the same
+        // extended arm - he reached in a single jump and then held still
+        // while a five-stage gate swung beside him. The six now follow the
+        // brief's own beats and split across PoseSequence's three parts:
+        //
+        //   frames     push_1..4  rest, turn and prepare, reach, contact
+        //   loopFrames push_5     the push itself, HELD - see below
+        //   tailFrames push_6     the settle back
+        //
+        // THE GATE STARTS ON THE FRAME HIS PALM ARRIVES. fireOnFrame counts
+        // from zero through the LEAD-IN, so 3 is guard_push_4, the one with
+        // his palm flat against the panel, and the gate's own sequence is
+        // started from onFrameReached. Earlier and the gate moves before he
+        // touches it; later and he pushes air.
+        //
+        // AND HE HOLDS ON UNTIL IT STOPS. At 10fps his palm lands 0.3s in;
+        // the gate then takes 3 frames at 6fps, half a second, to finish. So
+        // guard_push_5 is held for 0.4s on loopFrames - 2 cycles at 5fps -
+        // which carries him to the moment the panels settle. Without the
+        // hold he would reach the settle frame halfway through the swing and
+        // let go of a gate that was still moving, which is the one thing
+        // this whole arrangement exists to prevent. It did not show with
+        // three near-identical frames; it would show now.
         //
         // The push frames are drawn with an open hand reaching into empty
         // space and no gate in them, so the gate stays the separate thing it
@@ -255,12 +301,16 @@ public class BuildPaaralanScene1
             LoadSpriteOptional("guard_push_1"),
             LoadSpriteOptional("guard_push_2"),
             LoadSpriteOptional("guard_push_3"),
+            LoadSpriteOptional("guard_push_4"),
         };
-        guardPush.tailFrames = new[] { LoadSpriteOptional("guard_push_1") };
+        guardPush.loopFrames = new[] { LoadSpriteOptional("guard_push_5") };
+        guardPush.loopCycles = 2;
+        guardPush.loopFramesPerSecond = 5f;
+        guardPush.tailFrames = new[] { LoadSpriteOptional("guard_push_6") };
         guardPush.destinationSprite = LoadSpriteOptional("guard_frame_1");
-        guardPush.framesPerSecond = 7f;
+        guardPush.framesPerSecond = 10f;
         guardPush.playOnEnable = false;
-        guardPush.fireOnFrame = 1;
+        guardPush.fireOnFrame = 3;
 
         // --- Player, arriving at the gate on the left ---
         // Not further left than this: the flowering bushes along the left wall
@@ -476,6 +526,82 @@ public class BuildPaaralanScene1
         runToDoor.framesPerSecond = 6f;
         runToDoor.facingAwayFrames = backRun;
 
+        // --- He beat the bell, so the bell rings and he says so ---
+        //
+        // The whole scene is Kylo hurrying to get in before it. Until now it
+        // ended with him stopping in the courtyard with his back to us and a
+        // panel sliding over the top, which states the outcome in words and
+        // never shows it. The bell is the only thing that can tell him he
+        // made it, and the pose is the only thing that can tell us he knows.
+        //
+        // THE SWAP, not a second Kylo. He is switched off and the celebrating
+        // one switched on, which is how every pose change in this project
+        // works - PoseSettle's own notes call it out as the "Upo" pattern.
+        // Safe here because this fires after the LAST word of the scene: the
+        // objectives are done, nothing is listening for another, and the
+        // things that watch VoiceCommand hold C# event subscriptions that an
+        // inactive object simply stops feeding.
+        //
+        // WHERE HE STANDS, and why it is written as an offset rather than a
+        // position. The two sprites put the figure's feet at different
+        // distances below the pivot - 371.5px for the run, 438 for the
+        // celebrate, because the raised arms need a taller canvas - so a
+        // straight swap drops him through the pavement. Both import at 100
+        // pixels per unit, so the fix is that difference converted once:
+        //
+        //     (438 - 371.5) / 100 * scale
+        //
+        // Taken as a DIFFERENCE against where the runner actually ends, which
+        // matters: FeetBelowPivot is derived at 120 ppu while these two poses
+        // import at 100, so his feet do not land exactly where that constant
+        // claims. Anchoring to his real end position means that discrepancy
+        // cancels instead of being doubled.
+        const float RunFeetBelowPivotPx = 371.5f;        // back_run_*_uniform_with_bag
+        const float CelebrateFeetBelowPivotPx = 438f;    // celebrate_uniform_with_bag
+        const float PosePPU = 100f;                      // what both import at
+
+        float runEndY = SchoolDoorFeetY + FeetBelowPivot * scaleAtDoor;
+        float celebrateY = runEndY
+            + (CelebrateFeetBelowPivotPx - RunFeetBelowPivotPx) / PosePPU * scaleAtDoor;
+
+        GameObject cheerGO = new GameObject("Kylo_Celebrate");
+        cheerGO.transform.position = new Vector3(SchoolEntranceX, celebrateY, 0f);
+        // The SAME scale as the runner ends on, not a recomputed one. Both
+        // sprites are 100 ppu, so equal scale is equal size per drawn pixel,
+        // which is the only thing that keeps him from changing size as he
+        // turns round.
+        cheerGO.transform.localScale = new Vector3(scaleAtDoor, scaleAtDoor, 1f);
+        SpriteRenderer cheerSr = cheerGO.AddComponent<SpriteRenderer>();
+        cheerSr.sprite = LoadSpriteOptional("celebrate_uniform_with_bag");
+        cheerSr.sortingLayerName = "Player";
+        cheerSr.sortingOrder = playerSr.sortingOrder;
+
+        // He RISES into it rather than dropping. PoseSettle normally lands a
+        // pose from above, which is right for sitting down; a negative
+        // dropFrom runs it the other way, so he comes up off the pavement
+        // into the jump the drawing already shows him in. No squash, for the
+        // same reason - he is leaving the ground, not landing on it.
+        PoseSettle cheerSettle = cheerGO.AddComponent<PoseSettle>();
+        cheerSettle.dropFrom = -0.22f;
+        cheerSettle.driftFrom = 0f;
+        cheerSettle.duration = 0.26f;
+        cheerSettle.squash = 0f;
+        cheerGO.SetActive(false);
+
+        GameObject bellGO = new GameObject("Sfx_SchoolBell");
+        PlaySoundEffect bell = bellGO.AddComponent<PlaySoundEffect>();
+        bell.id = "school_bell";
+        bell.volume = 0.85f;   // under Rachel, who may still be talking
+
+        // All three on arrival, which is the frame he stops on - not on the
+        // word, which is a second and a half earlier while he is still
+        // running.
+        UnityEventTools.AddPersistentListener(runToDoor.onArrived, bell.Play);
+        UnityEventTools.AddBoolPersistentListener(
+            runToDoor.onArrived, cheerGO.SetActive, true);
+        UnityEventTools.AddBoolPersistentListener(
+            runToDoor.onArrived, playerGO.SetActive, false);
+
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
         follow.offset = new Vector3(0f, 0f, -10f);
@@ -596,6 +722,10 @@ public class BuildPaaralanScene1
 
         string missing = "";
         if (gateShut == null) missing += "\n  paaralan_gate_background_closed - the scene opens on an OPEN gate, so \"Bukas\" changes nothing.";
+        if (LoadSpriteOptional("celebrate_uniform_with_bag") == null)
+            missing += "\n  celebrate_uniform_with_bag - Kylo beats the bell and then does not react to it, which is the point of the scene.";
+        if (LoadSpriteOptional("guard_push_6") == null)
+            missing += "\n  guard_push_1..6 - the guard cannot open the gate, so \"Bukas\" moves nothing. Run Tools/make_guard_push_frames.py.";
         if (LoadSpriteOptional("guard_frame_1") == null)
             missing += "\n  guard_frame_1..3 - the guard cannot wave back, so \"Bati\" lands on nobody. Run Tools/make_guard_frames.py.";
         if (backWalk == null) missing += "\n  back_walk_1/3_uniform_with_bag - Kylo walks into the school side-on, which reads as sliding rather than going away.";
