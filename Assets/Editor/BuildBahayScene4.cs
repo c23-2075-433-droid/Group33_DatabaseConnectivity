@@ -77,20 +77,32 @@ public class BuildBahayScene4
 
     // Where the clothes sit on the painted bed, in world units.
     //
-    // These are not chosen - they are MEASURED. Both sprites are cut out of
-    // Art/bed_clothes_raw.png, which is this room with the clothes painted
-    // onto the bed, and Tools/cut_folded_uniform.py prints the world centre
-    // and height of whatever it cut. Putting them back at those numbers puts
-    // them exactly where they were painted, which is the only placement that
-    // is guaranteed to sit on the mattress rather than over its front edge.
+    // THE MATTRESS'S FLAT TOP IS ONLY ABOUT 50 BACKGROUND PIXELS DEEP. That
+    // is the one measurement everything here turns on, and it was wrong
+    // twice. The blanket's back edge against the wall is at y 500 and it
+    // FOLDS at y 550 - below that line it is hanging down the front of the
+    // bed, all the way to the border at y 650. The whole bright lower half
+    // of the blanket is the front of the bed, not the top of it, which is
+    // why clothes placed by eye kept ending up draped over the edge.
     //
-    // Re-cut the art and these may move; the tool prints the new ones.
-    private const float BedDamitX = -6.148f;
-    private const float BedDamitY = -0.787f;
-    private const float BedDamitH = 0.817f;
-    private const float BedMedyasX = -5.087f;
-    private const float BedMedyasY = -0.926f;
-    private const float BedMedyasH = 0.585f;
+    // So what is placed is not the sprite's centre but its BOTTOM, the point
+    // where it touches cloth, and that has to land between 500 and 550. The
+    // uniform rests at y 532 and the socks just forward of it at 537, which
+    // leaves most of the band showing in front of them. Both are small
+    // enough to sit in that band: the raw art drew them bigger than it is.
+    //
+    // They stand up above the back edge, over the wainscoting, the same way
+    // the painted pillow does. That is what a thing standing on a bed in
+    // front of a wall looks like, and it is not a mistake.
+    //
+    //   uniform  bottom at background pixel (290, 532), 62 px tall
+    //   socks    bottom at (384, 537), 45 px tall
+    private const float BedDamitX = -6.332f;
+    private const float BedDamitY = -0.334f;
+    private const float BedDamitH = 0.714f;
+    private const float BedMedyasX = -5.250f;
+    private const float BedMedyasY = -0.489f;
+    private const float BedMedyasH = 0.518f;
 
     // The word prompts, copied from Bahay Scene 3 - see the long note on
     // CreatePromptUI below for why the arrow had to change. PromptLift is how

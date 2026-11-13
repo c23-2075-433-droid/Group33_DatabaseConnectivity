@@ -42,11 +42,12 @@ ARROWBOB_GUID = "d6955ecfe9e654af191fd7b44a9a0047"      # ArrowBob.cs
 IMAGE_GUID = "fe87c0e1cc204ed48ad3b37840f39efc"         # UnityEngine.UI.Image
 PPU = 100.0                                             # what these props import at
 
-# Where the clothes go, and how big. Not chosen but MEASURED: these are what
-# Tools/cut_folded_uniform.py printed for the two sprites it cut out of the
-# painted art, so putting them here puts them back where they were painted.
-DAMIT = (-6.148, -0.787, 0.817)
-MEDYAS = (-5.087, -0.926, 0.585)
+# Where the clothes go, and how big. Not where the raw art had them: the
+# mattress's flat top is only about 50 background pixels deep, from the back
+# edge at y 500 to the fold at y 550, and the painted clothes hung over that
+# fold. These rest on it instead - see the long note in BuildBahayScene4.
+DAMIT = (-6.332, -0.334, 0.714)
+MEDYAS = (-5.250, -0.489, 0.518)
 
 PROMPT_LIFT = 110.0
 ARROW_SIZE = 76.0
