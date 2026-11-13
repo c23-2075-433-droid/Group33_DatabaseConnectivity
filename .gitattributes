@@ -70,3 +70,20 @@
 # *.wav  filter=lfs diff=lfs merge=lfs -text
 # *.png  filter=lfs diff=lfs merge=lfs -text
 # *.ttf  filter=lfs diff=lfs merge=lfs -text
+
+# ---------------------------------------------------------------- documents
+#
+# Found while committing the Activity 10 report, and worth writing down
+# because it had already damaged a file. Git's built in attributes give a PDF
+# `diff=astextplain` but never mark it binary, so with `core.autocrlf=true`,
+# which is the default on Windows, Git treats a PDF as text and rewrites every
+# LF byte inside it as CRLF on checkout.
+#
+# The proof is in this repository: the working copy of
+# Docs/Daquis_Group33_FirstRelease.pdf had a different checksum from the blob
+# it was checked out from. The blob is fine; the file on the Windows disk was
+# not. These lines stop it happening to the next one.
+*.pdf   binary
+*.docx  binary
+*.pptx  binary
+*.xlsx  binary
