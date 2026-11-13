@@ -42,7 +42,10 @@
 //   item_sipilyo, item_tuwalya, fx_bath,
 //   standing_towel_messy, talking_towel,
 //   standing_towel_combed if it has ever been drawn - "Suklay" falls back
-//   to talking_towel without it, sipilyo_frame_1..3,
+//   to talking_towel without it, sipilyo_frame_1..4,
+//
+// Sounds expected in Assets/Resources/Sfx/:
+//   brush_teeth - made by Tools/make_brush_sfx.py
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -219,20 +222,32 @@ public class BuildBahayScene3
         // standingSprite every frame it is not moving, so a sequence driving
         // the renderer directly is overwritten before anyone sees it.
         //
-        // The loop is one frame, so it holds rather than moves. A second
-        // brushing frame - the brush at the other side of his mouth - is the
-        // one thing missing from making this a real loop.
+        // The loop alternates the brush between the two sides of his mouth,
+        // which is the only reason it reads as brushing rather than as a
+        // held pose. Two frames at four a second is two strokes a second.
+        //
+        // The numbers add up to the length of the sound deliberately:
+        //   lead-in   2 frames / 4 fps = 0.50 s   he lifts the brush
+        //   loop      2 x 8   / 4 fps = 4.00 s   eight strokes
+        //   tail      1 frame / 4 fps = 0.25 s   he lowers it
+        //                              = 4.75 s, which is brush_teeth.wav.
+        // Change one and change the other, or he goes on brushing in silence.
         GameObject brushGO = new GameObject("Pose_Sipilyo");
         PoseSequence brush = brushGO.AddComponent<PoseSequence>();
         brush.player = player;
         brush.playOnEnable = false;
         brush.framesPerSecond = 4f;
-        brush.loopFramesPerSecond = 3f;
-        brush.loopCycles = 3;
+        brush.loopFramesPerSecond = 4f;
+        brush.loopCycles = 8;
         brush.frames = new[] { LoadSprite("sipilyo_frame_1"), LoadSprite("sipilyo_frame_2") };
-        brush.loopFrames = new[] { LoadSprite("sipilyo_frame_2") };
+        brush.loopFrames = new[] { LoadSprite("sipilyo_frame_2"), LoadSprite("sipilyo_frame_4") };
         brush.tailFrames = new[] { LoadSprite("sipilyo_frame_3") };
         brush.destinationSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
+
+        // The bristles. Static SoundEffects.Play cannot be a persistent
+        // UnityEvent listener, so the scene gets a component that can be.
+        PlaySoundEffect brushSound = brushGO.AddComponent<PlaySoundEffect>();
+        brushSound.id = "brush_teeth";
 
         GameObject combedGO = new GameObject("Pose_TowelCombed");
         PoseSwitch combed = combedGO.AddComponent<PoseSwitch>();
@@ -309,6 +324,7 @@ public class BuildBahayScene3
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, useSipilyo.PickUp);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, brush.Play);
+        UnityEventTools.AddPersistentListener(sipilyo.onCorrect, brushSound.Play);
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);

@@ -37,7 +37,7 @@ from PIL import Image
 from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fit_seated_pose import hair_cap, split_columns  # noqa: E402
+from fit_seated_pose import bleed_edges, hair_cap, split_columns  # noqa: E402
 from import_towel_pose import cut_background  # noqa: E402
 
 BASE = 'Assets/Sprites/standing_towel_messy.png'
@@ -125,8 +125,11 @@ def main():
         # on their own white card inside the strip, and the seated version -
         # written to protect a white polo shirt - leaves the card behind as a
         # pale panel either side of him.
-        cut = Image.fromarray(
-            np.dstack([tile, cut_background(tile)]).astype(np.uint8))
+        # bleed BEFORE the resize: once a resampler has mixed the white
+        # margin into the edge pixels there is no getting it back out, and
+        # the sprite keeps a pale rim over the bathroom tiles.
+        cut = bleed_edges(Image.fromarray(
+            np.dstack([tile, cut_background(tile)]).astype(np.uint8)))
         poses.append(scale_to_hair(keep_figure(cut), b_hair))
 
     # Measured from the head's centre column outwards, because that column is

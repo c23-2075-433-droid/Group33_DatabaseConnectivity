@@ -28,10 +28,34 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fit_seated_pose import bleed_edges  # noqa: E402
+
 OUT_DIR = 'Assets/Sprites'
 TARGET_H = 745          # every one of Kylo's poses is this tall
 WHITE = 236             # at or above this on all channels counts as paper
-FEATHER = 0.7           # pixels
+FEATHER = 0.6           # pixels
+
+# The generator anti-aliases the figure against the paper, so a rim of pale
+# pixels survives the cut and reads as a white outline once he is over the
+# bathroom tiles. A flat erosion would take it off and take a bite out of his
+# fingers and the arm of his glasses with it, so the background GROWS into
+# the halo instead - only into pixels pale enough to be paper rather than
+# drawing. His black outline is nowhere near that pale, so the growth stops
+# dead at the ink and the cream stripes of the towel, which sit behind the
+# outline, are never reached. Same constants as fit_seated_pose.py, which
+# worked them out.
+HALO_LUMA = 205
+HALO_ROUNDS = 40
+
+# White the border cannot reach is usually still paper: the triangle between
+# a raised arm and the chest, the gap under an elbow. Those have to go too or
+# the pose carries a white patch over the tiles. What saves the eyes and the
+# teeth, which are also enclosed and also white, is that they are SMALL - the
+# arm gaps run to thousands of pixels and the largest eye to a few hundred.
+# The towel is never at risk: its cream stripes are warm enough that they
+# never enter the white mask in the first place.
+ENCLOSED_GAP = 800      # px; above this an enclosed white region is paper
 
 # The importer settings are copied from an existing pose rather than left to
 # Unity. A PNG that arrives without a .meta is imported with the editor's
@@ -53,6 +77,23 @@ def cut_background(rgb):
     outside = outside[outside != 0]
     background = np.isin(labels, outside)
 
+    for region in range(1, labels.max() + 1):
+        if region in outside:
+            continue
+        m = labels == region
+        if m.sum() > ENCLOSED_GAP:
+            background |= m
+
+    lum = rgb.mean(axis=2)
+    pale = lum > HALO_LUMA
+    for _ in range(HALO_ROUNDS):
+        touching = (np.roll(background, 1, 0) | np.roll(background, -1, 0)
+                    | np.roll(background, 1, 1) | np.roll(background, -1, 1))
+        grown = background | (touching & pale)
+        if not grown[~background].any():
+            break
+        background = grown
+
     alpha = np.where(background, 0.0, 255.0)
     return ndimage.gaussian_filter(alpha, FEATHER)
 
@@ -65,8 +106,7 @@ def main():
     rgb = np.asarray(Image.open(src).convert('RGB'), dtype=int)
     alpha = cut_background(rgb)
 
-    out = np.dstack([rgb, alpha]).astype(np.uint8)
-    im = Image.fromarray(out, 'RGBA')
+    im = bleed_edges(Image.fromarray(np.dstack([rgb, alpha]).astype(np.uint8)))
 
     box = im.getbbox()
     if box is None:
