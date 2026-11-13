@@ -22,6 +22,8 @@ Scene 3 afterwards: the builder picks the file up on its own.
 """
 import sys
 import os
+import re
+import uuid
 import numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -30,6 +32,14 @@ OUT_DIR = 'Assets/Sprites'
 TARGET_H = 745          # every one of Kylo's poses is this tall
 WHITE = 236             # at or above this on all channels counts as paper
 FEATHER = 0.7           # pixels
+
+# The importer settings are copied from an existing pose rather than left to
+# Unity. A PNG that arrives without a .meta is imported with the editor's
+# defaults, which means 100 pixels per unit - and every one of Kylo's poses
+# is 120. Getting that wrong does not look like a settings problem, it looks
+# like he grew by a fifth the moment the pose switches. Only the GUID is
+# changed, so the new pose matches the old one in every other respect.
+META_TEMPLATE = os.path.join(OUT_DIR, 'talking_towel.png.meta')
 
 
 def cut_background(rgb):
@@ -70,6 +80,21 @@ def main():
     path = os.path.join(OUT_DIR, name + '.png')
     im.save(path)
     print('%s  %dx%d' % (path, im.width, im.height))
+
+    meta_path = path + '.meta'
+    if os.path.exists(meta_path):
+        print('%s already exists, left alone' % meta_path)
+    elif os.path.exists(META_TEMPLATE):
+        with open(META_TEMPLATE, encoding='utf-8') as f:
+            meta = f.read()
+        meta = re.sub(r'^guid: [0-9a-f]{32}$', 'guid: ' + uuid.uuid4().hex,
+                      meta, count=1, flags=re.M)
+        with open(meta_path, 'w', encoding='utf-8') as f:
+            f.write(meta)
+        print('%s  (120 px per unit, from %s)' % (meta_path, META_TEMPLATE))
+    else:
+        print('WARNING: no %s to copy import settings from - check the '
+              'pixels per unit in the Inspector, it must be 120' % META_TEMPLATE)
 
 
 if __name__ == '__main__':
