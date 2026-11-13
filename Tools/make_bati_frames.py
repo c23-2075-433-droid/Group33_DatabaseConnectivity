@@ -36,6 +36,24 @@ WHERE THE ART CAME FROM. Art/bati_frames_raw.png is one Canva generation
 from standing_uniform_with_bag. The API returns only a ~200px thumbnail, so
 the full-size file is downloaded by hand out of Canva Uploads.
 
+THEIR .META MUST SAY 120 PIXELS PER UNIT, and this is not a detail.
+
+Kylo's original six sprites - standing, talking and the four walk frames -
+import at 120. Every sprite generated for him since, these included, takes
+Unity's default of 100. The art is the same 745px tall either way, so the
+only thing that changes is how many world units Unity thinks that is:
+
+    745 / 120 = 6.21 units          745 / 100 = 7.45 units
+
+which is TWENTY PERCENT. "Bati" swaps him from standing to bati_frame_1 and
+back again, so at 100 he swelled by a fifth the moment he waved and snapped
+back when he finished - reported from the game as "nalaki ng sobra".
+
+Unity writes the .meta on first import and does not rewrite it afterwards,
+so the fix lives there rather than here: these three are set to 120 by hand.
+Re-running this script keeps them. DELETING a .meta does not - Unity makes a
+fresh one at the default 100 and the swell comes back.
+
 Writes  Assets/Sprites/bati_frame_1..3_uniform_with_bag.png
 
 Run from the repository root:  python Tools/make_bati_frames.py
