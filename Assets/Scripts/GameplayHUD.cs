@@ -288,9 +288,24 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         if (!wasCorrect) status.NoteTryAgain();
 
         // The cue fires here rather than with the praise line, because this is
-        // the earliest moment the word is known to be right. What the child
-        // is being rewarded for is saying it, not for watching Kylo move.
-        if (wasCorrect) SoundEffects.Play("cue_correct");
+        // the earliest moment the verdict is known. What the child is being
+        // rewarded for is saying the word, not for watching Kylo move - and
+        // the "oops" has to arrive while they still remember what they said.
+        //
+        // Both halves play from the same line on purpose. A right answer and a
+        // wrong one are the same event to the child, answered in the same
+        // breath, and splitting them across two call sites is how one of them
+        // ends up silent or late.
+        //
+        // The wrong cue lands ahead of anything Rachel says about it:
+        // VoicePromptDirector only speaks a hint on the second miss and a
+        // replay on the fourth, so most misses are answered by this sound
+        // alone. It is 0.58 s long and VoiceCommand.restartDelay is 0.5 s, so
+        // roughly its last 80 ms sound into a reopened microphone - a decaying
+        // horn tail, not an onset, which is nothing for the recognizer to
+        // match a word against. If restartDelay is ever shortened, check that
+        // again rather than assuming it still holds.
+        SoundEffects.Play(wasCorrect ? "SALINLAHI_Correct" : "SALINLAHI_Incorrect");
     }
 
     private void HandleSpeechBegan()
