@@ -63,7 +63,9 @@ CREASE = (180, 174, 169)
 NAVY = (41, 56, 83)
 NAVY_LIT = (62, 81, 114)
 NAVY_DIM = (26, 36, 56)
-SHADOW = (46, 28, 18, 95)
+# Dark enough to be seen on a painted yellow blanket. At 95 it was
+# invisible there and the stack looked stuck on rather than put down.
+SHADOW = (46, 28, 18, 140)
 
 SS = 3                         # supersampling, for clean curves at this size
 W, H = 960, 640

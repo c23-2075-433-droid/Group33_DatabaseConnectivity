@@ -42,9 +42,11 @@ ARROWBOB_GUID = "d6955ecfe9e654af191fd7b44a9a0047"      # ArrowBob.cs
 IMAGE_GUID = "fe87c0e1cc204ed48ad3b37840f39efc"         # UnityEngine.UI.Image
 PPU = 100.0                                             # what these props import at
 
-# Where the clothes go, and how big. Same values as BuildBahayScene4.
-DAMIT = (-6.217, -1.105, 1.05)
-MEDYAS = (-5.05, -1.432, 0.75)   # grown about their bottom edge, which stays at -1.807
+# Where the clothes go, and how big. Same values as BuildBahayScene4, which
+# explains why: both sit in the middle of the mattress's top surface, clear
+# of the front edge where the blanket starts hanging down the side.
+DAMIT = (-6.217, -0.898, 1.05)
+MEDYAS = (-5.008, -1.036, 0.75)
 
 PROMPT_LIFT = 110.0
 ARROW_SIZE = 76.0

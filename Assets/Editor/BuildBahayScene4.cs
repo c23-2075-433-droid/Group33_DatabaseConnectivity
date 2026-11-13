@@ -73,20 +73,30 @@ public class BuildBahayScene4
     private const float BgScale = 1.9458f;
     private const float FloorY = -3.32f;              // the painted floorboards
 
-    // Where the painted bed is, in world units. Measured off
-    // bedroom_background.png: it imports at 169 pixels per unit and is drawn
-    // at BgScale from the centre of the screen, so one background pixel is
-    // BgScale / 169 = 0.01151 world units, and the blanket's flat top runs
-    // from about x -6.8 to -4.7. Both of these sit on it.
+    // Where the painted bed is, in world units, and where on it these two go.
+    //
+    // Measured off bedroom_background.png: it imports at 169 pixels per unit
+    // and is drawn at BgScale from the centre of the screen, so one
+    // background pixel is BgScale / 169 = 0.01151 world units.
+    //
+    // WHAT MATTERS HERE IS THE MATTRESS'S FRONT EDGE. The bed is painted in
+    // perspective: its top surface is a band about 125 background pixels
+    // deep, from the back edge against the wall at y 488 down to the front
+    // edge at y 609-615, and BELOW that line the blanket hangs down the side
+    // of the bed. Anything whose bottom crosses that line is drawn on the
+    // hanging part, which reads as stuck to the front of the bed rather than
+    // lying on it - the socks were 20 pixels over it and looked like they
+    // were sliding off. Both of these now sit in the middle of the band,
+    // with 15-20 pixels of blanket showing in front of them.
+    //
+    //   uniform   centre (300, 550) in background pixels
+    //   socks     centre (405, 562), just forward of it and to the right,
+    //             clear of the painted footboard post at x 445
     private const float BedDamitX = -6.217f;
-    private const float BedDamitY = -1.105f;
+    private const float BedDamitY = -0.898f;
     private const float BedDamitH = 1.05f;
-    private const float BedMedyasX = -5.05f;
-    // Grown from 0.62 about their BOTTOM edge, which stays at -1.807: at
-    // 0.62 they read as undersized next to the shoes on the floor, and a
-    // pair of socks is not half a pair of shoes. Raising the centre rather
-    // than the height alone keeps them resting on the blanket.
-    private const float BedMedyasY = -1.432f;
+    private const float BedMedyasX = -5.008f;
+    private const float BedMedyasY = -1.036f;
     private const float BedMedyasH = 0.75f;
 
     // The word prompts, copied from Bahay Scene 3 - see the long note on
