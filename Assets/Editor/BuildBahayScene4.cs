@@ -3,13 +3,37 @@
 // One-click scene builder for Bahay Scene 4 ("Getting Dressed").
 // Teaches five words: Damit, Medyas, Sapatos, Bag, Kunin.
 //
+// The last two are the bag, in two beats: "Bag" names it and leaves it on
+// the floor gleaming, "Kunin" takes it and puts it on his back. Saying the
+// one word used to do both at once, which gave the child nothing to do with
+// the only object in the scene they are meant to act on. See BagPickup.cs.
+//
+// Salamin was in this builder for a while and is gone again. The bedroom has
+// no mirror painted in it, so the word had to land on Kylo himself with a
+// gleam - honest staging rather than finished - and it never reached the
+// saved scene, which has taught these five words all along. The two match
+// now, for the first time in a while.
+//
 // Reuses the bedroom, so it needs no new background. The bedroom's furniture
 // is painted INTO bedroom_background.png - bed, dresser, nightstand and door
-// are not separate objects - so everything the child names is laid out on the
-// floor in front of it. That also means the room has no mirror of its own;
-// The bedroom's furniture is painted INTO bedroom_background.png - bed,
-// dresser, nightstand and door are not separate objects - so everything the
-// child names is laid out on the floor in front of it.
+// are not separate objects - so everything the child names is a sprite laid
+// on top of that painting. That also means the room has no mirror of its own.
+//
+// THE CLOTHES ARE ON THE BED, THE REST ON THE FLOOR. Rachel's line here is
+// "His uniform is folded on the bed", and everything used to be laid out on
+// the floorboards, including the uniform - so the one line of English in the
+// scene described something the child could see was not there. The uniform
+// and the socks now sit on the painted blanket, at the world positions the
+// bed occupies (see BedDamit/BedMedyas below); the shoes and the bag stay on
+// the floor, where shoes and bags go.
+//
+// prop_damit_folded and prop_medyas_folded are both cut out of
+// Art/bed_clothes_raw.png by Tools/cut_folded_uniform.py - this room with
+// the clothes painted onto the bed. They are cut rather than drawn because
+// a drawn prop has to earn the painted room's lighting and perspective from
+// scratch, and these are painted into it already. The old prop_damit is a
+// shirt on a coat hanger, which cannot be laid down flat, and prop_medyas
+// is a pair of socks standing upright, which is not how socks lie on a bed.
 //
 // Kylo faces the player here rather than standing side-on, so the child can
 // see him being dressed. The walk frames stay side-on, since he only turns to
@@ -36,9 +60,9 @@
 // scene ended the level and carried the database demo itself.
 //
 // Sprites expected in Assets/Sprites/:
-//   bedroom_background, talking_towel, prop_damit, prop_medyas, prop_sapatos,
-//   prop_bag, fx_gleam, standing(_with_bag), walk_frame_1..4(_with_bag),
-//   ui_arrow, ui_word_badge
+//   bedroom_background, talking_towel, prop_damit_folded,
+//   prop_medyas_folded, prop_sapatos, prop_bag, fx_gleam, standing(_with_bag),
+//   walk_frame_1..4(_with_bag), ui_arrow_point, ui_word_badge
 //
 // Run via: Tools > SALINLAHI > Build Bahay Scene 4
 
@@ -61,6 +85,56 @@ public class BuildBahayScene4
     // before changing any of this.
     private const float BgScale = 1.9458f;
     private const float FloorY = -3.32f;              // the painted floorboards
+
+    // Where the clothes sit on the painted bed, in world units.
+    //
+    // THE MATTRESS'S FLAT TOP IS ONLY ABOUT 50 BACKGROUND PIXELS DEEP. That
+    // is the one measurement everything here turns on, and it was wrong
+    // twice. The blanket's back edge against the wall is at y 500 and it
+    // FOLDS at y 550 - below that line it is hanging down the front of the
+    // bed, all the way to the border at y 650. The whole bright lower half
+    // of the blanket is the front of the bed, not the top of it, which is
+    // why clothes placed by eye kept ending up draped over the edge.
+    //
+    // So what is placed is not the sprite's centre but its BOTTOM, the point
+    // where it touches cloth, and that has to land between 500 and 550. The
+    // uniform rests at y 532 and the socks just forward of it at 537, which
+    // leaves most of the band showing in front of them. Both are small
+    // enough to sit in that band: the raw art drew them bigger than it is.
+    //
+    // They stand up above the back edge, over the wainscoting, the same way
+    // the painted pillow does. That is what a thing standing on a bed in
+    // front of a wall looks like, and it is not a mistake.
+    //
+    //   uniform  bottom at background pixel (290, 532), 62 px tall
+    //   socks    bottom at (384, 537), 45 px tall
+    private const float BedDamitX = -6.332f;
+    private const float BedDamitY = -0.334f;
+    private const float BedDamitH = 0.714f;
+    private const float BedMedyasX = -5.250f;
+    private const float BedMedyasY = -0.489f;
+    private const float BedMedyasH = 0.518f;
+
+    // The bag, on the floor WITHIN REACH of Kylo rather than out in the
+    // middle of the room. He stands at x 5.0 and his feet cover 4.40 to
+    // 5.86, so a bag 1.83 wide centred here leaves about a third of a unit
+    // between it and his nearest foot - close enough that bending down and
+    // picking it up is a believable thing for him to do, which is what the
+    // animation to come needs, and far enough that the two sprites do not
+    // touch. It is drawn over the painted dresser behind it, correctly: its
+    // base is a long way below the dresser's, so it is nearer the viewer.
+    private const float BagX = 3.19f;
+    private const float BagH = 2.10f;
+
+    // The word prompts, copied from Bahay Scene 3 - see the long note on
+    // CreatePromptUI below for why the arrow had to change. PromptLift is how
+    // far above an object's TOP EDGE its badge floats, in canvas units (world
+    // units x100), and it is what it is because the arrow has to fit in the
+    // gap underneath.
+    private const float PromptLift = 110f;
+    private const float ArrowSize = 76f;              // the arrow's long side
+    private const float ArrowReach = 16f;             // how far the jab travels
+    private const float ArrowClear = 18f;             // tip-to-object gap at rest
 
     // The character art, which imports at 120 - see BuildBahayScene2.
     private const float SpritePPU = 120f;
@@ -96,13 +170,21 @@ public class BuildBahayScene4
         bgSr.sortingOrder = 0;
         bg.transform.localScale = new Vector3(BgScale, BgScale, 1f);
 
-        // --- The things laid out on the floor ---
-        // Each is sized by the world height it should stand, not by a scale
+        // --- The things he has to find ---
+        // Each is sized by the world height it should be, not by a scale
         // factor, so it comes out right whatever resolution the art is.
-        GameObject propDamit   = CreateProp("Prop_Damit",   "prop_damit",   -6.0f, 1.85f);
-        GameObject propMedyas  = CreateProp("Prop_Medyas",  "prop_medyas",  -3.8f, 0.85f);
+        //
+        // The uniform and the socks are folded on the bed, because that is
+        // what Rachel says. They are smaller than the floor props: a shoe
+        // seen on the floorboards and a folded shirt seen lying on a blanket
+        // are not the same size on screen, and sizing them like the floor
+        // props made the bed look like a shop display.
+        GameObject propDamit   = CreatePropAt("Prop_Damit",  "prop_damit_folded",
+                                              BedDamitX, BedDamitY, BedDamitH);
+        GameObject propMedyas  = CreatePropAt("Prop_Medyas", "prop_medyas_folded",
+                                              BedMedyasX, BedMedyasY, BedMedyasH);
         GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -2.0f, 0.95f);
-        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      0.2f, 2.10f);
+        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      BagX, BagH);
 
         PickUpItem takeDamit   = AddPickUp(propDamit);
         PickUpItem takeMedyas  = AddPickUp(propMedyas);
@@ -184,19 +266,8 @@ public class BuildBahayScene4
         CreateWall("Wall_Left", -9.3f);
         CreateWall("Wall_Right", 9.3f);
 
-        // --- A gleam, for the one word that names something rather than takes it ---
+        // --- A gleam, played when the bag becomes tappable ---
         TimedOverlay gleamBag = CreateGleam("Gleam_Bag", propBag, 2.8f);
-        // "Salamin" has NOTHING OF ITS OWN TO POINT AT. This bedroom is drawn
-        // without a mirror - see the note at the top of this file - so the
-        // word lands on Kylo himself, which is at least who he is checking.
-        // It wants a mirror drawn into the room and the gleam moved onto it;
-        // until then this is the honest staging rather than the finished one.
-        TimedOverlay gleamSalamin = CreateGleam("Gleam_Salamin", playerGO, 3.4f);
-        // It lands ON Kylo, and CreateGleam leaves a gleam on the "Props"
-        // layer, which this project sorts BELOW "Player". Left there it would
-        // be drawn behind the boy it is pointing at.
-        gleamSalamin.overlay.sortingLayerName = "Player";
-        gleamSalamin.overlay.sortingOrder = 40;
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -217,12 +288,41 @@ public class BuildBahayScene4
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-        // Each prompt sits above the thing it names.
-        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",   new Vector3(-600, -60, 0));
-        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",  new Vector3(-380, -150, 0));
-        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos", new Vector3(-200, -140, 0));
-        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin", new Vector3(360, 60, 0));
-        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",     new Vector3(20, -30, 0));
+        // Each prompt sits PromptLift above the top of the thing it names,
+        // rather than at a height picked by eye, so the arrow underneath it
+        // always has the same gap to point across. Over() does that sum.
+        //
+        // Every word here names something the child has to find, so every
+        // badge gets an arrow. Bag and Kunin share a position: they are the
+        // same object asked about twice, and only one badge is ever up.
+        GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",
+                                             Over(BedDamitX, BedDamitY + BedDamitH / 2f), true);
+        GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",
+                                             Over(BedMedyasX, BedMedyasY + BedMedyasH / 2f), true);
+        GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos",
+                                             Over(-2.0f, FloorY + 0.95f), true);
+        GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",
+                                             Over(BagX, FloorY + BagH), true);
+        GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",
+                                             Over(BagX, FloorY + BagH), true);
+
+        // --- The bag's own little sequence ---
+        // On an object of its own rather than on the bag, because the bag is
+        // switched off for most of the level and a component on a disabled
+        // object does not run - it could neither show itself nor count down.
+        GameObject bagPickupGO = new GameObject("BagPickup");
+        BagPickup bagPickup = bagPickupGO.AddComponent<BagPickup>();
+        bagPickup.bag = propBag;
+        bagPickup.pickUp = takeBag;
+        bagPickup.player = player;
+        bagPickup.gleam = gleamBag;
+        bagPickup.tapArea = BagTapArea(propBag);
+        bagPickup.onPickedUp = new UnityEngine.Events.UnityEvent();
+
+        // Hidden from the start, not hidden once the game runs. The bag
+        // belongs to the last word; a backpack standing in the room through
+        // the first three is a thing to say "Bag" at before being asked.
+        propBag.SetActive(false);
 
         // --- Objectives, in the order you would actually get dressed ---
         var damit = MakeObjective("Damit", pDamit);
@@ -234,22 +334,41 @@ public class BuildBahayScene4
         var sapatos = MakeObjective("Sapatos", pSapatos);
         UnityEventTools.AddPersistentListener(sapatos.onCorrect, takeSapatos.PickUp);
 
-        // He checks himself before leaving.
-        var salamin = MakeObjective("Salamin", pSalamin);
-        UnityEventTools.AddPersistentListener(salamin.onCorrect, gleamSalamin.Play);
-
-        // "Bag" BOTH names the bag and takes it now. It used to only gleam,
-        // with a second word - "Kunin" - to pick it up; the restructure drops
-        // Kunin, so the pickup moves here rather than being lost. Without
-        // this the bag would stay on the floor and Kylo would leave for
-        // school without it.
+        // The bag, in two beats. "Bag" brings it out and names it - it gleams
+        // and stays on the floor. "Kunin" takes it: BagPickup runs the pickup
+        // and holds the scene until the bag is on his back. Saying the one
+        // word used to do both at once, which left the child nothing to do
+        // with the only object in the scene they are meant to act on.
+        //
+        // What they do between the two is SAY THE SECOND WORD. This is a game
+        // played with your voice, so asking for a tap as well would be asking
+        // for the one thing the game never otherwise asks for.
+        // BagPickup.Arm() is there for a tap; nothing here wires it.
+        //
+        // THE BAG ARRIVES ON THE ANSWER, NOT ON THE QUESTION. It used to be
+        // put out when the word was asked, so the child saw a bag, was told
+        // to say "Bag", and said it, with nothing happening between the
+        // three. Arriving as the word lands makes the word do something: the
+        // room had no bag in it until they named one.
+        //
+        // Kunin still puts it out on being shown. By then it is already
+        // there, and that call only matters if a transition brings the scene
+        // back to this word; Appear() is safe to call twice.
         var bag = MakeObjective("Bag", pBag);
+        UnityEventTools.AddPersistentListener(bag.onCorrect, bagPickup.Appear);
         UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
-        UnityEventTools.AddPersistentListener(bag.onCorrect, takeBag.PickUp);
+
+        var kunin = MakeObjective("Kunin", pKunin);
+        UnityEventTools.AddPersistentListener(kunin.onShown, bagPickup.Appear);
+        UnityEventTools.AddPersistentListener(kunin.onCorrect, bagPickup.StartBagPickup);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
-        controller.objectives = new[] { damit, medyas, sapatos, salamin, bag };
+        // Longer than BagPickup's wait for a tap, or this cap - and not the
+        // pickup - is what decides when the scene moves on, and the results
+        // panel opens over a bag still sitting on the floor.
+        controller.maxActionWait = 12f;
+        controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -284,6 +403,7 @@ public class BuildBahayScene4
             word = word,
             promptRoot = prompt,
             instructionClip = VoiceClipLibrary.ForWord(word),
+            onShown = new UnityEngine.Events.UnityEvent(),
             onCorrect = new UnityEngine.Events.UnityEvent(),
         };
     }
@@ -308,6 +428,51 @@ public class BuildBahayScene4
         go.transform.localScale = new Vector3(s, s, 1f);
         go.transform.position = new Vector3(x, FloorY + worldHeight * 0.5f, 0f);
         return go;
+    }
+
+    /// <summary>
+    /// A prop at a place of its own rather than standing on the floor - the
+    /// clothes folded on the bed. Same sizing rule as CreateProp: the world
+    /// height it should be, not a scale factor.
+    /// </summary>
+    private static GameObject CreatePropAt(string name, string spriteFile,
+                                           float x, float y, float worldHeight)
+    {
+        GameObject go = new GameObject(name);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = LoadSprite(spriteFile);
+        sr.sortingLayerName = "Props";
+        sr.sortingOrder = 5;
+
+        float s = 1f;
+        if (sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            s = worldHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(s, s, 1f);
+        go.transform.position = new Vector3(x, y, 0f);
+        return go;
+    }
+
+    /// <summary>
+    /// Where a word badge goes for an object whose top edge is at topY:
+    /// PromptLift above it, in canvas units, which are world units x100.
+    /// </summary>
+    private static Vector3 Over(float x, float topY)
+    {
+        return new Vector3(x * 100f, topY * 100f + PromptLift, 0f);
+    }
+
+    /// <summary>
+    /// The bag's tappable area: a TRIGGER collider sized to the sprite, so a
+    /// child aiming at it has something to hit and the player still cannot
+    /// walk into it or stand on it.
+    /// </summary>
+    private static Collider2D BagTapArea(GameObject bagGO)
+    {
+        BoxCollider2D box = bagGO.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        SpriteRenderer sr = bagGO.GetComponent<SpriteRenderer>();
+        if (sr != null && sr.sprite != null) box.size = sr.sprite.bounds.size;
+        return box;
     }
 
     private static PickUpItem AddPickUp(GameObject item)
@@ -357,7 +522,8 @@ public class BuildBahayScene4
         EditorBuildSettings.scenes = scenes.ToArray();
     }
 
-    private static GameObject CreatePromptUI(Transform parent, string name, string word, Vector3 localPos)
+    private static GameObject CreatePromptUI(Transform parent, string name, string word,
+                                             Vector3 localPos, bool withArrow)
     {
         GameObject root = new GameObject(name, typeof(RectTransform));
         root.transform.SetParent(parent, false);
@@ -386,13 +552,46 @@ public class BuildBahayScene4
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
+        if (!withArrow)
+        {
+            root.SetActive(false);
+            return root;
+        }
+
+        // The arrow points DOWN, from under the badge at the object.
+        //
+        // It used to sit above the badge pointing up, which pointed at the
+        // ceiling: every badge in this scene floats above the thing it names,
+        // so up is away from it. That is the same fix Bahay Scene 3 already
+        // had, and this scene is where it matters most - after the move to
+        // the bed the uniform and the socks are no longer in the row of
+        // things on the floor, so a child who cannot read the badge has no
+        // way to guess where to look.
+        //
+        // ui_arrow_point rather than ui_arrow: a solid cartoon arrow with a
+        // shadow, which reads against a painted blanket. The old one is a
+        // thin chevron. It is drawn pointing RIGHT, hence the quarter turn,
+        // and preserveAspect because it is not square.
+        //
+        // And it moves - see ArrowBob.
         GameObject arrowGO = new GameObject("Arrow", typeof(RectTransform));
         arrowGO.transform.SetParent(root.transform, false);
         Image arrowImg = arrowGO.AddComponent<Image>();
-        arrowImg.sprite = LoadSprite("ui_arrow");
+        arrowImg.sprite = LoadSprite("ui_arrow_point");
+        arrowImg.preserveAspect = true;
         RectTransform arrowRect = arrowGO.GetComponent<RectTransform>();
-        arrowRect.sizeDelta = new Vector2(50, 50);
-        arrowRect.anchoredPosition = new Vector2(0, 55);
+        arrowRect.sizeDelta = new Vector2(ArrowSize, ArrowSize);
+        // Hangs in the gap between badge and object, and at full stretch its
+        // tip stops just short of the object rather than covering it: the tip
+        // at rest is PromptLift - ArrowReach - ArrowClear below the badge,
+        // and the jab spends ArrowReach of that.
+        arrowRect.anchoredPosition = new Vector2(
+            0, -(PromptLift - ArrowReach - ArrowClear) + ArrowSize / 2f);
+        arrowRect.localRotation = Quaternion.Euler(0, 0, -90);
+
+        ArrowBob bob = arrowGO.AddComponent<ArrowBob>();
+        bob.direction = Vector2.down;
+        bob.distance = ArrowReach;
 
         root.SetActive(false);
         return root;

@@ -42,6 +42,15 @@ public class SceneObjectiveController : MonoBehaviour
                  "Bangon\"). Replayed by the Replay/Speaker button - see VoiceInteractionUI.")]
         public AudioClip instructionClip;
 
+        [Tooltip("Invoked when this objective goes up, BEFORE the word has been " +
+                 "said - wire to anything that has to exist for the word to be " +
+                 "about, like Scene 4's bag arriving on the floor. It fires while " +
+                 "the badge is still dimmed and Rachel is introducing the word, so " +
+                 "the child sees the thing as they are told its name. Called again " +
+                 "if a transition puts the same objective back up, so whatever it " +
+                 "runs has to be safe to run twice.")]
+        public UnityEvent onShown = new UnityEvent();
+
         [Tooltip("Invoked when the player says this word correctly - wire to PlayerMovement.Bangon(), a door-open animation, etc.")]
         public UnityEvent onCorrect = new UnityEvent();
     }
@@ -249,6 +258,11 @@ public class SceneObjectiveController : MonoBehaviour
             objective.promptRoot.SetActive(true);
             SetPromptAlpha(objective.promptRoot, dimmedPromptAlpha);
         }
+
+        // Whatever this word needs in the room before it can be asked for.
+        // Before the narrator is raised, so a prop that has to appear is
+        // already there as she starts naming it.
+        objective.onShown?.Invoke();
 
         // Raised BEFORE the word is set, so the narrator has already been
         // asked to speak by the time we check below - VoiceNarrator.Enqueue
