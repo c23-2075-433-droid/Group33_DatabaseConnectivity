@@ -15,8 +15,8 @@ What it changes, and nothing else:
   BagPickup      a new object holding the sequence. Not on the bag: the bag
                  is switched off for most of the level, and a component on a
                  disabled object does not run
-  the Bag word   onShown brings the bag out; saying it only gleams the bag,
-                 which stays on the floor
+  the Bag word   saying it BRINGS THE BAG OUT and gleams it; it then stays
+                 on the floor
   the Kunin word takes it: onCorrect runs the pickup sequence, and the bag
                  goes onto his back at the grab moment
   maxActionWait  4 -> 12 seconds
@@ -59,9 +59,21 @@ MAX_ACTION_WAIT = 12            # longer than any pickup sequence
 
 # The bag's two words, and what each one does. Anything not named here keeps
 # whatever it already had.
+#
+# THE BAG ARRIVES ON THE ANSWER, NOT ON THE QUESTION. Putting it out when the
+# word was asked meant the child saw a bag, was told to say "Bag", and said
+# it - with nothing between the three. Arriving when the word lands makes the
+# word do something: the room did not have a bag in it until they named one.
+# Kunin still puts it out on being shown, because by then it is already there
+# and that call only matters if a transition brings the scene back here.
 BAG_WORDS = {
-    "Bag":   [("TimedOverlay", "Play", "gleam")],
-    "Kunin": [("BagPickup", "StartBagPickup", "pickup")],
+    "Bag": dict(
+        shown=[],
+        correct=[("BagPickup", "Appear", "pickup"),
+                 ("TimedOverlay", "Play", "gleam")]),
+    "Kunin": dict(
+        shown=[("BagPickup", "Appear", "pickup")],
+        correct=[("BagPickup", "StartBagPickup", "pickup")]),
 }
 PROMPT_OF = {"Bag": "Prompt_Bag", "Kunin": "Prompt_Kunin"}
 
@@ -256,11 +268,11 @@ def rebuild_objectives(scene, controller, targets):
         else:
             head = OBJECTIVE_HEAD % dict(word=word, prompt=prompt)
 
-        # Both words put the bag out, so whichever one the scene resumes on
-        # has it there. Appear() is safe to call twice.
-        shown = [dict(target=targets["pickup"], type="BagPickup", method="Appear")]
+        spec = BAG_WORDS[word]
+        shown = [dict(target=targets[key], type=typ, method=meth)
+                 for typ, meth, key in spec["shown"]]
         correct = [dict(target=targets[key], type=typ, method=meth)
-                   for typ, meth, key in BAG_WORDS[word]]
+                   for typ, meth, key in spec["correct"]]
         out.append(head + event("onShown", shown) + event("onCorrect", correct))
         order.append(word)
 

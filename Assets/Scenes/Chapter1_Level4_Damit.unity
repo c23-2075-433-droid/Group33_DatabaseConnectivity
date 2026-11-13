@@ -3809,6 +3809,9 @@ MonoBehaviour:
     instructionClip: {fileID: 0}
     onShown:
       m_PersistentCalls:
+        m_Calls: []
+    onCorrect:
+      m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 880000003}
           m_TargetAssemblyTypeName: BagPickup, Assembly-CSharp
@@ -3822,9 +3825,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-    onCorrect:
-      m_PersistentCalls:
-        m_Calls:
         - m_Target: {fileID: 1161134226}
           m_TargetAssemblyTypeName: TimedOverlay, Assembly-CSharp
           m_MethodName: Play

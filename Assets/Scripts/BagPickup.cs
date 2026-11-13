@@ -18,8 +18,9 @@ using UnityEngine.Events;
 /// Four things happen, in order:
 ///
 ///   Appear()            the bag is put on the floor beside Kylo. Wired to
-///                       the objective's onShown, so it arrives WITH the
-///                       word rather than sitting in the room all level.
+///                       the "Bag" objective's onCorrect, so it arrives as
+///                       the word LANDS rather than when it is asked - the
+///                       room has no bag in it until the child names one.
 ///   StartBagPickup()    begin the pickup now. This is what "Kunin" calls -
 ///                       SAYING THE WORD IS THE INTERACTION. This is a game
 ///                       played with your voice, so asking for a tap as well
@@ -125,16 +126,17 @@ public class BagPickup : MonoBehaviour
     void Awake()
     {
         // Hidden from the first frame, not hidden later: the bag belongs to
-        // the last word, and a backpack standing in the room through the
-        // first three words is a thing to say "Bag" at before being asked.
+        // the last two words, and a backpack standing in the room before
+        // then is a thing to say "Bag" at before being asked.
         if (bag != null) bag.SetActive(false);
         if (player == null) player = FindAnyObjectByType<PlayerMovement>();
     }
 
     /// <summary>
-    /// Puts the bag on the floor. Wired to the Bag objective's onShown, so it
-    /// appears as the word is introduced. Safe to call more than once - the
-    /// objective is shown again whenever a transition releases the sequence.
+    /// Puts the bag on the floor. Wired to the "Bag" objective's onCorrect,
+    /// so it appears as that word is answered. Safe to call more than once -
+    /// "Kunin" calls it too, in case a transition brings the scene back to
+    /// that word with the bag already out.
     /// </summary>
     public void Appear()
     {

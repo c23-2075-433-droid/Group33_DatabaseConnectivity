@@ -345,10 +345,17 @@ public class BuildBahayScene4
         // for the one thing the game never otherwise asks for.
         // BagPickup.Arm() is there for a tap; nothing here wires it.
         //
-        // Both words put the bag out, because either can be the one the scene
-        // comes back to after a transition. Appear() is safe to call twice.
+        // THE BAG ARRIVES ON THE ANSWER, NOT ON THE QUESTION. It used to be
+        // put out when the word was asked, so the child saw a bag, was told
+        // to say "Bag", and said it, with nothing happening between the
+        // three. Arriving as the word lands makes the word do something: the
+        // room had no bag in it until they named one.
+        //
+        // Kunin still puts it out on being shown. By then it is already
+        // there, and that call only matters if a transition brings the scene
+        // back to this word; Appear() is safe to call twice.
         var bag = MakeObjective("Bag", pBag);
-        UnityEventTools.AddPersistentListener(bag.onShown, bagPickup.Appear);
+        UnityEventTools.AddPersistentListener(bag.onCorrect, bagPickup.Appear);
         UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
 
         var kunin = MakeObjective("Kunin", pKunin);
