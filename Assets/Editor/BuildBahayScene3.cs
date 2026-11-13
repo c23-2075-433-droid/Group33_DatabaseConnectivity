@@ -40,9 +40,9 @@
 // Sprites expected in Assets/Sprites/:
 //   bathroom_background, item_sabon, item_suklay, item_baso,
 //   item_sipilyo, item_tuwalya, fx_bath,
-//   standing_towel_messy if it has been drawn, else talking_towel,
-//   standing_towel_combed, optional - "Suklay" only changes his hair if
-//   it exists,
+//   standing_towel_messy, talking_towel,
+//   standing_towel_combed if it has ever been drawn - "Suklay" falls back
+//   to talking_towel without it,
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -187,34 +187,32 @@ public class BuildBahayScene3
         // standing_towel is what the bath used to leave him in, and it is
         // the reason he spent the rest of this scene facing away.
         //
-        // standing_towel_messy wins if it is ever drawn: the same front
-        // pose with his arms down at his sides instead of raised mid-
-        // sentence, and his hair stuck up in every direction from the
-        // water. Rachel says exactly that a word later - "Kylo is clean,
-        // but his hair is sticking up in every direction" - and right now
-        // the art does not back her up. Dropping that file into
-        // Assets/Sprites is all it takes; no code change, just a rebuild.
+        // standing_towel_messy is the front pose with his arms down at his
+        // sides instead of raised mid-sentence, and his hair stuck up in
+        // every direction from the water - which is what Rachel says a
+        // word later: "Kylo is clean, but his hair is sticking up in every
+        // direction."
         GameObject towelGO = new GameObject("Pose_Towel");
         PoseSwitch towel = towelGO.AddComponent<PoseSwitch>();
         towel.player = player;
         towel.standingSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
 
-        // ...and the comb puts it back down again. This one is optional in
-        // a stronger sense: with no art there is simply no pose switch, so
-        // "Suklay" goes back to only taking the comb off the shelf. It is
-        // the one word in the scene that currently changes nothing about
-        // Kylo, which is what makes the messy hair worth drawing - the
-        // before only reads as a before if there is an after.
-        Sprite combedSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
-            SpriteFolder + "standing_towel_combed.png");
-        PoseSwitch combed = null;
-        if (combedSprite != null)
-        {
-            GameObject combedGO = new GameObject("Pose_TowelCombed");
-            combed = combedGO.AddComponent<PoseSwitch>();
-            combed.player = player;
-            combed.standingSprite = combedSprite;
-        }
+        // ...and the comb puts it back down again, which is what makes the
+        // messy hair work: a before only reads as a before if there is an
+        // after, and "Suklay" was otherwise the one word in the scene that
+        // changed nothing about Kylo.
+        //
+        // With no combed art drawn this lands on talking_towel - his hair
+        // neat again, but his hands back up. That is a deliberate trade.
+        // It keeps Rachel honest ("Kylo's hair is neat and smooth") without
+        // another drawing, and it leaves him in the exact pose Scene 4
+        // opens him in, so the hand-off between the two scenes is seamless.
+        // The arms are the price; standing_towel_combed removes it if it
+        // is ever drawn.
+        GameObject combedGO = new GameObject("Pose_TowelCombed");
+        PoseSwitch combed = combedGO.AddComponent<PoseSwitch>();
+        combed.player = player;
+        combed.standingSprite = LoadSpriteOr("standing_towel_combed", "talking_towel");
 
         CameraFollow follow = camGO.AddComponent<CameraFollow>();
         follow.target = playerGO.transform;
@@ -288,8 +286,7 @@ public class BuildBahayScene3
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
-        if (combed != null)
-            UnityEventTools.AddPersistentListener(suklay.onCorrect, combed.Apply);
+        UnityEventTools.AddPersistentListener(suklay.onCorrect, combed.Apply);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
