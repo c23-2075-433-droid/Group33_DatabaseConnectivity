@@ -86,8 +86,8 @@ Counted from the builders, not estimated:
 
 | scene | words | drawn frames? |
 |---|---|---|
-| Bahay 2 | Lakad Kaliwa Kanan Bukas Ilaw Tabo Sabon Sipilyo Tuwalya | no |
-| Bahay 3 | Kaliwa Maligo Suklay | no — snaps |
+| Bahay 2 | Lakad Kaliwa Kanan Bukas Ilaw | no |
+| Bahay 3 | Tuwalya Sabon Maligo Suklay Sipilyo | no — snaps |
 | Bahay 4 | Damit Medyas Sapatos Bag Kunin | no |
 | Bahay 5 | Upo Kanin Itlog Kain Inom | no |
 | Paaralan 1 | Lakad Bukas Kumusta Pasok Takbo | no — snaps |
