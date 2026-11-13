@@ -1183,6 +1183,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+  - component: {fileID: 352041108}
   - component: {fileID: 352041011}
   - component: {fileID: 352041010}
   - component: {fileID: 352041009}
@@ -1192,7 +1193,112 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!1 &880000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 880000002}
+  - component: {fileID: 880000003}
+  m_Layer: 0
+  m_Name: BagPickup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &880000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 880000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &880000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 880000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed32891a445d4c1da6a27940e5a8c672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BagPickup
+  bag: {fileID: 352041008}
+  tapArea: {fileID: 352041108}
+  pickUp: {fileID: 352041009}
+  player: {fileID: 1129512066}
+  animator: {fileID: 0}
+  animatorTrigger: PickUpBag
+  gleam: {fileID: 1161134226}
+  tapPadding: 0.4
+  waitForTapSeconds: 6
+  fallbackGrabDelay: 0.4
+  grabTimeout: 2.5
+  settleAfterGrab: 0.35
+  onPickedUp:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!61 &352041108
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 352041008}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 9.29, y: 10.66}
+  m_EdgeRadius: 0
 --- !u!114 &352041009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1286,7 +1392,7 @@ Transform:
   m_GameObject: {fileID: 352041008}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: -2.27, z: 0}
+  m_LocalPosition: {x: 3.19, y: -2.27, z: 0}
   m_LocalScale: {x: 0.19699812, y: 0.19699812, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3635,6 +3741,9 @@ MonoBehaviour:
     variants: []
     promptRoot: {fileID: 1519244761}
     instructionClip: {fileID: 0}
+    onShown:
+      m_PersistentCalls:
+        m_Calls: []
     onCorrect:
       m_PersistentCalls:
         m_Calls:
@@ -3654,6 +3763,9 @@ MonoBehaviour:
     variants: []
     promptRoot: {fileID: 1859864540}
     instructionClip: {fileID: 0}
+    onShown:
+      m_PersistentCalls:
+        m_Calls: []
     onCorrect:
       m_PersistentCalls:
         m_Calls:
@@ -3673,6 +3785,9 @@ MonoBehaviour:
     variants: []
     promptRoot: {fileID: 1447174010}
     instructionClip: {fileID: 0}
+    onShown:
+      m_PersistentCalls:
+        m_Calls: []
     onCorrect:
       m_PersistentCalls:
         m_Calls:
@@ -3692,12 +3807,12 @@ MonoBehaviour:
     variants: []
     promptRoot: {fileID: 1413016320}
     instructionClip: {fileID: 0}
-    onCorrect:
+    onShown:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1161134226}
-          m_TargetAssemblyTypeName: TimedOverlay, Assembly-CSharp
-          m_MethodName: Play
+        - m_Target: {fileID: 880000003}
+          m_TargetAssemblyTypeName: BagPickup, Assembly-CSharp
+          m_MethodName: Appear
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -3707,16 +3822,12 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - word: Kunin
-    variants: []
-    promptRoot: {fileID: 1328344391}
-    instructionClip: {fileID: 0}
     onCorrect:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 352041009}
-          m_TargetAssemblyTypeName: PickUpItem, Assembly-CSharp
-          m_MethodName: PickUp
+        - m_Target: {fileID: 880000003}
+          m_TargetAssemblyTypeName: BagPickup, Assembly-CSharp
+          m_MethodName: Arm
           m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -3731,7 +3842,7 @@ MonoBehaviour:
       m_Calls: []
   waitForActionToFinish: 1
   playerMovement: {fileID: 0}
-  maxActionWait: 4
+  maxActionWait: 12
   settlePause: 0.25
   holdPromptUntilNarrationEnds: 1
   dimmedPromptAlpha: 0.45
@@ -4388,7 +4499,7 @@ Transform:
   m_GameObject: {fileID: 1161134225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2, y: -2.27, z: 0}
+  m_LocalPosition: {x: 3.19, y: -2.27, z: 0}
   m_LocalScale: {x: 0.546875, y: 0.546875, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5044,7 +5155,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 20, y: -12}
+  m_AnchoredPosition: {x: 319, y: -12}
   m_SizeDelta: {x: 260, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1417911387
@@ -6809,6 +6920,7 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 880000002}
   - {fileID: 1857441562}
   - {fileID: 763670949}
   - {fileID: 1693953848}

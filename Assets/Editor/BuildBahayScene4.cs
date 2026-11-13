@@ -104,6 +104,17 @@ public class BuildBahayScene4
     private const float BedMedyasY = -0.489f;
     private const float BedMedyasH = 0.518f;
 
+    // The bag, on the floor WITHIN REACH of Kylo rather than out in the
+    // middle of the room. He stands at x 5.0 and his feet cover 4.40 to
+    // 5.86, so a bag 1.83 wide centred here leaves about a third of a unit
+    // between it and his nearest foot - close enough that bending down and
+    // picking it up is a believable thing for him to do, which is what the
+    // animation to come needs, and far enough that the two sprites do not
+    // touch. It is drawn over the painted dresser behind it, correctly: its
+    // base is a long way below the dresser's, so it is nearer the viewer.
+    private const float BagX = 3.19f;
+    private const float BagH = 2.10f;
+
     // The word prompts, copied from Bahay Scene 3 - see the long note on
     // CreatePromptUI below for why the arrow had to change. PromptLift is how
     // far above an object's TOP EDGE its badge floats, in canvas units (world
@@ -162,7 +173,7 @@ public class BuildBahayScene4
         GameObject propMedyas  = CreatePropAt("Prop_Medyas", "prop_medyas_folded",
                                               BedMedyasX, BedMedyasY, BedMedyasH);
         GameObject propSapatos = CreateProp("Prop_Sapatos", "prop_sapatos", -2.0f, 0.95f);
-        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      0.2f, 2.10f);
+        GameObject propBag     = CreateProp("Prop_Bag",     "prop_bag",      BagX, BagH);
 
         PickUpItem takeDamit   = AddPickUp(propDamit);
         PickUpItem takeMedyas  = AddPickUp(propMedyas);
@@ -244,7 +255,7 @@ public class BuildBahayScene4
         CreateWall("Wall_Left", -9.3f);
         CreateWall("Wall_Right", 9.3f);
 
-        // --- A gleam, for the one word that names something rather than takes it ---
+        // --- A gleam, played when the bag becomes tappable ---
         TimedOverlay gleamBag = CreateGleam("Gleam_Bag", propBag, 2.8f);
         // "Salamin" has NOTHING OF ITS OWN TO POINT AT. This bedroom is drawn
         // without a mirror - see the note at the top of this file - so the
@@ -295,7 +306,25 @@ public class BuildBahayScene4
         GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin",
                                              new Vector3(360, 60, 0), false);
         GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",
-                                             Over(0.2f, FloorY + 2.10f), true);
+                                             Over(BagX, FloorY + BagH), true);
+
+        // --- The bag's own little sequence ---
+        // On an object of its own rather than on the bag, because the bag is
+        // switched off for most of the level and a component on a disabled
+        // object does not run - it could neither show itself nor count down.
+        GameObject bagPickupGO = new GameObject("BagPickup");
+        BagPickup bagPickup = bagPickupGO.AddComponent<BagPickup>();
+        bagPickup.bag = propBag;
+        bagPickup.pickUp = takeBag;
+        bagPickup.player = player;
+        bagPickup.gleam = gleamBag;
+        bagPickup.tapArea = BagTapArea(propBag);
+        bagPickup.onPickedUp = new UnityEngine.Events.UnityEvent();
+
+        // Hidden from the start, not hidden once the game runs. The bag
+        // belongs to the last word; a backpack standing in the room through
+        // the first three is a thing to say "Bag" at before being asked.
+        propBag.SetActive(false);
 
         // --- Objectives, in the order you would actually get dressed ---
         var damit = MakeObjective("Damit", pDamit);
@@ -311,17 +340,23 @@ public class BuildBahayScene4
         var salamin = MakeObjective("Salamin", pSalamin);
         UnityEventTools.AddPersistentListener(salamin.onCorrect, gleamSalamin.Play);
 
-        // "Bag" BOTH names the bag and takes it now. It used to only gleam,
-        // with a second word - "Kunin" - to pick it up; the restructure drops
-        // Kunin, so the pickup moves here rather than being lost. Without
-        // this the bag would stay on the floor and Kylo would leave for
-        // school without it.
+        // "Bag" names the bag; picking it up is a separate beat. Saying the
+        // word used to make the bag vanish in the same instant, which gave
+        // the child nothing to watch and nothing to do - and it is the only
+        // object in this scene they are meant to DO something with. So the
+        // word arms the pickup, the bag stays on the floor and gleams, and
+        // BagPickup holds the scene until it has been taken. See that file;
+        // the pronunciation side of this is untouched.
         var bag = MakeObjective("Bag", pBag);
-        UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
-        UnityEventTools.AddPersistentListener(bag.onCorrect, takeBag.PickUp);
+        UnityEventTools.AddPersistentListener(bag.onShown, bagPickup.Appear);
+        UnityEventTools.AddPersistentListener(bag.onCorrect, bagPickup.Arm);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
+        // Longer than BagPickup's wait for a tap, or this cap - and not the
+        // pickup - is what decides when the scene moves on, and the results
+        // panel opens over a bag still sitting on the floor.
+        controller.maxActionWait = 12f;
         controller.objectives = new[] { damit, medyas, sapatos, salamin, bag };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
@@ -357,6 +392,7 @@ public class BuildBahayScene4
             word = word,
             promptRoot = prompt,
             instructionClip = VoiceClipLibrary.ForWord(word),
+            onShown = new UnityEngine.Events.UnityEvent(),
             onCorrect = new UnityEngine.Events.UnityEvent(),
         };
     }
@@ -412,6 +448,20 @@ public class BuildBahayScene4
     private static Vector3 Over(float x, float topY)
     {
         return new Vector3(x * 100f, topY * 100f + PromptLift, 0f);
+    }
+
+    /// <summary>
+    /// The bag's tappable area: a TRIGGER collider sized to the sprite, so a
+    /// child aiming at it has something to hit and the player still cannot
+    /// walk into it or stand on it.
+    /// </summary>
+    private static Collider2D BagTapArea(GameObject bagGO)
+    {
+        BoxCollider2D box = bagGO.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        SpriteRenderer sr = bagGO.GetComponent<SpriteRenderer>();
+        if (sr != null && sr.sprite != null) box.size = sr.sprite.bounds.size;
+        return box;
     }
 
     private static PickUpItem AddPickUp(GameObject item)
