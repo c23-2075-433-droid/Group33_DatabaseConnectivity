@@ -81,9 +81,13 @@ public class BuildBahayScene4
     private const float BedDamitX = -6.217f;
     private const float BedDamitY = -1.105f;
     private const float BedDamitH = 1.05f;
-    private const float BedMedyasX = -4.974f;
-    private const float BedMedyasY = -1.497f;
-    private const float BedMedyasH = 0.62f;
+    private const float BedMedyasX = -5.05f;
+    // Grown from 0.62 about their BOTTOM edge, which stays at -1.807: at
+    // 0.62 they read as undersized next to the shoes on the floor, and a
+    // pair of socks is not half a pair of shoes. Raising the centre rather
+    // than the height alone keeps them resting on the blanket.
+    private const float BedMedyasY = -1.432f;
+    private const float BedMedyasH = 0.75f;
 
     // The word prompts, copied from Bahay Scene 3 - see the long note on
     // CreatePromptUI below for why the arrow had to change. PromptLift is how

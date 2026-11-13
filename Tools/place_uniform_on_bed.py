@@ -39,11 +39,12 @@ MEDYAS_PNG = "Assets/Sprites/prop_medyas.png"
 
 ARROW_POINT_GUID = "0d4391b2493d474a99ed476ba313b781"   # ui_arrow_point.png
 ARROWBOB_GUID = "d6955ecfe9e654af191fd7b44a9a0047"      # ArrowBob.cs
+IMAGE_GUID = "fe87c0e1cc204ed48ad3b37840f39efc"         # UnityEngine.UI.Image
 PPU = 100.0                                             # what these props import at
 
 # Where the clothes go, and how big. Same values as BuildBahayScene4.
 DAMIT = (-6.217, -1.105, 1.05)
-MEDYAS = (-4.974, -1.497, 0.62)
+MEDYAS = (-5.05, -1.432, 0.75)   # grown about their bottom edge, which stays at -1.807
 
 PROMPT_LIFT = 110.0
 ARROW_SIZE = 76.0
@@ -117,11 +118,23 @@ class Scene:
     def components(self, go):
         return re.findall(r"component: \{fileID: (\d+)\}", self.block[go])
 
-    def component(self, go, prefix):
-        for c in self.components(go):
-            if self.block[c].startswith(prefix):
-                return c
-        sys.exit("%s: %s has no %s" % (SCENE, self.names.get(go, go), prefix))
+    def component(self, go, prefix, containing=None):
+        """The one component of this type - and, where several share a type,
+        the one whose block mentions `containing`.
+
+        An Arrow has two MonoBehaviours once this script has run: the Image
+        and the ArrowBob it added. Taking the first !u!114 found the ArrowBob
+        on a second run and tried to set a sprite on it, so the script was
+        only safe to run once. The script guid tells them apart.
+        """
+        found = [c for c in self.components(go)
+                 if self.block[c].startswith(prefix)
+                 and (containing is None or containing in self.block[c])]
+        if len(found) != 1:
+            sys.exit("%s: %s has %d of %s%s" % (
+                SCENE, self.names.get(go, go), len(found), prefix,
+                "" if containing is None else " matching " + containing))
+        return found[0]
 
     def children(self, rect):
         kids = re.search(r"m_Children:\n((?:  - \{fileID: \d+\}\n)*)", self.block[rect])
@@ -202,7 +215,7 @@ def point_arrow(scene, prompt_name, x, top_y):
               "  m_SizeDelta: {x: %s, y: %s}" % (num(ARROW_SIZE), num(ARROW_SIZE)),
               prompt_name + " arrow size")
 
-    image = scene.component(arrow_go, "!u!114 ")
+    image = scene.component(arrow_go, "!u!114 ", IMAGE_GUID)
     scene.set(image, r"^  m_Sprite: \{fileID: 21300000, guid: [0-9a-f]{32}, type: 3\}$",
               "  m_Sprite: {fileID: 21300000, guid: %s, type: 3}" % ARROW_POINT_GUID,
               prompt_name + " arrow sprite")
