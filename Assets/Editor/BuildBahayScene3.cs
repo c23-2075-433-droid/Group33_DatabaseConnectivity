@@ -73,6 +73,13 @@ public class BuildBahayScene3
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
 
+    // How far above an object's top edge its word badge floats, in canvas
+    // units (world units x100). Big enough that the arrow fits underneath.
+    private const float PromptLift = 110f;
+    private const float ArrowSize = 76f;      // the arrow's long side
+    private const float ArrowReach = 16f;     // how far the jab travels
+    private const float ArrowClear = 18f;     // tip-to-object gap at rest
+
     // Where the level carries on once the bath is done.
     private const string NextScene = "Chapter1_Level4_Damit";
 
@@ -298,12 +305,32 @@ public class BuildBahayScene3
         }
 
         // Canvas units are world units x100, so each badge sits over the
-        // object it names - the same positions Bahay 2 used for them.
-        GameObject pMaligo  = CreatePromptUI(uiRoot.transform, "Prompt_Maligo",  "Maligo",  new Vector3(-700, 300, 0));
-        GameObject pSabon   = CreatePromptUI(uiRoot.transform, "Prompt_Sabon",   "Sabon",   new Vector3( 156, 185, 0));
-        GameObject pSuklay  = CreatePromptUI(uiRoot.transform, "Prompt_Suklay",  "Suklay",  new Vector3( 275, 200, 0));
-        GameObject pSipilyo = CreatePromptUI(uiRoot.transform, "Prompt_Sipilyo", "Sipilyo", new Vector3( 422, 255, 0));
-        GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 390, 0));
+        // object it names.
+        //
+        // Each one is now PromptLift above the TOP of its object rather than
+        // just clear of it. The old spacing left 62 to 87 units between the
+        // badge and the object, and an arrow big enough for a child to see
+        // is taller than that - which is why the first attempt landed on
+        // top of the soap and hid the thing it was pointing at. The arrow
+        // has to fit in the gap, so the gap is what changed.
+        //
+        // ONLY THE THINGS HE HAS TO FIND GET AN ARROW. Sabon, Sipilyo and
+        // Tuwalya are small objects on a busy painted wall, and a child who
+        // cannot read the badge has no way to know which one is meant. The
+        // other two do not have that problem: Maligo is an action rather
+        // than an object, and the comb is not something the child has to
+        // hunt for by the time Suklay comes round. An arrow on everything
+        // is an arrow nobody looks at.
+        //
+        // Object tops, measured from the sprites: Sabon 119, Sipilyo 193,
+        // Tuwalya 326. The three with arrows are lifted to PromptLift above
+        // those so the arrow has room underneath; the other two keep the
+        // heights they were painted to.
+        GameObject pMaligo  = CreatePromptUI(uiRoot.transform, "Prompt_Maligo",  "Maligo",  new Vector3(-700, 300, 0), false);
+        GameObject pSabon   = CreatePromptUI(uiRoot.transform, "Prompt_Sabon",   "Sabon",   new Vector3( 156, 119 + PromptLift, 0), true);
+        GameObject pSuklay  = CreatePromptUI(uiRoot.transform, "Prompt_Suklay",  "Suklay",  new Vector3( 275, 200, 0), false);
+        GameObject pSipilyo = CreatePromptUI(uiRoot.transform, "Prompt_Sipilyo", "Sipilyo", new Vector3( 422, 193 + PromptLift, 0), true);
+        GameObject pTuwalya = CreatePromptUI(uiRoot.transform, "Prompt_Tuwalya", "Tuwalya", new Vector3( 726, 326 + PromptLift, 0), true);
 
         // --- Objectives, in the order of the routine ---
         // Getting ready, then the bath, then tidying up afterwards.
@@ -410,7 +437,8 @@ public class BuildBahayScene3
     }
 
     /// <summary>Arrow + badge + word label, matching the other scenes.</summary>
-    private static GameObject CreatePromptUI(Transform parent, string name, string word, Vector3 localPos)
+    private static GameObject CreatePromptUI(Transform parent, string name, string word,
+                                             Vector3 localPos, bool withArrow)
     {
         GameObject root = new GameObject(name, typeof(RectTransform));
         root.transform.SetParent(parent, false);
@@ -439,6 +467,12 @@ public class BuildBahayScene3
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
+        if (!withArrow)
+        {
+            root.SetActive(false);
+            return root;
+        }
+
         // The arrow points DOWN, from under the badge at the object.
         //
         // It used to sit above the badge pointing up, which pointed at the
@@ -460,12 +494,18 @@ public class BuildBahayScene3
         arrowImg.sprite = LoadSprite("ui_arrow_point");
         arrowImg.preserveAspect = true;
         RectTransform arrowRect = arrowGO.GetComponent<RectTransform>();
-        arrowRect.sizeDelta = new Vector2(96, 96);
-        arrowRect.anchoredPosition = new Vector2(0, -70);
+        arrowRect.sizeDelta = new Vector2(ArrowSize, ArrowSize);
+        // Hangs in the gap between badge and object, and at full stretch its
+        // tip stops just short of the object rather than covering it. That
+        // is the whole arithmetic: tip at rest is PromptLift - ArrowReach -
+        // ArrowClear below the badge, and the jab spends ArrowReach of it.
+        arrowRect.anchoredPosition = new Vector2(
+            0, -(PromptLift - ArrowReach - ArrowClear) + ArrowSize / 2f);
         arrowRect.localRotation = Quaternion.Euler(0, 0, -90);
 
         ArrowBob bob = arrowGO.AddComponent<ArrowBob>();
         bob.direction = Vector2.down;
+        bob.distance = ArrowReach;
 
         root.SetActive(false);   // SceneObjectiveController shows the first one
         return root;
