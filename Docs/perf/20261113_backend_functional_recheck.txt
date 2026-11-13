@@ -1,0 +1,13 @@
+host : hkfxnifxkcfgelkgvnat.supabase.co
+
+PASS  board read with the shipped key                HTTP 200, 1 row(s), 154 bytes
+PASS  board returns only the five display columns    no other column
+PASS  board ordered points then stars, by the database 1 row(s) in order
+PASS  rank function answers for a player on the board HTTP 200, rank 1 for the top row
+PASS  rank function returns nothing for an unknown player HTTP 200, body []
+PASS  recent scores ordered newest first             HTTP 200, 20 row(s), 4020 bytes
+PASS  the game's key cannot insert a leaderboard row HTTP 401, rows 1 before and 1 after
+PASS  the game's key cannot change a leaderboard row HTTP 204, and the top row's points are unchanged
+PASS  no token hash is readable with the game's key  HTTP 401, 0 row(s) returned
+
+all 9 checks passed

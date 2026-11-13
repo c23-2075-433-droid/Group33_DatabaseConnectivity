@@ -23,6 +23,8 @@ Develop on a branch
       ↓
 Pull request → review → merge into main
       ↓
+Run the checks  (see "Before every build")
+      ↓
 Decide the new version number  (see "Numbering")
       ↓
 Update Player Settings > Version, and Android versionCode
@@ -150,6 +152,30 @@ becomes unusable.
 
 Name the artifact after its version. Never `final.zip`, `final2.zip`,
 `latest-final.zip`.
+
+## Before every build
+
+Added after Activity 10, where the baseline these compare against was measured.
+All three are re runnable and write their evidence into `Docs/perf/`.
+
+```
+python Tools/check_backend.py                nine functional checks on the leaderboard path
+python Tools/measure_backend.py 20           times every backend call, phase by phase
+dotnet run -c Release --project Tools/perf_probe   per attempt cost of the pronunciation judgement
+```
+
+| Check | Expected condition |
+|---|---|
+| Functional checks | All nine pass, including the two forged writes that Row Level Security must refuse |
+| Board fetch | Median within about 150 ms of the 226.6 ms baseline, on a comparable connection |
+| Board fetch server leg | Under 250 ms. If this climbs while TCP stays near 43 ms and TLS near 85 ms, the cause is the query or the row count, not the network |
+| Requests to open the board | No more than two, and no per frame or per keystroke call anywhere on the menu |
+| Voice judgement | Per attempt cost still in microseconds, allocations near 682 bytes, and the 2,756 pair sweep still finding nothing confusable |
+| Memory on a device | No continuous growth across repeated scenes, and audio under about 60 MB in a Memory Profiler capture |
+| Known issues | Written into the release notes in the words a user would need |
+
+The numbers to compare against, and why each one is watched, are in
+`Docs/Activity10_Performance.md`.
 
 ## Numbering
 

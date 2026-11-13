@@ -1,0 +1,24 @@
+[cold] first IsCorrect call (static init + regex): 13.425 ms
+[data] taught words in WordVariants: 53
+
+== functional: the judgement itself ==
+PASS  said "bangon" for Bangon    expected True  got True   (the word, said correctly)
+PASS  said "Kuha mo" for Kuha      expected True  got True   (recognizer added a filler word)
+PASS  said "kanin" for Kain      expected False got False  (a different taught word from the same scene)
+PASS  said "sapatas" for Sapatos   expected False got False  (wrong vowel on a long word)
+PASS  said "mali" for Kuha      expected False got False  (an unrelated word)
+PASS  said "" for Kuha      expected False got False  (nothing said)
+
+== functional: every word accepted when said exactly ==
+PASS  all 53 taught words accepted when said exactly
+
+== functional: no taught word accepted for another ==
+PASS  2756 word pairs checked, none confusable
+[perf] full 2756-pair sweep: 43.9 ms (15.91 us per check)
+
+== per-attempt CPU cost (accepted and rejected mixed) ==
+[perf] 10 batches of 20000: min 2.30 us, median 5.19 us, max 7.71 us per attempt
+[mem ] 682 bytes allocated per attempt
+[mem ] gen0 collections during 200000 attempts: 18
+
+RESULT: all functional checks passed

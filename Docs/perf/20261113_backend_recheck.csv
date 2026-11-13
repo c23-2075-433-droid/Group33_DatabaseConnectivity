@@ -1,0 +1,6 @@
+metric,n,min_ms,median_ms,mean_ms,max_ms,dns_ms,tcp_ms,tls_ms,server_ms,bytes,http
+board_fetch_cold,20,203.1,225.0,250.4,678.7,0.3,43.1,86.4,90.5,154,200
+rank_rpc_warm,20,61.3,86.3,88.7,118.0,0,0,0,86.3,0,200
+nickname_lookup_cold,20,201.6,226.4,225.3,279.9,0.3,43.2,86.2,93.2,24,200
+recent_scores_cold,20,199.5,216.0,218.6,243.4,0.3,42.9,86.8,85.1,4020,200
+submit_function_refusal,20,205.0,215.6,234.8,392.2,0.3,42.9,86.2,84.4,48,400

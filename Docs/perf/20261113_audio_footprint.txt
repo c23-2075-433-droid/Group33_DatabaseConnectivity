@@ -1,0 +1,14 @@
+== music, in Resources so always in the build ==
+  music_bahay.wav                     177.0 s   29.8 MB on disk   29.8 MB as PCM in RAM  44100 Hz 2 ch
+  music_complete.wav                   10.1 s    1.7 MB on disk    1.7 MB as PCM in RAM  44100 Hz 2 ch
+  music_journey.wav                   177.0 s   29.8 MB on disk   29.8 MB as PCM in RAM  44100 Hz 2 ch
+  music_menu.wav                      177.0 s   29.8 MB on disk   29.8 MB as PCM in RAM  44100 Hz 2 ch
+  music_paaralan.wav                  177.0 s   29.8 MB on disk   29.8 MB as PCM in RAM  44100 Hz 2 ch
+  music_parke.wav                     177.0 s   29.8 MB on disk   29.8 MB as PCM in RAM  44100 Hz 2 ch
+  6 file(s), 150.6 MB on disk, 895.2 s of audio in total
+
+== narration clips ==
+  423 file(s), 124.7 MB on disk, 1482.1 s of audio in total
+
+longest narration clip: rachel_word_pagod_teach.wav, 6.5 s, 0.55 MB on disk, 0.55 MB as PCM
+narration clip size: median 313 KB, largest 561 KB

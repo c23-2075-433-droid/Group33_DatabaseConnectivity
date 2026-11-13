@@ -215,6 +215,7 @@ from the build itself at run time.
 | [`Docs/RELEASE_PROCESS.md`](Docs/RELEASE_PROCESS.md) | How a release is produced, numbered, tested and tagged. Read this before building one. |
 | [`Docs/release/v0.1.0/RELEASE_NOTES.txt`](Docs/release/v0.1.0/RELEASE_NOTES.txt) | What is in v0.1.0, what is fixed, what is broken, what is missing |
 | [`Docs/release/v0.1.0/README.txt`](Docs/release/v0.1.0/README.txt) | Install and run instructions for a tester |
+| [`Docs/Activity10_Performance.md`](Docs/Activity10_Performance.md) | The measured performance baseline for v0.1.0, what is being watched as the project grows, and the hotfix procedure |
 
 To produce a release build: **Tools > SALINLAHI > Build Release APK**. It reads
 the version from Player Settings rather than setting it, collects the enabled
@@ -222,6 +223,30 @@ scenes rather than hardcoding them, and refuses to run if the version, the
 scenes or that version's release notes are missing. The output is
 `Build/Release/SALINLAHI-v<version>/`, containing the APK alongside its README,
 release notes and a `BUILD_INFO.txt` naming the commit it came from.
+
+### Measuring it before you release it
+
+Three tools produce the numbers and the checks that
+[`Docs/Activity10_Performance.md`](Docs/Activity10_Performance.md) records, and
+they are meant to be re run rather than read. Each writes evidence into
+`Docs/perf/`.
+
+```
+python Tools/check_backend.py                 nine functional checks on the leaderboard path
+python Tools/measure_backend.py 20            times every backend call, split into DNS, TCP, TLS and server
+dotnet run -c Release --project Tools/perf_probe    per attempt cost of the pronunciation judgement
+```
+
+`check_backend.py` and `measure_backend.py` read the gitignored
+`Assets/Resources/SupabaseConfig.asset` for the project URL and key, and never
+print the key. Neither writes a row: the two write attempts in the functional
+checks are there because Row Level Security must refuse them. The probe needs a
+.NET SDK, and the one inside the Unity install will do:
+`"D:\Unity\6000.6.2f1\Editor\Data\DotNetSdk\dotnet.exe"`.
+
+The baseline to compare against, measured on 13 November 2026 against the
+v0.1.0 sources: board fetch median 226.6 ms of which 128.7 ms is connection
+setup, voice judgement 5.64 us per attempt, 682 bytes allocated per attempt.
 
 Build from this checkout, not from a git worktree:
 `Assets/Resources/SupabaseConfig.asset` is gitignored and exists only here, and
