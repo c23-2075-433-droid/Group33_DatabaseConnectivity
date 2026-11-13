@@ -158,7 +158,12 @@ public class BuildBahayScene3
 
         TimedOverlay bathFx = fxGO.AddComponent<TimedOverlay>();
         bathFx.overlay = fxSr;
-        bathFx.peakAlpha = 0.85f;
+        // 0.95 rather than 0.85, because the pose change now happens behind
+        // this at its peak and 0.85 leaves enough of him showing to see it.
+        bathFx.peakAlpha = 0.95f;
+
+        PlaySoundEffect bathSound = fxGO.AddComponent<PlaySoundEffect>();
+        bathSound.id = "bath_water";   // 2.6s, the same length as the fade
 
         // --- Player, starting across the room from the water jar ---
         GameObject playerGO = new GameObject("player_character");
@@ -353,7 +358,13 @@ public class BuildBahayScene3
         // for the rest of the scene.
         var maligo = MakeObjective("Maligo", pMaligo);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
-        UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, bathSound.Play);
+        // The pose change hangs off the overlay's PEAK, not off the word.
+        // Wired to the word it fired instantly: Kylo popped into a towel in
+        // plain sight and THEN water washed over him, which is two things
+        // happening rather than one thing happening. Behind the water he
+        // goes in dry and comes out dressed, which is what a transition is.
+        UnityEventTools.AddPersistentListener(bathFx.onPeak, towel.Apply);
 
         // 4-5. Clean and dry, and now he can see to his teeth and his hair.
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);

@@ -32,6 +32,15 @@ public class TimedOverlay : MonoBehaviour
     [Tooltip("Seconds to fade back out.")]
     public float fadeOutDuration = 0.9f;
 
+    [Tooltip("Runs the moment the overlay is at full strength, BEFORE it " +
+             "starts clearing - so anything wired here changes while it is " +
+             "hidden behind the effect.\n\nThis is what makes the bath a " +
+             "transition rather than two things happening at once: wire the " +
+             "pose change here and Kylo goes in dry and comes out in a " +
+             "towel, instead of changing in plain sight and THEN having " +
+             "water wash over him.")]
+    public UnityEvent onPeak;
+
     [Tooltip("Runs once the overlay has cleared.")]
     public UnityEvent onFinished;
 
@@ -56,6 +65,7 @@ public class TimedOverlay : MonoBehaviour
     private IEnumerator PlayRoutine()
     {
         yield return Fade(CurrentAlpha(), peakAlpha, fadeInDuration);
+        onPeak?.Invoke();
         if (holdDuration > 0f) yield return new WaitForSeconds(holdDuration);
         yield return Fade(peakAlpha, 0f, fadeOutDuration);
         playing = null;
