@@ -212,8 +212,10 @@ public class BuildBahayScene5
         // play over the top. Here there are no frames yet, and the seated
         // sprite is the STANDING drawing lowered - so a slide would be a
         // standing boy gliding across the kitchen, which is worse than the
-        // cut it replaces. Add "sit.driftFrom = SitX - StandX;" at the same
-        // time as the drawings, not before.
+        // cut it replaces. Add "sit.driftFrom = StandX - SitX;" at the same
+        // time as the drawings, not before - Stand minus Sit, +5.4 here,
+        // because he comes in from the RIGHT. Paaralan Scene 2's is negative
+        // for the opposite reason.
         PoseSettle sit = seatGO.AddComponent<PoseSettle>();
         sit.dropFrom = 0.5f;
         sit.duration = 0.4f;
