@@ -46,3 +46,11 @@ stretch  <- Kylo waking up (stretch, synthesised)
   by       SALINLAHI (Tools/make_wakeup_sfx.py)
   licence  CC0
 
+SALINLAHI_Correct  <- Pronunciation feedback (SALINLAHI_Correct, synthesised)
+  by       SALINLAHI (Tools/make_pronunciation_sfx.py)
+  licence  CC0
+
+SALINLAHI_Incorrect  <- Pronunciation feedback (SALINLAHI_Incorrect, synthesised)
+  by       SALINLAHI (Tools/make_pronunciation_sfx.py)
+  licence  CC0
+
