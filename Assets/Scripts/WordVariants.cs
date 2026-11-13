@@ -65,8 +65,14 @@ public static class WordVariants
         { "Medyas",  new[] { "medias", "mediyas", "me dyas" } },
         { "Sapatos", new[] { "sa patos", "zapatos", "sapatus" } },
         { "Bag",     new[] { "back", "beg", "bak" } },
+        // Kanin and Itlog are no longer asked for out loud - Bahay Scene 5
+        // teaches "Pagkain" for the meal as a whole - but their rows stay.
+        // They are the entries that keep the cross-check honest about the
+        // collision this table exists for: "kanin" must never be accepted
+        // for "Kain", and the guard is only run on words listed here.
         { "Kanin",   new[] { "ka nin", "canin", "kanen" } },
         { "Itlog",   new[] { "it log", "etlog", "it lock" } },
+        { "Pagkain", new[] { "pag kain", "pakain", "pagcain", "pag ka in" } },
         { "Kain",    new[] { "ka in", "cain", "kayin" } },
         { "Inom",    new[] { "i nom", "enom", "e nom" } },
 

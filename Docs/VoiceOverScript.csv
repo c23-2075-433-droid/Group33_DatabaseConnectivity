@@ -62,21 +62,27 @@ rachel_l1_s4_kunin_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 4 - Gettin
 rachel_l1_s4_kunin_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,Excellent! Kylo has his bag over his shoulder.,-,D - praise once the word is recognised,Kunin,Praise,5
 rachel_l1_s4_outro.wav,Rachel Line,Level 1 - Bahay,Scene 4 - Getting Dressed,Teacher Rachel,"Kylo is dressed and packed. But first, he needs his breakfast!",-,E - transition into the next scene,,SceneOutro,99
 rachel_l1_s5_intro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Nanay has made breakfast, and the whole kitchen smells wonderful.",-,Scene intro,,SceneIntro,0
-rachel_l1_s5_upo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Breakfast is on the table, and Kylo's chair is empty and waiting.",-,A - what is happening in the story,Upo,Story,1
+rachel_l1_s5_upo_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Nanay is still in the kitchen, and Kylo's chair is empty and waiting.",-,"A - what is happening in the story. RE-RECORD: the table now starts bare and Pagkain is what brings the food out, so the old line (""Breakfast is on the table"") describes a table the child cannot see yet.",Upo,Story,1
 rachel_l1_s5_upo_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Get him settled — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_upo.wav.",Upo,Prompt,1
 rachel_l1_s5_upo_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Good! Kylo is sitting at the table.,-,D - praise once the word is recognised,Upo,Praise,1
-rachel_l1_s5_kanin_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,There is a warm white heap on Kylo's plate. Filipino families eat it daily.,-,A - what is happening in the story,Kanin,Story,2
-rachel_l1_s5_kanin_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Name it for Kylo — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kanin.wav.",Kanin,Prompt,2
-rachel_l1_s5_kanin_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,That's right! Kylo's plate is full of rice.,-,D - praise once the word is recognised,Kanin,Praise,2
-rachel_l1_s5_itlog_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Beside the rice is something round, with a sunny yellow middle.",-,A - what is happening in the story,Itlog,Story,3
-rachel_l1_s5_itlog_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Tell Kylo what it is — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_itlog.wav.",Itlog,Prompt,3
-rachel_l1_s5_itlog_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Well done! The egg is Kylo's favourite part.,-,D - praise once the word is recognised,Itlog,Praise,3
-rachel_l1_s5_kain_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Everything is on the plate now, and Kylo's tummy is rumbling.",-,A - what is happening in the story,Kain,Story,4
-rachel_l1_s5_kain_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Let him start his breakfast! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kain.wav.",Kain,Prompt,4
-rachel_l1_s5_kain_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Yummy! Kylo is enjoying every bite.,-,D - praise once the word is recognised,Kain,Praise,4
-rachel_l1_s5_inom_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,All that rice has made Kylo thirsty. There is a glass beside his plate.,-,A - what is happening in the story,Inom,Story,5
-rachel_l1_s5_inom_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Help him finish it off with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_inom.wav.",Inom,Prompt,5
-rachel_l1_s5_inom_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Wonderful! Kylo's breakfast is all done.,-,D - praise once the word is recognised,Inom,Praise,5
+rachel_l1_s5_kanin_story.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,There is a warm white heap on Kylo's plate. Filipino families eat it daily.,-,A - what is happening in the story,Kanin,Story,0
+rachel_l1_s5_kanin_ask.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Name it for Kylo — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kanin.wav.",Kanin,Prompt,0
+rachel_l1_s5_kanin_done.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,That's right! Kylo's plate is full of rice.,-,D - praise once the word is recognised,Kanin,Praise,0
+rachel_l1_s5_itlog_story.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Beside the rice is something round, with a sunny yellow middle.",-,A - what is happening in the story,Itlog,Story,0
+rachel_l1_s5_itlog_ask.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Tell Kylo what it is — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_itlog.wav.",Itlog,Prompt,0
+rachel_l1_s5_itlog_done.wav,Rachel Line (Unused),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Well done! The egg is Kylo's favourite part.,-,D - praise once the word is recognised,Itlog,Praise,0
+rachel_l1_s5_pagkain_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"He is in his chair now, but the table in front of him is still bare.",-,A - what is happening in the story. NOT YET RECORDED.,Pagkain,Story,2
+rachel_l1_s5_pagkain_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Ask Nanay for his breakfast — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pagkain.wav. NOT YET RECORDED.",Pagkain,Prompt,2
+rachel_l1_s5_pagkain_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Here it comes! Rice, egg and a cool drink.",-,D - praise once the word is recognised. NOT YET RECORDED.,Pagkain,Praise,2
+rachel_l1_s5_kain_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,"Everything is on the plate now, and Kylo's tummy is rumbling.",-,A - what is happening in the story,Kain,Story,3
+rachel_l1_s5_kain_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Let him start his breakfast! Say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kain.wav.",Kain,Prompt,3
+rachel_l1_s5_kain_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Yummy! Kylo is enjoying every bite.,-,D - praise once the word is recognised,Kain,Praise,3
+rachel_l1_s5_inom_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,All that rice has made Kylo thirsty. There is a glass beside his plate.,-,A - what is happening in the story,Inom,Story,4
+rachel_l1_s5_inom_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Help him finish it off with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_inom.wav.",Inom,Prompt,4
+rachel_l1_s5_inom_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Wonderful! Kylo's breakfast is all done.,-,D - praise once the word is recognised,Inom,Praise,4
+rachel_l1_s5_linis_story.wav,Rachel Line (Story),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,The plates are empty and the cup is drained. The table needs clearing.,-,A - what is happening in the story. NOT YET RECORDED.,Linis,Story,5
+rachel_l1_s5_linis_ask.wav,Rachel Line (Prompt),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Help him tidy it all away — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_linis.wav. NOT YET RECORDED.",Linis,Prompt,5
+rachel_l1_s5_linis_done.wav,Rachel Line (Praise),Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Thank you! The table is clean and ready again.,-,D - praise once the word is recognised. NOT YET RECORDED.,Linis,Praise,5
 rachel_l1_s5_outro.wav,Rachel Line,Level 1 - Bahay,Scene 5 - Eating Breakfast,Teacher Rachel,Breakfast is finished. It is time for Kylo to head off to school!,-,E - transition into the next scene,,SceneOutro,99
 rachel_l2_s1_intro.wav,Rachel Line,Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"Here is Kylo's school! The gate is still shut, and the guard is waiting beside it.",-,Scene intro,,SceneIntro,0
 rachel_l2_s1_lakad_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Kylo can see his school now. The gate up ahead is still shut.,-,,Lakad,Story,1
@@ -323,6 +329,8 @@ rachel_word_tawa_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teache
 rachel_word_tawa_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tawa' means to laugh.",Laugh,"B - short reminder, played every time after the first.",Tawa,Recall,0
 rachel_word_tulong_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"'Tulong' is the Filipino word for help, or to help someone.",Help,"B - full English meaning, played the first time this word comes up in a session.",Tulong,Teach,0
 rachel_word_tulong_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Tulong' means help.",Help,"B - short reminder, played every time after the first.",Tulong,Recall,0
+rachel_word_pagkain_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Pagkain' means food, or a meal.",Food,"B - full English meaning, played the first time this word comes up in a session. NOT YET RECORDED.",Pagkain,Teach,0
+rachel_word_pagkain_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Pagkain' means food.",Food,"B - short reminder, played every time after the first. NOT YET RECORDED.",Pagkain,Recall,0
 rachel_word_linis_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Linis' means to clean up, or to tidy.",Clean up,"B - full English meaning, played the first time this word comes up in a session.",Linis,Teach,0
 rachel_word_linis_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Linis' means to clean up.",Clean up,"B - short reminder, played every time after the first.",Linis,Recall,0
 rachel_word_alis_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Alis' means to leave, or to go away from a place.",Leave / go,"B - full English meaning, played the first time this word comes up in a session.",Alis,Teach,0
@@ -390,6 +398,7 @@ word_kunin.wav,Word,All Levels,Level 1 Scene 4,-,Kunin,Take / get,First taught i
 word_upo.wav,Word,All Levels,Level 1 Scene 5,-,Upo,Sit down,First taught in Level 1 Scene 5.,Upo,Word,0
 word_kanin.wav,Word,All Levels,Level 1 Scene 5,-,Kanin,Rice,First taught in Level 1 Scene 5.,Kanin,Word,0
 word_itlog.wav,Word,All Levels,Level 1 Scene 5,-,Itlog,Egg,First taught in Level 1 Scene 5.,Itlog,Word,0
+word_pagkain.wav,Word,All Levels,Level 1 Scene 5,-,Pagkain,Food,"First taught in Level 1 Scene 5, where it is the word that brings the meal out onto the table. NOT YET RECORDED.",Pagkain,Word,0
 word_kain.wav,Word,All Levels,Level 1 Scene 5,-,Kain,Eat,First taught in Level 1 Scene 5.,Kain,Word,0
 word_inom.wav,Word,All Levels,Level 1 Scene 5,-,Inom,Drink,First taught in Level 1 Scene 5.,Inom,Word,0
 word_kumusta.wav,Word,All Levels,Level 2 Scene 1,-,Kumusta,Hello / how are you,First taught in Level 2 Scene 1.,Kumusta,Word,0
@@ -406,7 +415,7 @@ word_labas.wav,Word,All Levels,Level 2 Scene 4,-,Labas,Go outside,First taught i
 word_laro.wav,Word,All Levels,Level 2 Scene 4,-,Laro,Play,First taught in Level 2 Scene 4.,Laro,Word,0
 word_tawa.wav,Word,All Levels,Level 2 Scene 4,-,Tawa,Laugh,First taught in Level 2 Scene 4.,Tawa,Word,0
 word_tulong.wav,Word,All Levels,Level 2 Scene 4,-,Tulong,Help,First taught in Level 2 Scene 4.,Tulong,Word,0
-word_linis.wav,Word,All Levels,Level 2 Scene 5,-,Linis,Clean up,First taught in Level 2 Scene 5.,Linis,Word,0
+word_linis.wav,Word,All Levels,Level 1 Scene 5,-,Linis,Clean up,"First taught in Level 1 Scene 5, clearing the breakfast table; met again in Level 2 Scene 5.",Linis,Word,0
 word_alis.wav,Word,All Levels,Level 2 Scene 5,-,Alis,Leave / go,First taught in Level 2 Scene 5.,Alis,Word,0
 word_paalam.wav,Word,All Levels,Level 3 Scene 5,-,Paalam,Goodbye,First taught in Level 3 Scene 5.,Paalam,Word,0
 word_tingin.wav,Word,All Levels,Level 3 Scene 1,-,Tingin,Look,First taught in Level 3 Scene 1.,Tingin,Word,0

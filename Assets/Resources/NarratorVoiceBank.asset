@@ -267,7 +267,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: fe6dd5eb5f03d4fa8addd49cb7b57078, type: 3}
   - id: rachel_l1_s5_upo_story
-    text: Breakfast is on the table, and Kylo's chair is empty and waiting.
+    text: Nanay is still in the kitchen, and Kylo's chair is empty and waiting.
     gloss: 
     clip: {fileID: 8300000, guid: 0cc4d6011b39e4366aa60ddf8145ece1, type: 3}
   - id: rachel_l1_s5_upo_ask
@@ -278,6 +278,18 @@ MonoBehaviour:
     text: Good! Kylo is sitting at the table.
     gloss: 
     clip: {fileID: 8300000, guid: c3b84ab636adf48498239f9c9c8bc1d7, type: 3}
+  - id: rachel_l1_s5_pagkain_story
+    text: He is in his chair now, but the table in front of him is still bare.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_pagkain_ask
+    text: "Ask Nanay for his breakfast \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_pagkain_done
+    text: "Here it comes! Rice, egg and a cool drink."
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l1_s5_kanin_story
     text: There is a warm white heap on Kylo's plate. Filipino families eat it daily.
     gloss: 
@@ -326,6 +338,18 @@ MonoBehaviour:
     text: Wonderful! Kylo's breakfast is all done.
     gloss: 
     clip: {fileID: 8300000, guid: bd17b6a5a79bc493c8a5e8290daea5d1, type: 3}
+  - id: rachel_l1_s5_linis_story
+    text: The plates are empty and the cup is drained. The table needs clearing.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_linis_ask
+    text: "Help him tidy it all away \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_linis_done
+    text: Thank you! The table is clean and ready again.
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l1_s5_outro
     text: Breakfast is finished. It is time for Kylo to head off to school!
     gloss: 
@@ -1310,6 +1334,14 @@ MonoBehaviour:
     text: Remember, 'Tulong' means help.
     gloss: Help
     clip: {fileID: 8300000, guid: ae25106e4e7b948278a78611a83e4046, type: 3}
+  - id: rachel_word_pagkain_teach
+    text: In Filipino, 'Pagkain' means food, or a meal.
+    gloss: Food
+    clip: {fileID: 0}
+  - id: rachel_word_pagkain_recall
+    text: Remember, 'Pagkain' means food.
+    gloss: Food
+    clip: {fileID: 0}
   - id: rachel_word_linis_teach
     text: In Filipino, 'Linis' means to clean up, or to tidy.
     gloss: Clean up
@@ -1578,6 +1610,10 @@ MonoBehaviour:
     text: Itlog
     gloss: Egg
     clip: {fileID: 8300000, guid: 9849f6f4e31c448b4910a45bae1fa42d, type: 3}
+  - id: word_pagkain
+    text: Pagkain
+    gloss: Food
+    clip: {fileID: 0}
   - id: word_kain
     text: Kain
     gloss: Eat

@@ -43,6 +43,11 @@ using System.Text.RegularExpressions;
 ///   6. Each word's known mistranscriptions are accepted outright - see
 ///      WordVariants, which is the layer that actually buys accuracy on a real
 ///      device, and which grows from the attempt log rather than from guesses.
+///   7. A reply the recognizer split into pieces is read as ONE word when
+///      running it together spells another taught word: "pag kain" is
+///      "Pagkain" badly split, so the "kain" in it is not an answer to
+///      "Kain". Pagkain and Kain are asked one after the other in the
+///      breakfast scene, which is where this would otherwise be felt.
 ///
 /// Folding all 51 taught words this way leaves 51 DISTINCT canonical forms, so
 /// exact matching can never make two taught words ambiguous. The editor tool
@@ -149,8 +154,20 @@ public static class PronunciationChecker
 
         // Any single word of it. The recognizer often returns a short sentence
         // when the child said one word.
-        foreach (string token in contentTokens)
-            if (token == canonicalForm) return true;
+        //
+        // Unless the utterance run together IS some OTHER taught word, in
+        // which case its pieces are halves of that word rather than an
+        // answer. "pag kain" is the recognizer splitting "Pagkain", and the
+        // "kain" inside it is not the child saying "Kain" - but both are
+        // taught in the breakfast scene, one straight after the other, so
+        // without this the second word could be answered by repeating the
+        // first. The same guard stops "ka nin" passing for "Kunin", "u wi"
+        // for "Upo", and "ti ngin" for "Bati".
+        if (!IsSomeOtherTaughtWord(string.Concat(allTokens), canonicalForm))
+        {
+            foreach (string token in contentTokens)
+                if (token == canonicalForm) return true;
+        }
 
         // Everything run together, for when the recognizer splits one word in
         // two ("u po" for "Upo"). Built from the UNFILTERED tokens, because the
@@ -169,6 +186,36 @@ public static class PronunciationChecker
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// The canonical form of every taught word, for the fragment guard above.
+    /// Built once from WordVariants, which is the project's list of the words
+    /// the game actually asks for.
+    /// </summary>
+    private static readonly HashSet<string> TaughtForms = BuildTaughtForms();
+
+    private static HashSet<string> BuildTaughtForms()
+    {
+        HashSet<string> set = new HashSet<string>();
+        foreach (string word in WordVariants.Words)
+        {
+            string canonical = Canonicalize(word);
+            if (canonical.Length > 0) set.Add(canonical);
+        }
+        return set;
+    }
+
+    /// <summary>
+    /// True when a run-together utterance is a taught word OTHER than the one
+    /// being matched - i.e. the child said a different word of the course, and
+    /// the recognizer happened to split it across a token that looks like this
+    /// one.
+    /// </summary>
+    private static bool IsSomeOtherTaughtWord(string joined, string canonicalForm)
+    {
+        if (string.IsNullOrEmpty(joined) || joined == canonicalForm) return false;
+        return TaughtForms.Contains(joined);
     }
 
     /// <summary>

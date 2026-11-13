@@ -48,6 +48,15 @@ public static class PronunciationCheckTool
         new Case("kaha",  "Kuha",  false, "wrong vowel - the reported bug"),
         new Case("kanin", "Kain",  false, "a DIFFERENT taught word, same scene (Almusal)"),
         new Case("kain",  "Kanin", false, "the same collision the other way round"),
+
+        // Pagkain and Kain are asked one after the other in the breakfast
+        // scene, and "kain" is literally inside "pagkain" - so the recognizer
+        // splitting the longer word must not answer the shorter one.
+        new Case("pagkain",  "Kain",    false, "the whole word is not the half of it"),
+        new Case("pag kain", "Kain",    false, "the recognizer split Pagkain, same scene, next word"),
+        new Case("kain",     "Pagkain", false, "half the word is not the whole of it"),
+        new Case("pag kain", "Pagkain", true,  "the same split, read as the word it came from"),
+        new Case("pakain",   "Pagkain", true,  "one consonant dropped on a 7-letter word, vowels intact"),
         new Case("tuwa",  "Tawa",  false, "wrong vowel, and both are taught"),
         new Case("tawa",  "Tuwa",  false, "wrong vowel, and both are taught"),
         new Case("tabo",  "Takbo", false, "a near-miss on a real Filipino word"),
@@ -67,6 +76,8 @@ public static class PronunciationCheckTool
         new Case("inum",      "Inom",   true, "o/u alternation, also free"),
         new Case("twalya",    "Tuwalya", true, "the uw/w glide"),
         new Case("u po",      "Upo",    true, "recognizer split one word in two"),
+        new Case("ka nin",    "Kunin",  false, "a split 'Kanin' is not 'Kunin'"),
+        new Case("ti ngin",   "Bati",   false, "a split 'Tingin' is not 'Bati'"),
         new Case("oppo",      "Upo",    true, "doubled letter"),
         new Case("kamusta",   "Kumusta", true, "the other standard spelling"),
         new Case("i love",    "Ilaw",   true, "listed English mistranscription"),

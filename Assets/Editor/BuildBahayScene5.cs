@@ -1,40 +1,35 @@
 // Assets/Editor/BuildBahayScene5.cs
 //
 // One-click scene builder for Bahay Scene 5 ("Eating Breakfast").
-// Teaches five words: Hugas, Upo, Kain, Inom, Linis.
+// Teaches five words: Upo, Pagkain, Kain, Inom, Linis.
 //
-// Hugas and Linis bracket the meal: washing his hands before he sits, and
-// clearing up after he has eaten. Neither has an object of its own drawn
-// into this kitchen - there is no sink and no cloth - so each lands on the
-// thing it is about: Hugas on Kylo, who is the one washing, and Linis on
-// the emptied plates.
+// The five words are the meal in order, and every one of them changes the
+// table:
 //
-// Kanin and Itlog are no longer spoken objectives. The restructure keeps
-// them as bonus vocabulary to be TAPPED rather than said - "Can you find the
-// kanin and itlog?" - which is a different interaction and is not built yet.
-// The rice and the egg stay on the plate either way: they are what Kain
-// clears, and the scene would be a boy eating nothing without them.
+//   Upo      Kylo sits down at the table, which is still bare
+//   Pagkain  the food arrives - rice, egg and cup come out together
+//   Kain     he eats - the rice and egg go, the bowl and plate stay, empty
+//   Inom     he drinks - the cup stays and lights up; it is opaque, so an
+//            empty cup and a full one are the same picture
+//   Linis    he clears up - the empty dishes and the cup are taken away and
+//            the table is bare again, the way it started
+//
+// "Pagkain" is what earns the empty table. The scene now opens with nothing
+// laid out, so the word is not naming food that is already sitting there -
+// it is what puts it there. That is also why Kanin and Itlog are no longer
+// spoken objectives: with one word for the food as a whole, naming each dish
+// separately was three words for one idea. The rice and the egg are still
+// drawn, because they are what Kain empties, and the scene would be a boy
+// eating nothing without them.
+//
+// Hugas has left this scene for a plainer reason: there is no sink drawn in
+// this kitchen, so washing could only ever be a gleam on Kylo himself. It is
+// still taught at recess in Paaralan Scene 4, where there is one.
 //
 // This scene was in the design document from the start and was never built -
 // Level 1 ran Scene 1 -> 2 -> 3 -> 4 and then ended, so Kylo got dressed and
 // left for school without eating. Scene 6 ("Leaving for School") is still
 // missing after this one.
-//
-// Word order differs from the design document, which lists Upo, Kain, Inom
-// with Kanin and Itlog as bonus objects afterwards. Naming the food AFTER
-// eating it leaves nothing on the table to point at, so the naming words come
-// first and the eating words clear the plates:
-//
-//   Upo     Kylo sits down at the table
-//   Kanin   names the rice          (gleam, nothing is taken)
-//   Itlog   names the egg           (gleam, nothing is taken)
-//   Kain    eats - the rice and egg go, the bowl and plate stay, empty
-//   Inom    drinks - the cup stays and lights up; it is opaque, so an empty
-//           cup and a full one are the same picture
-//
-// The document also has Kanin and Itlog as tap-to-name rather than spoken.
-// They are spoken here so the scene uses the same objective sequence as every
-// other scene; tapping would need a second input path that nothing else uses.
 //
 // The scene is staged from Nanay's seat: the camera is her point of view
 // across the breakfast table, with Kylo facing her from the chair opposite.
@@ -182,9 +177,16 @@ public class BuildBahayScene5
         table.transform.localScale = new Vector3(BgScale, BgScale, 1f);
 
         // --- Breakfast, on the table in front of him ---
+        // Placed where it will land but switched OFF, because the scene opens
+        // on a bare table and "Pagkain" is what brings the meal out. Built
+        // here rather than spawned at the word: a persistent UnityEvent can
+        // switch an existing object on, and cannot create one.
         GameObject propItlog = CreateProp("Prop_Itlog", "prop_itlog", -2.3f, 1.05f, PlateY);
         GameObject propKanin = CreateProp("Prop_Kanin", "prop_kanin", -0.2f, 1.40f, PlateY);
         GameObject propBaso  = CreateProp("Prop_Baso",  "item_baso",   1.9f, 1.30f, PlateY);
+        propItlog.SetActive(false);
+        propKanin.SetActive(false);
+        propBaso.SetActive(false);
 
         // Eating empties the dishes rather than clearing the table: the same
         // bowl and plate stay where they were, with the food gone. Each is a
@@ -220,14 +222,16 @@ public class BuildBahayScene5
         VoiceCommand voiceCommand = rig.AddComponent<VoiceCommand>();
         voiceCommand.player = player;
 
-        // Something has to light up when a word only names a thing.
-        TimedOverlay gleamBaso  = CreateGleam("Gleam_Baso",  propBaso,  2.0f);
-        // "Hugas" is washing his hands, and there is no sink drawn in this
-        // kitchen, so it lands on him. "Linis" is clearing up, so it lands on
-        // the plates he has just emptied.
-        TimedOverlay gleamHugas = CreateGleam("Gleam_Hugas", standGO, 3.2f);
-        TimedOverlay gleamLinis = CreateGleam("Gleam_Linis", emptyKanin, 2.6f);
-        foreach (TimedOverlay fx in new[] { gleamBaso, gleamHugas, gleamLinis })
+        // Something has to light up when a word only names a thing, or when
+        // what it does would otherwise happen in silence.
+        TimedOverlay gleamBaso    = CreateGleam("Gleam_Baso",    propBaso,   2.0f);
+        // Wide, because "Pagkain" brings out all three dishes at once: the
+        // gleam has to cover the spread from the egg to the cup, not one plate.
+        TimedOverlay gleamPagkain = CreateGleam("Gleam_Pagkain", propKanin,  4.4f);
+        // "Linis" is clearing up, so it lands on the plates he has just
+        // emptied, in the moment before they are taken away.
+        TimedOverlay gleamLinis   = CreateGleam("Gleam_Linis",   emptyKanin, 2.6f);
+        foreach (TimedOverlay fx in new[] { gleamBaso, gleamPagkain, gleamLinis })
         {
             fx.overlay.sortingLayerName = "Player";
             fx.overlay.sortingOrder = OrderFood + 1;
@@ -253,21 +257,25 @@ public class BuildBahayScene5
 
         // Canvas units are world units x100. Each prompt sits above the thing
         // it names; "Upo" sits over the chair Kylo is about to use.
-        GameObject pHugas = CreatePromptUI(uiRoot.transform, "Prompt_Hugas", "Hugas", new Vector3(520, 120, 0));
-        GameObject pUpo   = CreatePromptUI(uiRoot.transform, "Prompt_Upo",   "Upo",   new Vector3(520, 250, 0));
-        GameObject pKain  = CreatePromptUI(uiRoot.transform, "Prompt_Kain",  "Kain",  new Vector3(-20, 300, 0));
-        GameObject pInom  = CreatePromptUI(uiRoot.transform, "Prompt_Inom",  "Inom",  new Vector3(190, -235, 0));
-        GameObject pLinis = CreatePromptUI(uiRoot.transform, "Prompt_Linis", "Linis", new Vector3(-20, -340, 0));
+        GameObject pUpo     = CreatePromptUI(uiRoot.transform, "Prompt_Upo",     "Upo",     new Vector3(520, 250, 0));
+        GameObject pPagkain = CreatePromptUI(uiRoot.transform, "Prompt_Pagkain", "Pagkain", new Vector3(-20, -110, 0));
+        GameObject pKain    = CreatePromptUI(uiRoot.transform, "Prompt_Kain",    "Kain",    new Vector3(-20, 300, 0));
+        GameObject pInom    = CreatePromptUI(uiRoot.transform, "Prompt_Inom",    "Inom",    new Vector3(190, -235, 0));
+        GameObject pLinis   = CreatePromptUI(uiRoot.transform, "Prompt_Linis",   "Linis",   new Vector3(-20, -340, 0));
 
         // --- Objectives, in order ---
-        // Hands first, while he is still standing - the gleam is on the
-        // standing pose, so this has to come before "Upo" switches it off.
-        var hugas = MakeObjective("Hugas", pHugas);
-        UnityEventTools.AddPersistentListener(hugas.onCorrect, gleamHugas.Play);
-
         var upo = MakeObjective("Upo", pUpo);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, standGO.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(upo.onCorrect, seatGO.SetActive, true);
+
+        // The meal arrives. All three dishes come out on the one word rather
+        // than one at a time: "Pagkain" is the food as a whole, and a table
+        // that filled in three steps would need three words to say so.
+        var pagkain = MakeObjective("Pagkain", pPagkain);
+        UnityEventTools.AddPersistentListener(pagkain.onCorrect, gleamPagkain.Play);
+        UnityEventTools.AddBoolPersistentListener(pagkain.onCorrect, propKanin.SetActive, true);
+        UnityEventTools.AddBoolPersistentListener(pagkain.onCorrect, propItlog.SetActive, true);
+        UnityEventTools.AddBoolPersistentListener(pagkain.onCorrect, propBaso.SetActive, true);
 
         // Eating swaps the full dishes for the empty ones.
         var kain = MakeObjective("Kain", pKain);
@@ -286,11 +294,17 @@ public class BuildBahayScene5
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
         // Clearing up comes last, and only makes sense after "Kain" has
-        // swapped the full plates for the empty ones it lights.
+        // swapped the full plates for the empty ones. The gleam lands on them
+        // and then they go, along with the cup, so the word visibly does
+        // something rather than only pointing: the table ends as bare as
+        // "Pagkain" found it.
         var linis = MakeObjective("Linis", pLinis);
         UnityEventTools.AddPersistentListener(linis.onCorrect, gleamLinis.Play);
+        UnityEventTools.AddBoolPersistentListener(linis.onCorrect, emptyKanin.SetActive, false);
+        UnityEventTools.AddBoolPersistentListener(linis.onCorrect, emptyItlog.SetActive, false);
+        UnityEventTools.AddBoolPersistentListener(linis.onCorrect, propBaso.SetActive, false);
 
-        controller.objectives = new[] { hugas, upo, kain, inom, linis };
+        controller.objectives = new[] { upo, pagkain, kain, inom, linis };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         SceneFaderBuilder.Build();
@@ -305,10 +319,11 @@ public class BuildBahayScene5
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Bahay Scene 5 built and saved to " + ScenePath +
-                   ". Words: Hugas, Upo, Kain, Inom, Linis. Kanin and Itlog are now tap-to-name bonus " +
-                   "vocabulary rather than spoken objectives, and that interaction is not " +
-                   "built yet - the food itself is still on the plate. Level 1 now ends here, " +
-                   "so re-run Build Bahay Scene 4 as well - it fades into this scene " +
+                   ". Words: Upo, Pagkain, Kain, Inom, Linis. The table starts bare - " +
+                   "\"Pagkain\" brings the meal out and \"Linis\" clears it away again. " +
+                   "Kanin and Itlog are no longer spoken objectives; the rice and the egg " +
+                   "are still drawn, because they are what \"Kain\" empties. Level 1 ends " +
+                   "here, so re-run Build Bahay Scene 4 as well - it fades into this scene " +
                    "instead of showing the result itself.");
     }
 
