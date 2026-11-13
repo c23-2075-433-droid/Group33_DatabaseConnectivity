@@ -43,6 +43,7 @@
 //   standing_towel_messy, talking_towel,
 //   standing_towel_combed if it has ever been drawn - "Suklay" falls back
 //   to talking_towel without it, sipilyo_frame_1..6,
+//   fx_drop - made by Tools/make_water_drop.py,
 //
 // Sounds expected in Assets/Resources/Sfx/:
 //   brush_teeth - made by Tools/make_brush_sfx.py
@@ -256,6 +257,17 @@ public class BuildBahayScene3
         PlaySoundEffect brushSound = brushGO.AddComponent<PlaySoundEffect>();
         brushSound.id = "brush_teeth";
 
+        // Water still running off him. This is what actually sells "just
+        // out of the bath" - his post-bath hair is barely messier than his
+        // normal hair, and redrawing it is not reliably available, so the
+        // wetness is carried by motion beside him instead. Motion reads
+        // faster than a hairstyle anyway, and it costs one 20x30 sprite.
+        GameObject dripGO = new GameObject("FX_Drips");
+        DripEffect drips = dripGO.AddComponent<DripEffect>();
+        drips.follow = playerGO.transform;
+        drips.dropSprite = LoadSprite("fx_drop");
+        drips.dripOnStart = false;        // the bath has not happened yet
+
         GameObject combedGO = new GameObject("Pose_TowelCombed");
         PoseSwitch combed = combedGO.AddComponent<PoseSwitch>();
         combed.player = player;
@@ -326,6 +338,7 @@ public class BuildBahayScene3
         var maligo = MakeObjective("Maligo", pMaligo);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, bathFx.Play);
         UnityEventTools.AddPersistentListener(maligo.onCorrect, towel.Apply);
+        UnityEventTools.AddPersistentListener(maligo.onCorrect, drips.Begin);
 
         // 4-5. Clean and dry, and now he can see to his teeth and his hair.
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
@@ -336,6 +349,9 @@ public class BuildBahayScene3
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, combed.Apply);
+        // ...and the comb dries him off, which is the second thing it does
+        // and what makes the two halves of the scene differ at a glance.
+        UnityEventTools.AddPersistentListener(suklay.onCorrect, drips.Stop);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
