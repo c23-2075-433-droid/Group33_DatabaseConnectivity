@@ -42,7 +42,7 @@
 //   item_sipilyo, item_tuwalya, fx_bath,
 //   standing_towel_messy, talking_towel,
 //   standing_towel_combed if it has ever been drawn - "Suklay" falls back
-//   to talking_towel without it,
+//   to talking_towel without it, sipilyo_frame_1..3,
 //   standing / walk_frame_1..4 - all _barefoot, because the shoes do not go
 //   on until Scene 4 - ui_arrow, ui_word_badge
 //
@@ -209,6 +209,31 @@ public class BuildBahayScene3
         // opens him in, so the hand-off between the two scenes is seamless.
         // The arms are the price; standing_towel_combed removes it if it
         // is ever drawn.
+        // "Sipilyo" is DRAWN rather than snapped - the first action in this
+        // scene that obeys the animation standard's rule 1. He lifts the
+        // brush to his mouth, brushes, and lowers it again, landing back on
+        // the pose he came out of the bath in, because his hair is not
+        // combed until the next word.
+        //
+        // player, not target: PlayerMovement rewrites its renderer from
+        // standingSprite every frame it is not moving, so a sequence driving
+        // the renderer directly is overwritten before anyone sees it.
+        //
+        // The loop is one frame, so it holds rather than moves. A second
+        // brushing frame - the brush at the other side of his mouth - is the
+        // one thing missing from making this a real loop.
+        GameObject brushGO = new GameObject("Pose_Sipilyo");
+        PoseSequence brush = brushGO.AddComponent<PoseSequence>();
+        brush.player = player;
+        brush.playOnEnable = false;
+        brush.framesPerSecond = 4f;
+        brush.loopFramesPerSecond = 3f;
+        brush.loopCycles = 3;
+        brush.frames = new[] { LoadSprite("sipilyo_frame_1"), LoadSprite("sipilyo_frame_2") };
+        brush.loopFrames = new[] { LoadSprite("sipilyo_frame_2") };
+        brush.tailFrames = new[] { LoadSprite("sipilyo_frame_3") };
+        brush.destinationSprite = LoadSpriteOr("standing_towel_messy", "talking_towel");
+
         GameObject combedGO = new GameObject("Pose_TowelCombed");
         PoseSwitch combed = combedGO.AddComponent<PoseSwitch>();
         combed.player = player;
@@ -283,6 +308,7 @@ public class BuildBahayScene3
         // 4-5. Clean and dry, and now he can see to his teeth and his hair.
         var sipilyo = MakeObjective("Sipilyo", pSipilyo);
         UnityEventTools.AddPersistentListener(sipilyo.onCorrect, useSipilyo.PickUp);
+        UnityEventTools.AddPersistentListener(sipilyo.onCorrect, brush.Play);
 
         var suklay = MakeObjective("Suklay", pSuklay);
         UnityEventTools.AddPersistentListener(suklay.onCorrect, useSuklay.PickUp);
