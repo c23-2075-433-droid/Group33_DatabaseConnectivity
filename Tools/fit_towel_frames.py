@@ -78,10 +78,40 @@ def keep_figure(pose):
     return Image.fromarray(a)
 
 
-def scale_to_hair(pose, b_hair):
-    """The figure resized so its head matches the base's, with its landmarks."""
+def figure_span(im):
+    """Crown row and lowest drawn row of the whole figure, not just the head."""
+    opaque = np.asarray(im)[:, :, 3] > 8
+    rows = np.nonzero(opaque.any(1))[0]
+    return int(rows[0]), int(rows[-1])
+
+
+def scale_to_hair(pose, b_hair, b_span=None):
+    """The figure resized so its head matches the base's, with its landmarks.
+
+    Matching the head is right when several frames of ONE generation sit in a
+    loop together - a head that changes size between frames is the worst
+    thing that can happen there.
+
+    It is wrong when the generated boy is a different shape from the base.
+    The carried-towel pose came back with slightly longer legs for the same
+    head, so matching the head made him 790px tall on a 745px canvas and the
+    overflow went off the bottom - he lost his feet. So when the head-matched
+    figure will not fit, his FULL HEIGHT is matched instead: his head comes
+    out a few percent off, which is nearly invisible, and his feet land on
+    the floor, which is not optional.
+    """
     p_crown, p_bottom, p_cx = hair_cap(pose)
     scale = b_hair / float(p_bottom - p_crown)
+
+    if b_span is not None:
+        top, bottom = figure_span(pose)
+        if (bottom - top) * scale > b_span:
+            scale = b_span / float(bottom - top)
+            print('  head-matched figure was %d px for a %d px canvas - '
+                  'matched full height instead (head %.0f%% off)'
+                  % (round((bottom - top) * b_hair / float(p_bottom - p_crown)),
+                     b_span, 100 * abs(1 - scale * (p_bottom - p_crown) / b_hair)))
+
     pose = pose.resize((max(1, round(pose.width * scale)),
                         max(1, round(pose.height * scale))), Image.LANCZOS)
     return pose, round(p_crown * scale), round(p_cx * scale), scale
@@ -117,8 +147,11 @@ def main():
     base = Image.open(base_path).convert('RGBA')
     b_crown, b_bottom, b_cx = hair_cap(base)
     b_hair = b_bottom - b_crown
+    b_top_row, b_foot_row = figure_span(base)
+    b_span = b_foot_row - b_top_row
     print('base %s  hair %dpx, crown row %d, head column %d'
           % (os.path.basename(base_path), b_hair, b_crown, b_cx))
+    print('base figure spans rows %d..%d (%d px)' % (b_top_row, b_foot_row, b_span))
 
     strip = Image.open(raw).convert('RGB')
     spans = split_columns(strip)
@@ -142,7 +175,7 @@ def main():
         # the sprite keeps a pale rim over the bathroom tiles.
         cut = bleed_edges(Image.fromarray(
             np.dstack([tile, cut_background(tile)]).astype(np.uint8)))
-        poses.append(scale_to_hair(keep_figure(cut), b_hair))
+        poses.append(scale_to_hair(keep_figure(cut), b_hair, b_span))
 
     # Measured from the head's centre column outwards, because that column is
     # what every frame is lined up on - and, once the canvas is symmetric
