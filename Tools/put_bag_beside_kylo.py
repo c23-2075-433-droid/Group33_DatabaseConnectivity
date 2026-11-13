@@ -15,19 +15,23 @@ What it changes, and nothing else:
   BagPickup      a new object holding the sequence. Not on the bag: the bag
                  is switched off for most of the level, and a component on a
                  disabled object does not run
-  the Bag word   onShown brings the bag out, onCorrect arms the pickup.
-                 It used to take the bag outright
-  the Kunin word REMOVED - see below
+  the Bag word   onShown brings the bag out; saying it only gleams the bag,
+                 which stays on the floor
+  the Kunin word takes it: onCorrect runs the pickup sequence, and the bag
+                 goes onto his back at the grab moment
   maxActionWait  4 -> 12 seconds
 
-WHY KUNIN GOES. The saved scene taught five words, and the last two were
-"Bag" (which only gleamed) and "Kunin" (which took the bag). The new flow
-puts the taking in the player's hands instead, between those two: the bag is
-already gone by the time Kunin would be asked, so the word would be left
-pointing at an empty floor. The builder dropped Kunin for its own reasons
-some time ago, so this brings the saved scene the same way. If it should
-come back, the honest shape is for KUNIN rather than Bag to arm the pickup -
-that is a one-line change here and in the builder, not a rewrite.
+TWO WORDS, NOT A WORD AND A TAP. The bag is the one thing in this scene the
+child is meant to DO something with, and saying "Bag" used to make it vanish
+in the same instant - the naming and the taking were the same event. They
+are two now, which is what the pair of words was always for: "Bag" names the
+thing, "Kunin" takes it.
+
+The interaction between them is SPEECH, not a tap. This is a game played
+with your voice; a tap would be the one thing it never otherwise asks for,
+and a child who does not realise they are meant to tap would be stuck
+looking at a bag. BagPickup.Arm() is still there for anywhere a tap is
+wanted. Nothing here wires it.
 
 Safe to run twice: it checks for what it writes before writing it.
 
@@ -51,8 +55,15 @@ PROMPT_LIFT = 110.0
 # in before the transform's scale is applied.
 BAG_SPRITE = (9.29, 10.66)
 
-MAX_ACTION_WAIT = 12            # longer than BagPickup's wait for a tap
-DROP_WORDS = ("Kunin",)
+MAX_ACTION_WAIT = 12            # longer than any pickup sequence
+
+# The bag's two words, and what each one does. Anything not named here keeps
+# whatever it already had.
+BAG_WORDS = {
+    "Bag":   [("TimedOverlay", "Play", "gleam")],
+    "Kunin": [("BagPickup", "StartBagPickup", "pickup")],
+}
+PROMPT_OF = {"Bag": "Prompt_Bag", "Kunin": "Prompt_Kunin"}
 
 COLLIDER = """!u!61 &%(fid)s
 BoxCollider2D:
@@ -204,8 +215,20 @@ def component_of(scene, go, ident):
     sys.exit("%s: %s has no %s" % (SCENE, scene.names.get(go, go), ident))
 
 
-def rebuild_objectives(scene, controller, bag_pickup):
-    """Rewrite the objective list: drop Kunin, hand the bag to BagPickup."""
+OBJECTIVE_HEAD = """  - word: %(word)s
+    variants: []
+    promptRoot: {fileID: %(prompt)s}
+    instructionClip: {fileID: 0}
+"""
+
+
+def rebuild_objectives(scene, controller, targets):
+    """Rewrite the objective list: both bag words point at BagPickup.
+
+    The words that dress him are left exactly as they are - this change is
+    not their business. Only Bag and Kunin are rewritten, and Kunin is built
+    from scratch if an earlier version of this tool removed it.
+    """
     block = scene.block[controller]
     start = block.index("  objectives:\n")
     end = block.index("  onAllObjectivesComplete:")
@@ -213,37 +236,37 @@ def rebuild_objectives(scene, controller, bag_pickup):
 
     entries = re.split(r"^(?=  - word: )", body, flags=re.M)
     entries = [e for e in entries if e.strip()]
+    by_word = {re.search(r"^  - word: (.*)$", e, re.M).group(1).strip(): e
+               for e in entries}
 
-    kept, dropped = [], []
+    out, order = [], []
     for e in entries:
         word = re.search(r"^  - word: (.*)$", e, re.M).group(1).strip()
-        if word in DROP_WORDS:
-            dropped.append(word)
-            continue
+        if word in BAG_WORDS:
+            continue                      # rebuilt below, in a fixed order
+        out.append(e)
+        order.append(word)
 
-        # Every objective gains an onShown; only the bag puts anything in it.
-        shown = [dict(target=bag_pickup, type="BagPickup", method="Appear")] \
-            if word == "Bag" else []
-
-        if word == "Bag":
-            correct = [dict(target=bag_pickup, type="BagPickup", method="Arm")]
-            corr_text = event("onCorrect", correct)
+    for word in ("Bag", "Kunin"):
+        prompt = scene.by_name(PROMPT_OF[word])
+        head = by_word.get(word)
+        if head is not None:
+            head = head[:head.index("    onShown:")] if "    onShown:" in head \
+                else head[:head.index("    onCorrect:")]
         else:
-            # Left exactly as it was - these words are not this change's business.
-            corr_text = e[e.index("    onCorrect:"):]
+            head = OBJECTIVE_HEAD % dict(word=word, prompt=prompt)
 
-        # head is everything before onCorrect, which is where an onShown
-        # from a previous run sits. Cut it there and write a fresh one, or
-        # running this twice stacks two onShown blocks on the same objective
-        # and the bag appears twice.
-        head = e[:e.index("    onCorrect:")]
-        if "    onShown:" in head:
-            head = head[:head.index("    onShown:")]
-        kept.append(head + event("onShown", shown) + corr_text)
+        # Both words put the bag out, so whichever one the scene resumes on
+        # has it there. Appear() is safe to call twice.
+        shown = [dict(target=targets["pickup"], type="BagPickup", method="Appear")]
+        correct = [dict(target=targets[key], type=typ, method=meth)
+                   for typ, meth, key in BAG_WORDS[word]]
+        out.append(head + event("onShown", shown) + event("onCorrect", correct))
+        order.append(word)
 
     scene.block[controller] = (block[:start] + "  objectives:\n"
-                               + "".join(kept) + block[end:])
-    return [re.search(r"^  - word: (.*)$", k, re.M).group(1).strip() for k in kept], dropped
+                               + "".join(out) + block[end:])
+    return order
 
 
 def main():
@@ -261,8 +284,8 @@ def main():
     player_go = scene.by_name("player_character")
     player = component_of(scene, player_go, "Assembly-CSharp::PlayerMovement")
 
-    prompt_go = scene.by_name("Prompt_Bag")
-    prompt_rect = scene.component(prompt_go, "!u!224 ")
+    prompt_rects = [scene.component(scene.by_name(n), "!u!224 ")
+                    for n in ("Prompt_Bag", "Prompt_Kunin")]
 
     canvas_go = scene.by_name("UI_WordPrompts_Canvas")
     controller = component_of(scene, canvas_go, "Assembly-CSharp::SceneObjectiveController")
@@ -272,15 +295,16 @@ def main():
         scene.set(fid, r"^  m_LocalPosition: \{.*\}$",
                   "  m_LocalPosition: {x: %s, y: %s, z: 0}" % (num(BAG_X), num(BAG_Y)),
                   label + " position")
-    scene.set(prompt_rect, r"^  m_AnchoredPosition: \{.*\}$",
-              "  m_AnchoredPosition: {x: %s, y: %s}"
-              % (num(BAG_X * 100.0), num((FLOOR_Y + BAG_H) * 100.0 + PROMPT_LIFT)),
-              "Prompt_Bag position")
+    for rect in prompt_rects:
+        scene.set(rect, r"^  m_AnchoredPosition: \{.*\}$",
+                  "  m_AnchoredPosition: {x: %s, y: %s}"
+                  % (num(BAG_X * 100.0), num((FLOOR_Y + BAG_H) * 100.0 + PROMPT_LIFT)),
+                  "bag badge position")
     # Off in the saved scene as well, not only once Awake has run: the bag
     # belongs to the last word, and a backpack standing in the room through
     # the first three is a thing to say "Bag" at before being asked.
     scene.set(bag_go, r"^  m_IsActive: \d$", "  m_IsActive: 0", "Prop_Bag hidden")
-    print("  Prop_Bag, its gleam and its badge moved to x %s, and hidden at start"
+    print("  Prop_Bag, its gleam and both badges moved to x %s, hidden at start"
           % num(BAG_X))
 
     # --- something to tap ---
@@ -323,11 +347,11 @@ def main():
         print("  BagPickup object added and wired")
 
     # --- the words ---
-    kept, dropped = rebuild_objectives(scene, controller, bag_pickup)
+    order = rebuild_objectives(scene, controller,
+                               dict(pickup=bag_pickup, gleam=gleam))
     scene.set(controller, r"^  maxActionWait: .*$",
               "  maxActionWait: %d" % MAX_ACTION_WAIT, "maxActionWait")
-    print("  words now: %s%s" % (", ".join(kept),
-                                 "   (dropped %s)" % ", ".join(dropped) if dropped else ""))
+    print("  words now: %s" % ", ".join(order))
 
     io.open(SCENE, "w", encoding="utf-8").write(scene.text())
     print("  wrote %s" % SCENE)

@@ -20,13 +20,18 @@ using UnityEngine.Events;
 ///   Appear()            the bag is put on the floor beside Kylo. Wired to
 ///                       the objective's onShown, so it arrives WITH the
 ///                       word rather than sitting in the room all level.
-///   Arm()               wired to onCorrect. The bag gleams and becomes
-///                       tappable; nothing else has happened to it yet.
-///   StartBagPickup()    the player tapped it (or the wait ran out). This is
-///                       the one to call from a button, a test, or anything
-///                       else that should start the pickup.
+///   StartBagPickup()    begin the pickup now. This is what "Kunin" calls -
+///                       SAYING THE WORD IS THE INTERACTION. This is a game
+///                       played with your voice, so asking for a tap as well
+///                       would be asking the child to do the one thing the
+///                       game otherwise never asks of them.
 ///   OnBagGrabbed()      the hand reaches the bag. The bag goes, Kylo's art
 ///                       changes to the set with it on his back.
+///
+/// Arm() is the other shape, kept because it is sometimes the right one: it
+/// leaves the bag gleaming and tappable and waits for a tap (or for
+/// waitForTapSeconds to run out) before starting the same sequence. Nothing
+/// in Scene 4 wires it; "Kunin" does the job instead.
 ///
 /// THE ANIMATION DOES NOT EXIST YET, AND THIS DOES NOT WAIT FOR ONE THAT
 /// NEVER COMES. If an Animator is wired up AND it really has the trigger
@@ -115,6 +120,7 @@ public class BagPickup : MonoBehaviour
     private Camera eye;
     private float waited;
     private bool grabbed;
+    private Coroutine running;
 
     void Awake()
     {
@@ -137,8 +143,9 @@ public class BagPickup : MonoBehaviour
     }
 
     /// <summary>
-    /// The word has been said correctly. The bag gleams, becomes tappable,
-    /// and the scene is held here until it has been picked up.
+    /// Leaves the bag gleaming and tappable, and holds the scene until it has
+    /// been picked up. The alternative to StartBagPickup for anywhere a tap
+    /// is wanted; Scene 4 lets the word "Kunin" do it instead.
     /// </summary>
     public void Arm()
     {
@@ -156,15 +163,24 @@ public class BagPickup : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts the pickup. Called by a tap on the bag, by the wait running out,
-    /// or by anything else that should begin it - a button, a test, a later
-    /// cutscene. Does nothing unless the bag is armed and waiting.
+    /// Starts the pickup, armed or not. "Kunin" calls this straight, a tap
+    /// calls it after Arm(), and so can a button, a test or a later cutscene.
+    /// Calling it twice does nothing the second time.
     /// </summary>
     public void StartBagPickup()
     {
-        if (!IsWaitingForTap) return;
+        if (HasBeenTaken || running != null) return;
+
+        // Everything Arm() would have set up, for the case where nothing
+        // armed this first - saying the word goes straight here.
+        Appear();
+        if (!IsBusy)
+        {
+            IsBusy = true;
+            if (player != null) player.SetPosing(true);
+        }
         IsWaitingForTap = false;
-        StartCoroutine(Run());
+        running = StartCoroutine(Run());
     }
 
     /// <summary>
@@ -214,6 +230,7 @@ public class BagPickup : MonoBehaviour
         // Released last. Until this, SceneObjectiveController is still waiting.
         if (player != null) player.SetPosing(false);
         IsBusy = false;
+        running = null;
 
         onPickedUp?.Invoke();
     }

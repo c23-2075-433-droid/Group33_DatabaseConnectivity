@@ -3,6 +3,17 @@
 // One-click scene builder for Bahay Scene 4 ("Getting Dressed").
 // Teaches five words: Damit, Medyas, Sapatos, Bag, Kunin.
 //
+// The last two are the bag, in two beats: "Bag" names it and leaves it on
+// the floor gleaming, "Kunin" takes it and puts it on his back. Saying the
+// one word used to do both at once, which gave the child nothing to do with
+// the only object in the scene they are meant to act on. See BagPickup.cs.
+//
+// Salamin was in this builder for a while and is gone again. The bedroom has
+// no mirror painted in it, so the word had to land on Kylo himself with a
+// gleam - honest staging rather than finished - and it never reached the
+// saved scene, which has taught these five words all along. The two match
+// now, for the first time in a while.
+//
 // Reuses the bedroom, so it needs no new background. The bedroom's furniture
 // is painted INTO bedroom_background.png - bed, dresser, nightstand and door
 // are not separate objects - so everything the child names is a sprite laid
@@ -257,17 +268,6 @@ public class BuildBahayScene4
 
         // --- A gleam, played when the bag becomes tappable ---
         TimedOverlay gleamBag = CreateGleam("Gleam_Bag", propBag, 2.8f);
-        // "Salamin" has NOTHING OF ITS OWN TO POINT AT. This bedroom is drawn
-        // without a mirror - see the note at the top of this file - so the
-        // word lands on Kylo himself, which is at least who he is checking.
-        // It wants a mirror drawn into the room and the gleam moved onto it;
-        // until then this is the honest staging rather than the finished one.
-        TimedOverlay gleamSalamin = CreateGleam("Gleam_Salamin", playerGO, 3.4f);
-        // It lands ON Kylo, and CreateGleam leaves a gleam on the "Props"
-        // layer, which this project sorts BELOW "Player". Left there it would
-        // be drawn behind the boy it is pointing at.
-        gleamSalamin.overlay.sortingLayerName = "Player";
-        gleamSalamin.overlay.sortingOrder = 40;
 
         // --- Word prompts ---
         GameObject uiRoot = new GameObject("UI_WordPrompts_Canvas");
@@ -292,20 +292,18 @@ public class BuildBahayScene4
         // rather than at a height picked by eye, so the arrow underneath it
         // always has the same gap to point across. Over() does that sum.
         //
-        // ONLY THE THINGS HE HAS TO FIND GET AN ARROW. Damit, Medyas,
-        // Sapatos and Bag are objects in the room; Salamin is not - the room
-        // has no mirror, so that word lands on Kylo himself and there is
-        // nothing for an arrow to point at. An arrow on everything is an
-        // arrow nobody looks at.
+        // Every word here names something the child has to find, so every
+        // badge gets an arrow. Bag and Kunin share a position: they are the
+        // same object asked about twice, and only one badge is ever up.
         GameObject pDamit   = CreatePromptUI(uiRoot.transform, "Prompt_Damit",   "Damit",
                                              Over(BedDamitX, BedDamitY + BedDamitH / 2f), true);
         GameObject pMedyas  = CreatePromptUI(uiRoot.transform, "Prompt_Medyas",  "Medyas",
                                              Over(BedMedyasX, BedMedyasY + BedMedyasH / 2f), true);
         GameObject pSapatos = CreatePromptUI(uiRoot.transform, "Prompt_Sapatos", "Sapatos",
                                              Over(-2.0f, FloorY + 0.95f), true);
-        GameObject pSalamin = CreatePromptUI(uiRoot.transform, "Prompt_Salamin", "Salamin",
-                                             new Vector3(360, 60, 0), false);
         GameObject pBag     = CreatePromptUI(uiRoot.transform, "Prompt_Bag",     "Bag",
+                                             Over(BagX, FloorY + BagH), true);
+        GameObject pKunin   = CreatePromptUI(uiRoot.transform, "Prompt_Kunin",   "Kunin",
                                              Over(BagX, FloorY + BagH), true);
 
         // --- The bag's own little sequence ---
@@ -336,20 +334,26 @@ public class BuildBahayScene4
         var sapatos = MakeObjective("Sapatos", pSapatos);
         UnityEventTools.AddPersistentListener(sapatos.onCorrect, takeSapatos.PickUp);
 
-        // He checks himself before leaving.
-        var salamin = MakeObjective("Salamin", pSalamin);
-        UnityEventTools.AddPersistentListener(salamin.onCorrect, gleamSalamin.Play);
-
-        // "Bag" names the bag; picking it up is a separate beat. Saying the
-        // word used to make the bag vanish in the same instant, which gave
-        // the child nothing to watch and nothing to do - and it is the only
-        // object in this scene they are meant to DO something with. So the
-        // word arms the pickup, the bag stays on the floor and gleams, and
-        // BagPickup holds the scene until it has been taken. See that file;
-        // the pronunciation side of this is untouched.
+        // The bag, in two beats. "Bag" brings it out and names it - it gleams
+        // and stays on the floor. "Kunin" takes it: BagPickup runs the pickup
+        // and holds the scene until the bag is on his back. Saying the one
+        // word used to do both at once, which left the child nothing to do
+        // with the only object in the scene they are meant to act on.
+        //
+        // What they do between the two is SAY THE SECOND WORD. This is a game
+        // played with your voice, so asking for a tap as well would be asking
+        // for the one thing the game never otherwise asks for.
+        // BagPickup.Arm() is there for a tap; nothing here wires it.
+        //
+        // Both words put the bag out, because either can be the one the scene
+        // comes back to after a transition. Appear() is safe to call twice.
         var bag = MakeObjective("Bag", pBag);
         UnityEventTools.AddPersistentListener(bag.onShown, bagPickup.Appear);
-        UnityEventTools.AddPersistentListener(bag.onCorrect, bagPickup.Arm);
+        UnityEventTools.AddPersistentListener(bag.onCorrect, gleamBag.Play);
+
+        var kunin = MakeObjective("Kunin", pKunin);
+        UnityEventTools.AddPersistentListener(kunin.onShown, bagPickup.Appear);
+        UnityEventTools.AddPersistentListener(kunin.onCorrect, bagPickup.StartBagPickup);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
@@ -357,7 +361,7 @@ public class BuildBahayScene4
         // pickup - is what decides when the scene moves on, and the results
         // panel opens over a bag still sitting on the floor.
         controller.maxActionWait = 12f;
-        controller.objectives = new[] { damit, medyas, sapatos, salamin, bag };
+        controller.objectives = new[] { damit, medyas, sapatos, bag, kunin };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
