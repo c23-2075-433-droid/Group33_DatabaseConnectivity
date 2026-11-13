@@ -46,7 +46,14 @@ public class WalkIntoScene : MonoBehaviour
     public Sprite[] facingAwayFrames;
 
     [Tooltip("Runs once he arrives.")]
-    public UnityEvent onArrived;
+    // Initialised here, NOT left to Unity. A UnityEvent field on a component
+    // created with AddComponent is null until something deserialises it, and
+    // UnityEventTools.AddPersistentListener dereferences it without checking -
+    // so a builder wiring this to a brand-new component throws a
+    // NullReferenceException and takes the whole build down with it, leaving
+    // an unsaved half-built scene behind. Invoking is null-safe here, which is
+    // exactly why this stayed hidden until the first builder wired it.
+    public UnityEvent onArrived = new UnityEvent();
 
     private bool moving;
 
@@ -78,6 +85,26 @@ public class WalkIntoScene : MonoBehaviour
             body.bodyType = RigidbodyType2D.Kinematic;
         }
         player.enabled = false;
+
+        // Stand the BREATHING down too, which is not optional.
+        //
+        // IdleBreath writes localPosition and localScale in LateUpdate -
+        // after this coroutine has written them - so while it runs it simply
+        // undoes this move, every frame. Its own guard does not catch this
+        // move: it watches PlayerMovement.IsActionPlaying and the
+        // Rigidbody2D's velocity, and neither says anything here, because the
+        // body was made kinematic and stopped two lines above.
+        //
+        // Measured in Paaralan Scene 1 before this line existed: Kylo cycled
+        // through the whole back-view walk and never moved or shrank, pinned
+        // at the spot "Lakad" left him, so "Pasok" and "Takbo" read as
+        // running on the spot OUTSIDE the gate rather than going through it.
+        //
+        // Switching it back on at the end re-anchors it - see its OnEnable -
+        // so he breathes at the size and place he arrives at rather than
+        // snapping back to where he started.
+        IdleBreath breath = player.GetComponent<IdleBreath>();
+        if (breath != null) breath.enabled = false;
 
         SpriteRenderer sr = player.GetComponent<SpriteRenderer>();
         Transform t = player.transform;
@@ -136,6 +163,9 @@ public class WalkIntoScene : MonoBehaviour
             if (away) { if (frames[0] != null) sr.sprite = frames[0]; }
             else if (player.standingSprite != null) sr.sprite = player.standingSprite;
         }
+
+        // Breathing resumes where he stopped, re-anchored by OnEnable.
+        if (breath != null) breath.enabled = true;
 
         moving = false;
         onArrived?.Invoke();

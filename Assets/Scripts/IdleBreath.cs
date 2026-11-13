@@ -52,12 +52,26 @@ public class IdleBreath : MonoBehaviour
     private void Awake()
     {
         if (player == null) player = GetComponent<PlayerMovement>();
-        baseScale = transform.localScale;
-        basePosition = transform.localPosition;
 
         // Start part-way in, so several characters in one scene are not all
         // inhaling on the same beat.
         phase = Random.value * Mathf.PI * 2f;
+    }
+
+    /// <summary>
+    /// Anchor the breath to wherever the figure is NOW.
+    ///
+    /// Deliberately OnEnable rather than Awake, so that switching this
+    /// component off and on again re-anchors it. WalkIntoScene relies on
+    /// that: it both moves him and SHRINKS him, and the only way to stop
+    /// this one undoing the move every LateUpdate is to switch it off for
+    /// the duration. Anchored in Awake, it would snap him back to where he
+    /// stood when the scene opened the moment it came back on.
+    /// </summary>
+    private void OnEnable()
+    {
+        baseScale = transform.localScale;
+        basePosition = transform.localPosition;
     }
 
     private void LateUpdate()

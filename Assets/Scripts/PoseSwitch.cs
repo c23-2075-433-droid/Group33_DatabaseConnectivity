@@ -26,7 +26,14 @@ public class PoseSwitch : MonoBehaviour
     public Sprite[] walkFrames;
 
     [Tooltip("Runs after the pose changes, for a sound or a follow-on action.")]
-    public UnityEvent onApplied;
+    // Initialised here, NOT left to Unity. A UnityEvent field on a component
+    // created with AddComponent is null until something deserialises it, and
+    // UnityEventTools.AddPersistentListener dereferences it without checking -
+    // so a builder wiring this to a brand-new component throws a
+    // NullReferenceException and takes the whole build down with it, leaving
+    // an unsaved half-built scene behind. Invoking is null-safe here, which is
+    // exactly why this stayed hidden until the first builder wired it.
+    public UnityEvent onApplied = new UnityEvent();
 
     /// <summary>
     /// Switches the player to this pose. Safe to call repeatedly - setting the

@@ -42,7 +42,14 @@ public class PickUpItem : MonoBehaviour
 
     [Header("Events")]
     [Tooltip("Runs after the item has been taken, for a sound, a line from Teacher Rachel, or anything else.")]
-    public UnityEvent onPickedUp;
+    // Initialised here, NOT left to Unity. A UnityEvent field on a component
+    // created with AddComponent is null until something deserialises it, and
+    // UnityEventTools.AddPersistentListener dereferences it without checking -
+    // so a builder wiring this to a brand-new component throws a
+    // NullReferenceException and takes the whole build down with it, leaving
+    // an unsaved half-built scene behind. Invoking is null-safe here, which is
+    // exactly why this stayed hidden until the first builder wired it.
+    public UnityEvent onPickedUp = new UnityEvent();
 
     // Saying the word twice must not double-fire the event or switch an
     // already-hidden prop back on.
