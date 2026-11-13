@@ -19,11 +19,14 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import (BaseDocTemplate, Frame, HRFlowable, KeepTogether,
-                                PageBreak, PageTemplate, Paragraph, Spacer, Table,
-                                TableStyle)
+from reportlab.pdfbase.pdfmetrics import stringWidth
+from reportlab.platypus import (BaseDocTemplate, Flowable, Frame, HRFlowable,
+                                KeepTogether, PageBreak, PageTemplate, Paragraph,
+                                Spacer, Table, TableStyle)
 
 INK = colors.HexColor("#1a1a1a")
+ACCENT = colors.HexColor("#2f6b70")
+ACCENT_BG = colors.HexColor("#f4f8f8")
 MUTED = colors.HexColor("#5a5a5a")
 RULE = colors.HexColor("#b9b9b9")
 HEAD_BG = colors.HexColor("#ececec")
@@ -41,7 +44,9 @@ FOLD = {"\u2192": "->", "\u2190": "<-", "\u2713": "x", "\u2022": "-",
         # Vertical flow diagrams and file trees. Without these, every arrow in a
         # process diagram and every branch of a directory listing renders as a
         # black box, which is how the Activity 8 report first came out.
-        "\u2193": "v", "\u2191": "^",
+        # A lone "v" on its own line reads as a stray letter, not an arrow -
+        # especially above a line that starts with a word. A bar reads as flow.
+        "\u2193": "|", "\u2191": "|",
         "\u2500": "-", "\u2502": "|", "\u251c": "+", "\u2514": "+",
         "\u252c": "+", "\u2534": "+", "\u253c": "+", "\u2510": "+",
         "\u250c": "+", "\u2518": "+"}
@@ -113,6 +118,92 @@ def styles():
                                leading=12.2, textColor=MUTED,
                                leftIndent=9, rightIndent=9)
     return s
+
+
+class Flowchart(Flowable):
+    """A vertical numbered flow diagram: boxes joined by downward arrows.
+
+    Written because the ASCII version reads badly on a page. An arrow has to
+    become a character, and every candidate is wrong: "v" on a line of its own
+    looks like a stray letter, and "|" is a connector with no direction. Drawn
+    as vector instead, so it is a real arrow - and being drawn here rather than
+    generated elsewhere, it picks up the report's own ink and rule colours, it
+    stays sharp at any zoom, and it is regenerated from the source text every
+    time the report is built, so the diagram cannot drift from the process it
+    documents.
+
+    Written in markdown as a fenced block tagged `flow`, one step per line.
+    """
+
+    FONT, SIZE, LEAD = "Helvetica", 9.3, 11.8
+    PAD_X, PAD_Y, GAP, NUM_W = 9, 6, 14, 22
+    MAX_W = 150 * mm
+
+    def __init__(self, steps, width):
+        Flowable.__init__(self)
+        self.steps = steps
+        self.width = width
+        self.box_w = min(width, self.MAX_W)
+        self._lines = [self._wrap(t) for t in steps]
+        self._heights = [len(l) * self.LEAD + 2 * self.PAD_Y for l in self._lines]
+
+    def _wrap(self, text):
+        avail = self.box_w - 2 * self.PAD_X - self.NUM_W
+        lines, cur = [], ""
+        for word in fold(text).split():
+            trial = (cur + " " + word).strip()
+            if not cur or stringWidth(trial, self.FONT, self.SIZE) <= avail:
+                cur = trial
+            else:
+                lines.append(cur)
+                cur = word
+        if cur:
+            lines.append(cur)
+        return lines or [""]
+
+    def wrap(self, availWidth, availHeight):
+        return self.width, (sum(self._heights)
+                            + self.GAP * (len(self.steps) - 1))
+
+    def draw(self):
+        c = self.canv
+        x = (self.width - self.box_w) / 2.0
+        y = self.wrap(0, 0)[1]
+        last = len(self.steps) - 1
+        for k, (lines, h) in enumerate(zip(self._lines, self._heights)):
+            top = y
+            y -= h
+            c.setStrokeColor(ACCENT)
+            c.setLineWidth(0.7)
+            c.setFillColor(ACCENT_BG)
+            c.roundRect(x, y, self.box_w, h, 3, stroke=1, fill=1)
+
+            base = top - self.PAD_Y - self.SIZE + 1.5
+            c.setFillColor(ACCENT)
+            c.setFont("Helvetica-Bold", self.SIZE)
+            c.drawRightString(x + self.PAD_X + self.NUM_W - 7, base, "%d." % (k + 1))
+
+            c.setFillColor(INK)
+            c.setFont(self.FONT, self.SIZE)
+            ty = base
+            for line in lines:
+                c.drawString(x + self.PAD_X + self.NUM_W, ty, line)
+                ty -= self.LEAD
+
+            if k < last:
+                cx = x + self.box_w / 2.0
+                head = y - self.GAP + 4.5
+                c.setStrokeColor(ACCENT)
+                c.setLineWidth(1.0)
+                c.line(cx, y, cx, head)
+                path = c.beginPath()
+                path.moveTo(cx - 3.2, head)
+                path.lineTo(cx + 3.2, head)
+                path.lineTo(cx, y - self.GAP)
+                path.close()
+                c.setFillColor(ACCENT)
+                c.drawPath(path, stroke=0, fill=1)
+            y -= self.GAP
 
 
 def make_table(rows, s):
@@ -191,12 +282,19 @@ def parse(md, s):
         stripped = line.strip()
 
         if stripped.startswith("```"):
+            lang = stripped[3:].strip().lower()
             i += 1
             buf = []
             while i < n and not lines[i].strip().startswith("```"):
                 buf.append(lines[i].rstrip())
                 i += 1
             i += 1
+            if lang == "flow":
+                steps = [l.strip() for l in buf if l.strip()]
+                out.append(Spacer(1, 7))
+                out.append(KeepTogether(Flowchart(steps, AVAIL)))
+                out.append(Spacer(1, 9))
+                continue
             text = "<br/>".join(
                 fold(l).replace("&", "&amp;").replace("<", "&lt;")
                 .replace(">", "&gt;").replace(" ", "&nbsp;") or "&nbsp;"
