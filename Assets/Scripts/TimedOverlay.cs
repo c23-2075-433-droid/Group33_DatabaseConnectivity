@@ -39,10 +39,18 @@ public class TimedOverlay : MonoBehaviour
              "pose change here and Kylo goes in dry and comes out in a " +
              "towel, instead of changing in plain sight and THEN having " +
              "water wash over him.")]
-    public UnityEvent onPeak;
+    // Both of these are constructed here rather than left to Unity, and
+    // that is not tidiness. A builder wires them with
+    // UnityEventTools.AddPersistentListener, which throws on a null event -
+    // and a throw inside a scene builder leaves a half-built, unsaved
+    // "Untitled" scene behind, which looks like the scene broke rather than
+    // like a missing initialiser. Every event the builders wire is
+    // initialised for the same reason: PoseSequence.onFinished,
+    // onFrameReached, SceneObjectiveController.onAllObjectivesComplete.
+    public UnityEvent onPeak = new UnityEvent();
 
     [Tooltip("Runs once the overlay has cleared.")]
-    public UnityEvent onFinished;
+    public UnityEvent onFinished = new UnityEvent();
 
     private Coroutine playing;
 
