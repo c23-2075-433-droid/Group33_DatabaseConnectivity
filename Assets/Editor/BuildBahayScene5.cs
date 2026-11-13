@@ -26,6 +26,11 @@
 // this kitchen, so washing could only ever be a gleam on Kylo himself. It is
 // still taught at recess in Paaralan Scene 4, where there is one.
 //
+// Washing hands has not left, though - only the asking has. Rachel says it in
+// the scene's first story line instead, so the child is told to wash before
+// eating without being made to earn a word for a sink that is not there. A
+// habit worth teaching does not have to be a spoken objective to be taught.
+//
 // This scene was in the design document from the start and was never built -
 // Level 1 ran Scene 1 -> 2 -> 3 -> 4 and then ended, so Kylo got dressed and
 // left for school without eating. Scene 6 ("Leaving for School") is still

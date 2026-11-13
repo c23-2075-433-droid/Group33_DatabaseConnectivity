@@ -267,7 +267,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: fe6dd5eb5f03d4fa8addd49cb7b57078, type: 3}
   - id: rachel_l1_s5_upo_story
-    text: Nanay is still in the kitchen, and Kylo's chair is empty and waiting.
+    text: Kylo has washed his hands, the way we always do before eating. His chair is waiting, and nothing is on the table yet.
     gloss: 
     clip: {fileID: 8300000, guid: 0cc4d6011b39e4366aa60ddf8145ece1, type: 3}
   - id: rachel_l1_s5_upo_ask
