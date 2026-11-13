@@ -43,24 +43,24 @@ does not add one.
 That shapes what a security review of it can honestly be. There is no account
 to break into. What there is, and what this review is about, is:
 
-```
-A phone in a classroom                A Supabase project
-+------------------------+            +--------------------------+
-| the save file          |            | leaderboard              |
-|  nickname              |            |  one row per player      |
-|  points, stars         |            |  readable by anyone      |
-|  words learned         |  --------> |  writable by nothing     |
-|  the submission token  |   4 values |                          |
-|                        |            | leaderboard_owner        |
-| everything a child     |            |  the hash of each token  |
-| is learning stays here |            |  readable by nobody      |
-+------------------------+            |                          |
-                                      | player_scores            |
-                                      |  one row per finished run |
-                                      |                          |
-                                      | submit-score function     |
-                                      |  the only writer          |
-                                      +--------------------------+
+```panels
+# A phone in a classroom
+The save file - players.json
+- nickname
+- points and stars
+- words learned, and how many tries each took
+- which scenes were played
+* the submission token
+# A Supabase project
+leaderboard
+- one row per player; anyone may read it, nothing may write it
+leaderboard_owner
+- the hash of each token; nobody may read it
+player_scores
+- one row per finished run
+submit-score function
+- the only thing that may write either table
+> four values
 ```
 
 The leaderboard was built with this in mind, and most of it held up under
@@ -151,27 +151,15 @@ identified by a UUID the device made up.
 
 The design treats that honestly:
 
-```
-First submission for a player id
-        |
-   registers it, no token needed
-        |
-   server generates a 32-byte token, returns it once
-        |
-   stores only SHA-256(token) in leaderboard_owner
-        |
-Every later submission for that id
-        |
-   must present the token
-        |
-   constant-time compare against the stored hash
-        |
-   +----------------+
-   | matches?       |
-   +----------------+
-    yes          no
-    |             |
-  update        403, and the row is untouched
+```flow
+The first submission for a player id registers it. No token is needed, because there is nothing yet to own.
+The server generates a 32-byte token and returns it once, in that reply and never again.
+It stores only SHA-256(token), in leaderboard_owner - a table the game's key cannot read.
+Every submission after that one has to present the token it was given.
+The function compares SHA-256 of what was sent against the stored hash, in constant time.
+? Do they match?
++ The row is updated, within the bounds the function enforces.
+- 403. The row is untouched, and the refusal is logged.
 ```
 
 So **the thing being authenticated is the installation, not the person.** A
@@ -734,16 +722,12 @@ deployed.
 This replaces nothing in `Docs/RELEASE_PROCESS.md`; it slots into it. The
 release loop established in Activity 8 now reads:
 
-```
-Develop on a branch
-      |
-Pull request -> review -> merge into main
-      |
-Security check        <- this checklist
-      |
-Decide the version number
-      |
-Build -> test the package on a device -> tag -> publish
+```flow
+Develop on a branch.
+Pull request, review, merge into main.
+Security check - the twelve lines below.
+Decide the version number.
+Build, test the package on a device, tag the source, publish.
 ```
 
 Two of the ten lines are commands rather than judgement, and that is
