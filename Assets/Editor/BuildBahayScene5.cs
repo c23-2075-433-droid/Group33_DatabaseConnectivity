@@ -68,6 +68,13 @@
 //   prop_kanin, prop_itlog, prop_kanin_empty, prop_itlog_empty, item_baso,
 //   fx_gleam, ui_arrow, ui_word_badge
 //
+// Sounds expected in Assets/Resources/Sfx/:
+//   eat_rice     2.90 s, made by Tools/make_eat_sfx.py
+//   drink_water  2.10 s, made by Tools/make_drink_sfx.py
+// Each one is exactly as long as the animation it plays over. The two are
+// paired in both directions: retime a PoseSequence here and the .wav has to
+// be regenerated, and vice versa.
+//
 // Run via: Tools > SALINLAHI > Build Bahay Scene 5
 
 using UnityEditor;
@@ -265,24 +272,36 @@ public class BuildBahayScene5
         eatFrames.target = seatSr;
         eatFrames.frames = new[] { LoadSpriteOptional("eat_bite_bahay") };
         // Chew, bite, chew, bite - the repeat IS the eating, which is what
-        // loopFrames is for. Two cycles at 4fps runs about a second and a
-        // half: the pace of a child taking a couple of mouthfuls rather
-        // than a flicker.
+        // loopFrames is for. Three cycles is three mouthfuls.
         eatFrames.loopFrames = new[]
         {
             LoadSpriteOptional("eat_chew_bahay"),
             LoadSpriteOptional("eat_bite_bahay"),
         };
-        eatFrames.loopCycles = 2;
+        eatFrames.loopCycles = 3;
         eatFrames.tailFrames = new[] { LoadSpriteOptional("eat_chew_bahay") };
         eatFrames.destinationSprite = LoadSpriteOptional("sitting_front_bahay");
-        eatFrames.framesPerSecond = 6f;
-        eatFrames.loopFramesPerSecond = 4f;
+        // These add up to the length of eat_rice.wav, the way Bahay Scene
+        // 3's brushing adds up to brush_teeth.wav:
+        //   lead-in  1 frame / 4 fps   = 0.25 s   the spoon comes up
+        //   loop     3 x 2   / 2.5 fps = 2.40 s   three mouthfuls
+        //   tail     1 frame / 4 fps   = 0.25 s   the last swallow
+        //                               = 2.90 s
+        // Change one and change the other, or he chews on in silence.
+        eatFrames.framesPerSecond = 4f;
+        eatFrames.loopFramesPerSecond = 2.5f;
         // The WORD drives this, not the object switching on - he is already
         // sitting by the time anyone says "Kain", so there is no enable to
         // hang it from, and tying it to the word is what keeps it from
         // running on a wrong answer.
         eatFrames.playOnEnable = false;
+
+        // Spoon on china, three soft mouthfuls and a small pleased hum.
+        // SoundEffects.Play is static and a UnityEvent cannot hold a
+        // persistent listener on a static method, so the scene needs a
+        // component that can - the same way Bahay Scene 3 does its bristles.
+        PlaySoundEffect eatSound = seatGO.AddComponent<PlaySoundEffect>();
+        eatSound.id = "eat_rice";
 
         // "Inom" is drinking, and until now the glass only lit up where it
         // stood - the note below says the cup is opaque, so there was
@@ -313,6 +332,10 @@ public class BuildBahayScene5
         // down, beside "Inom", because the glass itself does not exist yet
         // at this point in the build.
         drinkFrames.fireOnFrame = 0;
+
+        // Glass off the wood, two sips with a swallow each, glass back down.
+        PlaySoundEffect drinkSound = seatGO.AddComponent<PlaySoundEffect>();
+        drinkSound.id = "drink_water";
 
         // --- The table, drawn in front of him so he sits behind it ---
         GameObject table = new GameObject("Foreground_Table");
@@ -444,6 +467,7 @@ public class BuildBahayScene5
         // sequence does nothing, and the plates still have to empty.
         var kain = MakeObjective("Kain", pKain);
         UnityEventTools.AddPersistentListener(kain.onCorrect, eatFrames.Play);
+        UnityEventTools.AddPersistentListener(kain.onCorrect, eatSound.Play);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, propKanin.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, propItlog.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, emptyKanin.SetActive, true);
@@ -456,6 +480,7 @@ public class BuildBahayScene5
         var inom = MakeObjective("Inom", pInom);
         UnityEventTools.AddPersistentListener(inom.onCorrect, gleamBaso.Play);
         UnityEventTools.AddPersistentListener(inom.onCorrect, drinkFrames.Play);
+        UnityEventTools.AddPersistentListener(inom.onCorrect, drinkSound.Play);
 
         // The glass on the table has to leave it while he is holding one, or
         // there are two. This is the prop handoff fireOnFrame exists for,
