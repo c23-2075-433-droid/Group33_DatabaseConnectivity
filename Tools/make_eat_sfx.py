@@ -14,37 +14,45 @@ over, the same way brush_teeth.wav is 4.75 s because the brushing is:
 
 Change one and change the other, or he goes on chewing in silence.
 
-WHAT IT IS MADE OF, and what it is NOT made of.
+WHAT IT IS MADE OF, and the two things it has already not been.
 
-The first version of this built the chewing out of filtered noise, the way
-the brushing is built. That was wrong, and it is worth saying why: brushing
-IS noise - bristles scrubbing - but chewing is not. A mouth is a small
-resonant box opening and closing, and what you actually hear is a series of
-soft SMACKS, each one a brief resonance that dies almost at once. Noise in
-that band just sounds like static, which is what it sounded like.
+First it was filtered noise, the way the brushing is built. That was wrong:
+brushing IS noise - bristles scrubbing - but chewing is not, and noise in
+that band is just static. Then it was resonant smacks, which is what a real
+mouth does but came out dry and easy to miss.
 
-So the chewing here is made of transients, not texture:
+What it is now is a gentle "nom nom nom", which is asked for rather than
+deduced, and is the right answer for a children's game: it is legible as
+EATING in a way a realistic chew is not.
 
-  smack    a very short noise click through three damped resonators at
-           roughly 420, 980 and 1900 Hz - the mouth's own formants - each
-           decaying inside 50 ms. Two or three per mouthful, lightly
-           varied in pitch and spacing so the jaw does not sound like a
-           metronome.
+  nom      a voiced syllable, built the way the mouth builds one. "N" is
+           the lips closed and the sound coming down the nose, so it
+           starts dark - everything above about 900 Hz rolled off. The
+           vowel opens: the filter sweeps up and the second formant comes
+           in around 1100 Hz. Then "M" closes it again, back to dark. One
+           amplitude swell and one brightness swell, slightly out of step,
+           which is the whole trick.
+           Three of them, a little lower and a little softer each time, so
+           it is a child chewing rather than a loop.
   clink    the spoon against the china, once as he lifts it and once as
            each mouthful starts. Noise through a 2.5-7 kHz bandpass with a
            very fast decay, plus two faint partials so it rings like a
-           plate rather than clicking like a switch.
-  mmm      a hummed, contented note near the end: a 250 Hz fundamental
-           with a couple of harmonics, gliding down a tone, under a slow
-           swell. Quiet on purpose - see below.
+           plate rather than clicking like a switch. Kept well under the
+           voice, which is now the point of the effect.
+  mmm      the contented note at the end, unchanged.
 
-THE "MMM" IS KEPT SHORT AND SOFT, and that is deliberate rather than shy.
-make_brush_sfx.py keeps its whole effect above 1.6 kHz so the recogniser
-cannot mistake it for a child's voice. A hum cannot do that - it lives
-exactly where speech lives. What protects it instead is WHEN it plays, the
-argument SoundEffects.cs makes: Kylo only moves after a word has landed,
-while the controller holds the next one off and nothing is being scored.
-So it is allowed, but it is 0.45 s long and well down in the mix.
+GENTLE IS A LEVEL, NOT A SHAPE. Soft attacks, nothing above 2 kHz in the
+voiced part, and the whole thing mixed low enough to sit under Rachel.
+
+THE VOICED PARTS ARE A KNOWN RISK, taken with eyes open. make_brush_sfx.py
+keeps its whole effect above 1.6 kHz precisely so the recogniser cannot
+mistake it for a child's voice, and "nom nom nom" cannot do that - it lives
+exactly where speech lives, and there is now more of it than the old hum.
+What protects it is WHEN it plays, the argument SoundEffects.cs makes: Kylo
+only moves after a word has landed, while the controller holds the next one
+off and nothing is being scored. If a stray "nom" is ever heard as an
+answer, this is the first thing to look at, and dropping NOM_GAIN is the
+first thing to try.
 
 Writes Assets/Resources/Sfx/eat_rice.wav, where SoundEffects.Play finds it.
 
@@ -96,45 +104,34 @@ def clink(seed, length_s=0.16):
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
-def resonators(n, freqs, decays, gains):
-    """Sum of damped sines - a small resonant box rung once."""
-    t = np.arange(n) / RATE
-    out = np.zeros(n)
-    for f, d, g in zip(freqs, decays, gains):
-        out += g * np.sin(2 * np.pi * f * t) * np.exp(-t / d)
-    return out
+NOM_GAIN = 0.30        # the dial to turn down if the recogniser hears it
 
 
-def smack(seed, pitch=1.0):
-    """One soft chew: the mouth opening and closing, not a hiss of noise."""
-    rng = np.random.default_rng(seed)
-    n = int(0.09 * RATE)
-    # A two-millisecond click to excite the resonances, then the box rings.
-    click = np.zeros(n)
-    k = int(0.002 * RATE)
-    click[:k] = rng.normal(size=k)
-    body = resonators(n,
-                      [420 * pitch, 980 * pitch, 1900 * pitch],
-                      [0.030, 0.018, 0.009],
-                      [1.0, 0.55, 0.25])
-    out = body + 0.35 * bandpass(click, 200.0, 2600.0)
-    out *= np.exp(-np.arange(n) / (RATE * 0.045))
-    return out / max(float(np.max(np.abs(out))), 1e-9)
-
-
-def mouthful(seed, length_s):
-    """Two or three smacks, unevenly spaced, inside one mouthful."""
+def nom(seed, f0=250.0, length_s=0.26):
+    """One gentle "nom": nose, vowel, nose - dark, open, dark again."""
     rng = np.random.default_rng(seed)
     n = int(length_s * RATE)
-    out = np.zeros(n)
-    count = 3 if rng.random() < 0.6 else 2
-    for j in range(count):
-        at = (0.04 + j * (0.62 / count) + rng.uniform(-0.02, 0.02)) * length_s
-        piece = smack(seed * 17 + j, pitch=float(rng.uniform(0.88, 1.14)))
-        start = int(at * RATE)
-        end = min(n, start + len(piece))
-        if end > start:
-            out[start:end] += float(rng.uniform(0.75, 1.0)) * piece[:end - start]
+    t = np.arange(n) / RATE
+    frac = np.linspace(0.0, 1.0, n)
+
+    # A voiced buzz with a little natural drift, falling slightly.
+    f = f0 * (1.0 - 0.07 * frac) * (1.0 + 0.004 * np.sin(2 * np.pi * 5.5 * t))
+    phase = 2 * np.pi * np.cumsum(f) / RATE
+    buzz = (np.sin(phase) + 0.38 * np.sin(2 * phase)
+            + 0.16 * np.sin(3 * phase) + 0.07 * np.sin(4 * phase))
+
+    # "N" and "M" are the same gesture: lips shut, sound down the nose, so
+    # nothing bright gets out. The vowel in the middle opens up. Crossfade a
+    # dark copy with a brighter one rather than sweeping a filter in slices.
+    dark = bandpass(buzz, 90.0, 900.0)
+    open_ = bandpass(buzz, 90.0, 2000.0)
+    openness = np.sin(np.pi * frac) ** 2          # shut, open, shut
+    body = dark * (1.0 - openness) + open_ * openness
+
+    # Amplitude swells a touch LATER than the mouth opens, which is what
+    # stops it sounding like a note and starts it sounding like a syllable.
+    env = np.sin(np.pi * np.clip(frac * 1.08 - 0.04, 0.0, 1.0)) ** 1.25
+    out = body * env * float(rng.uniform(0.92, 1.0))
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
@@ -161,16 +158,17 @@ def main():
     # He lifts the spoon off the plate.
     add(y, 0.02, clink(1), 0.38)
 
-    # Three mouthfuls across the looping part of the animation.
+    # Three mouthfuls across the looping part of the animation. Each nom
+    # sits a little lower and a little quieter than the one before.
     step = LOOP / BITES
     for i in range(BITES):
         at = LEAD + i * step
-        add(y, at, clink(10 + i, 0.13), 0.22)        # spoon meets the plate
-        add(y, at + 0.10, mouthful(20 + i, step * 0.72), 0.34)
+        add(y, at, clink(10 + i, 0.13), 0.16)        # spoon meets the plate
+        add(y, at + 0.12, nom(20 + i, f0=250.0 - 11.0 * i),
+            NOM_GAIN - 0.03 * i)
 
-    # The last swallow, and a small pleased hum over the tail.
-    add(y, LEAD + LOOP - 0.10, smack(40, 0.92), 0.26)
-    add(y, TOTAL - 0.52, mmm(), 0.20)
+    # The contented hum over the tail.
+    add(y, TOTAL - 0.52, mmm(), 0.18)
 
     y = np.tanh(1.2 * y) / np.tanh(1.2)
     y *= 0.72 / max(float(np.max(np.abs(y))), 1e-9)
@@ -183,7 +181,7 @@ def main():
         w.setsampwidth(2)
         w.setframerate(RATE)
         w.writeframes(s.tobytes())
-    print('%s  %.2f s, %d mouthfuls of resonant smacks'
+    print('%s  %.2f s, %d gentle noms'
           % (path, len(s) / float(RATE), BITES))
 
 
