@@ -43,11 +43,18 @@ pronunciation, and advances the story when the word is said correctly.
 | **Paaralan** (school) | Paaralan, Klasrum, Aralin, Recess, Uwian |
 | **Parke** (park) | Parke, Palaruan, Kaibigan, Piknik, Uwi |
 
-**49 distinct Filipino words** are taught across **66 spoken objectives** —
+**53 distinct Filipino words** are taught across **72 spoken objectives** —
 among them Bangon, Tayo, Lakad, Kaliwa, Kanan, Bukas, Ilaw, Tuwalya, Sabon,
 Maligo, Sipilyo, Suklay, Damit, Medyas, Sapatos, Kunin, Kain, Inom, Bati,
 Pasok, Takbo, Lapis, Aklat, Basa, Sulat, Sagot, Akyat, Dausdos, Sakay, Ngiti,
-Salamat and Paalam. Each word drives one action.
+Salamat and Paalam. Each word drives one action. The remaining 19 objectives
+re-ask a word met in an earlier scene, which is the spaced repetition: Lakad
+is learned in the bedroom and asked for again at the park a whole chapter
+later.
+
+Those three numbers have been wrong in this file twice. They are read off the
+fifteen scene files rather than counted by hand — `python3
+Tools/completeness_report.py` prints them, and is the thing to trust.
 
 Pronunciation is judged by Filipino phonology rather than letter-edit distance,
 so a wrong vowel is rejected — saying *kaha* for **Kuha** counts as wrong, on
@@ -432,10 +439,20 @@ than treating them as missing art.
 
 As released in v0.1.0. The release notes carry the same list in tester's terms.
 
+- **Wrong pronunciation is still accepted on a device.** The most serious one,
+  and it touches the game's whole point. The checker rejects a wrong vowel in
+  its own tests, but the v0.1.0 device test found a mispronounced word still
+  passing in play. The likely cause is that Android's Filipino dictation
+  service returns the nearest real Filipino word rather than the sounds the
+  child made, so the checker is handed an already-corrected string and never
+  sees the mistake — which is the limitation Bhardwaj et al. (2022) and
+  Santiago et al. (2025) describe for children's speech. If that is confirmed
+  it cannot be fixed inside the checker. The game still teaches and prompts
+  every word; it does not yet reliably correct pronunciation.
 - **The Palengke (market) level is not built**, nor is a sixth Bahay scene,
   "Leaving for School" — its slot and its two narrator lines exist, the scene
   does not. Both are shown locked on the map.
-- **20 of the 443 narrator lines are unrecorded**, and 15 of them are the lines
+- **35 of the 436 narrator lines are unrecorded**, and 15 of them are the lines
   heard most often: the three framing lines ("Sabihin", "Ngayon", "Ulitin"),
   the listening cue, two hints, the idle nudge, the mic-blocked line, and the
   correct / incorrect / not-heard replies. A missing clip is not an error —
@@ -445,8 +462,9 @@ As released in v0.1.0. The release notes carry the same list in tester's terms.
   is allowed to speak.
 - **The MINI GAME button does nothing.** It is drawn on the menu and
   deliberately inert.
-- **Teacher Rachel's portrait is unassigned** (`UITheme.rachelPortrait`), so
-  her captions appear without her picture.
+- **12 words are still taught by caption rather than by voice**: Alok, Apir,
+  Hugas, Kinig, Ligpit, Linis, Padyak, Pagkain, Salamin, Sali, Suot, Tapon.
+  This one matters more than the count suggests — the players are pre-readers.
 - Word badges sit low on screen in Paaralan 2, Paaralan 5 and Parke 4.
 - **Nothing works offline.** Recognition is a network service
   (`preferOfflineRecognition: false`) and the leaderboard is hosted.

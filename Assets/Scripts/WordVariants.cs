@@ -31,6 +31,16 @@ using System.Collections.Generic;
 ///      where the child actually said the word right.
 ///   4. Add those exact strings here.
 ///
+/// EVERY TAUGHT WORD NEEDS A ROW, EVEN AN UNINTERESTING ONE
+///
+/// PronunciationChecker builds its set of taught forms from the KEYS of this
+/// table, and that set is what the split-fragment guard consults - the rule
+/// that stops the "kain" inside "pag kain" answering Kain. So a word with no
+/// row here is missing twice over: it gets no curated mistranscriptions, and
+/// it is invisible to the guard. Hugas, Kinig, Ligpit and Tapon were all in
+/// that position - asked for in Recess, Klasrum and Uwian, and absent from
+/// here - which is not something the game would ever have reported.
+///
 /// THE ONE RULE WHEN ADDING AN ENTRY
 ///
 /// A variant must never be another taught word. If "kanen" were listed under
@@ -81,6 +91,10 @@ public static class WordVariants
         { "Pasok",   new[] { "pa sok", "pasock", "pasuk" } },
         { "Takbo",   new[] { "tak bo", "tagbo", "takbu" } },
         { "Upo",     new[] { "oppo", "u po", "oh po", "upu" } },
+        // Kinig is the listening word of the classroom. "Makinig" is accepted
+        // outright: a child told to listen is at least as likely to say the
+        // whole word as the stem the badge shows.
+        { "Kinig",   new[] { "ki nig", "makinig", "kinik", "king" } },
         { "Kuha",    new[] { "kua", "koha", "cooha", "ku ha" } },
         { "Lapis",   new[] { "lapiz", "la pis", "lappis" } },
         { "Aklat",   new[] { "ak lat", "aclat", "oclat" } },
@@ -91,9 +105,14 @@ public static class WordVariants
         { "Tingin",  new[] { "ti ngin", "tingen", "tingnan" } },
         { "Linis",   new[] { "lines", "li nis", "lenis" } },
         { "Kunin",   new[] { "ku nin", "cumin", "coonin" } },
+        // Ligpit is six canonical letters, one short of the consonant-slip
+        // threshold, so a garbled g has to be listed rather than tolerated.
+        { "Ligpit",  new[] { "lig pit", "lickpit", "ligpet" } },
         { "Kaliwa",  new[] { "ka liwa", "caliwa", "kaleewa" } },
         { "Kanan",   new[] { "ka nan", "canon", "kanann" } },
+        { "Hugas",   new[] { "hu gas", "ugas", "who gas" } },
         { "Labas",   new[] { "la bas", "lavas", "la vas" } },
+        { "Tapon",   new[] { "ta pon", "tap on", "tapong" } },
         { "Uwi",     new[] { "u wi", "oowi", "ui" } },
 
         // --- Parke and friends: playing, feelings, being kind ---

@@ -49,10 +49,12 @@ using System.Text.RegularExpressions;
 ///      "Kain". Pagkain and Kain are asked one after the other in the
 ///      breakfast scene, which is where this would otherwise be felt.
 ///
-/// Folding all 51 taught words this way leaves 51 DISTINCT canonical forms, so
+/// Folding all 53 taught words this way leaves 53 DISTINCT canonical forms, so
 /// exact matching can never make two taught words ambiguous. The editor tool
 /// Tools > SALINLAHI > Check Pronunciation Matching proves that every time it
-/// runs, by testing all 51x50 cross pairs.
+/// runs, by testing all 53x52 cross pairs. The count is the one the fifteen
+/// built scenes ask for, so it moves when the word list does - re-read it off
+/// the scenes (Tools/completeness_report.py) rather than trusting this line.
 ///
 /// The one remaining piece of fuzziness is deliberate and narrow: on a word of
 /// 7+ canonical letters, ONE consonant may be garbled, as long as every vowel
