@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SALINLAHI — Defense Reviewer</title>
+<style>
+@page { size: A4; margin: 14mm 13mm 16mm 13mm; }
+
+:root{
+  --ink:#16181d; --mid:#4a4f5a; --faint:#878d99;
+  --rule:#d4d8e0; --rule2:#e8ebf0;
+  --accent:#1f4e7a; --warn:#9a3412; --good:#166534;
+  --wash:#f4f6f9; --warnwash:#fdf3ee; --goodwash:#f0f7f1;
+}
+*{ box-sizing:border-box; }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  font-family:"Charter","Georgia","Times New Roman",serif;
+  font-size:9.1pt; line-height:1.42; color:var(--ink); margin:0;
+}
+.sans{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+code,.mono{ font-family:"SF Mono","Menlo",Consolas,monospace; font-size:.86em;
+  background:var(--wash); padding:.5px 3px; border-radius:2px; }
+
+h1{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:23pt;
+  letter-spacing:-.6px; margin:0 0 2px; font-weight:800; }
+h2{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:12.5pt;
+  margin:20px 0 7px; padding-bottom:4px; border-bottom:2px solid var(--ink);
+  font-weight:800; letter-spacing:-.25px; break-after:avoid; }
+h3{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:9.6pt;
+  margin:13px 0 5px; font-weight:700; color:var(--accent);
+  text-transform:uppercase; letter-spacing:.7px; break-after:avoid; }
+p{ margin:0 0 6px; }
+ul,ol{ margin:0 0 7px; padding-left:16px; }
+li{ margin-bottom:2.5px; }
+strong{ font-weight:700; }
+.break{ break-before:page; }
+.avoid{ break-inside:avoid; }
+
+/* ---- cover ---- */
+.cover{ border-bottom:3px solid var(--ink); padding-bottom:10px; margin-bottom:14px; }
+.kicker{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:7.6pt;
+  text-transform:uppercase; letter-spacing:2.4px; color:var(--faint); font-weight:700; }
+.sub{ font-size:10pt; color:var(--mid); margin-top:4px; font-style:italic; }
+
+/* ---- number strip ---- */
+.nums{ display:flex; flex-wrap:wrap; gap:0; border:1.5px solid var(--ink);
+  margin:0 0 12px; break-inside:avoid; }
+.nums div{ flex:1 1 11%; padding:7px 4px; text-align:center;
+  border-right:1px solid var(--rule); }
+.nums div:last-child{ border-right:0; }
+.nums b{ display:block; font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:16pt; font-weight:800; letter-spacing:-.5px; line-height:1.05; }
+.nums span{ font-size:6.8pt; text-transform:uppercase; letter-spacing:.5px;
+  color:var(--mid); font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+
+/* ---- boxes ---- */
+.box{ border:1px solid var(--rule); background:var(--wash);
+  padding:8px 10px; margin:0 0 10px; break-inside:avoid; }
+.box.warn{ border-left:4px solid var(--warn); background:var(--warnwash); }
+.box.good{ border-left:4px solid var(--good); background:var(--goodwash); }
+.box.key{ border:2px solid var(--ink); background:#fff; }
+.box h4{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:8.6pt;
+  margin:0 0 5px; text-transform:uppercase; letter-spacing:1px; font-weight:800; }
+.box.warn h4{ color:var(--warn); }
+.box.good h4{ color:var(--good); }
+
+/* ---- Q&A ---- */
+.qa{ break-inside:avoid; margin-bottom:8px; padding-bottom:7px;
+  border-bottom:1px dotted var(--rule); }
+.qa:last-child{ border-bottom:0; }
+.q{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-weight:700;
+  font-size:8.9pt; margin-bottom:3px; }
+.q .n{ display:inline-block; min-width:21px; color:var(--accent); font-weight:800; }
+.a{ padding-left:21px; }
+.a .lbl{ font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:6.8pt;
+  font-weight:800; letter-spacing:.9px; color:var(--faint); margin-right:4px; }
+.hard{ background:#fdf3ee; padding:6px 8px 7px; border-left:3px solid var(--warn); }
+.hard .q{ color:var(--warn); }
+
+/* ---- tables ---- */
+table{ border-collapse:collapse; width:100%; margin:0 0 10px; font-size:8.3pt;
+  break-inside:avoid; }
+th{ background:var(--ink); color:#fff; text-align:left; padding:4px 6px;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; font-size:7.4pt;
+  text-transform:uppercase; letter-spacing:.7px; font-weight:700; }
+td{ padding:4px 6px; border-bottom:1px solid var(--rule2); vertical-align:top; }
+tr:nth-child(even) td{ background:#fafbfc; }
+td.c{ text-align:center; }
+
+/* ---- two column ---- */
+.two{ display:flex; gap:12px; }
+.two > *{ flex:1; min-width:0; }
+
+/* ---- checklist ---- */
+.chk li{ list-style:none; margin-left:-14px; padding-left:16px; position:relative; }
+.chk li:before{ content:"☐"; position:absolute; left:0; font-size:10pt; color:var(--mid); }
+
+.say{ border-left:3px solid var(--accent); padding:4px 0 4px 9px; margin:5px 0 8px;
+  font-style:italic; color:#232833; break-inside:avoid; }
+.foot{ text-align:center; color:var(--faint); font-size:7.4pt; margin-top:16px;
+  border-top:1px solid var(--rule); padding-top:6px;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Pre-Final Defense · Capstone 2026 · Group 33 · IT33</div>
+  <h1>SALINLAHI — Defense Reviewer</h1>
+  <div class="sub">A Voice-Interactive Filipino Language Learning Game · Daquis · Lacida · Manzanero</div>
+  <div class="sub" style="font-style:normal;font-size:8pt;color:var(--faint);margin-top:5px;">
+    Every figure read out of the repository at commit <span class="mono">c037486</span>, 15 November 2026.
+    Where this disagrees with the paper, the build is right.
+  </div>
+</div>
+
+<div class="nums">
+  <div><b>15</b><span>scenes built</span></div>
+  <div><b>72</b><span>objectives</span></div>
+  <div><b>53</b><span>words</span></div>
+  <div><b>19</b><span>re-asks</span></div>
+  <div><b>401</b><span>of 436 VO lines</span></div>
+  <div><b>423</b><span>clips on disk</span></div>
+  <div><b>67</b><span>runtime scripts</span></div>
+  <div><b>351</b><span>commits</span></div>
+  <div><b>82%</b><span>complete</span></div>
+</div>
+
+<div class="box key">
+  <h4>The five sentences to have word-perfect</h4>
+  <ol style="margin-bottom:0;">
+    <li><strong>“Speaking is the controller, not the answer to a quiz.”</strong> — the thesis in one line.</li>
+    <li><strong>“‘Kaha’ was scored correct for ‘Kuha’.”</strong> — why scaled edit distance failed for Filipino.</li>
+    <li><strong>“53 taught words fold to 53 distinct canonical forms.”</strong> — why exact matching is safe, and an editor tool re-proves it.</li>
+    <li><strong>“The recognizer hands us an already-corrected word.”</strong> — the device limitation, said by you first.</li>
+    <li><strong>“Four values leave the device; the client cannot write the leaderboard.”</strong> — privacy and security in one breath.</li>
+  </ol>
+</div>
+
+<div class="box warn">
+  <h4>The one thing that can sink you — say it yourselves, in the demo</h4>
+  <p style="margin-bottom:5px;">Your v0.1.0 device test found that <strong>a mispronounced word is still accepted on a real phone.</strong>
+  The cause is almost certainly architectural: Android’s Filipino <em>dictation</em> service is a language model, so handed a child’s
+  approximate “ka-ha” it returns the nearest real Filipino word — possibly “kuha”. Your checker receives an already-corrected
+  string and never sees the error. No amount of strictness in your code can recover information the recognizer threw away.</p>
+  <p style="margin-bottom:0;"><strong>Frame it as a finding, not a bug.</strong> It is exactly what Bhardwaj et al. (2022) and
+  Santiago et al. (2025) predict — Santiago’s adult-Filipino model scored 39.70% WER on children’s speech, and their
+  recommendation is to embed a <em>fine-tuned</em> recognizer in an interactive platform. You are that platform, using a stock
+  recognizer, and you found the problem they predict. Stated by you it is research. Found by a panelist it is a hole.</p>
+</div>
+
+<h2>Part 1 · What to review, in priority order</h2>
+
+<table>
+<tr><th style="width:4%">#</th><th style="width:30%">Review this</th><th style="width:10%">Time</th><th>Because</th></tr>
+<tr><td class="c">1</td><td><strong>This sheet, Parts 3 and 4</strong></td><td>2 h</td><td><strong>45 of your 60 minutes are questions.</strong> The demo is the smaller half.</td></tr>
+<tr><td class="c">2</td><td><code>PronunciationChecker.cs</code></td><td>45 m</td><td>The technical heart. Read the class docstring — it names the bugs by example.</td></tr>
+<tr><td class="c">3</td><td><code>SceneObjectiveController.cs</code></td><td>30 m</td><td>The conductor. Know <code>SceneObjective</code>’s six fields by heart.</td></tr>
+<tr><td class="c">4</td><td><code>VoiceCommand.cs</code></td><td>30 m</td><td>The five events. Know which ones are scored and which are not.</td></tr>
+<tr><td class="c">5</td><td>Chapter 1 §1.3 and §1.4</td><td>20 m</td><td>Problems and objectives must be quotable, not paraphrased.</td></tr>
+<tr><td class="c">6</td><td><code>submit-score/index.ts</code></td><td>20 m</td><td>The whole security answer lives here.</td></tr>
+<tr><td class="c">7</td><td>v0.1.0 <code>RELEASE_NOTES.txt</code></td><td>15 m</td><td>Your own honest list of known issues. Know it better than they do.</td></tr>
+<tr><td class="c">8</td><td><code>RunScore.cs</code> + <code>LevelProgress.cs</code></td><td>15 m</td><td>Scoring and unlocking — easy marks if fluent, embarrassing if not.</td></tr>
+<tr><td class="c">9</td><td>Chapter 2 §2.5 (the gap)</td><td>15 m</td><td>Your contribution claim. One paragraph, must be memorised.</td></tr>
+<tr><td class="c">10</td><td><code>07_Paper_vs_Build.md</code></td><td>15 m</td><td>So no inconsistency surprises you.</td></tr>
+</table>
+
+<div class="box">
+<h4>Split the blocks between you</h4>
+<p style="margin-bottom:0;"><strong>Daquis</strong> → voice recognition, architecture, code.
+<strong>Lacida</strong> → UX, testing, evaluation, the demo itself.
+<strong>Manzanero</strong> → background, literature, data, limitations.
+<em>But everyone reads everything</em> — a panel will not politely ask the right person, and three people looking at each
+other is worse than one imperfect answer.</p>
+</div>
+
+<h2>Part 2 · Facts you must not get wrong</h2>
+
+<div class="two">
+<div>
+<h3>The stack</h3>
+<table>
+<tr><td><strong>Engine</strong></td><td>Unity 6000.6.2f1, built-in RP, 2D</td></tr>
+<tr><td><strong>Language</strong></td><td>C#</td></tr>
+<tr><td><strong>Speech</strong></td><td>UnitySpeechToText (yasirkula), Git-pinned to commit <span class="mono">27a99b18…</span></td></tr>
+<tr><td><strong>Locale</strong></td><td><code>fil-PH</code>, dictation model, online only</td></tr>
+<tr><td><strong>Platform</strong></td><td>Android 8.0 / API 26, ARM64</td></tr>
+<tr><td><strong>Package</strong></td><td><span class="mono">ph.edu.uphsl.group33.salinlahi</span></td></tr>
+<tr><td><strong>Database</strong></td><td>Supabase / PostgreSQL over PostgREST</td></tr>
+<tr><td><strong>HTTP</strong></td><td>Plain <code>UnityWebRequest</code> — no SDK</td></tr>
+<tr><td><strong>Server code</strong></td><td>Deno Edge Function <code>submit-score</code></td></tr>
+<tr><td><strong>Version</strong></td><td>v0.1.0, 12 Nov 2026 — a testing build</td></tr>
+</table>
+</div>
+<div>
+<h3>The content</h3>
+<table>
+<tr><td><strong>Bahay</strong></td><td>UmagaNa 3 · Banyo 5 · Maligo 5 · Damit 5 · Almusal 5</td></tr>
+<tr><td><strong>Paaralan</strong></td><td>Paaralan 5 · Klasrum 5 · Aralin 4 · Recess 5 · Uwian 5</td></tr>
+<tr><td><strong>Parke</strong></td><td>Parke 5 · Palaruan 5 · Kaibigan 5 · Piknik 5 · Uwi 5</td></tr>
+<tr><td><strong>Totals</strong></td><td>72 objectives, 53 distinct words, 19 re-asks</td></tr>
+<tr><td><strong>Unbuilt</strong></td><td>Bahay scene 6, “Leaving for School”</td></tr>
+<tr><td><strong>Points</strong></td><td>10 × words + up to 50 for accuracy</td></tr>
+<tr><td><strong>Stars</strong></td><td>3 at ≥95%, 2 at ≥70%, else 1 — accuracy only</td></tr>
+<tr><td><strong>Profiles</strong></td><td>3 per device, <span class="mono">players.json</span></td></tr>
+<tr><td><strong>Perf</strong></td><td>Board fetch 226.6 ms · judgement 5.64 µs / 682 B</td></tr>
+</table>
+</div>
+</div>
+
+<div class="box warn">
+<h4>Numbers that are wrong in your own documents</h4>
+<p style="margin-bottom:0;">The <strong>paper</strong> says 73 objectives. The <strong>release notes</strong> say 74 and 54 words.
+The README said 66 and 49 until this week. The build is <strong>72 / 53 / 19</strong>. If asked, say:
+<em>“Those were true when they were written; the build moved and the documents did not. The count is read off the fifteen
+scene files by <code>Tools/completeness_report.py</code> — I can run it now.”</em> That turns a weakness into a process answer.</p>
+</div>
+
+<h3>The pronunciation checker, in the order you should explain it</h3>
+<ol>
+<li><strong>Canonicalize both sides.</strong> Strip accents and punctuation → map Spanish-era spellings (<code>qu→k</code>, <code>ll→ly</code>, <code>x→ks</code>, then <code>c→k z→s f→p v→b j→h</code>) → fold <code>e→i</code> and <code>o→u</code> → fold the <code>uw/w</code> glide → collapse doubled letters.</li>
+<li><strong>Drop 21 filler words</strong> (<em>po, mo, na, ang, ay…</em>) — unless filler is all that was said.</li>
+<li><strong>Require an exact match</strong> of the whole phrase, any single token, or everything run together.</li>
+<li><strong>The fragment guard:</strong> a token is refused if the whole utterance run together is some <em>other</em> taught word. “pag kain” is <em>Pagkain</em> badly split, so the “kain” in it does not answer <em>Kain</em>.</li>
+<li><strong>The variants table:</strong> curated per-word mistranscriptions — “i love” for <em>Ilaw</em>, “lines” for <em>Linis</em>, “oppo” for <em>Upo</em>.</li>
+<li><strong>One consonant slip</strong>, only on canonical forms of <strong>7+ letters</strong>, and only if every vowel still lines up.</li>
+</ol>
+<p><strong>Why e/i and o/u fold but a/u does not:</strong> e/i and o/u genuinely alternate in Filipino — <em>babae/babai</em>,
+<em>noon/nuon</em> — and the recognizer returns either spelling. a/u never alternates. That single asymmetry is what makes
+“kaha” fail for <strong>Kuha</strong>, and it is the best thirty seconds of technical explanation you own.</p>
+
+<h2 class="break">Part 3 · The questions, with short answers</h2>
+<p style="color:var(--mid);font-size:8.4pt;margin-bottom:10px;">Shaded = the ones that can hurt. Answer in one or two
+sentences and <em>stop</em>; let them ask for more. The long version of every answer is in
+<code>Docs/Defense/04_Defense_Questions.md</code>.</p>
+
+<h3>A · Background, problem, objectives</h3>
+
+<div class="qa"><div class="q"><span class="n">1</span>What is SALINLAHI, in one sentence?</div>
+<div class="a">A voice-interactive Filipino vocabulary game for Kinder–Grade 3 where the child says a Filipino word out loud and that word is what makes the game move.</div></div>
+
+<div class="qa"><div class="q"><span class="n">2</span>What problem does it solve?</div>
+<div class="a">English-dominant Filipino children can recognise Filipino words but cannot produce them. Most apps let a child be right by tapping. We made saying it the only way forward.</div></div>
+
+<div class="qa"><div class="q"><span class="n">3</span>Your theoretical basis?</div>
+<div class="a">Swain’s Output Hypothesis (producing language deepens processing) → the mechanic. Krashen’s Input Hypothesis (meaning before use) → the teach line before the ask line. Plus digital game-based language learning.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">4</span>How is this different from Ibigkas! or Duolingo?</div>
+<div class="a">Ibigkas! is Filipino but drill-based and for Grades 4–6, and voice is not the control. Wizardly and Studycat are voice-controlled but English. Nobody has a Kinder–Grade 3 child speaking a Filipino word that performs the action. <span class="lbl">SHOW</span>Table 2.1.</div></div>
+
+<div class="qa"><div class="q"><span class="n">5</span>Who exactly are your users?</div>
+<div class="a">Children K–Grade 3, English-dominant at home, including pre-readers. Teachers and parents are stakeholders, not users.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">6</span>Have real children tested this?</div>
+<div class="a">Not yet as a formal evaluation — v0.1.0 was device-tested by the group, which is where we found the pronunciation issue. The pupil evaluation is Objective 5 and belongs to Chapter 4. <strong>Do not overclaim. Say the date and the school.</strong></div></div>
+
+<div class="qa"><div class="q"><span class="n">7</span>Why the name?</div>
+<div class="a">It means lineage. The vocabulary is the household Filipino that passes from a grandparent to a child in conversation, not from a classroom word list.</div></div>
+
+<div class="qa"><div class="q"><span class="n">8</span>Scope and delimitations?</div>
+<div class="a">Android only (forced by the plugin); three environments; a selected word set; vocabulary not grammar; supplementary not a replacement; and explicitly not usable by a child who cannot produce clear speech.</div></div>
+
+<h3>B · Architecture and implementation</h3>
+
+<div class="qa"><div class="q"><span class="n">9</span>Describe your architecture.</div>
+<div class="a">Four parts on the device — presentation, game logic, speech input, local data — plus a Supabase backend. They talk through C# events, so no part reaches into another’s internals.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">10</span>Walk me through what happens when a child says “Bangon”.</div>
+<div class="a">Recognizer returns text → <code>VoiceCommand.ProcessRecognizedText</code> → <code>PronunciationChecker.IsCorrect</code> → <code>OnAnswerChecked(true)</code> → <code>SceneObjectiveController</code> hides the prompt and invokes the objective’s <code>onCorrect</code> → <code>PlayerMovement.Bangon()</code> → <code>RunScoreCounter</code> counts it → Rachel says “Tama!” → the controller waits for the sit-up to finish before the next word. <strong>Name each as a file. This question proves you wrote it.</strong></div></div>
+
+<div class="qa"><div class="q"><span class="n">11</span>Why Unity 6 and C#?</div>
+<div class="a">2D sprite work, a mature Android pipeline, and the deciding factor — the speech plugin we needed is a Unity package binding to Android’s native recognizer.</div></div>
+
+<div class="qa"><div class="q"><span class="n">12</span>How do you add a word or a scene?</div>
+<div class="a">A word is a list entry, not code: <code>{word, variants, promptRoot, instructionClip, onShown, onCorrect}</code>. Fourteen of fifteen scenes are generated by editor builders, so the workflow is edit the builder, re-run, commit.</div></div>
+
+<div class="qa"><div class="q"><span class="n">13</span>Which design patterns?</div>
+<div class="a">Observer throughout. Singleton for <code>VoiceNarrator</code> (one mouth, so two lines never overlap). Static utilities for things that are data or pure functions. Strategy-by-data for objectives.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">14</span>Why is <code>WakeUpSequence.cs</code> 1,118 lines?</div>
+<div class="a">Scene 1 is the only scene with no builder, and it carries the bespoke opening — the snore, the sit-up, the stretch. <strong>Volunteer the refactor:</strong> split it into the pose sequence, the audio loop and the scene choreography. A known weakness with a plan reads as judgement; defended, it reads as denial.</div></div>
+
+<div class="qa"><div class="q"><span class="n">15</span>How do scripts communicate?</div>
+<div class="a">Five events on <code>VoiceCommand</code>, two on the objective controller, UnityEvents per objective. Nothing polls. <code>OnObjectiveCompleted</code> passes the <em>word</em> rather than letting listeners read the field, because that field is cleared synchronously — a real race we closed.</div></div>
+
+<div class="qa"><div class="q"><span class="n">16</span>What if a result arrives after the object is destroyed?</div>
+<div class="a">An <code>isShuttingDown</code> flag at the top of every recognizer callback, and <code>OnDestroy</code> cancels the queued restart. Unity’s <code>==</code> lies about destroyed objects, so a null check is not enough.</div></div>
+
+<div class="qa"><div class="q"><span class="n">17</span>How is the HUD built?</div>
+<div class="a">At run time from a <code>UITheme</code> ScriptableObject — because regenerated scenes would lose anything hand-placed, and one change updates fifteen scenes.</div></div>
+
+<h3>C · Voice recognition — the heart of it</h3>
+
+<div class="qa"><div class="q"><span class="n">18</span>How does the voice recognition work?</div>
+<div class="a">We don’t do recognition ourselves — we ask Android’s own service to listen in Filipino and give back text, then judge the text. Building a recognizer was never in scope; judging Filipino correctly was.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">19</span>Why not string matching or edit distance?</div>
+<div class="a">We did, and it was wrong for Filipino. The words are short and separated by one vowel, so one edit of slack accepts every vowel error — “kaha” passed for <strong>Kuha</strong>, “kanin” passed for <strong>Kain</strong>, and both are taught in the same scene. A game that teaches pronunciation cannot reward a wrong vowel.</div></div>
+
+<div class="qa"><div class="q"><span class="n">20</span>Walk me through the canonicalization.</div>
+<div class="a">The six folds in Part 2 above. Key detail: digraphs first, so <code>ll</code> is not eaten by the single-letter pass; and the concatenation test uses <em>unfiltered</em> tokens, so the filler list does not eat the “po” that is part of <strong>Upo</strong>.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">21</span>Prove two taught words cannot be confused.</div>
+<div class="a">All 53 fold to 53 <strong>distinct</strong> canonical forms, so exact matching cannot make two ambiguous — by construction. <strong>Tools &gt; SALINLAHI &gt; Check Pronunciation Matching</strong> re-proves it over every cross pair and refuses any variant equal to another taught word. <span class="lbl">SHOW</span>Run it live. Best 20 seconds you have.</div></div>
+
+<div class="qa"><div class="q"><span class="n">22</span>Then where is the tolerance?</div>
+<div class="a">Three narrow places: the variants table, the fragment handling, and one consonant slip on words of 7+ canonical letters where every vowel still matches. Below 7 letters a single consonant <em>is</em> the word.</div></div>
+
+<div class="qa"><div class="q"><span class="n">23</span>What is the fragment guard?</div>
+<div class="a">Before accepting a single token we check whether the whole utterance run together is another taught word. “pag kain” is <em>Pagkain</em> split, not an answer to <em>Kain</em>. Same guard stops “ka nin”/Kunin, “u wi”/Upo, “ti ngin”/Bati.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">24</span>How did you build the variants table?</div>
+<div class="a"><strong>Be honest:</strong> the entries are still mostly informed seeds. The pipeline is real — play with logging on, pull the CSV, read rows marked wrong where the child said it right, add those exact strings. <strong>Bringing one real CSV converts this from a weakness into a method.</strong></div></div>
+
+<div class="qa hard"><div class="q"><span class="n">25</span>Does it actually reject a mispronounced word on a phone?</div>
+<div class="a">See the box on page 1. In our tests yes, every time; on a device not reliably, and we know why — the dictation service returns the nearest real word, so we are handed an already-corrected string. It is the first known issue in v0.1.0, it is why v0.1.0 is a testing build, and it is what defines the next version. <strong>Say this in the demo before they ask.</strong></div></div>
+
+<div class="qa"><div class="q"><span class="n">26</span>Why not train your own model?</div>
+<div class="a">Out of scope for one year, and the Filipino children’s corpora are recent and mostly not redistributable. We made the game right and treated recognition as replaceable — <code>VoiceCommand</code> is the only script that knows the plugin exists. Swapping it touches one file.</div></div>
+
+<div class="qa"><div class="q"><span class="n">27</span>What if the child speaks while Rachel is talking?</div>
+<div class="a">Listening is suspended for the whole line — on a phone speaker the recognizer hears her perfectly and would score it as the child. A result arriving while suspended is discarded as our own <code>Cancel()</code>.</div></div>
+
+<h3>D · Gameplay, UX, pedagogy</h3>
+
+<div class="qa"><div class="q"><span class="n">28</span>Why no penalty or timer?</div>
+<div class="a">The user is four to eight and speaking a second language; timing them punishes exactly the behaviour we want. Grounded too: Zargham et al. (2022) found a voice game acting on its own makes things worse when it guesses wrong.</div></div>
+
+<div class="qa"><div class="q"><span class="n">29</span>How are stars and points calculated?</div>
+<div class="a">10 points per word plus up to 50 for accuracy. Stars on accuracy only: 3 at ≥95%, 2 at ≥70%, else 1. The best run per scene is kept, never the last.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">30</span>How does a non-reader play this?</div>
+<div class="a">Every instruction is a voice line plus a picture; on-screen text is a label for the adult. <strong>Then concede:</strong> twelve words are currently taught by caption only, and that matters precisely because the users are pre-readers. It is on the fix list.</div></div>
+
+<div class="qa"><div class="q"><span class="n">31</span>What happens after repeated failures?</div>
+<div class="a">A ladder. Two misses → Rachel says it again slowly, unasked — the most important accessibility behaviour, because a child who cannot reach the replay button still gets help. Four → she points at the button. Ten seconds of silence → encouragement; then a re-prompt every twenty.</div></div>
+
+<div class="qa"><div class="q"><span class="n">32</span>How do you hold attention across 72 objectives?</div>
+<div class="a">The vocabulary is a day, not a list — when the game asks for <em>Sipilyo</em> the child is standing at a sink holding one. Five words a scene, and 19 objectives re-ask an earlier word in a different room, so the child retrieves it from the word rather than the picture.</div></div>
+
+<div class="qa"><div class="q"><span class="n">33</span>Doesn’t repetition get boring?</div>
+<div class="a"><code>VocabularyMemory</code>: full explanation the first time, a one-line reminder after, within one sitting. Cleared on close, deliberately — a child returning days later should be taught properly, not reminded.</div></div>
+
+<div class="qa"><div class="q"><span class="n">34</span>Why is the narration in English?</div>
+<div class="a">The learners are English-dominant — that is the premise. The instruction is in the language they have; the word they must produce is Filipino. And the Filipino word clips were <strong>recorded by a group member</strong>, not generated, because Tagalog distinguishes by stress — <em>tayô</em> vs <em>táyo</em> — and TTS cannot know which is meant.</div></div>
+
+<div class="qa"><div class="q"><span class="n">35</span>What are the accent marks on some words?</div>
+<div class="a">Six of the 53 are minimal pairs the plain spelling cannot disambiguate. Those six carry marks <strong>on screen only</strong> — nothing reaches the matcher. Marking a word that doesn’t need it teaches a distinction that isn’t there.</div></div>
+
+<h3>E · Data and database</h3>
+
+<div class="qa"><div class="q"><span class="n">36</span>What is stored, and where?</div>
+<div class="a">Two things, two places, on purpose. The learning record — which words, which scenes, how many stars — stays on the phone. Four values go online: id, nickname, total points, total stars.</div></div>
+
+<div class="qa"><div class="q"><span class="n">37</span>Show me the save and retrieve code.</div>
+<div class="a"><code>SupabaseClient.SaveScore()</code> POSTs, <code>FetchRecentScores()</code> GETs, <code>SessionScoreTracker</code> decides when. We omit <code>player_id</code> and <code>created_at</code> so the database fills them — and the anon role has no grant on those columns, so a client could not choose its own id or backdate a row.</div></div>
+
+<div class="qa"><div class="q"><span class="n">38</span>Why Supabase?</div>
+<div class="a">Managed PostgreSQL with REST, Row Level Security, and Edge Functions — a real server-side check without running a server. And it works from Unity with no SDK.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">39</span>The API key ships inside the APK. How is that secure?</div>
+<div class="a">The key is public by design; what protects the data is what it is <em>allowed</em> to do. Three layers: Row Level Security (which rows), column grants (which columns — <code>select=*</code> is now refused by the database), and CHECK constraints (what a value may be). No update and no delete, by policy and by grant.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">40</span>What stops a child cheating the leaderboard?</div>
+<div class="a">The client cannot write it at all — it posts to an Edge Function holding the only key that may write. First submission registers the player and the server issues a 32-byte token; only its SHA-256 is stored; every later submission presents it, compared in constant time. <strong>Then concede first:</strong> the totals are still the client’s word — no server can replay a child speaking. What it does is refuse the absurd and bound what a forgery is worth.</div></div>
+
+<div class="qa"><div class="q"><span class="n">41</span>Your data privacy position?</div>
+<div class="a">Minimisation. No email, no birthdate, no account, no login. A nickname the child chooses, capped at 16 characters. Deleting a profile deliberately leaves the leaderboard row alone. <em>Gap to admit: no parental deletion path yet.</em></div></div>
+
+<div class="qa"><div class="q"><span class="n">42</span>What if the phone is offline?</div>
+<div class="a">Saving never blocks — the run is written to the device before the network is touched, and the leaderboard retries next time the menu opens. <strong>But concede the bigger one:</strong> the child cannot play at all offline, because recognition itself is a network service.</div></div>
+
+<h3>F · Testing, evaluation, methodology</h3>
+
+<div class="qa hard"><div class="q"><span class="n">43</span>How did you test this?</div>
+<div class="a">Four layers: compile verification outside Unity with warnings-as-errors; an editor self-check that re-proves no two taught words can collide; nine functional checks against the live backend, two of which must be <em>refused</em>; and device testing. <strong>Concede:</strong> there is no NUnit suite, and that is the gap.</div></div>
+
+<div class="qa"><div class="q"><span class="n">44</span>Your development methodology?</div>
+<div class="a">Iterative and incremental with version control as the backbone — 351 commits, feature branches to main, and a documented release process producing a numbered artifact tied to a commit. <strong>Say what you did, not a textbook name.</strong></div></div>
+
+<div class="qa hard"><div class="q"><span class="n">45</span>Why no pre-test / post-test?</div>
+<div class="a">A learning-gain design needs a control group, a longer intervention and a validated instrument. Claiming a gain we cannot support is worse than not claiming one — Muñoz et al. (2025) found a well-received game with no significant gain. <em>Note: Chapter 2’s IPO model still lists a post-test. Fix that before the defense.</em></div></div>
+
+<div class="qa"><div class="q"><span class="n">46</span>Your performance baseline?</div>
+<div class="a">Measured, not estimated: board fetch 226.6 ms median, of which 128.7 ms is connection setup; judgement 5.64 µs and 682 bytes per attempt. All re-runnable.</div></div>
+
+<div class="qa"><div class="q"><span class="n">47</span>Biggest technical challenges?</div>
+<div class="a">The matcher accepting wrong vowels (forced the rewrite). The recognizer hearing Rachel through the speaker (forced suspend/resume). The recognizer returning the nearest real word (still open). Bonus: the newer Supabase keys aren’t JWTs, so sending one as a bearer 401’d everything.</div></div>
+
+<h3>G · Limitations and future work</h3>
+
+<div class="qa"><div class="q"><span class="n">48</span>What are your limitations?</div>
+<div class="a">Lead with the device recognizer. Then: Android only; nothing offline; one of sixteen scenes unbuilt; fifteen of the most-heard lines unrecorded; twelve words caption-only; no mini game; and unusable by a child who cannot produce clear speech.</div></div>
+
+<div class="qa"><div class="q"><span class="n">49</span>What would six more months buy?</div>
+<div class="a">In order: a children’s-speech recognizer (what Santiago recommends, and the architecture is ready for it), the remaining recordings, Bahay scene 6, offline recognition, a mini game, and a proper pupil evaluation.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">50</span>Is this really 60% complete?</div>
+<div class="a">By our stated criteria it is 82%, weighted across eight dimensions, and I can recompute it in front of you — the script reads the repository rather than our memory. The weighting is a judgement; the arithmetic is not. <strong>Offer the criteria for challenge.</strong></div></div>
+
+<div class="qa hard"><div class="q"><span class="n">51</span>Why use this instead of a teacher?</div>
+<div class="a">It shouldn’t be, and we never claim it should. One teacher with forty pupils gives each child a few chances to say a word out loud. This gives one child a hundred chances in ten minutes, with nobody listening and nothing at stake. It is practice between lessons.</div></div>
+
+<div class="qa hard"><div class="q"><span class="n">52</span>What is the single weakest part of your system?</div>
+<div class="a">Pronunciation correction on a real device. Everything around it works and can be shown; the judgement itself is sound in our tests and unreliable in the field, and we know the mechanism. <strong>Answer this honestly — a rehearsed non-answer is worse than the weakness.</strong></div></div>
+
+<h2 class="break">Part 4 · What to defend, and how to phrase it</h2>
+
+<div class="box good">
+<h4>Design decisions that are strengths — claim them, do not apologise for them</h4>
+<table style="margin-bottom:0;">
+<tr><th style="width:26%">Looks like</th><th>Is actually</th></tr>
+<tr><td>No score penalty</td><td>A pedagogical choice grounded in Zargham (2022) and Getman (2023). Punishing a wrong attempt punishes the behaviour we want.</td></tr>
+<tr><td>Exact matching</td><td>The <em>stricter</em> and more accurate option. Fuzzy matching is what let “kaha” pass for Kuha.</td></tr>
+<tr><td>Android only</td><td>Forced by the mechanic — the plugin has no desktop implementation. A technical constraint, not a preference.</td></tr>
+<tr><td>MINI GAME does nothing</td><td>Deliberate. “A button that loads a stub screen would be a worse lie than one that sits still.”</td></tr>
+<tr><td>Only 4 values uploaded</td><td>Privacy by design. A child’s learning record never leaves the phone.</td></tr>
+<tr><td>Captions for pre-readers</td><td>For the supervising adult, for a muted phone, and for lines not yet recorded — and they can be switched off per mode.</td></tr>
+<tr><td>English narration</td><td>The learners are English-dominant. The Filipino word clips are human-recorded, because stress matters.</td></tr>
+<tr><td>Evaluation without learning gain</td><td>Scientific restraint, argued from Muñoz et al. (2025), not an easy way out.</td></tr>
+</table>
+</div>
+
+<div class="box warn">
+<h4>Weaknesses — concede fast, frame once, move on</h4>
+<ul style="margin-bottom:0;">
+<li><strong>Device pronunciation.</strong> “That is our first known issue, and here is the mechanism.” Then the Santiago citation. <em>Never</em> apologise twice.</li>
+<li><strong>No children have tested it yet.</strong> Give the date and the school. Do not improvise a number.</li>
+<li><strong>No unit test suite.</strong> “Our self-check proves the matching property and both assemblies compile with warnings-as-errors — but a proper suite is the gap.”</li>
+<li><strong>Variants are mostly seeded.</strong> “The pipeline is real and the next playtest feeds it.”</li>
+<li><strong>Documents disagree with the build.</strong> “True when written; the count comes from a script now.”</li>
+<li><strong>One Supabase project for test and release.</strong> “No staging database — a test play writes a real row. Known, and the fix is a second project.”</li>
+<li><strong>1,118-line script.</strong> Volunteer the refactor before they ask for it.</li>
+</ul>
+</div>
+
+<h3>Phrases that work</h3>
+<div class="say">“I don’t have that number in front of me — it’s in <em>[the file]</em>, and I can pull it up.” <strong>Never guess a number.</strong></div>
+<div class="say">“Yes — that’s in our known issues, and here’s why.” <strong>The best possible moment for a weakness they found.</strong></div>
+<div class="say">“We tried that first. Here is what went wrong, and here is what replaced it.” <strong>Turns a criticism into evidence of iteration.</strong></div>
+<div class="say">“That’s a judgement, and here are the criteria — disagree with the weights and I’ll recompute.” <strong>Invites challenge instead of defending.</strong></div>
+
+<h3>Phrases that lose marks</h3>
+<p><em>“It should work.” · “It works on my machine.” · “We ran out of time.” · “That’s just a minor bug.” ·
+“I’m not sure, maybe around fifty-something?” · “That’s the other member’s part.” ·
+Silence while three people look at each other.</em></p>
+
+<h2>Part 5 · The five-minute demo, in beats</h2>
+
+<table>
+<tr><th style="width:11%">Time</th><th style="width:22%">Beat</th><th>Say</th></tr>
+<tr><td><strong>0:00</strong></td><td>Frame it</td><td>“The child does not tap an answer — the child says the word, and saying the word is what makes the game move.”</td></tr>
+<tr><td><strong>0:30</strong></td><td>Menu → map → scene</td><td>Three places, fifteen scenes, each tile opens when the one before it is finished. Pick <strong>Umaga Na</strong> — three words fits the clock.</td></tr>
+<tr><td><strong>1:00</strong></td><td>Teaching, then “BANGON”</td><td>“Three lines every time: what’s happening, what the word means, what to say. The badge is faint — it is not the child’s turn until she finishes.”</td></tr>
+<tr><td><strong>2:00</strong></td><td><strong>A wrong word, on purpose</strong></td><td>“No penalty, no lives, no timer.” Miss twice → she repeats it slowly unasked. <strong>Then the honest paragraph about the recognizer.</strong></td></tr>
+<tr><td><strong>2:45</strong></td><td>“LAKAD”, scene ends</td><td>—</td></tr>
+<tr><td><strong>3:15</strong></td><td>Summary panel</td><td>“Two numbers say how well it went. This row says <em>what was learned</em> — and that is what a parent actually asks about.”</td></tr>
+<tr><td><strong>4:00</strong></td><td>Leaderboard</td><td>“Four values leave the phone. And the game cannot write this table.”</td></tr>
+<tr><td><strong>4:40</strong></td><td>Stop</td><td>“Fifteen scenes, seventy-two objectives, fifty-three words — every one said out loud.” <strong>Then hands off the phone.</strong></td></tr>
+</table>
+
+<div class="box">
+<h4>If it breaks</h4>
+<p style="margin-bottom:0;"><strong>Narrate once, recover in ten seconds, never debug on stage.</strong>
+Word not recognised → say it once more, louder; then use replay; then move on. Never try three times.
+No network → “recognition is a network service, that’s in our limitations” → hotspot → Plan B.
+Crash → second phone, already unlocked. Rachel silent → “fifteen of her most frequent lines aren’t recorded yet; the caption
+shows and the pause is held.” Over time at 4:00 → skip the leaderboard, jump to the closing line.</p>
+</div>
+
+<h2>Part 6 · Before the defense</h2>
+
+<div class="two">
+<div>
+<h3>Fix in the paper (≈4 hours)</h3>
+<ul class="chk">
+<li>§3.2.4 scene table — it still lists an older word set (teaches <em>Tabo</em> in Banyo; Banyo is not 9 words)</li>
+<li>All totals → <strong>72 / 53 / 19</strong> in §3.2.3, §3.2.4, §3.6</li>
+<li>§3.2.2 + §3.4.2 — the matching rule still describes the <strong>edit-distance algorithm you deleted</strong></li>
+<li>Replace the <em>Opo</em> examples — Opo is not a taught word; <strong>Upo</strong> is</li>
+<li>Add the device-recognizer limitation, cited to Bhardwaj and Santiago</li>
+<li>Add the leaderboard + Edge Function + token + RLS to §3.4 — currently absent</li>
+<li>§3.5.1 — record is written per <em>level</em>; nodes unlock per <em>scene</em>. Both are stated backwards</li>
+<li>§3.2.3 — Rachel is the narrator of the whole game, not a classroom character</li>
+<li>Chapter 2 IPO — remove the pre/post-test</li>
+<li>Age range — §3.2.1 says 4–7, Chapters 1–2 say K–Grade 3</li>
+<li>The two <span class="mono">[CONFIRM:]</span> tags in §3.4.1 — measure on the phone, write the device table</li>
+</ul>
+</div>
+<div>
+<h3>Logistics</h3>
+<ul class="chk">
+<li>Check <strong>tcpms.base44.app</strong> for slot, room and panel</li>
+<li>Defense fee ₱3,000 ÷ members — <strong>IT33 pays Subion</strong></li>
+<li>Formal / corporate attire</li>
+<li>Supporting docs attached <em>as a link</em>: logbooks, forms, picture evidence, <strong>approval letter</strong>, <strong>preliminary survey</strong></li>
+<li>Chapters I–III with title page, as a link</li>
+<li>Slide deck uploaded by the document editor — <strong>Chapters I and III only</strong></li>
+<li>Both phones charged, timeout off, Do Not Disturb on</li>
+<li><strong>Test the room’s network</strong> — no internet, no demo</li>
+<li>Fresh profile; Umaga Na unlocked and unplayed</li>
+<li>Mic permission already granted (open the app once)</li>
+<li>Backup screen recording on a USB stick</li>
+<li>Printed: completeness report dated today, release-notes known issues, the hardening SQL</li>
+<li>Rehearse the demo <strong>three times, timed, on the demo phone</strong></li>
+</ul>
+</div>
+</div>
+
+<div class="box warn">
+<h4>Also, outside the defense</h4>
+<p style="margin-bottom:0;">Your <strong>ElevenLabs API key is still reachable in git history</strong> at commit
+<span class="mono">0250197</span> on <span class="mono">origin/main</span>. Untracking did not remove it. <strong>Rotate it.</strong>
+If a panelist asks a security question and you mention it as found-and-rotated, it reads as rigour.</p>
+</div>
+
+<div class="box key">
+<h4>The shape of the hour — plan for it</h4>
+<p style="margin-bottom:0;">5 min setup · 5 min slides (Chapters I and III) · 5 min demo · <strong>45 min questions and deliberation.</strong>
+Three quarters of your defense is Part 3 of this sheet. Answer in one or two sentences and stop. Let them ask for more.
+Whoever owns a block answers it — do not all talk at once, and do not let one person answer everything. Panels notice both.</p>
+</div>
+
+<div class="foot">
+SALINLAHI · Group 33 · generated 15 November 2026 from commit c037486 · full detail in <span class="mono">Docs/Defense/</span>
+</div>
+
+</body>
+</html>
