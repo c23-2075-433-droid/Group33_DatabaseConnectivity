@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// The whole journey, in order, as one list: every level marker and every
 /// scene between them.
 ///
-///   Bahay - s1 - s2 - s3 - s4 - s5 - s6 - Paaralan - s1 - ... - Palengke
+///   Bahay - s1 - s2 - s3 - s4 - s5 - s6 - Paaralan - s1 - ... - Parke - s5
 ///
 /// This is the single place the order is written down. The map scene lays its
 /// nodes out from this list, and LevelProgress counts how far along it the
@@ -48,9 +48,15 @@ public static class JourneyMap
                    sceneName = sceneName };
 
     /// <summary>
-    /// The journey in order. Twenty steps: four level markers and the sixteen
-    /// scenes the design document lays out. Fifteen of those scenes are built;
-    /// only Bahay's sixth, leaving for school, is still to come.
+    /// The journey in order. Nineteen steps: three level markers and the
+    /// sixteen scenes the design document lays out. Fifteen of those scenes
+    /// are built; only Bahay's sixth, leaving for school, is still to come.
+    ///
+    /// There was a fourth marker here, Palengke, with no scenes behind it. It
+    /// never reached the screen - BuildLevelSelectScene leaves out any place
+    /// with nothing built - so all it did was disagree with the paper, which
+    /// describes three environments. It did hold one job, as the step the
+    /// journey ended on; StepAfter now gives the end of the journey itself.
     /// </summary>
     public static readonly Step[] Steps = new[]
     {
@@ -75,8 +81,6 @@ public static class JourneyMap
         Scene("3", 3, "Chapter3_Level3_Kaibigan"),
         Scene("4", 3, "Chapter3_Level4_Piknik"),
         Scene("5", 3, "Chapter3_Level5_Uwi"),
-
-        Level("Palengke", 4, "map_palengke"),
     };
 
     /// <summary>Where a scene sits in the journey, or -1 if it is not on it.</summary>
@@ -111,14 +115,17 @@ public static class JourneyMap
     /// did.
     ///
     /// Past the last playable step there is nothing left to enter, so this
-    /// gives the end of the journey. That opens the closing marker rather than
-    /// stopping one short of it, which is what tells the last level it has
-    /// been completed.
+    /// gives Steps.Length - one beyond the end of the journey, which is not a
+    /// step at all. That is deliberate: IsLevelComplete asks whether progress
+    /// has moved PAST a level's last step, so the final level can only be
+    /// completed by a value no real step has. While a Palengke marker sat at
+    /// the end, that value was the marker; with it gone, the end of the
+    /// journey has to be a number rather than a place.
     /// </summary>
     public static int StepAfter(int fromIndex)
     {
         int next = NextPlayable(fromIndex);
-        return next >= 0 ? next : Steps.Length - 1;
+        return next >= 0 ? next : Steps.Length;
     }
 
     /// <summary>

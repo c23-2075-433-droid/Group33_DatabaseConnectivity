@@ -236,8 +236,12 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         }
 
         // The spelling on the signpost is the word's own, uppercased only for
-        // reading - the same way the badge over the object shows it.
-        ui.wordText.text = objective.word != null ? objective.word.Trim().ToUpperInvariant() : "";
+        // reading - the same way the badge over the object shows it. WordStress
+        // puts the marks back on the six words whose bare spelling is two
+        // different words, so the signpost says which one is being asked for.
+        ui.wordText.text = objective.word != null
+            ? WordStress.Display(objective.word).ToUpperInvariant()
+            : "";
 
         string gloss = NarratorScript.GlossFor(objective.word);
         ui.glossText.text = gloss;

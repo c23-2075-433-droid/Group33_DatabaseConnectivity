@@ -19,7 +19,12 @@ using UnityEngine;
 /// </summary>
 public static class LevelProgress
 {
-    /// <summary>Index into JourneyMap.Steps of the furthest step unlocked.</summary>
+    /// <summary>
+    /// Index into JourneyMap.Steps of the furthest step unlocked. Once the
+    /// last scene is finished this is Steps.Length, one past the end, which
+    /// is what marks the journey complete - see JourneyMap.StepAfter. Nothing
+    /// indexes Steps with it, so the extra value is safe.
+    /// </summary>
     public static int HighestUnlockedStep
     {
         get
@@ -38,7 +43,7 @@ public static class LevelProgress
         private set
         {
             PlayerProfileStore.Active.highestUnlockedStep =
-                Mathf.Clamp(value, 0, JourneyMap.Steps.Length - 1);
+                Mathf.Clamp(value, 0, JourneyMap.Steps.Length);
             PlayerProfileStore.Save();
         }
     }
@@ -153,8 +158,9 @@ public static class LevelProgress
                 return i;
         }
 
-        // A level with no scenes at all - Palengke, so far. Its marker is as
-        // far as anyone can get.
+        // A level with no scenes at all. None exists today, now that Palengke
+        // is gone, but a marker added before its scenes are built would be
+        // one, and its own marker is as far as anyone could get.
         for (int i = 0; i < JourneyMap.Steps.Length; i++)
             if (JourneyMap.Steps[i].levelIndex == levelIndex) return i;
         return 0;
