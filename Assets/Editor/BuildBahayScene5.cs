@@ -314,7 +314,9 @@ public class BuildBahayScene5
         // Canvas units are world units x100. Each prompt sits above the thing
         // it names; "Upo" sits over the chair Kylo is about to use.
         GameObject pUpo     = CreatePromptUI(uiRoot.transform, "Prompt_Upo",     "Upo",     new Vector3(520, 250, 0));
-        GameObject pPagkain = CreatePromptUI(uiRoot.transform, "Prompt_Pagkain", "Pagkain", new Vector3(-20, -110, 0));
+        // On the bare table, where the meal is about to land - not at -110,
+        // which put the badge squarely on Kylo's chest once he was seated.
+        GameObject pPagkain = CreatePromptUI(uiRoot.transform, "Prompt_Pagkain", "Pagkain", new Vector3(-20, -205, 0));
         GameObject pKain    = CreatePromptUI(uiRoot.transform, "Prompt_Kain",    "Kain",    new Vector3(-20, 300, 0));
         GameObject pInom    = CreatePromptUI(uiRoot.transform, "Prompt_Inom",    "Inom",    new Vector3(190, -235, 0));
         GameObject pLinis   = CreatePromptUI(uiRoot.transform, "Prompt_Linis",   "Linis",   new Vector3(-20, -340, 0));
