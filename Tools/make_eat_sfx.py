@@ -14,15 +14,26 @@ over, the same way brush_teeth.wav is 4.75 s because the brushing is:
 
 Change one and change the other, or he goes on chewing in silence.
 
-WHAT IT IS MADE OF
+WHAT IT IS MADE OF, and what it is NOT made of.
 
+The first version of this built the chewing out of filtered noise, the way
+the brushing is built. That was wrong, and it is worth saying why: brushing
+IS noise - bristles scrubbing - but chewing is not. A mouth is a small
+resonant box opening and closing, and what you actually hear is a series of
+soft SMACKS, each one a brief resonance that dies almost at once. Noise in
+that band just sounds like static, which is what it sounded like.
+
+So the chewing here is made of transients, not texture:
+
+  smack    a very short noise click through three damped resonators at
+           roughly 420, 980 and 1900 Hz - the mouth's own formants - each
+           decaying inside 50 ms. Two or three per mouthful, lightly
+           varied in pitch and spacing so the jaw does not sound like a
+           metronome.
   clink    the spoon against the china, once as he lifts it and once as
            each mouthful starts. Noise through a 2.5-7 kHz bandpass with a
            very fast decay, plus two faint partials so it rings like a
            plate rather than clicking like a switch.
-  chew     soft noise bursts at the chewing rate, 300-1400 Hz. Low and
-           round, because the sound of eating rice is a soft one - a
-           brighter band reads as crunching crisps.
   mmm      a hummed, contented note near the end: a 250 Hz fundamental
            with a couple of harmonics, gliding down a tone, under a slow
            swell. Quiet on purpose - see below.
@@ -54,7 +65,6 @@ TAIL = 0.25
 TOTAL = LEAD + LOOP + TAIL
 
 BITES = 3                      # loopCycles in BuildBahayScene5
-CHEW_LOW, CHEW_HIGH = 300.0, 1400.0
 CLINK_LOW, CLINK_HIGH = 2500.0, 7000.0
 
 
@@ -86,15 +96,45 @@ def clink(seed, length_s=0.16):
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
-def chew(seed, length_s):
-    """One soft mouthful: a round noise swell, fast in and slower out."""
+def resonators(n, freqs, decays, gains):
+    """Sum of damped sines - a small resonant box rung once."""
+    t = np.arange(n) / RATE
+    out = np.zeros(n)
+    for f, d, g in zip(freqs, decays, gains):
+        out += g * np.sin(2 * np.pi * f * t) * np.exp(-t / d)
+    return out
+
+
+def smack(seed, pitch=1.0):
+    """One soft chew: the mouth opening and closing, not a hiss of noise."""
+    rng = np.random.default_rng(seed)
+    n = int(0.09 * RATE)
+    # A two-millisecond click to excite the resonances, then the box rings.
+    click = np.zeros(n)
+    k = int(0.002 * RATE)
+    click[:k] = rng.normal(size=k)
+    body = resonators(n,
+                      [420 * pitch, 980 * pitch, 1900 * pitch],
+                      [0.030, 0.018, 0.009],
+                      [1.0, 0.55, 0.25])
+    out = body + 0.35 * bandpass(click, 200.0, 2600.0)
+    out *= np.exp(-np.arange(n) / (RATE * 0.045))
+    return out / max(float(np.max(np.abs(out))), 1e-9)
+
+
+def mouthful(seed, length_s):
+    """Two or three smacks, unevenly spaced, inside one mouthful."""
     rng = np.random.default_rng(seed)
     n = int(length_s * RATE)
-    phase = np.linspace(0.0, 1.0, n, endpoint=False)
-    body = bandpass(rng.normal(size=n), CHEW_LOW, CHEW_HIGH)
-    env = np.minimum(np.clip(phase / 0.25, 0, 1),
-                     np.clip((1.0 - phase) / 0.6, 0, 1)) ** 1.3
-    out = body * env
+    out = np.zeros(n)
+    count = 3 if rng.random() < 0.6 else 2
+    for j in range(count):
+        at = (0.04 + j * (0.62 / count) + rng.uniform(-0.02, 0.02)) * length_s
+        piece = smack(seed * 17 + j, pitch=float(rng.uniform(0.88, 1.14)))
+        start = int(at * RATE)
+        end = min(n, start + len(piece))
+        if end > start:
+            out[start:end] += float(rng.uniform(0.75, 1.0)) * piece[:end - start]
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
@@ -126,10 +166,10 @@ def main():
     for i in range(BITES):
         at = LEAD + i * step
         add(y, at, clink(10 + i, 0.13), 0.22)        # spoon meets the plate
-        add(y, at + 0.10, chew(20 + i, step * 0.72), 0.30)
+        add(y, at + 0.10, mouthful(20 + i, step * 0.72), 0.34)
 
     # The last swallow, and a small pleased hum over the tail.
-    add(y, LEAD + LOOP - 0.12, chew(40, 0.26), 0.22)
+    add(y, LEAD + LOOP - 0.10, smack(40, 0.92), 0.26)
     add(y, TOTAL - 0.52, mmm(), 0.20)
 
     y = np.tanh(1.2 * y) / np.tanh(1.2)
@@ -143,8 +183,8 @@ def main():
         w.setsampwidth(2)
         w.setframerate(RATE)
         w.writeframes(s.tobytes())
-    print('%s  %.2f s, %d mouthfuls, chew %.0f-%.0f Hz'
-          % (path, len(s) / float(RATE), BITES, CHEW_LOW, CHEW_HIGH))
+    print('%s  %.2f s, %d mouthfuls of resonant smacks'
+          % (path, len(s) / float(RATE), BITES))
 
 
 if __name__ == '__main__':

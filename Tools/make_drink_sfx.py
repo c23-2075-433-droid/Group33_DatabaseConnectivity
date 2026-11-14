@@ -14,19 +14,28 @@ over, the same way brush_teeth.wav is 4.75 s because the brushing is:
 
 Change one and change the other, or he drinks on in silence.
 
-WHAT IT IS MADE OF
+WHAT IT IS MADE OF, and what it is NOT made of.
+
+The first version made the drinking out of a swept noise band - liquid
+drawn in through the lips. It was too subtle to read as anything, and what
+this scene wants is a GULP: the sound of swallowing, not of sipping.
+
+A gulp is not noise at all. It is a small resonant cavity collapsing - the
+throat closing round a mouthful - and the ear hears that as a short tone
+whose pitch drops fast. Three of them in a row is the whole effect, and is
+why a cartoon writes it "glug glug glug".
 
   pickup   the glass leaving the wood. A soft low knock, 120-700 Hz, very
            short - a tumbler lifted, not a mug banged down.
-  sip      noise through a 900-3500 Hz bandpass whose centre rises across
-           each sip, which is what makes it read as liquid drawn in rather
-           than as air. Two of them, one per tip of the glass.
-  swallow  a short resonant blip falling from about 190 to 115 Hz after
-           each sip. This is the part that makes the sip sound swallowed
-           instead of merely sucked; without it the effect is oddly empty.
-  setdown  the glass returning to the table, brighter and shorter than the
-           pickup, with a small ring on top so it reads as glass against
-           wood rather than a knuckle.
+  glug     a sine whose pitch falls from about 520 to 150 Hz inside a
+           tenth of a second, with a second partial and a touch of
+           throat resonance around 700 Hz. Three of them, each a little
+           lower and a little slower than the last, the way a real
+           swallow tires. A two-millisecond click opens each one so it
+           starts crisply instead of fading in.
+  setdown  the glass returning to the table, brighter and shorter than
+           the pickup, with a small ring so it reads as glass on wood
+           rather than a knuckle.
 
 It is kept gentle throughout. The brief that asked for these said cute and
 child-friendly, and a loud gulp in a children's game is comedy, which is
@@ -51,8 +60,7 @@ LOOP = 1.60
 TAIL = 0.25
 TOTAL = LEAD + LOOP + TAIL
 
-SIPS = 2                       # loopCycles in BuildBahayScene5
-SIP_LOW, SIP_HIGH = 900.0, 3500.0
+GULPS = 3                      # three swallows across the loop
 
 
 def bandpass(x, low, high):
@@ -82,31 +90,22 @@ def knock(seed, low, high, decay, length_s=0.14, ring_hz=None):
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
-def sip(seed, length_s):
-    """Liquid drawn in: a noise band whose centre climbs as the glass tips."""
+def glug(seed, top_hz=520.0, bottom_hz=150.0, length_s=0.13):
+    """One swallow: a short tone falling fast, which is what a gulp is."""
     rng = np.random.default_rng(seed)
     n = int(length_s * RATE)
-    frac = np.linspace(0.0, 1.0, n)
-    # Two overlapping bands crossfaded, which is a cheap way to sweep a
-    # brick-wall filter without filtering in slices.
-    noise = rng.normal(size=n)
-    low_band = bandpass(noise, SIP_LOW, SIP_LOW + 1100.0)
-    high_band = bandpass(noise, SIP_LOW + 700.0, SIP_HIGH)
-    body = low_band * (1.0 - frac) + high_band * frac
-    env = np.minimum(np.clip(frac / 0.3, 0, 1),
-                     np.clip((1.0 - frac) / 0.45, 0, 1)) ** 1.2
-    out = body * env
-    return out / max(float(np.max(np.abs(out))), 1e-9)
-
-
-def swallow(length_s=0.13):
-    """The small falling blip that makes a sip read as swallowed."""
-    n = int(length_s * RATE)
     t = np.arange(n) / RATE
-    f = np.linspace(190.0, 115.0, n)
+    # Exponential fall, not linear - a throat closes quickly then settles.
+    f = bottom_hz + (top_hz - bottom_hz) * np.exp(-t / (length_s * 0.28))
     phase = 2 * np.pi * np.cumsum(f) / RATE
-    tone = np.sin(phase) + 0.25 * np.sin(2 * phase)
-    out = tone * np.exp(-t / 0.045)
+    tone = np.sin(phase) + 0.3 * np.sin(2 * phase)
+    # A little throat around it, and a click to open it crisply.
+    throat = np.sin(2 * np.pi * 700.0 * t) * np.exp(-t / 0.012) * 0.25
+    click = np.zeros(n)
+    k = int(0.002 * RATE)
+    click[:k] = rng.normal(size=k)
+    out = tone * np.exp(-t / (length_s * 0.42)) + throat + 0.2 * bandpass(
+        click, 200.0, 3000.0)
     return out / max(float(np.max(np.abs(out))), 1e-9)
 
 
@@ -116,12 +115,17 @@ def main():
     # Lifting it off the table.
     add(y, 0.03, knock(1, 120.0, 700.0, 0.030), 0.30)
 
-    # Two tips of the glass across the looping part.
-    step = LOOP / SIPS
-    for i in range(SIPS):
-        at = LEAD + i * step
-        add(y, at + 0.05, sip(10 + i, step * 0.55), 0.26)
-        add(y, at + 0.05 + step * 0.55, swallow(), 0.22)
+    # Three swallows across the looping part, each lower and slower than
+    # the last - a real gulp sequence runs down, it does not repeat.
+    step = LOOP / GULPS
+    for i in range(GULPS):
+        at = LEAD + 0.10 + i * step
+        add(y, at,
+            glug(10 + i,
+                 top_hz=520.0 - 55.0 * i,
+                 bottom_hz=150.0 - 12.0 * i,
+                 length_s=0.13 + 0.015 * i),
+            0.42 - 0.04 * i)
 
     # Setting it down again, on the tail frame.
     add(y, TOTAL - 0.22, knock(2, 700.0, 6000.0, 0.012, ring_hz=2600.0), 0.26)
@@ -137,8 +141,8 @@ def main():
         w.setsampwidth(2)
         w.setframerate(RATE)
         w.writeframes(s.tobytes())
-    print('%s  %.2f s, %d sips, sip band %.0f-%.0f Hz'
-          % (path, len(s) / float(RATE), SIPS, SIP_LOW, SIP_HIGH))
+    print('%s  %.2f s, %d gulps'
+          % (path, len(s) / float(RATE), GULPS))
 
 
 if __name__ == '__main__':
