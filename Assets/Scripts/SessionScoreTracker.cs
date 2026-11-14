@@ -197,6 +197,13 @@ public class SessionScoreTracker : MonoBehaviour
 
     private void FetchAndDisplayRecords()
     {
+        // Nowhere to show them. The summary board dropped its records strip
+        // - the leaderboard in the profile menu is where past scores are
+        // read back now - so there is no reason to make the request. Saving
+        // above still happens either way, which is what the leaderboard
+        // reads.
+        if (recordsText == null) return;
+
         SetText(recordsText, "Loading recent scores...");
 
         supabaseClient.FetchRecentScores(recentRecordsToShow, (records, error) =>

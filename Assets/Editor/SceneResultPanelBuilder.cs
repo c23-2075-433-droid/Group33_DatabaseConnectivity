@@ -52,17 +52,7 @@ public static class SceneResultPanelBuilder
     private const float PlaceFrac = 0.5005f;
     private const float PointsFrac = 0.6307f;
     private const float WordsFrac = 0.7508f;
-    // The records strip and the buttons share the one empty band on
-    // ui_result_board, between the bottom of the painted WORDS COMPLETED
-    // plate (0.792 of the board) and the inner frame below it (0.944). They
-    // were overlapping: the strip's box alone reached 0.867 while the
-    // buttons began at 0.835, and the strip OVERFLOWED its box on top of
-    // that, so six rows of scores printed straight through REPLAY and
-    // CONTINUE. The band is divided between them now - strip above, buttons
-    // sitting on the frame - and the strip truncates so it can never spill
-    // into them again however many rows come back.
-    private const float RecordsFrac = 0.826f;
-    private const float ButtonFrac = 0.904f;
+    private const float ButtonFrac = 0.875f;
 
     // Fractions of the board, all checked against the mockup by compositing
     // the cut sprites at these numbers and diffing the result by eye.
@@ -125,7 +115,6 @@ public static class SceneResultPanelBuilder
     private const float ButtonWidthFrac = 0.26f;
     private const float ButtonXFrac = 0.19f;
 
-    private static readonly Vector2 RecordsSize = new Vector2(580f, 60f);
 
     // Where each star's own centre sits relative to the row's, in the art's
     // own pixels, and how wide that row is there. The row is drawn rather
@@ -353,27 +342,18 @@ public static class SceneResultPanelBuilder
             VocabularyFont.Apply(figure);
         }
 
-        // Only on a level's last scene: the scores read back out of the
-        // database, which is the half of the Activity 5 requirement that has
-        // to be visible on screen rather than merely fetched.
+        // No records strip. There is one empty band on ui_result_board,
+        // between the painted WORDS COMPLETED plate and the inner frame
+        // below it, and the buttons already live in it - a list of past
+        // scores squeezed in above them was cramped at any size that left
+        // the buttons where they belong, and read as stray text under the
+        // score rather than as a leaderboard.
+        //
+        // The scores are still SAVED, and the retrieve-and-display half of
+        // the Activity 5 requirement is still met, on the leaderboard in the
+        // profile menu - see ProfileUIBuilder.BuildLeaderboard - which has a
+        // whole panel for it instead of forty pixels.
         Text recordsText = null;
-        if (levelEnd)
-        {
-            recordsText = CreateText(panel.transform, "RecordsText", "",
-                new Vector2(0f, FromTop(RecordsFrac)), RecordsSize, 18,
-                TextAnchor.UpperCenter);
-            recordsText.lineSpacing = 1.1f;
-            recordsText.resizeTextForBestFit = true;
-            recordsText.resizeTextMinSize = 12;
-            recordsText.resizeTextMaxSize = 18;
-
-            // Truncate, not Overflow. Best fit treats height as free under
-            // Overflow, so it picked the maximum size and let the rows run
-            // off the bottom of the box - which is how they ended up across
-            // the buttons. Truncating puts the height back in play, so the
-            // same four lines set themselves to about 13px and stay inside.
-            recordsText.verticalOverflow = VerticalWrapMode.Truncate;
-        }
 
         // One row whether or not the records strip is there - the new board
         // has a place for both, so the buttons no longer move to make room.
