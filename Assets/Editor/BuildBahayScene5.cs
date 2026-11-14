@@ -284,6 +284,36 @@ public class BuildBahayScene5
         // running on a wrong answer.
         eatFrames.playOnEnable = false;
 
+        // "Inom" is drinking, and until now the glass only lit up where it
+        // stood - the note below says the cup is opaque, so there was
+        // nothing a drink could change about it. Now he picks it up.
+        //
+        // Same visible band as eating. The glass stands at y -3.15 to -1.90
+        // and Kylo is hidden below -1.97, so its top is level with the table
+        // edge: the reach down to it happens behind the furniture and what
+        // shows is the glass arriving at his mouth and the tilt.
+        PoseSequence drinkFrames = seatGO.AddComponent<PoseSequence>();
+        drinkFrames.target = seatSr;
+        drinkFrames.frames = new[] { LoadSpriteOptional("drink_sip_bahay") };
+        drinkFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("drink_tilt_bahay"),
+            LoadSpriteOptional("drink_sip_bahay"),
+        };
+        drinkFrames.loopCycles = 2;
+        drinkFrames.tailFrames = new[] { LoadSpriteOptional("drink_tilt_bahay") };
+        drinkFrames.destinationSprite = LoadSpriteOptional("sitting_front_bahay");
+        // 0.25s in, 1.6s of tipping, 0.25s out: a little over two seconds,
+        // which is about how long a child takes over a glass of water.
+        drinkFrames.framesPerSecond = 4f;
+        drinkFrames.loopFramesPerSecond = 2.5f;
+        drinkFrames.playOnEnable = false;
+
+        // The frame he lifts the glass on. What that fires is wired further
+        // down, beside "Inom", because the glass itself does not exist yet
+        // at this point in the build.
+        drinkFrames.fireOnFrame = 0;
+
         // --- The table, drawn in front of him so he sits behind it ---
         GameObject table = new GameObject("Foreground_Table");
         SpriteRenderer tableSr = table.AddComponent<SpriteRenderer>();
@@ -419,11 +449,24 @@ public class BuildBahayScene5
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, emptyKanin.SetActive, true);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, emptyItlog.SetActive, true);
 
-        // The cup is opaque, so drinking from it cannot change how it looks and
-        // taking it away would be the same mistake as clearing the plates. It
-        // stays on the table and lights up instead.
+        // The gleam stays even though he now drinks for real. The cup is
+        // opaque, so the glass in his hand looks the same as the one on the
+        // table, and the gleam is what says WHICH thing the word was about -
+        // and the only thing left saying it if a drawing ever fails to load.
         var inom = MakeObjective("Inom", pInom);
         UnityEventTools.AddPersistentListener(inom.onCorrect, gleamBaso.Play);
+        UnityEventTools.AddPersistentListener(inom.onCorrect, drinkFrames.Play);
+
+        // The glass on the table has to leave it while he is holding one, or
+        // there are two. This is the prop handoff fireOnFrame exists for,
+        // and hanging it off the SEQUENCE rather than off the word is what
+        // makes it safe: PoseSequence fires both onFrameReached and
+        // onFinished even when it has no art at all, precisely so a prop
+        // cannot be taken away and never given back.
+        UnityEventTools.AddBoolPersistentListener(
+            drinkFrames.onFrameReached, propBaso.SetActive, false);
+        UnityEventTools.AddBoolPersistentListener(
+            drinkFrames.onFinished, propBaso.SetActive, true);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;

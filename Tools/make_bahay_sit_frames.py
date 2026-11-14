@@ -85,6 +85,10 @@ FRAMES = [
 EAT_FRAMES = [
     ("Art/eat_bite_bahay_raw.png", "eat_bite_bahay"),
     ("Art/eat_chew_bahay_raw.png", "eat_chew_bahay"),
+    # "Inom" is the same shape of beat: the glass comes up into the band
+    # above the table edge, which is the only part of the reach that shows.
+    ("Art/drink_sip_bahay_raw.png", "drink_sip_bahay"),
+    ("Art/drink_tilt_bahay_raw.png", "drink_tilt_bahay"),
 ]
 
 CANVAS_H = 885          # forced by frame 1's crown; see the note above
