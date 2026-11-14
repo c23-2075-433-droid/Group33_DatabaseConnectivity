@@ -27,9 +27,9 @@ public class LeaderboardPanel : MonoBehaviour
     public GameObject root;
     [Tooltip("The full-screen catcher behind the board. Tapping it closes the board.")]
     public Button scrim;
-    [Tooltip("The OKAY plate under the board. A tap outside works too, but a child " +
-              "should be able to see the way out.")]
-    public Button okayButton;
+    [Tooltip("The wooden X in the board's top right corner. A tap outside works " +
+              "too, but a child should be able to see the way out.")]
+    public Button closeButton;
 
     [Header("Slots")]
     [Tooltip("The six painted rows, top to bottom.")]
@@ -50,7 +50,7 @@ public class LeaderboardPanel : MonoBehaviour
     void Start()
     {
         if (scrim != null) scrim.onClick.AddListener(Close);
-        if (okayButton != null) okayButton.onClick.AddListener(Close);
+        if (closeButton != null) closeButton.onClick.AddListener(Close);
         if (root != null) root.SetActive(false);
     }
 

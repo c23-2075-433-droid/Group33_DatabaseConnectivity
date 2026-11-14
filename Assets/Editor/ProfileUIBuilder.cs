@@ -14,6 +14,10 @@
 //   ui_profile_board, ui_leaderboard_board
 //   btn_rename, btn_delete, btn_okay_plate, btn_cancel_plate
 //
+// One sprite comes from outside that set: btn_settings_close, the round
+// wooden X the settings popup uses. The leaderboard closes on the same X in
+// the same corner, and there is no reason to draw a second one.
+//
 // Both boards are drawn complete - title, slots and plates all painted in -
 // so nothing here draws a panel or a button of its own. The rows become
 // invisible rects with a Text laid over them, and each plate gets its own copy
@@ -79,9 +83,13 @@ public static class ProfileUIBuilder
     private static readonly Vector2 OkayPosition = new Vector2(-108.0f, -272.6f);
     private static readonly Vector2 CancelPosition = new Vector2(120.0f, -272.2f);
 
-    // The leaderboard board has no plates painted on it, so its way out is a
-    // loose OKAY plate hung under the board rather than inside it.
-    private static readonly Vector2 LeaderboardOkayPosition = new Vector2(0f, -450f);
+    // The leaderboard's way out: the wooden X over the frame's top right
+    // corner, just clear of the painted title. Measured on the board art and
+    // scaled by K like every other number here. Slightly larger than the
+    // settings popup's X, which is 89 units on a board half again as wide -
+    // the coin has to stay a finger's worth of target on the smaller board.
+    private static readonly Vector2 LeaderboardClosePosition = new Vector2(255.8f, 334.8f);
+    private static readonly Vector2 CloseSize = new Vector2(96.2f, 96.2f);
 
     /// <summary>
     /// A catcher that draws nothing. Alpha plays no part in UI raycasting, so
@@ -269,18 +277,20 @@ public static class ProfileUIBuilder
                                     36, TextAnchor.MiddleLeft, Cream, false);
         }
 
-        // The board has no plate painted on it, so the way out is a loose one
-        // hung underneath - a tap outside closes it too, but a child should be
-        // able to see the door.
-        Button okay = Plate(root.transform, "OkayButton", "btn_okay_plate",
-                            LeaderboardOkayPosition);
+        // A tap outside closes the board too, but a child should be able to
+        // see the door. It hangs off the board rather than off the root, so it
+        // keeps its corner if the board is ever moved. CreateImage preserves
+        // the aspect, so the square size above cannot squash the coin.
+        Button close = MakeButton(CreateImage(board.transform, "CloseButton",
+                                              "btn_settings_close",
+                                              LeaderboardClosePosition, CloseSize));
 
         root.SetActive(false);
 
         LeaderboardPanel panel = canvas.gameObject.AddComponent<LeaderboardPanel>();
         panel.root = root;
         panel.scrim = scrim;
-        panel.okayButton = okay;
+        panel.closeButton = close;
         panel.rowLabels = labels;
         panel.client = client;
         panel.menuBlur = blur;
