@@ -278,18 +278,6 @@ MonoBehaviour:
     text: Good! Kylo is sitting at the table.
     gloss: 
     clip: {fileID: 8300000, guid: c3b84ab636adf48498239f9c9c8bc1d7, type: 3}
-  - id: rachel_l1_s5_pagkain_story
-    text: He is in his chair now, but the table in front of him is still bare.
-    gloss: 
-    clip: {fileID: 0}
-  - id: rachel_l1_s5_pagkain_ask
-    text: "Ask Nanay for his breakfast \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 0}
-  - id: rachel_l1_s5_pagkain_done
-    text: "Here it comes! Rice, egg and a cool drink."
-    gloss: 
-    clip: {fileID: 0}
   - id: rachel_l1_s5_kanin_story
     text: There is a warm white heap on Kylo's plate. Filipino families eat it daily.
     gloss: 
@@ -314,6 +302,18 @@ MonoBehaviour:
     text: Well done! The egg is Kylo's favourite part.
     gloss: 
     clip: {fileID: 8300000, guid: 8125ccb555f454265a30a30bfe27022e, type: 3}
+  - id: rachel_l1_s5_pagkain_story
+    text: He is in his chair now, but the table in front of him is still bare.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_pagkain_ask
+    text: "Ask Nanay for his breakfast \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l1_s5_pagkain_done
+    text: Here it comes! Rice, egg and a cool drink.
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l1_s5_kain_story
     text: Everything is on the plate now, and Kylo's tummy is rumbling.
     gloss: 
