@@ -242,6 +242,15 @@ is git-ignored on purpose.
 
 That's it — `SupabaseClient` reads from that asset at runtime.
 
+The tool gives the asset a fixed GUID, and that matters more than it sounds.
+Unity wires a scene reference by GUID rather than by path, and three committed
+scenes point at this asset: `MainMenu` (both clients), `Chapter1_Level5_Almusal`
+and `Chapter2_Level5_Uwian`. An asset created with a random GUID would be a
+perfectly good config that no scene refers to — every client reporting "not
+configured" while the asset sits in the Project window. If you made your config
+before the tool did this, run it again: it repoints the one you already have and
+leaves your URL and key alone.
+
 ## Troubleshooting
 
 | Symptom | Likely cause |
@@ -252,6 +261,7 @@ That's it — `SupabaseClient` reads from that asset at runtime.
 | Fetch returns `[]` | No rows saved yet — play a level through to the end first |
 | Works in Editor, fails on Android | No internet on the device, or cleartext/HTTPS issue — Supabase is HTTPS so this is normally just connectivity |
 | Leaderboard says "not set up on this device" | No `SupabaseConfig.asset`, or its URL/key are blank |
+| Config asset exists and is filled in, clients still say "not configured" | Its GUID is not the one the scenes reference. Run **Create Supabase Config** again to repoint it |
 | Leaderboard opens empty | Nobody has finished a level yet, or the SQL in 2b has not been run |
 | Submissions return `401` | Either the platform's JWT check rejected the key — turn JWT verification off for `submit-score` (see 2b) — or the function's own gate did: `SALINLAHI_PUBLISHABLE_KEY` is set to a key the game is no longer sending |
 | Saves return `400` with a constraint name | Working as intended: the hardening migration refused a value outside what the game can produce. The constraint name says which |
