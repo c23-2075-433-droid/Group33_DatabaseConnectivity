@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 466145b057424d5988b91b98f53714a8
+guid: 172096ce34574f2396fd6ed48389ebd7
 TextureImporter:
   internalIDToNameTable:
   - first:
       213: 269364150263362248
-    second: sit_frame_1_uniform_with_bag_0
+    second: sitting_front_bahay_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -128,7 +128,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: sit_frame_1_uniform_with_bag_0
+      name: sitting_front_bahay_0
       rect:
         serializedVersion: 2
         x: 0

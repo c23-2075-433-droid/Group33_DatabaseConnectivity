@@ -1,51 +1,53 @@
-"""Cut Bahay Scene 5's "Upo" frames out of the single-figure generations.
+"""Refit Paaralan Scene 2's "Upo" frames for Bahay Scene 5's table.
 
-WHY THIS IS NOT make_sit_frames.py. That one cuts Paaralan Scene 2's frames:
-a near-portrait of a boy at a desk, no backpack, on the 663x921 canvas every
-seated pose in that scene shares, placed by crown height because the desk
-hides his legs. Bahay Scene 5 is a different shot - a full figure seen across
-a breakfast table, with the bag still on - so it needs its own frames and its
-own fitting. See Docs/AnimationStandard.md.
+WHY REFIT RATHER THAN DRAW NEW ONES. The breakfast scene faked sitting by
+moving the standing drawing down behind the table, and generated crouches
+made for it did not read as sitting. The classroom already has the pose:
+sit_frame_1..3_uniform and sitting_front_uniform, four front-facing drawings
+of this same boy lowering himself onto a chair, upright and relaxed with his
+hands in his lap.
 
-WHERE THE ART CAME FROM. Three single-figure square generations, each made
-from talking_uniform_with_bag as the design reference:
+They were passed over once for being "a near-portrait for the close desk
+shot". That was the wrong reason. The two scenes differ in how near the
+camera is, and nothing else about the drawing cares: scaled so his HEAD
+matches, a classroom frame covers the breakfast scene's visible band almost
+to the pixel. The camera distance was never the obstacle.
 
-    Art/sit_crouch_bahay_raw.png   knees bent, hips back, arms hanging
-    Art/sit_seated_bahay_raw.png   lower, both hands arriving on his thighs
+    the drawing must reach 395px below the crown to meet the table edge
+    sitting_front_uniform, scaled to match the head, reaches 396
 
-One figure per square image, not a strip. A strip of four on a 16:9 canvas
-gave 95px of hair where 142 is wanted, and two figures in one square came
-back standing at identical heights, because the generator composes for the
-frame rather than for a shared ground line. Alone in a square each figure
-gets 228px of hair, so these scale DOWN into the scene.
+The real cost is the backpack: the classroom Kylo has his bag off at his
+desk. So he sets it down to eat, and all four seated frames are bagless.
+Standing still wears it, which is the one visible seam, and it is the seam
+the player is told about - he is sitting down to breakfast.
 
-HOW THEY ARE FITTED, and why it is by the CROWN rather than the feet.
+HOW THEY ARE FITTED.
 
-talking_uniform_with_bag is 292x745 at 120 pixels per unit with the pivot at
-the canvas centre, and the drawing fills it: crown on the top edge, feet on
-the bottom one.
+Scale: by hair cap, to talking_uniform_with_bag's 142px, so his head is the
+same size as the standing drawing it replaces. That is x0.513, a reduction,
+so nothing is upscaled.
 
-The obvious fit is feet on the floor, letting a shorter crouching figure drop
-its own crown. That would be wrong here, because the scene ALREADY carries
-the descent: the builder puts Kylo_Seated 1.9 units below Kylo_Standing, and
-that offset was tuned against the painting until "the table edge cuts him at
-the hip and his head reaches y +2.2". Baking a second drop into the art would
-count it twice and sink him through the table.
+Horizontally: his hair's centre column the same distance right of the canvas
+centre as the standing sprite's, so his head does not shift sideways.
 
-So every frame is placed crown on the top edge, like the base sprite, with
-its hair centre the same distance right of the canvas centre. A sprite swap
-then changes the DRAWING and nothing else, and the scene keeps the framing
-somebody already checked by eye. The descent stays where it was: the 1.9 unit
-step, eased by PoseSettle.
+Vertically: all four share one ink BOTTOM row, which is what puts his feet on
+one floor and lets the fold do the rest. As he lowers, each drawing reaches
+less far below his crown - 466, 444, 421, 396 once scaled - so pinning the
+bottom makes his crown fall 70px across the run on its own. That is 0.74
+world units of head drop, drawn rather than faked.
 
-His drawn feet end up well above the canvas bottom, which does not show - the
-table hides everything below y -1.97, and that is the same reason the scene
-could fake sitting with a standing drawing in the first place.
+The bottom row is chosen so the LAST frame's crown lands exactly where the
+seated pose's crown lands today, at world y +2.21 - the height Bahay Scene 5
+was tuned to, where the table edge cuts him at the hip. The scene's own 1.9
+unit step down to Kylo_Seated is untouched and still carries the rest of the
+descent; this only distributes the last stretch of it across the drawings.
+
+That forces the canvas height: frame 1's crown has to fit above the others,
+which needs 885px. The width is whatever the widest frame needs.
 
 Each PNG is written with a .meta cloned from talking_uniform_with_bag's, so
-the frames import at 120 PPU with a centre pivot like every other character
-sprite. Without that they take the project default and come out the wrong
-size in the scene.
+they import at 120 PPU with a centre pivot like every other character
+sprite. Without that they take the project default and come out wrong.
 
 Run from the repository root:  python3 Tools/make_bahay_sit_frames.py
 Then re-run Tools > SALINLAHI > Build Bahay Scene 5 in Unity.
@@ -58,81 +60,81 @@ import uuid
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fit_seated_pose import cut_background, hair_cap  # noqa: E402
+from fit_seated_pose import hair_cap  # noqa: E402
 
 SPRITES = "Assets/Sprites/"
 BASE = SPRITES + "talking_uniform_with_bag.png"
 
-# raw generation -> sprite name the scene builder asks for
+# classroom source -> the name Bahay Scene 5's builder asks for
 FRAMES = [
-    ("Art/sit_crouch_bahay_raw.png", "sit_frame_1_uniform_with_bag"),
-    ("Art/sit_seated_bahay_raw.png", "sitting_uniform_with_bag"),
+    ("sit_frame_1_uniform", "sit_frame_1_bahay"),
+    ("sit_frame_2_uniform", "sit_frame_2_bahay"),
+    ("sit_frame_3_uniform", "sit_frame_3_bahay"),
+    ("sitting_front_uniform", "sitting_front_bahay"),
 ]
 
-
-def hair_height(im):
-    """Hair cap height. hair_cap returns (crown, bottom, centre COLUMN) - the
-    third value is a column, and reading it as a height is how a strip that
-    was far too small once looked like it cleared the threshold."""
-    crown, bottom, _col = hair_cap(im)
-    return bottom - crown
+CANVAS_H = 885          # forced by frame 1's crown; see the note above
+PPU, SCALE = 120.0, 1.27
+SIT_PIVOT_Y = -1.73     # BuildBahayScene5.SitPivotY
+SEATED_CROWN_Y = 2.213  # where the seated crown lands today, and must still
 
 
-def geometry(im):
-    """(hair height, hair centre column, crown row) for a cut figure."""
+def measure(im):
+    """(hair height, hair centre column, crown row, lowest ink row)."""
     crown, bottom, col = hair_cap(im)
-    return bottom - crown, col, crown
+    ink = im.convert("RGBA").split()[3].getbbox()
+    return bottom - crown, col, crown, ink[3] - 1
 
 
 def main():
     base = Image.open(BASE).convert("RGBA")
-    bw, bh = base.size
-    base_hair, base_col, base_crown = geometry(base)
-
-    # What the scene is actually anchored on, as offsets from the pivot.
+    bw = base.size[0]
+    base_hair, base_col, _crown, _feet = measure(base)
     head_dx = base_col - bw / 2.0
-    print("%s: %dx%d  hair %dpx  head %+.1f from centre  crown row %d"
-          % (os.path.basename(BASE), bw, bh, base_hair, head_dx, base_crown))
+
+    # Load and scale every frame first: the shared bottom row cannot be
+    # chosen until the tallest one is known.
+    prepared = []
+    for src, name in FRAMES:
+        im = Image.open(SPRITES + src + ".png").convert("RGBA")
+        hair, _col, _cr, _ft = measure(im)
+        s = float(base_hair) / hair
+        im = im.resize((round(im.size[0] * s), round(im.size[1] * s)), Image.LANCZOS)
+        box = im.split()[3].getbbox()
+        im = im.crop(box)
+        hair, col, crown, feet = measure(im)
+        prepared.append((name, im, col, crown, feet, feet - crown))
+
+    # The last frame's crown has to land where the seated crown lands now.
+    dest_reach = prepared[-1][5]
+    dest_crown_row = CANVAS_H / 2.0 - (SEATED_CROWN_Y - SIT_PIVOT_Y) / SCALE * PPU
+    bottom_row = dest_crown_row + dest_reach
+    width = max(im.size[0] for _n, im, _c, _cr, _f, _r in prepared) + 24
+
+    print("%s: hair %dpx, head %+.1f from canvas centre" % (
+        os.path.basename(BASE), base_hair, head_dx))
+    print("canvas %dx%d, every frame's feet on row %.0f\n" % (width, CANVAS_H, bottom_row))
 
     meta = io.open(BASE + ".meta", encoding="utf-8").read()
 
-    for raw, name in FRAMES:
-        fig = cut_background(raw).convert("RGBA")
-        hair, _col, _crown = geometry(fig)
-
-        scale = float(base_hair) / hair
-        fig = fig.resize((max(1, round(fig.size[0] * scale)),
-                          max(1, round(fig.size[1] * scale))), Image.LANCZOS)
-
-        # Crop to the ink, so a mostly empty 1024px generation does not
-        # become a mostly empty 1024px sprite.
-        box = fig.split()[3].getbbox()
-        fig = fig.crop(box)
-        crown2, _bottom2, col2 = hair_cap(fig)
-
-        width = max(bw, fig.size[0] + 24)
-        if (width - bw) % 2:
-            width += 1                 # keep the widening symmetric
-        height = bh
-
-        canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-        x = int(round(width / 2.0 + head_dx - col2))
-        y = int(round(base_crown - crown2))
-        canvas.alpha_composite(fig, (x, y))
+    for name, im, col, crown, feet, reach in prepared:
+        canvas = Image.new("RGBA", (width, CANVAS_H), (0, 0, 0, 0))
+        x = int(round(width / 2.0 + head_dx - col))
+        y = int(round(bottom_row - feet))
+        canvas.alpha_composite(im, (x, y))
 
         out = SPRITES + name + ".png"
         canvas.save(out)
 
-        # Its own GUID, or two sprites share one and Unity drops a scene
-        # reference. The sub-asset name has to follow the file name too.
         guid = uuid.uuid4().hex
         m = meta.replace("84e37c7a6289499a92ac93742e431552", guid)
         m = m.replace("talking_uniform_with_bag_0", name + "_0")
         io.open(out + ".meta", "w", encoding="utf-8").write(m)
 
-        print("%-32s %dx%d  hair %d->%d  crown row %d (base %d)  guid %s"
-              % (name, width, height, hair, hair_height(canvas),
-                 hair_cap(canvas)[0], base_crown, guid[:8]))
+        crown_row = y + crown
+        crown_world = SIT_PIVOT_Y + (CANVAS_H / 2.0 - crown_row) / PPU * SCALE
+        print("%-22s reach %3d  crown row %3d  crown at world y %+.2f  guid %s"
+              % (name, reach, crown_row, crown_world, guid[:8]))
 
 
 if __name__ == "__main__":

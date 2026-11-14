@@ -55,9 +55,9 @@
 // Sitting down moves the same front-facing pose down rather than swapping
 // sprites - from the far side of a table, standing and sitting differ in how
 // much of him clears the table edge, nothing else. On top of that he is now
-// DRAWN crouching and then seated rather than standing all the way down -
-// see the PoseSequence below - and PoseSettle eases the last half unit so he
-// lands on the chair instead of starting on it.
+// DRAWN lowering himself and then sitting - Paaralan Scene 2's four "Upo"
+// drawings, refitted to this table - so the last stretch of the descent is
+// drawn rather than faked. See the PoseSequence below.
 //
 // This is now the LAST playable scene of Level 1, so the level's result is
 // saved and shown here - Scene 4 fades into this one instead. When Scene 6 is
@@ -171,58 +171,60 @@ public class BuildBahayScene5
         seatGO.transform.position = new Vector3(SitX, SitPivotY, 0f);
         seatGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
         SpriteRenderer seatSr = seatGO.AddComponent<SpriteRenderer>();
-        seatSr.sprite = LoadSprite("talking_uniform_with_bag");
+        // The seated pose, not the standing drawing. If PoseSequence below
+        // never runs, this is still a boy sitting down.
+        seatSr.sprite = LoadSprite("sitting_front_bahay");
         seatSr.sortingLayerName = "Player";
         seatSr.sortingOrder = OrderKylo;
         seatGO.SetActive(false);                   // "Upo" turns him on
 
-        // ...and when it does, he should LOWER into the chair rather than
-        // appear in it. Rule 1 of Docs/AnimationStandard.md: no instant pose
-        // changes.
+        // ...and when it does, he LOWERS into the chair rather than
+        // appearing in it. Rule 1 of Docs/AnimationStandard.md: no instant
+        // pose changes.
         //
-        // The drawn descent, cut by Tools/make_bahay_sit_frames.py. Paaralan
-        // Scene 2's in-betweens (sit_frame_1..3_uniform) do not fit here:
-        // they are a near-portrait for the close desk shot and have no
-        // backpack, while this is a full figure across a table with the bag
-        // still on. So this scene has its own, framed to match
-        // talking_uniform_with_bag.
+        // These are Paaralan Scene 2's own "Upo" drawings, refitted for this
+        // table by Tools/make_bahay_sit_frames.py. They were passed over
+        // once for being "a near-portrait for the close desk shot", which
+        // was the wrong reason: scaled so his HEAD matches the standing
+        // sprite's, a classroom frame covers this scene's visible band to
+        // within a pixel. Camera distance was never the obstacle.
         //
-        // One in-between rather than three. The generator would draw a
-        // crouch, and a finished sit, and nothing reliably between them - ask
-        // for a pose lower than the last and it returns the last one again.
-        // So the run is: crouch, then rest on the seated pose. Both are
-        // placed crown-on-the-top-edge like the standing sprite, so a swap
-        // changes the drawing and nothing else; the descent stays where it
-        // always was, in the 1.9 unit step down to this object and the ease
-        // below. Dropping the art as well would count it twice.
+        // What it does cost is the backpack - the classroom Kylo has his bag
+        // off at his desk - so he sets it down to eat and every seated frame
+        // is bagless. That seam is at the one moment the scene is about.
+        //
+        // The four share an ink bottom row, so his feet stay on one floor
+        // and the fold drops his crown 0.73 units across the run, ending at
+        // +2.21: exactly where the seated crown has always landed, with the
+        // table edge cutting him where this scene was tuned for.
         PoseSequence sitFrames = seatGO.AddComponent<PoseSequence>();
         sitFrames.target = seatSr;
         sitFrames.frames = new[]
         {
-            LoadSpriteOptional("sit_frame_1_uniform_with_bag"),
+            LoadSpriteOptional("sit_frame_1_bahay"),
+            LoadSpriteOptional("sit_frame_2_bahay"),
+            LoadSpriteOptional("sit_frame_3_bahay"),
         };
         // Sitting happens once - it is on the standard's play-once list - so
         // loopFrames stays empty and it runs straight through.
-        sitFrames.destinationSprite = LoadSpriteOptional("sitting_uniform_with_bag");
+        sitFrames.destinationSprite = LoadSpriteOptional("sitting_front_bahay");
         sitFrames.framesPerSecond = 9f;
         sitFrames.playOnEnable = true;    // "Upo" switches this object on
 
-        // Still here, and still doing the work the two drawings cannot: the
-        // seated pose arrives half a unit high and settles, so he lands on
-        // the chair instead of being already on it.
+        // Small now, the way Paaralan Scene 2's is. It was carrying half a
+        // unit of drop on its own while the art did nothing; on top of a
+        // real drawn descent that would read as a second dip. What is left
+        // is a body taking its own weight as it lands.
         //
-        // No driftFrom, deliberately. He stands at x 5.2 and the chair is at
-        // -0.2, and Paaralan Scene 2 slides that gap while its drawn frames
-        // play over the top. Here there are no frames yet, and the seated
-        // sprite is the STANDING drawing lowered - so a slide would be a
-        // standing boy gliding across the kitchen, which is worse than the
-        // cut it replaces. Add "sit.driftFrom = StandX - SitX;" at the same
-        // time as the drawings, not before - Stand minus Sit, +5.4 here,
-        // because he comes in from the RIGHT. Paaralan Scene 2's is negative
-        // for the opposite reason.
+        // Still no driftFrom. He stands at x 5.2 and the chair is at -0.2,
+        // and Paaralan slides its gap underneath these same frames - but its
+        // gap is 3.37 units over 0.45s, where this one would be 5.4 units in
+        // the 0.33s the frames take, nearly twice the speed. It wants to be
+        // watched before it goes in: "sit.driftFrom = StandX - SitX;", Stand
+        // minus Sit, positive here because he comes in from the RIGHT.
         PoseSettle sit = seatGO.AddComponent<PoseSettle>();
-        sit.dropFrom = 0.5f;
-        sit.duration = 0.4f;
+        sit.dropFrom = 0.12f;
+        sit.duration = 0.35f;
 
         // --- The table, drawn in front of him so he sits behind it ---
         GameObject table = new GameObject("Foreground_Table");
