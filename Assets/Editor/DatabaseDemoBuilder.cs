@@ -79,6 +79,10 @@ public static class DatabaseDemoBuilder
         tracker.resultPanel = summary.panel;
         tracker.scoreText = null;          // the summary writes its own score line
         tracker.recordsText = summary.recordsText;
+        // Three, not the field's default five. The strip gets the band above
+        // the buttons and no more, and a header plus three rows is what sets
+        // legibly in it - five rows would have to drop to about 11px.
+        tracker.recentRecordsToShow = 3;
         tracker.levelName = levelName;
         tracker.levelIndex = levelIndex;
 
