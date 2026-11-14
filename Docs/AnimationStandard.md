@@ -170,8 +170,26 @@ HEIGHT, not how many figures are in it. Measured on Gemini, 2026-11-14:
 | 2 figures, 16:9 | 1024x572 | 2 | 114-118px — still rejected |
 
 Halving the figure count bought almost nothing, because each figure was
-already full-height in a 572px-tall frame. Ask for a **square or portrait**
-image and say the figures must fill it top to bottom; at 1024px tall the same
-two figures land near 200px of hair, which clears the floor. Two generations
-of two figures beats one of four, and the reference image is what keeps the
-character consistent across them, not being in the same strip.
+already full-height in a 572px-tall frame. A **square** 1024x1024 frame fixed
+it: the same two figures came back at 165 and 181px of hair, bracketing the
+170px target.
+
+### But then ask for ONE figure per image, not a strip
+
+Filling the frame and showing a descent are in direct conflict. Asked for two
+figures filling a square, the generator drew both standing at exactly the same
+height - crown drop of **0px**, measured - because it composes for the frame.
+Told twice, in plain words, to put the second head a head-height lower, it did
+it again.
+
+Asked for **one figure alone** in the square, it drew the crouch correctly
+first time: knees bent, thighs sloping, hips back, arms at his sides.
+
+This costs nothing, because **the crown drop does not have to come from the
+art**. `make_sit_frames.py` already normalises every frame by hair cap and
+then places each one so the crown sits at a chosen world height - that is
+where the descent comes from. The generator only has to supply the POSE. So:
+
+- one square generation per pose, the figure filling the frame
+- frame 1 is free - it is the existing standing sprite
+- the pipeline stacks them and steps the crowns down
