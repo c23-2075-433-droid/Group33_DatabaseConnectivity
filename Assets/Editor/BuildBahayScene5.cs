@@ -54,10 +54,10 @@
 //
 // Sitting down moves the same front-facing pose down rather than swapping
 // sprites - from the far side of a table, standing and sitting differ in how
-// much of him clears the table edge, nothing else. PoseSettle now lowers him
-// the last half unit so he lands on the chair instead of starting on it, and
-// a PoseSequence is wired for the three drawn in-betweens this scene still
-// needs; see the note beside it for why Paaralan Scene 2's cannot be reused.
+// much of him clears the table edge, nothing else. On top of that he is now
+// DRAWN crouching and then seated rather than standing all the way down -
+// see the PoseSequence below - and PoseSettle eases the last half unit so he
+// lands on the chair instead of starting on it.
 //
 // This is now the LAST playable scene of Level 1, so the level's result is
 // saved and shown here - Scene 4 fades into this one instead. When Scene 6 is
@@ -180,22 +180,26 @@ public class BuildBahayScene5
         // appear in it. Rule 1 of Docs/AnimationStandard.md: no instant pose
         // changes.
         //
-        // The drawn descent is wired but not yet drawn. Paaralan Scene 2 has
-        // its three "Upo" in-betweens (sit_frame_1..3_uniform) and they do
-        // not fit here: they are a near-portrait for the close desk shot and
-        // have no backpack, while this scene is a full figure across a table
-        // with the bag still on. So this scene needs its own three, plus a
-        // seated pose to rest on - four drawings, framed to match
-        // talking_uniform_with_bag. Until they exist, LoadSpriteOptional
-        // returns null for each and PoseSequence skips a missing drawing
-        // instead of stalling, so the scene behaves exactly as it did.
+        // The drawn descent, cut by Tools/make_bahay_sit_frames.py. Paaralan
+        // Scene 2's in-betweens (sit_frame_1..3_uniform) do not fit here:
+        // they are a near-portrait for the close desk shot and have no
+        // backpack, while this is a full figure across a table with the bag
+        // still on. So this scene has its own, framed to match
+        // talking_uniform_with_bag.
+        //
+        // One in-between rather than three. The generator would draw a
+        // crouch, and a finished sit, and nothing reliably between them - ask
+        // for a pose lower than the last and it returns the last one again.
+        // So the run is: crouch, then rest on the seated pose. Both are
+        // placed crown-on-the-top-edge like the standing sprite, so a swap
+        // changes the drawing and nothing else; the descent stays where it
+        // always was, in the 1.9 unit step down to this object and the ease
+        // below. Dropping the art as well would count it twice.
         PoseSequence sitFrames = seatGO.AddComponent<PoseSequence>();
         sitFrames.target = seatSr;
         sitFrames.frames = new[]
         {
             LoadSpriteOptional("sit_frame_1_uniform_with_bag"),
-            LoadSpriteOptional("sit_frame_2_uniform_with_bag"),
-            LoadSpriteOptional("sit_frame_3_uniform_with_bag"),
         };
         // Sitting happens once - it is on the standard's play-once list - so
         // loopFrames stays empty and it runs straight through.
@@ -203,8 +207,8 @@ public class BuildBahayScene5
         sitFrames.framesPerSecond = 9f;
         sitFrames.playOnEnable = true;    // "Upo" switches this object on
 
-        // The cheap nine-tenths, and the only part that works TODAY. The
-        // seated pose arrives half a unit high and settles, so he drops onto
+        // Still here, and still doing the work the two drawings cannot: the
+        // seated pose arrives half a unit high and settles, so he lands on
         // the chair instead of being already on it.
         //
         // No driftFrom, deliberately. He stands at x 5.2 and the chair is at
