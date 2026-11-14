@@ -47,7 +47,7 @@
       }
     },
     "com.yasirkula.speechtotext": {
-      "version": "https://github.com/yasirkula/UnitySpeechToText.git",
+      "version": "https://github.com/yasirkula/UnitySpeechToText.git#27a99b18ba3d10477b26b91c6c3e8f2b0c391150",
       "depth": 0,
       "source": "git",
       "dependencies": {},

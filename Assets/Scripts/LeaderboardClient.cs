@@ -75,6 +75,17 @@ public class LeaderboardClient : MonoBehaviour
             return;
         }
 
+        // A profile whose id is not a UUID cannot own a row: the function
+        // refuses it, and rightly. Stop here rather than spend a request
+        // finding that out.
+        if (!profile.HasValidId())
+        {
+            Debug.LogWarning("LeaderboardClient: this profile's id is not a UUID, " +
+                              "so it has no row to submit to.");
+            onDone?.Invoke(false, "This profile cannot be put on the board.");
+            return;
+        }
+
         if (!IsConfigured)
         {
             onDone?.Invoke(false, "Leaderboard is not configured.");
@@ -120,10 +131,12 @@ public class LeaderboardClient : MonoBehaviour
             {
                 // A warning, not an error: being offline is an ordinary day
                 // here, and the profile still carries everything it earned.
-                string msg = "Leaderboard submission failed (" + request.responseCode + "): " +
-                              request.error + " | " + request.downloadHandler.text;
-                Debug.LogWarning("LeaderboardClient: " + msg);
-                onDone?.Invoke(false, msg);
+                // The code and the body go to the log; the caller gets a line
+                // that can be shown to anyone.
+                Debug.LogWarning("LeaderboardClient: submission failed (" +
+                                  request.responseCode + "): " + request.error + " | " +
+                                  (request.downloadHandler != null ? request.downloadHandler.text : ""));
+                onDone?.Invoke(false, "Your progress is saved on this device.");
                 yield break;
             }
 
@@ -139,10 +152,14 @@ public class LeaderboardClient : MonoBehaviour
 
             if (result == null || !result.ok)
             {
-                string msg = result != null && !string.IsNullOrEmpty(result.error)
-                    ? result.error : "The server refused the submission.";
-                Debug.LogWarning("LeaderboardClient: " + msg);
-                onDone?.Invoke(false, msg);
+                // The function's own reason is written for us, not for a
+                // child - "That is a bigger jump in points than the game can
+                // award at once" is a developer's sentence. Log it; show the
+                // one thing that is true either way.
+                Debug.LogWarning("LeaderboardClient: the server refused the submission - " +
+                                  (result != null && !string.IsNullOrEmpty(result.error)
+                                      ? result.error : "no reason given"));
+                onDone?.Invoke(false, "Your progress is saved on this device.");
                 yield break;
             }
 
@@ -198,10 +215,9 @@ public class LeaderboardClient : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                string msg = "Leaderboard fetch failed (" + request.responseCode + "): " +
-                              request.error;
-                Debug.LogWarning("LeaderboardClient: " + msg);
-                onDone?.Invoke(null, 0, msg);
+                Debug.LogWarning("LeaderboardClient: fetch failed (" + request.responseCode +
+                                  "): " + request.error);
+                onDone?.Invoke(null, 0, "The board could not be loaded.");
                 yield break;
             }
 
@@ -219,7 +235,7 @@ public class LeaderboardClient : MonoBehaviour
         // Off the end of the fetched page: ask the database to count how many
         // players are ahead rather than pulling the whole board down to find
         // out. A failure here is not an error - the board still shows.
-        if (yourRank == 0)
+        if (yourRank == 0 && PlayerProfile.IsValidId(you))
         {
             yield return RankRoutine(you, found => yourRank = found);
         }
@@ -229,7 +245,9 @@ public class LeaderboardClient : MonoBehaviour
 
     private IEnumerator RankRoutine(string playerId, Action<int> onDone)
     {
-        string body = "{\"p_player_id\":\"" + playerId + "\"}";
+        // Serialized, never concatenated: the id is read from a file on the
+        // device and so is input like any other. JsonUtility escapes it.
+        string body = JsonUtility.ToJson(new LeaderboardRankRequest { p_player_id = playerId });
         using (UnityWebRequest request =
                new UnityWebRequest(config.RankEndpoint, UnityWebRequest.kHttpVerbPOST))
         {
