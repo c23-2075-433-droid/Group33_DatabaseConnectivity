@@ -226,6 +226,43 @@ public class BuildBahayScene5
         sit.dropFrom = 0.12f;
         sit.duration = 0.35f;
 
+        // "Kain" means EAT, and until now the word only swapped the full
+        // dishes for empty ones while Kylo sat perfectly still. These two
+        // drawings give him the action: the spoon comes up with rice on it
+        // and his mouth opens, then he chews with it empty.
+        //
+        // Only the half above the table edge is drawn, because only that
+        // half can be SEEN. The plate is drawn in front of the table layer,
+        // below its edge, so a scoop down at the plate would happen behind
+        // the furniture however well it was drawn. What reads from here is
+        // the spoon rising to his mouth and the mouth working.
+        //
+        // Crown-pinned to the seated pose rather than bottom-pinned like the
+        // sitting frames: he is already in the chair, so his head must stay
+        // exactly where it is and only the arm and the mouth move.
+        PoseSequence eatFrames = seatGO.AddComponent<PoseSequence>();
+        eatFrames.target = seatSr;
+        eatFrames.frames = new[] { LoadSpriteOptional("eat_bite_bahay") };
+        // Chew, bite, chew, bite - the repeat IS the eating, which is what
+        // loopFrames is for. Two cycles at 4fps runs about a second and a
+        // half: the pace of a child taking a couple of mouthfuls rather
+        // than a flicker.
+        eatFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("eat_chew_bahay"),
+            LoadSpriteOptional("eat_bite_bahay"),
+        };
+        eatFrames.loopCycles = 2;
+        eatFrames.tailFrames = new[] { LoadSpriteOptional("eat_chew_bahay") };
+        eatFrames.destinationSprite = LoadSpriteOptional("sitting_front_bahay");
+        eatFrames.framesPerSecond = 6f;
+        eatFrames.loopFramesPerSecond = 4f;
+        // The WORD drives this, not the object switching on - he is already
+        // sitting by the time anyone says "Kain", so there is no enable to
+        // hang it from, and tying it to the word is what keeps it from
+        // running on a wrong answer.
+        eatFrames.playOnEnable = false;
+
         // --- The table, drawn in front of him so he sits behind it ---
         GameObject table = new GameObject("Foreground_Table");
         SpriteRenderer tableSr = table.AddComponent<SpriteRenderer>();
@@ -337,8 +374,12 @@ public class BuildBahayScene5
         UnityEventTools.AddBoolPersistentListener(pagkain.onCorrect, propItlog.SetActive, true);
         UnityEventTools.AddBoolPersistentListener(pagkain.onCorrect, propBaso.SetActive, true);
 
-        // Eating swaps the full dishes for the empty ones.
+        // Eating swaps the full dishes for the empty ones, and now also
+        // plays the spoon going up. The swap stays on the word rather than
+        // on the end of the animation: if a drawing is ever missing the
+        // sequence does nothing, and the plates still have to empty.
         var kain = MakeObjective("Kain", pKain);
+        UnityEventTools.AddPersistentListener(kain.onCorrect, eatFrames.Play);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, propKanin.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, propItlog.SetActive, false);
         UnityEventTools.AddBoolPersistentListener(kain.onCorrect, emptyKanin.SetActive, true);

@@ -54,13 +54,14 @@ Then re-run Tools > SALINLAHI > Build Bahay Scene 5 in Unity.
 """
 import io
 import os
+import re
 import sys
 import uuid
 
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fit_seated_pose import hair_cap  # noqa: E402
+from fit_seated_pose import cut_background, hair_cap  # noqa: E402
 
 SPRITES = "Assets/Sprites/"
 BASE = SPRITES + "talking_uniform_with_bag.png"
@@ -73,10 +74,46 @@ FRAMES = [
     ("sitting_front_uniform", "sitting_front_bahay"),
 ]
 
+# The eating beat. Generated for this scene rather than refitted, because
+# the classroom has no drawing of him with a spoon - and at this camera the
+# plate is BELOW the table edge, so a scoop could never be seen. What can be
+# seen is the half above the edge: the spoon coming up to his mouth, the
+# mouth opening, the chewing. These two are that.
+#
+# Crown-aligned, not bottom-aligned. He is already sitting; only his arm and
+# his mouth move, so his head must stay exactly where the seated pose put it.
+EAT_FRAMES = [
+    ("Art/eat_bite_bahay_raw.png", "eat_bite_bahay"),
+    ("Art/eat_chew_bahay_raw.png", "eat_chew_bahay"),
+]
+
 CANVAS_H = 885          # forced by frame 1's crown; see the note above
 PPU, SCALE = 120.0, 1.27
 SIT_PIVOT_Y = -1.73     # BuildBahayScene5.SitPivotY
 SEATED_CROWN_Y = 2.213  # where the seated crown lands today, and must still
+
+
+def write_meta(out, name, meta):
+    """Write the sprite's .meta, KEEPING the GUID if one already exists.
+
+    A fresh uuid every run would hand every rebuild a new GUID, and every
+    scene reference to the sprite would break - the exact failure the
+    animation standard warns about when a .png is committed without its
+    .meta. Only a sprite that has never been cut before gets a new one.
+    """
+    path = out + ".meta"
+    guid = None
+    if os.path.exists(path):
+        m = re.search(r"^guid: ([0-9a-f]{32})$", io.open(path, encoding="utf-8").read(), re.M)
+        if m:
+            guid = m.group(1)
+    fresh = guid is None
+    if fresh:
+        guid = uuid.uuid4().hex
+    text = meta.replace("84e37c7a6289499a92ac93742e431552", guid)
+    text = text.replace("talking_uniform_with_bag_0", name + "_0")
+    io.open(path, "w", encoding="utf-8").write(text)
+    return guid, fresh
 
 
 def measure(im):
@@ -126,15 +163,42 @@ def main():
         out = SPRITES + name + ".png"
         canvas.save(out)
 
-        guid = uuid.uuid4().hex
-        m = meta.replace("84e37c7a6289499a92ac93742e431552", guid)
-        m = m.replace("talking_uniform_with_bag_0", name + "_0")
-        io.open(out + ".meta", "w", encoding="utf-8").write(m)
+        guid, fresh = write_meta(out, name, meta)
 
         crown_row = y + crown
         crown_world = SIT_PIVOT_Y + (CANVAS_H / 2.0 - crown_row) / PPU * SCALE
         print("%-22s reach %3d  crown row %3d  crown at world y %+.2f  guid %s"
-              % (name, reach, crown_row, crown_world, guid[:8]))
+              % (name, reach, crown_row, crown_world, guid[:8] + ("" if fresh else " (kept)")))
+
+    eating(base_hair, head_dx, dest_crown_row, meta)
+
+
+def eating(base_hair, head_dx, dest_crown_row, meta):
+    """The two spoon frames, crown-pinned to the seated pose's head."""
+    print()
+    for raw, name in EAT_FRAMES:
+        fig = cut_background(raw).convert("RGBA")
+        hair, _col, _cr, _ft = measure(fig)
+        s = float(base_hair) / hair
+        fig = fig.resize((round(fig.size[0] * s), round(fig.size[1] * s)), Image.LANCZOS)
+        box = fig.split()[3].getbbox()
+        fig = fig.crop(box)
+        _hair, col, crown, _feet = measure(fig)
+
+        width = fig.size[0] + 24
+        canvas = Image.new("RGBA", (width, CANVAS_H), (0, 0, 0, 0))
+        x = int(round(width / 2.0 + head_dx - col))
+        y = int(round(dest_crown_row - crown))
+        canvas.alpha_composite(fig, (x, y))
+
+        out = SPRITES + name + ".png"
+        canvas.save(out)
+        guid, fresh = write_meta(out, name, meta)
+
+        crown_row = y + crown
+        crown_world = SIT_PIVOT_Y + (CANVAS_H / 2.0 - crown_row) / PPU * SCALE
+        print("%-22s %dx%d  crown row %3d  crown at world y %+.2f  guid %s"
+              % (name, width, CANVAS_H, crown_row, crown_world, guid[:8] + ("" if fresh else " (kept)")))
 
 
 if __name__ == "__main__":
