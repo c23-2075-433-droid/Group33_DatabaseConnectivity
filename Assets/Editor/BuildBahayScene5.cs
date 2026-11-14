@@ -91,7 +91,10 @@ public class BuildBahayScene5
     private const float TableEdgeY = -1.97f;
 
     // Where the food rests on the near side of the table, in front of him.
-    private const float PlateY = -2.90f;
+    // Where the food rests. Brought forward from -2.90: against the bigger
+    // seated figure the dishes were crowded up against the table's far edge
+    // with two thirds of the tabletop empty in front of them.
+    private const float PlateY = -3.15f;
 
     // Drawn in the Player sorting layer, ordered back to front.
     private const int OrderKylo = 0;
@@ -106,6 +109,17 @@ public class BuildBahayScene5
     // end of the room.
     private const float PlayerScale = 1.27f;
 
+    // The SEATED pose is drawn larger than the standing one, and has to be.
+    // At 1.27 he sat small inside a chair whose back is twice his shoulder
+    // width, and read as a child at the far end of the room rather than at
+    // this table. 1.6 fills the chair the way a boy sitting in it would.
+    //
+    // It cannot just be PlayerScale: that also drives the standing pose,
+    // which is a FULL figure rather than this waist-up one. At 1.6 standing
+    // Kylo's crown lands at y +5.14 against a camera top of +5.4, so his
+    // hair would all but leave the frame.
+    private const float SeatedScale = 1.6f;
+
     // Where he is across the table, and how far standing clears the edge
     // compared with sitting. Only the difference matters: the table hides
     // everything below its edge either way.
@@ -118,6 +132,13 @@ public class BuildBahayScene5
     private const float SitX   = -0.2f;
     private const float SitPivotY   = -1.73f;
     private const float StandPivotY = SitPivotY + 1.9f;
+
+    // Where the seated object sits so its CROWN still lands at y +2.21 -
+    // the height this scene was tuned to, with the table edge cutting him
+    // at the right place. The seated sprites are 885px tall with the crown
+    // on row 70, so the crown is (885/2 - 70) px above the canvas centre.
+    private const float SeatedCrownY = 2.213f;
+    private const float SeatedPivotY = SeatedCrownY - (885f / 2f - 70f) / 120f * SeatedScale;
 
     [MenuItem("Tools/SALINLAHI/Build Bahay Scene 5")]
     public static void BuildScene()
@@ -168,8 +189,8 @@ public class BuildBahayScene5
         standSr.sortingOrder = OrderKylo;
 
         GameObject seatGO = new GameObject("Kylo_Seated");
-        seatGO.transform.position = new Vector3(SitX, SitPivotY, 0f);
-        seatGO.transform.localScale = new Vector3(PlayerScale, PlayerScale, 1f);
+        seatGO.transform.position = new Vector3(SitX, SeatedPivotY, 0f);
+        seatGO.transform.localScale = new Vector3(SeatedScale, SeatedScale, 1f);
         SpriteRenderer seatSr = seatGO.AddComponent<SpriteRenderer>();
         // The seated pose, not the standing drawing. If PoseSequence below
         // never runs, this is still a boy sitting down.
@@ -276,9 +297,11 @@ public class BuildBahayScene5
         // on a bare table and "Pagkain" is what brings the meal out. Built
         // here rather than spawned at the word: a persistent UnityEvent can
         // switch an existing object on, and cannot create one.
-        GameObject propItlog = CreateProp("Prop_Itlog", "prop_itlog", -2.3f, 1.05f, PlateY);
-        GameObject propKanin = CreateProp("Prop_Kanin", "prop_kanin", -0.2f, 1.40f, PlateY);
-        GameObject propBaso  = CreateProp("Prop_Baso",  "item_baso",   1.9f, 1.30f, PlateY);
+        // Spread wider than they were: the three sat within 4.2 units of
+        // each other, bunched left of the plate line.
+        GameObject propItlog = CreateProp("Prop_Itlog", "prop_itlog", -2.75f, 1.05f, PlateY);
+        GameObject propKanin = CreateProp("Prop_Kanin", "prop_kanin", -0.20f, 1.45f, PlateY);
+        GameObject propBaso  = CreateProp("Prop_Baso",  "item_baso",   2.35f, 1.25f, PlateY);
         propItlog.SetActive(false);
         propKanin.SetActive(false);
         propBaso.SetActive(false);
@@ -289,8 +312,8 @@ public class BuildBahayScene5
         // persistent UnityEvent can switch an object on but cannot set a
         // sprite. They are shorter than the full ones - what is removed is the
         // mound of rice and the egg, not the crockery.
-        GameObject emptyItlog = CreateProp("Prop_Itlog_Empty", "prop_itlog_empty", -2.3f, 0.50f, PlateY);
-        GameObject emptyKanin = CreateProp("Prop_Kanin_Empty", "prop_kanin_empty", -0.2f, 0.95f, PlateY);
+        GameObject emptyItlog = CreateProp("Prop_Itlog_Empty", "prop_itlog_empty", -2.75f, 0.50f, PlateY);
+        GameObject emptyKanin = CreateProp("Prop_Kanin_Empty", "prop_kanin_empty", -0.20f, 0.95f, PlateY);
         emptyItlog.SetActive(false);
         emptyKanin.SetActive(false);
         // CreateProp leaves these on the "Props" layer, which draws BELOW
@@ -304,6 +327,17 @@ public class BuildBahayScene5
             fsr.sortingLayerName = "Player";
             fsr.sortingOrder = OrderFood;
         }
+
+        // Each dish gets a soft ellipse where it meets the wood. Without one
+        // they read as floating just above the tabletop, which is what
+        // happens to anything composited onto a painted surface with nothing
+        // underneath it. Children of the prop, so they switch on and off
+        // with it and need no wiring of their own.
+        AddContactShadow(propItlog, 1.05f, 1.55f);
+        AddContactShadow(propKanin, 1.45f, 1.95f);
+        AddContactShadow(propBaso,  1.25f, 1.00f);
+        AddContactShadow(emptyItlog, 0.50f, 1.55f);
+        AddContactShadow(emptyKanin, 0.95f, 1.75f);
 
         // Nothing walks or falls in this scene, so Kylo needs no physics - he
         // is placed, not dropped. PlayerMovement is still here because
@@ -453,6 +487,39 @@ public class BuildBahayScene5
         go.transform.localScale = new Vector3(s, s, 1f);
         go.transform.position = new Vector3(x, baseY + worldHeight * 0.5f, 0f);
         return go;
+    }
+
+    /// <summary>
+    /// A soft contact shadow under a prop, as a child so it inherits the
+    /// prop's own scale and visibility.
+    /// </summary>
+    /// <param name="worldHeight">The height the prop was built at, which is
+    /// how far its base is below its centre.</param>
+    /// <param name="worldWidth">How wide the shadow should be in world units -
+    /// a little wider than the object's footprint.</param>
+    private static void AddContactShadow(GameObject prop, float worldHeight, float worldWidth)
+    {
+        Sprite sprite = LoadSpriteOptional("fx_contact_shadow");
+        if (sprite == null) return;
+
+        GameObject go = new GameObject("ContactShadow");
+        go.transform.SetParent(prop.transform, false);
+
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        sr.sortingLayerName = "Player";
+        sr.sortingOrder = OrderFood - 1;      // over the table, under the dish
+
+        // The prop carries a scale of its own, so undo it: a child asked for
+        // worldWidth has to be given worldWidth / (sprite width * prop scale).
+        float propScale = prop.transform.localScale.x;
+        float spriteWidth = sprite.bounds.size.x;
+        if (propScale <= 0.0001f || spriteWidth <= 0.0001f) return;
+        float s = worldWidth / (spriteWidth * propScale);
+        go.transform.localScale = new Vector3(s, s, 1f);
+
+        // Sat at the prop's base rather than its middle.
+        go.transform.localPosition = new Vector3(0f, -(worldHeight * 0.5f) / propScale, 0f);
     }
 
     private static PickUpItem AddPickUp(GameObject item)
