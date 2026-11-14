@@ -155,3 +155,23 @@ around that is more useful than pretending otherwise.
    `destinationSprite`, with `Play` on the word's `onCorrect`.
 6. Commit each new `.png` **with its `.meta`**, or it gets a fresh GUID on
    another machine and every scene reference to it breaks.
+
+### Resolution: ask for a TALL image, not a wide strip
+
+`check_pose_strip.py` refuses any figure whose hair cap is under 120px, and
+the sprites these have to match are drawn at 170px (`talking_uniform_with_bag`)
+to 332px (`sitting_front_uniform`). A generator that returns ~1024px on the
+long side cannot meet that in a wide strip, and the limit is the image's
+HEIGHT, not how many figures are in it. Measured on Gemini, 2026-11-14:
+
+| ask | image | figures | hair cap |
+|---|---|---|---|
+| 4 figures, 16:9 | 1024x572 | 4 | 75-103px — rejected |
+| 2 figures, 16:9 | 1024x572 | 2 | 114-118px — still rejected |
+
+Halving the figure count bought almost nothing, because each figure was
+already full-height in a 572px-tall frame. Ask for a **square or portrait**
+image and say the figures must fill it top to bottom; at 1024px tall the same
+two figures land near 200px of hair, which clears the floor. Two generations
+of two figures beats one of four, and the reference image is what keeps the
+character consistent across them, not being in the same strip.
