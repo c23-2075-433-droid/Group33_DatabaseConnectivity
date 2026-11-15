@@ -181,7 +181,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     void Update()
     {
-        if (!enableKeyboardFallback || player == null) return;
+        // No PlayerMovement needed. Only "Talon" is about the player, and
+        // ProcessRecognizedText checks that reference itself, so a scene that
+        // teaches words without a walking character can still be answered -
+        // which matters now that the keyboard is the ONLY way to answer in
+        // the Editor.
+        if (!enableKeyboardFallback) return;
 
         // These go through SimulateSpeech, NOT straight to PlayerMovement, so
         // the Editor exercises the real pipeline: objective matching,
@@ -252,9 +257,43 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     void Start()
     {
+#if !UNITY_EDITOR
         SetStatusText("Requesting microphone permission...");
+#endif
         RequestPermissionAndListen();
     }
+
+    // ---- Why the recognizer is switched off in the Editor ---------------
+    //
+    // The speech plugin has no microphone in the Editor, so SpeechToText.Start
+    // runs an emulator instead: it waits about 1.6 seconds and then delivers
+    // the fixed string "Hello world" as a SUCCESSFUL result, with no error
+    // code. Because listenContinuously is on, that repeats for as long as the
+    // scene is playing, and nothing downstream can tell those results from a
+    // child speaking. Every playtest therefore:
+    //
+    //   - counted an attempt every ~1.6 seconds while any word was live, so
+    //     accuracy collapsed and every saved score came out at one star;
+    //   - made VoicePromptDirector see a miss each cycle, so Rachel fired her
+    //     slow hint at ~3 s and her replay hint at ~6 s at a child who had not
+    //     said anything;
+    //   - filled salinlahi_voice_attempts.csv with mali / "Hello world" rows,
+    //     which is the log the WordVariants table is supposed to be tuned from.
+    //
+    // ("Hello world" no longer scores tama for Ilaw - a variant has to be the
+    // whole recognizer result now - but it is still a wrong answer every cycle,
+    // and "hello" on its own is still a listed variant of Ilaw.)
+    //
+    // So the recognizer is never started under UNITY_EDITOR. Speech comes from
+    // the keyboard fallback in Update() instead - ENTER says whatever word the
+    // scene is currently asking for - which runs through the same
+    // ProcessRecognizedText as a real result, so the Editor still exercises
+    // objective matching, feedback and scoring. Nothing here changes on a
+    // device: the gate is compiled out of real builds.
+    //
+    // The emulator lives in the plugin (Plugins/SpeechToText/SpeechToText.cs),
+    // which arrives as a git package, so it cannot be edited from this project
+    // - the two start calls below are the only place to stop it.
 
     /// <summary>
     /// Requests microphone permission (if not already granted) and starts
@@ -263,6 +302,8 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     /// </summary>
     public void RequestPermissionAndListen()
     {
+        // Still checked in the Editor: this one is about the plugin failing to
+        // initialize at all, which is worth hearing about wherever it happens.
         if (!isInitialized)
         {
             SetStatusText("Speech recognition unavailable on this device.");
@@ -270,6 +311,15 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             return;
         }
 
+#if UNITY_EDITOR
+        // Deliberately does NOT raise OnMicrophoneUnavailable: nothing is
+        // broken, there is simply no microphone here, and that event has the
+        // narrator point the child at the mic button. The panel sits on
+        // SPEAK NOW instead, which is the truth - the game is waiting for you.
+        SetListening(false);
+        SetStatusText("Editor: the microphone is off here. Press ENTER to say the current word.");
+        return;
+#else
         SpeechToText.RequestPermissionAsync((permission) =>
         {
             // The permission dialog is async too, so the same "destroyed while
@@ -287,10 +337,17 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
                 if (OnMicrophoneUnavailable != null) OnMicrophoneUnavailable();
             }
         });
+#endif
     }
 
     private void StartListening()
     {
+#if UNITY_EDITOR
+        // The other door into the emulator: ResumeListening after the narrator
+        // finishes a line, and the queued restart after each result.
+        SetListening(false);
+        return;
+#else
         if (isShuttingDown || this == null) return;
         if (!isInitialized) return;
         if (isSuspended) return;
@@ -301,6 +358,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         SetStatusText("Listening...");
         speechStartedThisSession = false;
         SpeechToText.Start(this, useFreeFormLanguageModel, preferOfflineRecognition: false);
+#endif
     }
 
     // ---- ISpeechToTextListener callbacks ----
