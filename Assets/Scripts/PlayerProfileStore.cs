@@ -40,7 +40,14 @@ public static class PlayerProfileStore
     public const int MaxStarsPerScene = LevelProgress.MaxStars;
 
     private const string FileName = "players.json";
-    private const int CurrentVersion = 1;
+    // 1 -> 2: Bahay's sixth scene, designed but never built, was taken off
+    // JourneyMap, so every step index after it moved down by one and a saved
+    // position written against the old map now names the wrong step. See
+    // MigrateStepNumbering.
+    private const int CurrentVersion = 2;
+
+    /// <summary>The index the dropped Bahay scene held on the old map.</summary>
+    private const int DroppedStep = 6;
 
     // The PlayerPrefs keys this replaces. Read once by Migrate(), never written.
     private const string LegacyNicknameKey = "SALINLAHI_Nickname";
@@ -332,7 +339,46 @@ public static class PlayerProfileStore
         }
 
         Repair();
+        MigrateStepNumbering();
         Migrate();
+    }
+
+    /// <summary>
+    /// A journey position written against the map that still had Bahay's
+    /// sixth scene, read on the map without it.
+    ///
+    /// Progress is stored as one index into JourneyMap.Steps, so removing a
+    /// step silently renames every saved position after it: a child who had
+    /// just reached Paaralan's first scene would be read as having reached
+    /// its second, and would be handed a scene they had never played. The
+    /// indices before the dropped one are untouched, which is why this is a
+    /// shift rather than a reset - nobody is sent back to the beginning.
+    ///
+    /// The step itself was never storable: it had no scene behind it, and
+    /// progress only ever moves to a step that can be entered, so there is no
+    /// saved value of exactly DroppedStep to decide about. The end-of-journey
+    /// sentinel, one past the last step, shifts with everything else.
+    /// </summary>
+    private static int StepOnOldMap(int step) => step > DroppedStep ? step - 1 : step;
+
+    private static void MigrateStepNumbering()
+    {
+        if (book.version >= 2) return;
+
+        int moved = 0;
+        foreach (PlayerProfile p in book.players)
+        {
+            int was = p.highestUnlockedStep;
+            if (was <= DroppedStep) continue;       // -1 for "never recorded" included
+            p.highestUnlockedStep = StepOnOldMap(was);
+            moved++;
+        }
+
+        book.version = CurrentVersion;
+        Save();
+        if (moved > 0)
+            Debug.Log("PlayerProfileStore: moved " + moved + " saved journey position(s) " +
+                       "onto the map without Bahay's sixth scene.");
     }
 
     /// <summary>
@@ -422,8 +468,10 @@ public static class PlayerProfileStore
             nickname = Clean(PlayerPrefs.GetString(LegacyNicknameKey, "")),
             createdAt = Now(),
             lastPlayedAt = Now(),
+            // Written by a build older than the profile file, so older than
+            // the map change as well: the same shift applies.
             highestUnlockedStep = PlayerPrefs.HasKey(LegacyStepKey)
-                ? PlayerPrefs.GetInt(LegacyStepKey, -1) : -1,
+                ? StepOnOldMap(PlayerPrefs.GetInt(LegacyStepKey, -1)) : -1,
         };
 
         // Stars were keyed by scene name, and the journey knows every scene

@@ -33,8 +33,10 @@
 //
 // This scene was in the design document from the start and was never built -
 // Level 1 ran Scene 1 -> 2 -> 3 -> 4 and then ended, so Kylo got dressed and
-// left for school without eating. Scene 6 ("Leaving for School") is still
-// missing after this one.
+// left for school without eating. The design document put a sixth after it,
+// "Leaving for School", which was never built either and has now been
+// dropped from JourneyMap: breakfast is the end of the home chapter, and
+// this is the scene that closes it.
 //
 // The scene is staged from Nanay's seat: the camera is her point of view
 // across the breakfast table, with Kylo facing her from the chair opposite.

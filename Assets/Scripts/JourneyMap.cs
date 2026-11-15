@@ -4,16 +4,19 @@ using System.Collections.Generic;
 /// The whole journey, in order, as one list: every level marker and every
 /// scene between them.
 ///
-///   Bahay - s1 - s2 - s3 - s4 - s5 - s6 - Paaralan - s1 - ... - Parke - s5
+///   Bahay - s1 - s2 - s3 - s4 - s5 - Paaralan - s1 - ... - Parke - s5
 ///
 /// This is the single place the order is written down. The map scene lays its
 /// nodes out from this list, and LevelProgress counts how far along it the
 /// player has reached, so the two can never disagree about what comes next.
 ///
-/// Scenes that are designed but not built yet carry an empty sceneName. They
-/// still appear on the map - the journey is meant to show where the child is
-/// going, not only where they have been - but they can never be entered, so a
-/// node that leads nowhere is impossible rather than merely unlikely.
+/// A scene that is designed but not built yet carries an empty sceneName. It
+/// still appears on the map - the journey is meant to show where the child is
+/// going, not only where they have been - but it can never be entered, so a
+/// node that leads nowhere is impossible rather than merely unlikely. No step
+/// is in that state today: Bahay's sixth, leaving for school, was the last
+/// one and has been dropped, so breakfast ends the chapter. The handling
+/// stays because the next scene drawn before it is built will need it.
 /// </summary>
 public static class JourneyMap
 {
@@ -48,9 +51,13 @@ public static class JourneyMap
                    sceneName = sceneName };
 
     /// <summary>
-    /// The journey in order. Nineteen steps: three level markers and the
-    /// sixteen scenes the design document lays out. Fifteen of those scenes
-    /// are built; only Bahay's sixth, leaving for school, is still to come.
+    /// The journey in order. Eighteen steps: three level markers and fifteen
+    /// scenes, every one of them built and enterable.
+    ///
+    /// Bahay had a sixth, leaving for school, which was in the design
+    /// document and never built. It is gone rather than still pending:
+    /// breakfast is the end of the home chapter, so the map no longer shows
+    /// the child a padlock it was never going to open.
     ///
     /// There was a fourth marker here, Palengke, with no scenes behind it. It
     /// never reached the screen - BuildLevelSelectScene leaves out any place
@@ -66,7 +73,6 @@ public static class JourneyMap
         Scene("3", 1, "Chapter1_Level3_Maligo"),
         Scene("4", 1, "Chapter1_Level4_Damit"),
         Scene("5", 1, "Chapter1_Level5_Almusal"),
-        Scene("6", 1, ""),                               // Leaving for School
 
         Level("Paaralan", 2, "map_paaralan"),
         Scene("1", 2, "Chapter2_Level1_Paaralan"),
@@ -109,10 +115,12 @@ public static class JourneyMap
     ///
     /// Anything that can never be finished has to be stepped over - a level
     /// marker, or a scene that is designed but not built yet - or the journey
-    /// dams behind it. Bahay's sixth scene is exactly that: unbuilt, and
-    /// sitting between breakfast and Paaralan, so opening the very next step
-    /// would leave every later scene locked for good however well the child
-    /// did.
+    /// dams behind it. Every level's last scene is followed by the next
+    /// level's marker, so this is not a rare case: it is what happens at the
+    /// end of each chapter. Bahay's unbuilt sixth scene used to sit in front
+    /// of that marker as well, two unenterable steps in a row between
+    /// breakfast and Paaralan; with it gone the walk is shorter, but it is
+    /// still a walk rather than a single step.
     ///
     /// Past the last playable step there is nothing left to enter, so this
     /// gives Steps.Length - one beyond the end of the journey, which is not a
