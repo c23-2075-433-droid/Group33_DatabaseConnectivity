@@ -325,3 +325,51 @@ than as a side effect of something else.
    `destinationSprite`, with `Play` on the word's `onCorrect`.
 6. Commit each new `.png` **with its `.meta`**, or it gets a fresh GUID on
    another machine and every scene reference to it breaks.
+
+### Resolution: ask for a SQUARE image, and one figure at a time
+
+`check_pose_strip.py` refuses any figure whose hair cap is under 120px, and
+the sprite a Bahay Scene 5 frame has to match, `talking_uniform_with_bag`, is
+drawn at 142px. Measure hair as `bottom - crown` from `hair_cap`; its third
+return value is a centre COLUMN, not a height, and mistaking the two will
+tell you a strip passed when it did not.
+
+A generator that returns ~1024px on the long side cannot meet that in a wide
+strip, and the limit is the image's HEIGHT, not how many figures are in it.
+Measured on Gemini, 2026-11-14:
+
+| ask | image | figures | hair height |
+|---|---|---|---|
+| 4 figures, 16:9 | 1024x572 | 4 | 95-97px — rejected |
+| 2 figures, 16:9 | 1024x572 | 2 | 108-109px — still rejected |
+| 2 figures, square | 1024x1024 | 2 | 192px — passes |
+| 1 figure, square | 1024x1024 | 1 | 228px — comfortable |
+
+Halving the figure count bought almost nothing, because each figure was
+already full-height in a 572px-tall frame. The square frame is what fixed it.
+
+### Ask for ONE figure per image, not a strip
+
+Filling the frame and showing a descent are in direct conflict. Asked for two
+figures filling a square, the generator drew both standing at exactly the same
+height - crown drop of **0px**, measured - because it composes for the frame.
+Told twice, in plain words, to put the second head a head-height lower, it did
+it again.
+
+Asked for **one figure alone** in the square, it drew the crouch correctly
+first time: knees bent, thighs sloping, hips back, arms at his sides.
+
+This costs nothing, because **the crown drop does not have to come from the
+art**. `make_sit_frames.py` already normalises every frame by hair cap and
+then places each one so the crown sits at a chosen world height - that is
+where the descent comes from. The generator only has to supply the POSE. So:
+
+- one square generation per pose, the figure filling the frame
+- frame 1 is free - it is the existing standing sprite
+- the pipeline stacks them and steps the crowns down
+
+One limit found the hard way: it will not reliably draw a pose *lower than
+the one before*. Asked for a deeper crouch it returned the previous crouch
+again; asked for a finished sit with horizontal thighs it returned a deeper
+crouch with the hands on the thighs. Describe each pose from scratch in
+absolute terms rather than as "lower than the last one".

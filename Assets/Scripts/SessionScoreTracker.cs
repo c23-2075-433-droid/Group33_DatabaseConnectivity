@@ -186,7 +186,12 @@ public class SessionScoreTracker : MonoBehaviour
         {
             if (!success)
             {
-                SetText(recordsText, "Could not save result.\n" + error);
+                // The reason is in the log, not on the panel: see
+                // SupabaseClient.Log. What a child needs to know is that the
+                // run still counted, which it did - RecordRun() above saved it
+                // to this device before the network was ever involved.
+                SetText(recordsText, "Your result is saved on this device.\n" +
+                                      "We will send it when you are online.");
                 return;
             }
             FetchAndDisplayRecords();
@@ -197,13 +202,20 @@ public class SessionScoreTracker : MonoBehaviour
 
     private void FetchAndDisplayRecords()
     {
+        // Nowhere to show them. The summary board dropped its records strip
+        // - the leaderboard in the profile menu is where past scores are
+        // read back now - so there is no reason to make the request. Saving
+        // above still happens either way, which is what the leaderboard
+        // reads.
+        if (recordsText == null) return;
+
         SetText(recordsText, "Loading recent scores...");
 
         supabaseClient.FetchRecentScores(recentRecordsToShow, (records, error) =>
         {
             if (error != null)
             {
-                SetText(recordsText, "Saved, but could not load recent scores.\n" + error);
+                SetText(recordsText, "Saved! Recent scores could not be loaded right now.");
                 return;
             }
             SetText(recordsText, FormatRecords(records));

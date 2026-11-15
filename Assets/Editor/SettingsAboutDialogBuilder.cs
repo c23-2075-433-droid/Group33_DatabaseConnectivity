@@ -11,18 +11,21 @@
 //   ui_settings_slider_track - grey capsule with its dark groove
 //   ui_settings_slider_fill  - the orange bar, 9-sliced
 //   ui_settings_slider_knob  - round dark handle
-//   ui_results_panel         - empty bamboo frame, still the About background
-//   btn_okay                 - "OKAY", still closes About
+//   ui_about_panel           - the whole About board: its heading, its three
+//                              sections, its credits and its corner X are all
+//                              painted into the art
 //
-// The two popups no longer share a look. Settings is a drawn board with its own
-// lettering baked in, so it has no title and no captions of its own; About is
-// still the bamboo frame with text laid on it. What they do share is BuildShell,
-// which is now only the backdrop and the panel image - the title and the close
-// button moved out, because About still wants OKAY under a heading and Settings
-// wants an X in its corner.
+// Both popups are drawn boards that carry their own lettering, so neither has
+// a title or captions of its own. All they share now is the dimmed backdrop -
+// each builder adds its own board, because the two are sized differently.
+// Settings is landscape and takes a fixed size. About is PORTRAIT, taller than
+// the canvas is at 16:9, so a fixed size would hang off the top and bottom of
+// the screen; it is fitted to the space instead, and the two things laid on it
+// are anchored by fractions of the art rather than given a size in units, so
+// they follow the board wherever it lands.
 //
-// Everything inside a panel is positioned as a fraction of the panel size, so
-// changing PanelWidth rescales the whole popup.
+// Everything inside the settings panel is positioned as a fraction of the panel
+// size, so changing PanelWidth rescales that popup.
 //
 // Used by AddSettingsAboutToMainMenu.cs (patches the built menu) and
 // BuildMainMenuScene.cs (fresh rebuild).
@@ -39,8 +42,21 @@ public static class SettingsAboutDialogBuilder
     public const string AboutRootName = "AboutPanel";
 
     private const float PanelWidth = 1000f;
-    private const float AboutAspect = 1014f / 793f;      // ui_results_panel
     private const float SettingsAspect = 1224f / 946f;   // ui_settings_panel
+    private const float AboutAspect = 794f / 941f;       // ui_about_panel
+
+    // How much room the About board leaves itself on its tight axis - the top
+    // and bottom of a landscape screen, the sides of a portrait one.
+    private const float AboutScreenMargin = 32f;
+
+    // Measured off ui_about_panel, as fractions of the art with the origin at
+    // its top-left, the way an image editor reads it: the painted X in the
+    // corner, and the strip of bare wood along the bottom rail, which is the
+    // only band the artwork leaves clear.
+    private const float CloseLeft = 0.846f, CloseRight = 0.979f;
+    private const float CloseTop = 0.064f, CloseBottom = 0.171f;
+    private const float VersionLeft = 0.30f, VersionRight = 0.70f;
+    private const float VersionTop = 0.953f, VersionBottom = 0.987f;
 
     // Cream, matching the lettering painted into btn_okay and the menu buttons.
     private static readonly Color CreamText = new Color(0.99f, 0.95f, 0.86f);
@@ -62,8 +78,11 @@ public static class SettingsAboutDialogBuilder
     public static Dialog BuildSettings(Transform canvas)
     {
         Vector2 board = new Vector2(PanelWidth, PanelWidth / SettingsAspect);
-        Dialog d = BuildShell(canvas, SettingsRootName, "ui_settings_panel", board);
-        Transform panel = d.root.transform.Find("Panel");
+        Dialog d = new Dialog { root = BuildBackdrop(canvas, SettingsRootName) };
+        GameObject boardGO = CreateImage(d.root.transform, "Panel", "ui_settings_panel",
+            Vector2.zero, board);
+        boardGO.GetComponent<Image>().raycastTarget = false;
+        Transform panel = boardGO.transform;
 
         // No title and no captions: the board carries all of its own lettering.
         d.soundToggle = BuildToggle(panel, "SoundToggle", board,
@@ -85,65 +104,85 @@ public static class SettingsAboutDialogBuilder
         return d;
     }
 
-    /// <summary>About popup: the build's version, the capstone credits and an OKAY button.</summary>
+    /// <summary>
+    /// About popup. The board is one piece of drawn art - the heading, the
+    /// three sections and the credits are all painted into it - so the only
+    /// things built here are a hit area over the X it already shows and the
+    /// build version, which is the one line the art cannot carry.
+    /// </summary>
     public static Dialog BuildAbout(Transform canvas)
     {
-        Vector2 board = new Vector2(PanelWidth, PanelWidth / AboutAspect);
-        float h = board.y;
-        Dialog d = BuildShell(canvas, AboutRootName, "ui_results_panel", board);
-        Transform panel = d.root.transform.Find("Panel");
+        Dialog d = new Dialog { root = BuildBackdrop(canvas, AboutRootName) };
 
-        CreateText(panel, "Title", "About", new Vector2(0, h * 0.27f),
-            new Vector2(PanelWidth * 0.7f, h * 0.14f), 58, FontStyle.Bold);
+        // Two nodes, one for the margin and one for the board: FitInParent
+        // writes the board's own anchors and offsets on every layout pass, so
+        // an inset put on the board directly would not survive the first one.
+        GameObject area = new GameObject("Fit", typeof(RectTransform));
+        area.transform.SetParent(d.root.transform, false);
+        Stretch(area.GetComponent<RectTransform>(),
+            new Vector2(AboutScreenMargin, AboutScreenMargin),
+            new Vector2(-AboutScreenMargin, -AboutScreenMargin));
 
-        // The version sits in the gap between the title and the credits, which
-        // is the only clear band on this board: the credits run to about
-        // -0.2h and OKAY starts at -0.3h, so there is nothing below them to
-        // use. A tester reading a bug report can now name the build it came
-        // from. The number itself is filled in at run time by VersionLabel, so
-        // it tracks Player Settings rather than whenever this builder last ran.
-        Text version = CreateText(panel, "Version", "v" + Application.version,
-            new Vector2(0, h * 0.198f), new Vector2(PanelWidth * 0.5f, h * 0.06f),
-            26, FontStyle.Bold);
+        GameObject board = CreateImage(area.transform, "Panel", "ui_about_panel",
+            Vector2.zero, Vector2.zero);
+        board.GetComponent<Image>().raycastTarget = false;
+        AspectRatioFitter fitter = board.AddComponent<AspectRatioFitter>();
+        fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        fitter.aspectRatio = AboutAspect;
+
+        // The build version, so a tester reading a bug report can name the
+        // build it came from. VersionLabel fills in the number at run time,
+        // which keeps it tracking Player Settings rather than whenever this
+        // builder last ran. Best-fit rather than a point size: the board's
+        // size follows the screen, and a fixed size would not follow with it.
+        Text version = CreateText(board.transform, "Version", "v" + Application.version,
+            Vector2.zero, Vector2.zero, 22, FontStyle.Bold);
+        version.resizeTextForBestFit = true;
+        version.resizeTextMinSize = 8;
+        version.resizeTextMaxSize = 26;
+        version.color = new Color(CreamText.r, CreamText.g, CreamText.b, 0.8f);
+        AnchorFraction(version.rectTransform,
+            VersionLeft, VersionRight, VersionTop, VersionBottom);
         version.gameObject.AddComponent<VersionLabel>();
 
-        CreateText(panel, "AboutBody",
-            "A game for learning Filipino words by speaking them out loud.\n\n" +
-            "BSIT Capstone Project\nUniversity of Perpetual Help System Laguna\n\n" +
-            "Daquis, Jhesza Mhei G.\nLacida, Kylo Bryan\nManzanero, Kyla Samantha",
-            new Vector2(0, -h * 0.02f), new Vector2(PanelWidth * 0.66f, h * 0.44f), 30, FontStyle.Normal);
-
-        // OKAY button, same proportions as the nickname dialog's (1733x407 art).
-        GameObject closeGO = CreateImage(panel, "CloseButton", "btn_okay",
-            new Vector2(0, -h * 0.3f),
-            new Vector2(PanelWidth * 0.38f, PanelWidth * 0.38f * 407f / 1733f));
+        // The close button is transparent, because the X it closes on is part
+        // of the board. A sprite laid over it could only be the same pixels
+        // again, and tinting those on a press would flash a square patch of
+        // the wood around them. Nothing is lost by leaving it bare: the press
+        // still clicks, since UIClickSound watches for presses rather than
+        // being wired to each button, and the panel shutting is the rest of
+        // the answer.
+        GameObject closeGO = new GameObject("CloseButton", typeof(RectTransform));
+        closeGO.transform.SetParent(board.transform, false);
+        Image closeImage = closeGO.AddComponent<Image>();
+        closeImage.color = new Color(0f, 0f, 0f, 0f);
+        closeImage.raycastTarget = true;
+        AnchorFraction(closeGO.GetComponent<RectTransform>(),
+            CloseLeft, CloseRight, CloseTop, CloseBottom);
         d.close = MakeButton(closeGO);
 
         return d;
     }
 
-    /// <summary>What both popups share: the dimmed backdrop and the panel image.</summary>
-    private static Dialog BuildShell(Transform canvas, string rootName, string panelSprite, Vector2 board)
+    /// <summary>
+    /// What both popups share: the full-screen dimmed backdrop, which also
+    /// swallows the presses meant for the menu behind it. The board goes on
+    /// top of this, and each builder adds its own - they are no longer the
+    /// same shape or sized the same way.
+    /// </summary>
+    private static GameObject BuildBackdrop(Transform canvas, string rootName)
     {
         foreach (GameObject stale in FindAllInScene(rootName)) Object.DestroyImmediate(stale);
 
-        // Full-screen root, which also blocks clicks on the menu behind it.
         GameObject root = new GameObject(rootName, typeof(RectTransform));
         root.transform.SetParent(canvas, false);
-        RectTransform rootRect = root.GetComponent<RectTransform>();
-        rootRect.anchorMin = Vector2.zero;
-        rootRect.anchorMax = Vector2.one;
-        rootRect.offsetMin = Vector2.zero;
-        rootRect.offsetMax = Vector2.zero;
+        Stretch(root.GetComponent<RectTransform>(), Vector2.zero, Vector2.zero);
         // Matches the in-game panel's dim, so the two read as one dialog.
         root.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
 
-        GameObject panel = CreateImage(root.transform, "Panel", panelSprite, Vector2.zero, board);
-        panel.GetComponent<Image>().raycastTarget = false;
-
         root.SetActive(false); // MainMenuController shows it when the button is pressed
 
-        return new Dialog { root = root };
+        return root;
     }
 
     /// <summary>
@@ -264,6 +303,23 @@ public static class SettingsAboutDialogBuilder
         rect.anchoredPosition = new Vector2(
             ((left + right) * 0.5f - 0.5f) * panel.x,
             (0.5f - (top + bottom) * 0.5f) * panel.y);
+    }
+
+    /// <summary>
+    /// Pins a child to a rectangle given as fractions of its PARENT, measured
+    /// with the origin at the top-left. FillFraction's sibling, and the one to
+    /// reach for when the parent resizes: it sets anchors rather than a size,
+    /// so the child is re-laid out with the parent instead of staying the size
+    /// the builder happened to compute.
+    /// </summary>
+    private static void AnchorFraction(RectTransform rect,
+        float left, float right, float top, float bottom)
+    {
+        rect.anchorMin = new Vector2(left, 1f - bottom);
+        rect.anchorMax = new Vector2(right, 1f - top);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
     }
 
     private static void Stretch(RectTransform rect, Vector2 offsetMin, Vector2 offsetMax)

@@ -133,22 +133,64 @@ class Flowchart(Flowable):
     documents.
 
     Written in markdown as a fenced block tagged `flow`, one step per line.
+
+    A flow may end in a decision, which is what the security review needed and
+    the release process did not: a sequence of steps is only half of how a
+    token check works, because the point of it is that there are two outcomes
+    and they are not equal. Three prefixes say so:
+
+        ? matches?              a decision - drawn as a hexagon, not numbered
+        + update the row        the "yes" outcome
+        - 403, the row is untouched    the "no" outcome
+
+    The decision and its two outcomes have to come last, and that is not a
+    limitation worth lifting: a flow that branches in the middle and rejoins is
+    a different picture, and it should be drawn as one rather than squeezed
+    through this.
     """
 
     FONT, SIZE, LEAD = "Helvetica", 9.3, 11.8
     PAD_X, PAD_Y, GAP, NUM_W = 9, 6, 14, 22
     MAX_W = 150 * mm
+    FORK_GAP = 10          # between the two outcome boxes
+    STEM = 11              # the drop below the decision before the fork splits
 
     def __init__(self, steps, width):
         Flowable.__init__(self)
-        self.steps = steps
         self.width = width
         self.box_w = min(width, self.MAX_W)
-        self._lines = [self._wrap(t) for t in steps]
+
+        # Split the lines into the linear part and the decision, if there is one.
+        self.steps, self.decision, self.outcomes = [], None, []
+        for raw in steps:
+            if raw.startswith("? "):
+                self.decision = raw[2:].strip()
+            elif raw.startswith("+ "):
+                self.outcomes.append(("Yes", raw[2:].strip()))
+            elif raw.startswith("- "):
+                self.outcomes.append(("No", raw[2:].strip()))
+            else:
+                self.steps.append(raw)
+
+        self._lines = [self._wrap(t) for t in self.steps]
         self._heights = [len(l) * self.LEAD + 2 * self.PAD_Y for l in self._lines]
 
-    def _wrap(self, text):
-        avail = self.box_w - 2 * self.PAD_X - self.NUM_W
+        # The decision's text is centred, so it gets the full width to wrap in.
+        self._dec_lines = (self._wrap(self.decision, numbered=False)
+                           if self.decision else [])
+        self._dec_h = (len(self._dec_lines) * self.LEAD + 2 * self.PAD_Y
+                       if self.decision else 0)
+
+        # Both outcome boxes are the same height, so the fork reads as a pair.
+        self.out_w = (self.box_w - self.FORK_GAP) / 2.0
+        self._out_lines = [self._wrap(t, numbered=False, width=self.out_w)
+                           for _, t in self.outcomes]
+        self._out_h = (max((len(l) for l in self._out_lines), default=0)
+                       * self.LEAD + 2 * self.PAD_Y)
+
+    def _wrap(self, text, numbered=True, width=None):
+        box = width if width is not None else self.box_w
+        avail = box - 2 * self.PAD_X - (self.NUM_W if numbered else 0)
         lines, cur = [], ""
         for word in fold(text).split():
             trial = (cur + " " + word).strip()
@@ -162,14 +204,17 @@ class Flowchart(Flowable):
         return lines or [""]
 
     def wrap(self, availWidth, availHeight):
-        return self.width, (sum(self._heights)
-                            + self.GAP * (len(self.steps) - 1))
+        h = sum(self._heights) + self.GAP * (len(self.steps) - 1)
+        if self.decision:
+            h += self.GAP + self._dec_h + self.STEM + self.GAP + self._out_h
+        return self.width, h
 
     def draw(self):
         c = self.canv
         x = (self.width - self.box_w) / 2.0
         y = self.wrap(0, 0)[1]
-        last = len(self.steps) - 1
+        # The last plain step keeps its arrow when a decision follows it.
+        last = len(self.steps) - 1 if not self.decision else -1
         for k, (lines, h) in enumerate(zip(self._lines, self._heights)):
             top = y
             y -= h
@@ -190,20 +235,247 @@ class Flowchart(Flowable):
                 c.drawString(x + self.PAD_X + self.NUM_W, ty, line)
                 ty -= self.LEAD
 
-            if k < last:
-                cx = x + self.box_w / 2.0
-                head = y - self.GAP + 4.5
-                c.setStrokeColor(ACCENT)
-                c.setLineWidth(1.0)
-                c.line(cx, y, cx, head)
-                path = c.beginPath()
-                path.moveTo(cx - 3.2, head)
-                path.lineTo(cx + 3.2, head)
-                path.lineTo(cx, y - self.GAP)
-                path.close()
-                c.setFillColor(ACCENT)
-                c.drawPath(path, stroke=0, fill=1)
+            if k < last or (self.decision and k == len(self.steps) - 1):
+                self._arrow_down(x + self.box_w / 2.0, y, y - self.GAP)
             y -= self.GAP
+
+        if not self.decision:
+            return
+
+        # ---- the decision, as a hexagon so it is not read as another step ----
+        y -= self._dec_h
+        cx = x + self.box_w / 2.0
+        nick = min(16.0, self.box_w / 6.0)
+        mid = y + self._dec_h / 2.0
+        path = c.beginPath()
+        path.moveTo(x + nick, y + self._dec_h)
+        path.lineTo(x + self.box_w - nick, y + self._dec_h)
+        path.lineTo(x + self.box_w, mid)
+        path.lineTo(x + self.box_w - nick, y)
+        path.lineTo(x + nick, y)
+        path.lineTo(x, mid)
+        path.close()
+        c.setStrokeColor(ACCENT)
+        c.setLineWidth(0.9)
+        c.setFillColor(colors.white)
+        c.drawPath(path, stroke=1, fill=1)
+
+        c.setFillColor(ACCENT)
+        c.setFont("Helvetica-Bold", self.SIZE)
+        ty = y + self._dec_h - self.PAD_Y - self.SIZE + 1.5
+        for line in self._dec_lines:
+            c.drawCentredString(cx, ty, line)
+            ty -= self.LEAD
+
+        if not self.outcomes:
+            return
+
+        # ---- the fork: a stem, then one arrow into each outcome ----
+        stem_bottom = y - self.STEM
+        c.setStrokeColor(ACCENT)
+        c.setLineWidth(1.0)
+        c.line(cx, y, cx, stem_bottom)
+
+        out_top = stem_bottom - self.GAP
+        out_y = out_top - self._out_h
+        centres = [x + self.out_w / 2.0,
+                   x + self.out_w + self.FORK_GAP + self.out_w / 2.0]
+        for (label, _), ocx in zip(self.outcomes, centres):
+            c.setStrokeColor(ACCENT)
+            c.setLineWidth(1.0)
+            c.line(cx, stem_bottom, ocx, stem_bottom)
+            self._arrow_down(ocx, stem_bottom, out_top)
+            # The label sits beside the horizontal run, on the side it travels.
+            c.setFont("Helvetica-Bold", self.SIZE - 1.4)
+            c.setFillColor(ACCENT)
+            toward_left = ocx < cx
+            c.drawString(ocx + (5 if toward_left else -5 -
+                                stringWidth(label, "Helvetica-Bold", self.SIZE - 1.4)),
+                         stem_bottom + 3.2, label)
+
+        for k, ((_, text), lines) in enumerate(zip(self.outcomes, self._out_lines)):
+            ox = x + k * (self.out_w + self.FORK_GAP)
+            c.setStrokeColor(ACCENT)
+            c.setLineWidth(0.7)
+            c.setFillColor(ACCENT_BG)
+            c.roundRect(ox, out_y, self.out_w, self._out_h, 3, stroke=1, fill=1)
+            c.setFillColor(INK)
+            c.setFont(self.FONT, self.SIZE)
+            ty = out_top - self.PAD_Y - self.SIZE + 1.5
+            for line in lines:
+                c.drawString(ox + self.PAD_X, ty, line)
+                ty -= self.LEAD
+
+    def _arrow_down(self, cx, top, bottom):
+        """A vertical line ending in a real arrowhead at `bottom`."""
+        c = self.canv
+        head = bottom + 4.5
+        c.setStrokeColor(ACCENT)
+        c.setLineWidth(1.0)
+        c.line(cx, top, cx, head)
+        path = c.beginPath()
+        path.moveTo(cx - 3.2, head)
+        path.lineTo(cx + 3.2, head)
+        path.lineTo(cx, bottom)
+        path.close()
+        c.setFillColor(ACCENT)
+        c.drawPath(path, stroke=0, fill=1)
+
+
+class Panels(Flowable):
+    """Two labelled panels side by side, with an arrow from one to the other.
+
+    For the picture a flow cannot draw: not a sequence of steps but two places
+    and the small thing that passes between them. The security review needed
+    exactly one of these, and it is the diagram the whole report rests on -
+    what stays on the device against what reaches the cloud - so it is worth
+    being a drawing rather than a wall of pipe characters.
+
+    Written in markdown as a fenced block tagged `panels`:
+
+        # A phone in a classroom      <- a panel title, two of them
+        the save file                 <- a heading inside the current panel
+        - nickname, points and stars  <- a line belonging to the heading above
+        * the submission token        <- marked out in the accent ink
+        > four values                 <- the label on the arrow between them
+
+    The heading and its indented lines are what make the picture readable:
+    without them a panel is a list of eight equal things, and the whole point
+    of this diagram is which of them sit inside which.
+
+    The arrow is drawn left to right, because that is the direction the data
+    travels and a reader should not have to be told so in a caption.
+    """
+
+    FONT, SIZE, LEAD = "Helvetica", 8.7, 11.2
+    TITLE_SIZE = 9.4
+    PAD_X, PAD_Y = 9, 7
+    SUB_X = 9                # how far a line sits inside its heading
+    MID = 30                 # the channel the arrow runs through
+    MAX_W = 165 * mm
+
+    def __init__(self, spec, width):
+        Flowable.__init__(self)
+        self.width = width
+        self.total_w = min(width, self.MAX_W)
+        self.panel_w = (self.total_w - self.MID) / 2.0
+
+        self.titles, self.bodies, self.arrow = ["", ""], [[], []], ""
+        which = -1
+        for raw in spec:
+            line = raw.strip()
+            if not line:
+                continue
+            if line.startswith("# "):
+                which += 1
+                if which < 2:
+                    self.titles[which] = line[2:].strip()
+            elif line.startswith("> "):
+                self.arrow = line[2:].strip()
+            elif 0 <= which < 2:
+                # kind: "head" stands on its own, "sub" belongs to the head
+                # above it, "mark" is the one line worth the accent ink.
+                if line.startswith("* "):
+                    self.bodies[which].append(("mark", line[2:].strip()))
+                elif line.startswith("- "):
+                    self.bodies[which].append(("sub", line[2:].strip()))
+                else:
+                    self.bodies[which].append(("head", line))
+
+        # Wrap every line, then make both panels as tall as the taller one so
+        # the pair reads as two things being compared rather than two lists.
+        self._wrapped = []
+        for which in (0, 1):
+            rows = []
+            for kind, text in self.bodies[which]:
+                indent = self.SUB_X if kind == "sub" else 0
+                for k, line in enumerate(self._wrap(text, indent)):
+                    rows.append((kind, line, k == 0, indent))
+            self._wrapped.append(rows)
+
+        tallest = max(len(r) for r in self._wrapped) if self._wrapped else 0
+        self.panel_h = (self.PAD_Y * 2 + self.TITLE_SIZE + 7
+                        + tallest * self.LEAD)
+
+    def _wrap(self, text, indent=0):
+        avail = self.panel_w - 2 * self.PAD_X - indent
+        lines, cur = [], ""
+        for word in fold(text).split():
+            trial = (cur + " " + word).strip()
+            if not cur or stringWidth(trial, self.FONT, self.SIZE) <= avail:
+                cur = trial
+            else:
+                lines.append(cur)
+                cur = word
+        if cur:
+            lines.append(cur)
+        return lines or [""]
+
+    def wrap(self, availWidth, availHeight):
+        return self.width, self.panel_h
+
+    def draw(self):
+        c = self.canv
+        x0 = (self.width - self.total_w) / 2.0
+        for which in (0, 1):
+            x = x0 + which * (self.panel_w + self.MID)
+            c.setStrokeColor(RULE)
+            c.setLineWidth(0.7)
+            c.setFillColor(colors.white)
+            c.roundRect(x, 0, self.panel_w, self.panel_h, 3, stroke=1, fill=1)
+
+            # The title sits on a tinted strip, so the panels have a top edge
+            # to read from rather than starting mid-sentence.
+            strip_h = self.PAD_Y + self.TITLE_SIZE + 3
+            c.setFillColor(ACCENT_BG)
+            c.rect(x + 0.4, self.panel_h - strip_h, self.panel_w - 0.8,
+                   strip_h - 0.4, stroke=0, fill=1)
+            c.setFillColor(ACCENT)
+            c.setFont("Helvetica-Bold", self.TITLE_SIZE)
+            c.drawString(x + self.PAD_X,
+                         self.panel_h - self.PAD_Y - self.TITLE_SIZE + 1.5,
+                         fold(self.titles[which]))
+
+            ty = self.panel_h - strip_h - 6 - self.SIZE
+            for kind, line, first, indent in self._wrapped[which]:
+                if kind == "mark":
+                    c.setFillColor(ACCENT)
+                    c.setFont("Helvetica-Bold", self.SIZE)
+                elif kind == "head":
+                    c.setFillColor(INK)
+                    c.setFont("Helvetica-Bold", self.SIZE)
+                else:
+                    c.setFillColor(MUTED)
+                    c.setFont(self.FONT, self.SIZE)
+                # A wrapped line is indented past its own first line, so a
+                # sentence that runs on is never mistaken for a new item.
+                c.drawString(x + self.PAD_X + indent + (0 if first else 7),
+                             ty, line)
+                ty -= self.LEAD
+
+        # ---- the arrow through the channel, left to right ----
+        y = self.panel_h / 2.0
+        ax, bx = x0 + self.panel_w, x0 + self.panel_w + self.MID
+        c.setStrokeColor(ACCENT)
+        c.setLineWidth(1.1)
+        c.line(ax + 2, y, bx - 4.5, y)
+        path = c.beginPath()
+        path.moveTo(bx - 4.5, y - 3.2)
+        path.lineTo(bx - 4.5, y + 3.2)
+        path.lineTo(bx - 1, y)
+        path.close()
+        c.setFillColor(ACCENT)
+        c.drawPath(path, stroke=0, fill=1)
+
+        if self.arrow:
+            label = fold(self.arrow)
+            c.setFont("Helvetica-Bold", self.SIZE - 1.2)
+            w = stringWidth(label, "Helvetica-Bold", self.SIZE - 1.2)
+            c.setFillColor(colors.white)
+            c.rect((ax + bx) / 2.0 - w / 2.0 - 2, y + 4, w + 4,
+                   self.SIZE - 0.5, stroke=0, fill=1)
+            c.setFillColor(ACCENT)
+            c.drawCentredString((ax + bx) / 2.0, y + 5.5, label)
 
 
 def make_table(rows, s):
@@ -293,6 +565,11 @@ def parse(md, s):
                 steps = [l.strip() for l in buf if l.strip()]
                 out.append(Spacer(1, 7))
                 out.append(KeepTogether(Flowchart(steps, AVAIL)))
+                out.append(Spacer(1, 9))
+                continue
+            if lang == "panels":
+                out.append(Spacer(1, 7))
+                out.append(KeepTogether(Panels(buf, AVAIL)))
                 out.append(Spacer(1, 9))
                 continue
             text = "<br/>".join(

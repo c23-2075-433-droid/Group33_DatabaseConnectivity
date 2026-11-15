@@ -52,7 +52,6 @@ public static class SceneResultPanelBuilder
     private const float PlaceFrac = 0.5005f;
     private const float PointsFrac = 0.6307f;
     private const float WordsFrac = 0.7508f;
-    private const float RecordsFrac = 0.818f;
     private const float ButtonFrac = 0.875f;
 
     // Fractions of the board, all checked against the mockup by compositing
@@ -116,7 +115,6 @@ public static class SceneResultPanelBuilder
     private const float ButtonWidthFrac = 0.26f;
     private const float ButtonXFrac = 0.19f;
 
-    private static readonly Vector2 RecordsSize = new Vector2(580f, 86f);
 
     // Where each star's own centre sits relative to the row's, in the art's
     // own pixels, and how wide that row is there. The row is drawn rather
@@ -344,20 +342,18 @@ public static class SceneResultPanelBuilder
             VocabularyFont.Apply(figure);
         }
 
-        // Only on a level's last scene: the scores read back out of the
-        // database, which is the half of the Activity 5 requirement that has
-        // to be visible on screen rather than merely fetched.
+        // No records strip. There is one empty band on ui_result_board,
+        // between the painted WORDS COMPLETED plate and the inner frame
+        // below it, and the buttons already live in it - a list of past
+        // scores squeezed in above them was cramped at any size that left
+        // the buttons where they belong, and read as stray text under the
+        // score rather than as a leaderboard.
+        //
+        // The scores are still SAVED, and the retrieve-and-display half of
+        // the Activity 5 requirement is still met, on the leaderboard in the
+        // profile menu - see ProfileUIBuilder.BuildLeaderboard - which has a
+        // whole panel for it instead of forty pixels.
         Text recordsText = null;
-        if (levelEnd)
-        {
-            recordsText = CreateText(panel.transform, "RecordsText", "",
-                new Vector2(0f, FromTop(RecordsFrac)), RecordsSize, 18,
-                TextAnchor.UpperCenter);
-            recordsText.lineSpacing = 1.1f;
-            recordsText.resizeTextForBestFit = true;
-            recordsText.resizeTextMinSize = 12;
-            recordsText.resizeTextMaxSize = 18;
-        }
 
         // One row whether or not the records strip is there - the new board
         // has a place for both, so the buttons no longer move to make room.

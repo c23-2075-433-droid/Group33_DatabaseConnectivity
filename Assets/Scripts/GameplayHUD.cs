@@ -236,14 +236,12 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         }
 
         // The spelling on the signpost is the word's own, uppercased only for
-        // reading - the same way the badge over the object shows it.
-        //
-        // The MARKED spelling, not the objective's plain key: the signpost is
-        // the thing a child reads before saying the word, so it carries the
-        // stress marks - BATI is the key, BATI with its accents is the
-        // pronunciation. See NarratorScript.SpellingFor. Uppercasing keeps
-        // them: A-acute uppercases to A-acute.
-        ui.wordText.text = NarratorScript.SpellingFor(objective.word).ToUpperInvariant();
+        // reading - the same way the badge over the object shows it. WordStress
+        // puts the marks back on the six words whose bare spelling is two
+        // different words, so the signpost says which one is being asked for.
+        ui.wordText.text = objective.word != null
+            ? WordStress.Display(objective.word).ToUpperInvariant()
+            : "";
 
         string gloss = NarratorScript.GlossFor(objective.word);
         ui.glossText.text = gloss;

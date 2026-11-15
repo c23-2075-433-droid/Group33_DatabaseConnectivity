@@ -31,6 +31,16 @@ using System.Collections.Generic;
 ///      where the child actually said the word right.
 ///   4. Add those exact strings here.
 ///
+/// EVERY TAUGHT WORD NEEDS A ROW, EVEN AN UNINTERESTING ONE
+///
+/// PronunciationChecker builds its set of taught forms from the KEYS of this
+/// table, and that set is what the split-fragment guard consults - the rule
+/// that stops the "kain" inside "pag kain" answering Kain. So a word with no
+/// row here is missing twice over: it gets no curated mistranscriptions, and
+/// it is invisible to the guard. Hugas, Kinig, Ligpit and Tapon were all in
+/// that position - asked for in Recess, Klasrum and Uwian, and absent from
+/// here - which is not something the game would ever have reported.
+///
 /// THE ONE RULE WHEN ADDING AN ENTRY
 ///
 /// A variant must never be another taught word. If "kanen" were listed under
@@ -65,8 +75,14 @@ public static class WordVariants
         { "Medyas",  new[] { "medias", "mediyas", "me dyas" } },
         { "Sapatos", new[] { "sa patos", "zapatos", "sapatus" } },
         { "Bag",     new[] { "back", "beg", "bak" } },
+        // Kanin and Itlog are no longer asked for out loud - Bahay Scene 5
+        // teaches "Pagkain" for the meal as a whole - but their rows stay.
+        // They are the entries that keep the cross-check honest about the
+        // collision this table exists for: "kanin" must never be accepted
+        // for "Kain", and the guard is only run on words listed here.
         { "Kanin",   new[] { "ka nin", "canin", "kanen" } },
         { "Itlog",   new[] { "it log", "etlog", "it lock" } },
+        { "Pagkain", new[] { "pag kain", "pakain", "pagcain", "pag ka in" } },
         { "Kain",    new[] { "ka in", "cain", "kayin" } },
         { "Inom",    new[] { "i nom", "enom", "e nom" } },
 
@@ -75,18 +91,10 @@ public static class WordVariants
         { "Pasok",   new[] { "pa sok", "pasock", "pasuk" } },
         { "Takbo",   new[] { "tak bo", "tagbo", "takbu" } },
         { "Upo",     new[] { "oppo", "u po", "oh po", "upu" } },
-        // Taught in Paaralan Scene 2 and, until now, the one word on the list
-        // with no row here at all - so it was being matched by fuzzy distance
-        // alone, which is how "kaha" got accepted for "Kuha".
-        //
-        // "makinig" is deliberately NOT here, and it is the entry playtesting
-        // has to settle. It is the ordinary Filipino word for listening, so a
-        // recogniser set to Filipino may well return it for a child who said
-        // "Kinig" correctly - in which case it belongs in this list. It is
-        // equally what a child says INSTEAD of the word being taught. Only the
-        // rawSpokenText column of a real session can tell those apart, so it
-        // stays out until it has been seen there.
-        { "Kinig",   new[] { "ki nig", "kining", "keenig", "kinnig" } },
+        // Kinig is the listening word of the classroom. "Makinig" is accepted
+        // outright: a child told to listen is at least as likely to say the
+        // whole word as the stem the badge shows.
+        { "Kinig",   new[] { "ki nig", "makinig", "kinik", "king" } },
         { "Kuha",    new[] { "kua", "koha", "cooha", "ku ha" } },
         { "Lapis",   new[] { "lapiz", "la pis", "lappis" } },
         { "Aklat",   new[] { "ak lat", "aclat", "oclat" } },
@@ -97,9 +105,14 @@ public static class WordVariants
         { "Tingin",  new[] { "ti ngin", "tingen", "tingnan" } },
         { "Linis",   new[] { "lines", "li nis", "lenis" } },
         { "Kunin",   new[] { "ku nin", "cumin", "coonin" } },
+        // Ligpit is six canonical letters, one short of the consonant-slip
+        // threshold, so a garbled g has to be listed rather than tolerated.
+        { "Ligpit",  new[] { "lig pit", "lickpit", "ligpet" } },
         { "Kaliwa",  new[] { "ka liwa", "caliwa", "kaleewa" } },
         { "Kanan",   new[] { "ka nan", "canon", "kanann" } },
+        { "Hugas",   new[] { "hu gas", "ugas", "who gas" } },
         { "Labas",   new[] { "la bas", "lavas", "la vas" } },
+        { "Tapon",   new[] { "ta pon", "tap on", "tapong" } },
         { "Uwi",     new[] { "u wi", "oowi", "ui" } },
 
         // --- Parke and friends: playing, feelings, being kind ---

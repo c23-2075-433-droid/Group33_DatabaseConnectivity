@@ -1,8 +1,19 @@
 using UnityEngine;
 
 /// <summary>
-/// Simple 2D platformer movement for the SALINLAHI player character.
-/// Move with A/D or Left/Right arrow keys. Jump with Space or Up/W.
+/// Kylo's body: every visible thing a spoken word makes him do.
+///
+/// This is not driven by input. A word that is said correctly calls one of the
+/// methods below - Bangon, TayoUp, WalkLeft, Takbo, SetAppearance - and the
+/// method sets a timer and a direction. While that timer runs, FixedUpdate
+/// forces the velocity instead of reading the keyboard, which is how voice
+/// control works on a phone with no keyboard attached at all. The arrow keys
+/// still move him, but only as a development convenience.
+///
+/// Three things it reports back, because SceneObjectiveController has to know
+/// when an action has finished before it asks for the next word:
+/// IsVoiceWalking, IsPosing, and IsActionPlaying, which is either of them.
+///
 /// Requires a Rigidbody2D and a Collider2D on the same GameObject.
 /// </summary>
 [RequireComponent(typeof(Rigidbody2D))]

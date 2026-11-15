@@ -216,8 +216,9 @@ public class BuildLevelSelectScene
             string placeName = PlaceName(levelIndex);
 
             // A place with nothing built, or with no board drawn for it, is
-            // left off rather than given an empty board to press. Palengke is
-            // both: it is on the journey as somewhere the game is going.
+            // left off rather than given an empty board to press. Every place
+            // on the journey qualifies today; this guards a marker added
+            // ahead of its scenes.
             if (sceneSteps.Count == 0 || !Art.ContainsKey(levelIndex))
             {
                 skipped++;

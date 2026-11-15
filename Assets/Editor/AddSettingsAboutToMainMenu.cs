@@ -3,8 +3,10 @@
 // Restyles the Settings and About popups in the ALREADY-BUILT main menu scene
 // without regenerating it, so manual tweaks to the menu are preserved.
 //
-// Swaps the plain grey Unity panels for the bamboo frame, the OKAY button and
-// the wooden volume slider, matching the nickname dialog and the menu buttons.
+// Both popups are drawn boards now: the settings art with working toggles and
+// sliders laid on its painted rows, and the About art, which is a single piece
+// of finished artwork with nothing on it but a hit area over the X it already
+// shows and the build version.
 //
 // Safe to re-run: both popups are rebuilt rather than duplicated.
 //
@@ -58,7 +60,8 @@ public class AddSettingsAboutToMainMenu
                    ".\n  Settings: the drawn board, with SOUND and MUSIC toggles and the " +
                    "SOUND EFFECTS and MS. RACHEL sliders. Its rows, icons and labels are " +
                    "painted into the art, so the panel carries no text of its own." +
-                   "\n  About: bamboo panel, OKAY button, Fredoka UI font, and the build version " +
-                   "under the title (filled in at run time by VersionLabel).");
+                   "\n  About: the ui_about_panel artwork, fitted to the screen, closing on " +
+                   "its own painted X, with the build version on the bottom rail (filled in " +
+                   "at run time by VersionLabel).");
     }
 }

@@ -78,6 +78,8 @@ public static class DatabaseDemoBuilder
         tracker.levelCompletePanel = null;
         tracker.resultPanel = summary.panel;
         tracker.scoreText = null;          // the summary writes its own score line
+        // Null: the summary board has no records strip. Past scores are
+        // read back on the profile menu's leaderboard instead.
         tracker.recordsText = summary.recordsText;
         tracker.levelName = levelName;
         tracker.levelIndex = levelIndex;

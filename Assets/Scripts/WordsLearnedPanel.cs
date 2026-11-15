@@ -167,12 +167,9 @@ public class WordsLearnedPanel : MonoBehaviour
             if (!used) continue;
 
             string word = words[index];
-            // The marked spelling, with its stress accents, because this board
-            // is read: the plain "word" is the key the objective and the
-            // database carry. NarratorScript.SpellingFor says why the two are
-            // kept apart, and GlossFor below still takes the plain one.
-            if (row.word != null)
-                row.word.text = NarratorScript.SpellingFor(word).ToUpperInvariant();
+            // Marked where the bare spelling would be ambiguous - see
+            // WordStress. The lookup below still uses the plain word.
+            if (row.word != null) row.word.text = WordStress.Display(word).ToUpperInvariant();
 
             // No meaning recorded: show the word on its own rather than leave a
             // gap where English should be. Same rule the word signpost follows.
