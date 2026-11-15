@@ -6,10 +6,17 @@ using UnityEngine.UI;
 /// The "WHO ARE YOU?" board, opened by CHANGE PROFILE.
 ///
 /// The board's art has three slots and a "(CREATE NEW USER)" row painted into
-/// it, which is also the cap on how many children can share a device - a limit
-/// that matches the drawing is better than one that quietly runs off the
-/// bottom of it. The widgets here are laid over the painted rows and plates
-/// rather than drawn: see ProfileUIBuilder.
+/// it. Three rows is how much is on screen at once, not how many children can
+/// share the tablet: the list runs past those three rows on a scroll bar in the
+/// board's right-hand margin, and the rows can be swiped as well, so a class
+/// going one at a time all fit. PlayerProfileStore.MaxProfiles is the real cap.
+/// The widgets here are laid over the painted rows and plates rather than
+/// drawn: see ProfileUIBuilder.
+///
+/// Everything this class counts in - chosen, and what DELETE and RENAME act on -
+/// is an index into the whole list of profiles, never into the three slots. The
+/// slots are a window onto it, and SlotListScroller.First says where that window
+/// starts; slot i is showing profile First + i.
 ///
 /// Renaming is the thing this screen is really for, and the one rule that
 /// matters is that it changes a name and nothing else. Points, stars, levels
@@ -29,12 +36,15 @@ public class ProfilePickerPanel : MonoBehaviour
     public Button scrim;
 
     [Header("Slots")]
-    [Tooltip("The three painted rows, top to bottom. One per profile on this device.")]
+    [Tooltip("The three painted rows, top to bottom. A window onto the profile list.")]
     public Text[] slotLabels;
     [Tooltip("Invisible rects over the same three rows.")]
     public Button[] slotButtons;
     [Tooltip("The '(CREATE NEW USER)' row. Its words are painted on, so there is no label here.")]
     public Button createButton;
+    [Tooltip("Runs the profile list past the three painted rows. Its bar hides " +
+              "itself while there are three profiles or fewer.")]
+    public SlotListScroller scroller;
 
     [Header("Plates")]
     public Button renameButton;
@@ -70,13 +80,17 @@ public class ProfilePickerPanel : MonoBehaviour
         if (deleteButton != null) deleteButton.onClick.AddListener(DeleteChosen);
         if (createButton != null) createButton.onClick.AddListener(CreateNew);
 
+        // Scrolling does not change who is chosen, only which three of them are
+        // on the board, so it is a repaint and nothing more.
+        if (scroller != null) scroller.onScrolled = Refresh;
+
         if (slotButtons != null)
         {
             for (int i = 0; i < slotButtons.Length; i++)
             {
                 if (slotButtons[i] == null) continue;
-                int index = i;                       // captured per row, not per loop
-                slotButtons[i].onClick.AddListener(() => Choose(index));
+                int slot = i;                        // captured per row, not per loop
+                slotButtons[i].onClick.AddListener(() => Choose(slot));
             }
         }
 
@@ -92,7 +106,9 @@ public class ProfilePickerPanel : MonoBehaviour
         chosen = IndexOfActive();
         if (menuBlur != null) menuBlur.SetBlurred(true);
         if (root != null) root.SetActive(true);
-        Refresh();
+        // Opens on whoever is playing rather than at the top of the list: with
+        // ten profiles the child holding the tablet may be well down it.
+        ShowChosen();
     }
 
     private static int IndexOfActive()
@@ -105,30 +121,49 @@ public class ProfilePickerPanel : MonoBehaviour
         return 0;
     }
 
+    /// <summary>The profile showing in the top slot. Nothing without a scroll
+    /// bar wired up can scroll, so it is showing the top of the list.</summary>
+    private int FirstShown => scroller != null ? scroller.First : 0;
+
+    /// <summary>Scrolls the chosen profile into view and repaints. Used after
+    /// anything that moves it - opening the board, creating, deleting.</summary>
+    private void ShowChosen()
+    {
+        if (scroller != null)
+        {
+            scroller.SetTotal(PlayerProfileStore.All.Count);
+            scroller.Reveal(chosen);
+        }
+        Refresh();
+    }
+
     private void Refresh()
     {
         int count = PlayerProfileStore.All.Count;
         if (chosen >= count) chosen = Mathf.Max(0, count - 1);
+        if (scroller != null) scroller.SetTotal(count);
 
+        int first = FirstShown;
         if (slotLabels != null)
         {
-            for (int i = 0; i < slotLabels.Length; i++)
+            for (int slot = 0; slot < slotLabels.Length; slot++)
             {
-                if (slotLabels[i] == null) continue;
-                if (i >= count)
+                if (slotLabels[slot] == null) continue;
+                int index = first + slot;
+                if (index >= count)
                 {
-                    slotLabels[i].text = "- - -";
-                    slotLabels[i].color = quietColor;
+                    slotLabels[slot].text = "- - -";
+                    slotLabels[slot].color = quietColor;
                     continue;
                 }
-                if (deleteArmed && i == chosen)
+                if (deleteArmed && index == chosen)
                 {
-                    slotLabels[i].text = "DELETE? PRESS AGAIN";
-                    slotLabels[i].color = quietColor;
+                    slotLabels[slot].text = "DELETE? PRESS AGAIN";
+                    slotLabels[slot].color = quietColor;
                     continue;
                 }
-                slotLabels[i].text = PlayerProfileStore.All[i].DisplayName().ToUpperInvariant();
-                slotLabels[i].color = i == chosen ? chosenColor : nameColor;
+                slotLabels[slot].text = PlayerProfileStore.All[index].DisplayName().ToUpperInvariant();
+                slotLabels[slot].color = index == chosen ? chosenColor : nameColor;
             }
         }
 
@@ -136,14 +171,27 @@ public class ProfilePickerPanel : MonoBehaviour
         if (renameButton != null) renameButton.interactable = real;
         if (deleteButton != null) deleteButton.interactable = real;
         if (okayButton != null) okayButton.interactable = real;
-        if (createButton != null) createButton.interactable = PlayerProfileStore.CanCreate;
+        // A board with no scroll bar wired up can only ever show its painted
+        // rows, so on one it will not make a profile it could not then reach.
+        // That is the state a scene saved before the bar existed is in, and a
+        // profile nobody can select is worse than one they cannot make.
+        bool canReach = scroller != null
+                        || slotLabels == null
+                        || count < slotLabels.Length;
+        if (createButton != null)
+            createButton.interactable = PlayerProfileStore.CanCreate && canReach;
     }
 
-    private void Choose(int index)
+    /// <summary>A press on one of the three painted rows. The row is a slot, so
+    /// which profile it is depends on how far the list has been scrolled.</summary>
+    private void Choose(int slot)
     {
         // Touching anything else takes the finger off the trigger.
         deleteArmed = false;
-        chosen = index;
+        int index = FirstShown + slot;
+        // An empty row below the end of a short list is scenery, not a choice:
+        // leave the child on the profile they already had.
+        if (index < PlayerProfileStore.All.Count) chosen = index;
         Refresh();
     }
 
@@ -155,7 +203,10 @@ public class ProfilePickerPanel : MonoBehaviour
         {
             PlayerProfileStore.Create(typed);           // also makes it the playing profile
             chosen = PlayerProfileStore.All.Count - 1;
-            Refresh();
+            // The new profile is on the end of the list, which with ten of them
+            // is off the bottom of the board. Scroll down to it, or the press
+            // on CREATE looks as though it did nothing.
+            ShowChosen();
         });
     }
 
@@ -216,7 +267,9 @@ public class ProfilePickerPanel : MonoBehaviour
         deleteArmed = false;
         PlayerProfileStore.Delete(PlayerProfileStore.All[chosen]);
         chosen = IndexOfActive();
-        Refresh();
+        // The list is a row shorter, so the window may now be hanging off the
+        // end of it. ShowChosen pulls it back.
+        ShowChosen();
     }
 
     private void Accept()

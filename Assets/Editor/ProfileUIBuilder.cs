@@ -24,6 +24,14 @@
 // of the same art laid exactly on top of the painted one, which is what lets a
 // press tint the plate instead of the whole board.
 //
+// The one thing drawn rather than cut is a scroll bar down each board's right
+// margin, because the art has no bar in it and the lists are longer than the
+// painted rows: ten profiles over three rows, eleven leaderboard places over
+// six. It is two rectangles in the boards' own colours, laid in the gap the
+// art leaves between the rows and the frame - page pixels 574 to 591, which is
+// what ScrollbarX and ScrollbarWidth below come from. The rows are parented to
+// one rect per board so they can be swiped as well; see SlotListDragArea.
+//
 // Every number below is a page coordinate measured off the Canva export,
 // scaled by 0.96 onto the 1920x1080 canvas - the same convention as
 // BuildMainMenuScene and NicknameDialogBuilder. To adjust by hand, move the
@@ -77,6 +85,13 @@ public static class ProfileUIBuilder
     private static readonly float[] LeaderboardSlotY =
         { 189.1f, 97.0f, 4.8f, -87.4f, -177.6f, -267.8f };
 
+    // The scroll bar, in the clear margin between the painted rows and the
+    // board's inner frame. Both boards leave the same gap, and 18 page pixels
+    // of the 20 available keeps the bar off the plates at one end and off the
+    // frame at the other.
+    private const float ScrollbarX = 250.8f;
+    private const float ScrollbarWidth = 17.3f;
+
     private static readonly Vector2 PlateSize = new Vector2(218.9f, 84.5f);
     private static readonly Vector2 RenamePosition = new Vector2(-109.9f, -188.6f);
     private static readonly Vector2 DeletePosition = new Vector2(118.6f, -188.6f);
@@ -103,6 +118,12 @@ public static class ProfileUIBuilder
     // its own colour and stroke (VocabularyFont.Chalk), so this is only for
     // the text that stays in the UI font.
     private static readonly Color Cream = new Color(1f, 0.92f, 0.78f);
+
+    // The scroll bar's two colours, both taken off the boards themselves: the
+    // groove is the plates' dark brown and the handle is the gold a chosen row
+    // is picked out in, so a bar the art never had still looks painted on.
+    private static readonly Color Groove = new Color(0.376f, 0.192f, 0.031f, 0.85f);
+    private static readonly Color Grip = new Color(1f, 0.82f, 0.35f);
 
     public class Built
     {
@@ -205,17 +226,29 @@ public static class ProfileUIBuilder
                                        Vector2.zero, BoardSize);
         board.GetComponent<Image>().raycastTarget = false;
 
-        // Three profile rows, then the painted "(CREATE NEW USER)" row.
-        Text[] labels = new Text[ProfileSlotY.Length - 1];
-        Button[] buttons = new Button[ProfileSlotY.Length - 1];
+        // Three profile rows, then the painted "(CREATE NEW USER)" row. The
+        // three are a window onto a list of up to ten, so they hang off one
+        // rect covering the block of them: that rect is what a swipe is caught
+        // on, and parenting them to it means a slot's position is its position
+        // in the window rather than on the board.
+        int rows = ProfileSlotY.Length - 1;
+        GameObject rowBlock = CreateTransparentRect(board.transform, "Rows",
+            new Vector2(SlotX, BlockCenter(ProfileSlotY, rows)),
+            new Vector2(SlotSize.x, BlockHeight(ProfileSlotY, rows)));
+
+        Text[] labels = new Text[rows];
+        Button[] buttons = new Button[rows];
         for (int i = 0; i < labels.Length; i++)
         {
-            GameObject slot = CreateTransparentRect(board.transform, "Slot" + (i + 1),
-                new Vector2(SlotX, ProfileSlotY[i]), SlotSize);
+            GameObject slot = CreateTransparentRect(rowBlock.transform, "Slot" + (i + 1),
+                new Vector2(0f, ProfileSlotY[i] - BlockCenter(ProfileSlotY, rows)), SlotSize);
             buttons[i] = MakeButton(slot);
             labels[i] = CreateLabel(slot.transform, "Name", Vector2.zero, SlotSize,
                                     40, TextAnchor.MiddleCenter, Cream, true);
         }
+
+        SlotListScroller scroller = Scroller(canvas, board.transform, "ProfileScrollbar",
+                                             ProfileSlotY, rows, rowBlock);
 
         GameObject createSlot = CreateTransparentRect(board.transform, "CreateSlot",
             new Vector2(SlotX, ProfileSlotY[ProfileSlotY.Length - 1]), SlotSize);
@@ -238,6 +271,7 @@ public static class ProfileUIBuilder
         panel.slotLabels = labels;
         panel.slotButtons = buttons;
         panel.createButton = create;
+        panel.scroller = scroller;
         panel.renameButton = rename;
         panel.deleteButton = remove;
         panel.okayButton = okay;
@@ -259,15 +293,24 @@ public static class ProfileUIBuilder
                                        Vector2.zero, BoardSize);
         board.GetComponent<Image>().raycastTarget = false;
 
-        Text[] labels = new Text[LeaderboardSlotY.Length];
+        // The six rows as one block, for the same two reasons as the profile
+        // board's three: it is what a swipe is caught on, and it is what the
+        // scroll bar runs beside.
+        int rows = LeaderboardSlotY.Length;
+        GameObject rowBlock = CreateTransparentRect(board.transform, "Rows",
+            new Vector2(SlotX, BlockCenter(LeaderboardSlotY, rows)),
+            new Vector2(SlotSize.x, BlockHeight(LeaderboardSlotY, rows)));
+
+        Text[] labels = new Text[rows];
         for (int i = 0; i < labels.Length; i++)
         {
             // Left-aligned with the rank first, because that is the column a
             // child reads down. The inset keeps it off the slot's rounded end.
             GameObject slot = new GameObject("Row" + (i + 1), typeof(RectTransform));
-            slot.transform.SetParent(board.transform, false);
+            slot.transform.SetParent(rowBlock.transform, false);
             RectTransform rect = slot.GetComponent<RectTransform>();
-            rect.anchoredPosition = new Vector2(SlotX, LeaderboardSlotY[i]);
+            rect.anchoredPosition =
+                new Vector2(0f, LeaderboardSlotY[i] - BlockCenter(LeaderboardSlotY, rows));
             rect.sizeDelta = SlotSize;
             // The one piece of text here left in the UI font. It is a column
             // of names and scores rather than a line addressed to the child,
@@ -276,6 +319,9 @@ public static class ProfileUIBuilder
                                     new Vector2(SlotSize.x - 56f, SlotSize.y),
                                     36, TextAnchor.MiddleLeft, Cream, false);
         }
+
+        SlotListScroller scroller = Scroller(canvas, board.transform, "LeaderboardScrollbar",
+                                             LeaderboardSlotY, rows, rowBlock);
 
         // A tap outside closes the board too, but a child should be able to
         // see the door. It hangs off the board rather than off the root, so it
@@ -292,6 +338,7 @@ public static class ProfileUIBuilder
         panel.scrim = scrim;
         panel.closeButton = close;
         panel.rowLabels = labels;
+        panel.scroller = scroller;
         panel.client = client;
         panel.menuBlur = blur;
         return panel;
@@ -317,6 +364,123 @@ public static class ProfileUIBuilder
     private static Button Plate(Transform parent, string name, string sprite, Vector2 position)
     {
         return MakeButton(CreateImage(parent, name, sprite, position, PlateSize));
+    }
+
+    // ---------- scrolling ----------
+
+    /// <summary>The middle of a run of painted rows, measured from the middle
+    /// of the board - where the scroll bar and the swipe rect are centred.</summary>
+    private static float BlockCenter(float[] slotY, int rows) =>
+        (slotY[0] + slotY[rows - 1]) * 0.5f;
+
+    /// <summary>Top of the first plate to the bottom of the last.</summary>
+    private static float BlockHeight(float[] slotY, int rows) =>
+        slotY[0] - slotY[rows - 1] + SlotSize.y;
+
+    /// <summary>
+    /// The bar, the swipe handler and the window that ties them together.
+    ///
+    /// The window itself goes on the canvas, beside the panel that reads it,
+    /// for the reason every other component here does: a board starts switched
+    /// off, and a component on a switched-off object gets no Awake, so it would
+    /// not be listening to its own bar the first time the board was opened.
+    /// </summary>
+    private static SlotListScroller Scroller(Transform canvas, Transform board, string name,
+                                             float[] slotY, int rows, GameObject rowBlock)
+    {
+        Scrollbar bar = CreateScrollbar(board, name,
+                                        BlockCenter(slotY, rows), BlockHeight(slotY, rows));
+
+        SlotListScroller scroller = canvas.gameObject.AddComponent<SlotListScroller>();
+        scroller.scrollbar = bar;
+        scroller.visibleSlots = rows;
+
+        SlotListDragArea drag = rowBlock.AddComponent<SlotListDragArea>();
+        drag.scroller = scroller;
+        // One plate to the next, so dragging a row's worth moves the list by
+        // one entry however the canvas has been scaled onto the screen.
+        drag.rowPitch = rows > 1 ? slotY[0] - slotY[1] : SlotSize.y;
+        return scroller;
+    }
+
+    /// <summary>
+    /// A scroll bar in the board's own colours. There is no bar in the art, so
+    /// this is the one widget on these boards that is drawn rather than laid
+    /// over a painting: a groove and a grip, both plain rectangles.
+    ///
+    /// It is built switched off. SlotListScroller turns it on only when there
+    /// is more in the list than the board has rows, which on a tablet one child
+    /// plays on is never.
+    /// </summary>
+    private static Scrollbar CreateScrollbar(Transform parent, string name,
+                                             float centerY, float height)
+    {
+        GameObject bar = new GameObject(name, typeof(RectTransform));
+        bar.transform.SetParent(parent, false);
+        RectTransform barRect = bar.GetComponent<RectTransform>();
+        barRect.anchoredPosition = new Vector2(ScrollbarX, centerY);
+        barRect.sizeDelta = new Vector2(ScrollbarWidth, height);
+        // Left as a raycast target on purpose: a press on the groove above or
+        // below the grip pages the list, which is Scrollbar's own behaviour.
+        Rounded(bar.AddComponent<Image>(), Groove);
+
+        // Scrollbar moves the grip by rewriting its anchors, so what decides
+        // how far it can travel is the rect the grip is parented to. Inset a
+        // little, which is what leaves the groove showing at both ends.
+        GameObject track = new GameObject("Sliding Area", typeof(RectTransform));
+        track.transform.SetParent(bar.transform, false);
+        RectTransform trackRect = track.GetComponent<RectTransform>();
+        trackRect.anchorMin = Vector2.zero;
+        trackRect.anchorMax = Vector2.one;
+        trackRect.offsetMin = new Vector2(2f, 2f);
+        trackRect.offsetMax = new Vector2(-2f, -2f);
+
+        GameObject handle = new GameObject("Handle", typeof(RectTransform));
+        handle.transform.SetParent(track.transform, false);
+        Image grip = Rounded(handle.AddComponent<Image>(), Grip);
+        RectTransform gripRect = handle.GetComponent<RectTransform>();
+        gripRect.anchoredPosition = Vector2.zero;
+        gripRect.sizeDelta = Vector2.zero;        // it fills whatever the anchors say
+
+        Scrollbar scrollbar = bar.AddComponent<Scrollbar>();
+        scrollbar.handleRect = gripRect;
+        scrollbar.targetGraphic = grip;
+        // Top to bottom, so nought is the top of the list - which is how the
+        // panels read it, and how a list is counted everywhere else.
+        scrollbar.direction = Scrollbar.Direction.TopToBottom;
+        ColorBlock colors = scrollbar.colors;
+        colors.normalColor = Color.white;
+        colors.highlightedColor = new Color(1f, 0.97f, 0.9f);
+        colors.pressedColor = new Color(0.8f, 0.75f, 0.7f);
+        colors.fadeDuration = 0.08f;
+        scrollbar.colors = colors;
+
+        bar.SetActive(false);
+        return scrollbar;
+    }
+
+    /// <summary>
+    /// Colours a rectangle and rounds its ends, so the bar sits among plates
+    /// with rounded corners without being the one square thing on the board.
+    ///
+    /// The shape is Unity's own UI sprite, which is the rounded rectangle every
+    /// default UI widget is drawn with - no art to import for two rectangles.
+    /// It is nine-sliced and drawn for a widget far larger than this, hence the
+    /// multiplier: left alone, its corners are wider than the bar is. If the
+    /// built-in ever fails to load, the Image simply draws a square rectangle
+    /// in the right colour, which is a blemish and not a break.
+    /// </summary>
+    private static Image Rounded(Image image, Color color)
+    {
+        image.color = color;
+        Sprite rounded = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        if (rounded != null)
+        {
+            image.sprite = rounded;
+            image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = 3f;
+        }
+        return image;
     }
 
     private static GameObject CreateImage(Transform parent, string name, string spriteFile,

@@ -135,7 +135,7 @@ compiles" is not "it works".
 
 1. **Suspend / resume on a phone at full speaker volume** — never tested. The
    narrator-vs-microphone interaction is exactly where this would break.
-2. **Three profiles in genuine use** — the store is written and sanitised, but
+2. **Several profiles in genuine use** — the store is written and sanitised, but
    switching mid-progress has not been run through a full level on a device.
 3. **PlayerPrefs → profile migration on a device that actually has an old save** —
    exercised in the Editor only.

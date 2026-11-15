@@ -18,17 +18,21 @@ using UnityEngine;
 /// profile one, keeping the nickname, the journey progress and every scene's
 /// stars. See Migrate().
 ///
-/// Three profiles, plus a row to make a new one: that is what the WHO ARE YOU?
-/// board has slots for, and a cap that matches the art is better than one that
-/// silently runs off the bottom of it.
+/// Ten profiles, which is a classroom's worth of children taking turns on one
+/// tablet rather than one family's. The board has three painted rows to show
+/// them in, so the list is scrolled past those rows rather than cut down to
+/// them - see SlotListScroller. The cap is still a real one: every profile is
+/// a save file's worth of stars, words and points, and a list nobody can reach
+/// the bottom of is not a feature.
 ///
 /// Nothing here needs a GameObject - it is a file and a list - so it is static
 /// for the same reason RunScore and VocabularyMemory are.
 /// </summary>
 public static class PlayerProfileStore
 {
-    /// <summary>Slots on the WHO ARE YOU? board, before the "create new" row.</summary>
-    public const int MaxProfiles = 3;
+    /// <summary>How many children can share one copy of the game. More than
+    /// the board has painted rows for, which is what the scroll bar is for.</summary>
+    public const int MaxProfiles = 10;
 
     /// <summary>Longest nickname kept - NicknameRules.MaxLength, named here
     /// because the profile board and the menu both ask the store.</summary>

@@ -6,12 +6,16 @@ using UnityEngine.UI;
 /// The LEADERBOARDS board: every registered SALINLAHI player on one list,
 /// best first.
 ///
-/// The board is drawn with six slots, and the design asks for the top ten plus
-/// this child's own place. Six will not hold both, so the rule is the one
-/// every leaderboard this size uses: the top five, and then you. A child
-/// already inside the top six simply sees six places and no repeat of
-/// themselves. The top ten is still what gets fetched, so the rank shown is
-/// the real one and not a rank within the page.
+/// The board is drawn with six slots and the design asks for the top ten plus
+/// this child's own place. Six does not hold eleven, so the list runs past the
+/// six painted rows on a scroll bar in the board's right-hand margin, and the
+/// rows can be swiped too - see SlotListScroller. The board opens at the top,
+/// where first place is, and a child who is not in the ten finds their own row
+/// on the end of the list, picked out in gold like every other row of theirs.
+///
+/// The rank shown is always the real one, worked out from the whole table
+/// rather than from the page: a player off the end of the top ten is ranked by
+/// the server. See LeaderboardClient.
 ///
 /// Reading is a plain select on the leaderboard table - the ordering, points
 /// descending then stars, is the database's. Nothing is written from here:
@@ -32,8 +36,11 @@ public class LeaderboardPanel : MonoBehaviour
     public Button closeButton;
 
     [Header("Slots")]
-    [Tooltip("The six painted rows, top to bottom.")]
+    [Tooltip("The six painted rows, top to bottom. A window onto the fetched list.")]
     public Text[] rowLabels;
+    [Tooltip("Runs the list past the six painted rows. Its bar hides itself " +
+              "while there are six players or fewer.")]
+    public SlotListScroller scroller;
 
     [Header("Wiring")]
     public LeaderboardClient client;
@@ -47,10 +54,19 @@ public class LeaderboardPanel : MonoBehaviour
     [Tooltip("\"Loading...\", \"No one has played yet\", and the offline line.")]
     public Color noticeColor = new Color(0.82f, 0.70f, 0.54f);
 
+    /// <summary>The list as it is to be read down, which is the fetched rows
+    /// and, when this child is not among them, their own row after them.</summary>
+    private readonly List<LeaderboardEntry> listed = new List<LeaderboardEntry>();
+
+    /// <summary>A line to put after the last row, or null. It is what a player
+    /// with no row yet is told instead of being shown a blank one.</summary>
+    private string tail;
+
     void Start()
     {
         if (scrim != null) scrim.onClick.AddListener(Close);
         if (closeButton != null) closeButton.onClick.AddListener(Close);
+        if (scroller != null) scroller.onScrolled = Paint;
         if (root != null) root.SetActive(false);
     }
 
@@ -59,7 +75,7 @@ public class LeaderboardPanel : MonoBehaviour
         if (menuBlur != null) menuBlur.SetBlurred(true);
         if (root != null) root.SetActive(true);
 
-        Clear();
+        Empty();
         Notice(0, "Loading...");
 
         if (client == null || !client.IsConfigured)
@@ -73,7 +89,7 @@ public class LeaderboardPanel : MonoBehaviour
             // The board can be closed while the call is still out.
             if (root == null || !root.activeSelf) return;
 
-            Clear();
+            Empty();
             if (error != null)
             {
                 Notice(0, "No connection.");
@@ -91,6 +107,8 @@ public class LeaderboardPanel : MonoBehaviour
         if (menuBlur != null) menuBlur.SetBlurred(false);
     }
 
+    /// <summary>Works out what there is to read, then paints the first six of
+    /// it. Scrolling after this only repaints.</summary>
     private void Fill(List<LeaderboardEntry> rows, int yourRank)
     {
         if (rows == null || rows.Count == 0)
@@ -100,41 +118,65 @@ public class LeaderboardPanel : MonoBehaviour
             return;
         }
 
-        int slots = rowLabels != null ? rowLabels.Length : 0;
-        if (slots == 0) return;
-
-        PlayerProfile you = PlayerProfileStore.Active;
-
-        // Is this child already on the page that fits? Then the board is just
-        // the top of the list, with their row picked out.
-        bool youAreShown = false;
-        for (int i = 0; i < rows.Count && i < slots; i++)
+        bool youAreListed = false;
+        foreach (LeaderboardEntry row in rows)
         {
-            if (rows[i].isYou) youAreShown = true;
+            listed.Add(row);
+            if (row.isYou) youAreListed = true;
         }
 
-        int listed = youAreShown ? slots : slots - 1;
-        int row = 0;
-        for (int i = 0; i < rows.Count && row < listed; i++, row++)
+        if (!youAreListed)
         {
-            Write(row, rows[i].rank, rows[i].nickname, rows[i].total_points,
-                  rows[i].total_stars, rows[i].isYou);
+            // A row is kept for whoever is holding the tablet, wherever they
+            // are on the table: on the end of what was fetched, at their real
+            // rank. The totals are this device's, which are what was last sent
+            // up, so the row reads the same as the one on the server.
+            PlayerProfile you = PlayerProfileStore.Active;
+            if (yourRank > 0)
+            {
+                listed.Add(new LeaderboardEntry
+                {
+                    nickname = you.DisplayName(),
+                    total_points = you.totalPoints,
+                    total_stars = you.TotalStars(),
+                    rank = yourRank,
+                    isYou = true,
+                });
+            }
+            else
+            {
+                tail = "Finish a level to join the board!";
+            }
         }
 
-        if (youAreShown) return;
-
-        // A slot is kept for whoever is holding the phone, wherever they are
-        // on the list: the last one on a full board, and otherwise straight
-        // after the players above them rather than below a gap. A player with
-        // no row yet is told so rather than shown a blank line.
-        int yourSlot = Mathf.Min(row, slots - 1);
-        if (yourRank > 0)
+        if (scroller != null)
         {
-            Write(yourSlot, yourRank, you.DisplayName(), you.totalPoints, you.TotalStars(), true);
+            scroller.SetTotal(listed.Count + (tail != null ? 1 : 0));
+            scroller.SetFirst(0);       // first place is what the board opens on
         }
-        else
+        Paint();
+    }
+
+    /// <summary>Writes the six slots from wherever the list is scrolled to.</summary>
+    private void Paint()
+    {
+        if (rowLabels == null) return;
+
+        Clear();
+        int first = scroller != null ? scroller.First : 0;
+        for (int slot = 0; slot < rowLabels.Length; slot++)
         {
-            Notice(yourSlot, "Finish a level to join the board!");
+            int index = first + slot;
+            if (index < listed.Count)
+            {
+                LeaderboardEntry entry = listed[index];
+                Write(slot, entry.rank, entry.nickname, entry.total_points,
+                      entry.total_stars, entry.isYou);
+            }
+            else if (index == listed.Count && tail != null)
+            {
+                Notice(slot, tail);
+            }
         }
     }
 
@@ -155,6 +197,16 @@ public class LeaderboardPanel : MonoBehaviour
         if (rowLabels[slot] == null) return;
         rowLabels[slot].text = message;
         rowLabels[slot].color = noticeColor;
+    }
+
+    /// <summary>Back to a board with nothing on it and nothing to scroll:
+    /// what "Loading..." and the offline line are written onto.</summary>
+    private void Empty()
+    {
+        listed.Clear();
+        tail = null;
+        if (scroller != null) scroller.SetTotal(0);
+        Clear();
     }
 
     private void Clear()

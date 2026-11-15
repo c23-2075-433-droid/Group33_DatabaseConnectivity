@@ -239,7 +239,7 @@ first-*scene* vs first-*marker*, and the end of the journey being `Steps.Length`
 
 > **Say this:** "Progress used to be PlayerPrefs keys, which cannot hold a second
 > child's record and has nowhere to keep a player id. It is now one JSON file in
-> the app's private storage, with up to three profiles — and because that file is
+> the app's private storage, with up to ten profiles — and because that file is
 > ordinary JSON on the device, everything read from it is treated as input."
 
 Name `Repair()` specifically: non-UUID id replaced (and its token discarded),
