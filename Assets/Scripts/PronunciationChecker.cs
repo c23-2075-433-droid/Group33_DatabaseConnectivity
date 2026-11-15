@@ -52,6 +52,9 @@ using System.Text.RegularExpressions;
 ///      "ba ti"), and filler-stripping those collapsed them to a bare
 ///      syllable - "gut", "ha", "ti" - which then matched any single word the
 ///      child said. Saying one syllable of the word is not saying the word.
+///      A variant must also be the WHOLE utterance, since it describes a whole
+///      recognizer result: "hello" alone is a misheard Ilaw, but "hello world"
+///      - what SpeechToText returns in the editor - is not.
 ///   7. A reply the recognizer split into pieces is read as ONE word when
 ///      running it together spells another taught word: "pag kain" is
 ///      "Pagkain" badly split, so the "kain" in it is not an answer to
@@ -118,12 +121,12 @@ public static class PronunciationChecker
         Utterance said = Utterance.Of(spokenText);
         if (said.IsEmpty) return false;
 
-        if (said.Matches(Canonicalize(targetWord)))
+        if (said.MatchesTaughtWord(Canonicalize(targetWord)))
             return true;
 
-        // A variant is just another spelling that counts as the word, so it is
-        // matched exactly like the target itself - and canonicalized exactly
-        // like it, whole, keeping every token it was written with.
+        // A variant is another spelling that counts as the word, canonicalized
+        // whole exactly like the target - but matched a little more strictly;
+        // see Utterance.MatchesVariant.
         if (MatchesAnyVariant(said, acceptedVariants)) return true;
         if (MatchesAnyVariant(said, WordVariants.For(targetWord))) return true;
 
@@ -152,7 +155,7 @@ public static class PronunciationChecker
         foreach (string variant in variants)
         {
             if (string.IsNullOrWhiteSpace(variant)) continue;
-            if (said.Matches(Canonicalize(variant))) return true;
+            if (said.MatchesVariant(Canonicalize(variant))) return true;
         }
         return false;
     }
@@ -188,10 +191,38 @@ public static class PronunciationChecker
         }
 
         /// <summary>
-        /// Compares this utterance against one canonical form (the target
-        /// word, or one of its accepted variants).
+        /// Compares this utterance against the taught word itself. A child may
+        /// say the word inside a sentence, so one whole word of the utterance
+        /// counts.
         /// </summary>
-        public bool Matches(string canonicalForm)
+        public bool MatchesTaughtWord(string canonicalForm)
+        {
+            return Matches(canonicalForm, true);
+        }
+
+        /// <summary>
+        /// Compares this utterance against one curated mistranscription, which
+        /// has to be the WHOLE utterance.
+        ///
+        /// A variant is a record of what the recognizer hands back when the
+        /// child says the word - "hello" for Ilaw, "lines" for Linis, "books"
+        /// for Bukas. That is a statement about the whole result, not about a
+        /// word appearing anywhere in it: "hello" coming back on its own is a
+        /// misheard Ilaw, while "hello world" is the in-editor recognizer stub,
+        /// and it used to be scored tama for Ilaw on the strength of its first
+        /// token. Two such rows are in the attempt log. Everyday English the
+        /// recognizer picks up around an answer would get in the same way.
+        ///
+        /// The taught word keeps the one-word-of-a-sentence allowance, because
+        /// a child really does say it in the middle of one. A guessed English
+        /// substitute has no such claim.
+        /// </summary>
+        public bool MatchesVariant(string canonicalForm)
+        {
+            return Matches(canonicalForm, false);
+        }
+
+        private bool Matches(string canonicalForm, bool mayBeOneWordOfASentence)
         {
             if (string.IsNullOrEmpty(canonicalForm)) return false;
 
@@ -204,7 +235,8 @@ public static class PronunciationChecker
             // Any single word of it: the recognizer often returns a short
             // sentence when the child said one word. Only ever a whole word of
             // the utterance against a whole single-token form - a piece of
-            // either side is not an answer.
+            // either side is not an answer - and only for the taught word, not
+            // for a curated mistranscription.
             //
             // Unless the utterance run together IS some OTHER taught word, in
             // which case its pieces are halves of that word rather than an
@@ -214,7 +246,7 @@ public static class PronunciationChecker
             // so without this the second word could be answered by repeating
             // the first. The same guard stops "ka nin" passing for "Kunin"
             // and "ti ngin" for "Bati".
-            if (canonicalForm.IndexOf(' ') < 0 &&
+            if (mayBeOneWordOfASentence && canonicalForm.IndexOf(' ') < 0 &&
                 !IsSomeOtherTaughtWord(string.Concat(allTokens), canonicalForm))
             {
                 foreach (string token in contentTokens)
@@ -226,8 +258,11 @@ public static class PronunciationChecker
             // "kuha" while still forgiving a smudged "Sapatos".
             if (canonicalForm.Length >= ConsonantSlipMinLength)
             {
-                foreach (string token in contentTokens)
-                    if (IsConsonantSlip(token, canonicalForm)) return true;
+                if (mayBeOneWordOfASentence)
+                {
+                    foreach (string token in contentTokens)
+                        if (IsConsonantSlip(token, canonicalForm)) return true;
+                }
 
                 foreach (string form in wholeForms)
                     if (form.IndexOf(' ') < 0 && IsConsonantSlip(form, canonicalForm)) return true;

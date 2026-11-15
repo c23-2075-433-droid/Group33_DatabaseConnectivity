@@ -25,6 +25,10 @@
 // its filler-looking syllable thrown away, leaving a bare "gut", "ti" or "u"
 // that any single word the child said would match. #7 says every piece of
 // every variant outright, and requires all of them to be scored mali.
+//
+// Check #8 is the other half of that: a variant must be the WHOLE utterance,
+// so the editor's "Hello world" stub can no longer pass as Ilaw on the
+// strength of the "hello" listed under it.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -119,6 +123,18 @@ public static class PronunciationCheckTool
         new Case("ngon po",    "Bangon",  false, "the tail of the word, even so"),
         new Case("patos po",   "Sapatos", false, "the tail of a long word, even so"),
 
+        // A curated mistranscription has to be the whole thing the recognizer
+        // returned, not one word inside it. "hello" on its own is a misheard
+        // Ilaw and is listed as one; "hello world" is the in-editor stub, and
+        // it was being scored tama for Ilaw off its first token alone - twice
+        // in the attempt log, both in Banyo.
+        new Case("hello",       "Ilaw", true,  "listed mistranscription, said alone"),
+        new Case("hello po",    "Ilaw", true,  "the same, with a filler after it"),
+        new Case("hello world", "Ilaw", false, "the editor stub is not an answer"),
+        new Case("world hello", "Ilaw", false, "nor in the other order"),
+        new Case("books",       "Bukas", true,  "listed mistranscription, said alone"),
+        new Case("books are fun", "Bukas", false, "but not as one word of a sentence"),
+
         // Nothing at all, and things that are not the word.
         new Case("mali",        "Kuha", false, "an unrelated word"),
         new Case("hello world", "Kain", false, "what the in-editor recognizer stub returns"),
@@ -145,6 +161,7 @@ public static class PronunciationCheckTool
         failures += CheckVariantsMatchTheirOwnWord(words, log);
         failures += CheckRegressionCases(log);
         failures += CheckNoVariantPieceIsAccepted(words, log);
+        failures += CheckVariantsNeedTheWholeUtterance(words, log);
 
         ReportObjectiveWordsWithoutVariants(log);
 
@@ -363,6 +380,52 @@ public static class PronunciationCheckTool
         }
 
         log.AppendLine("FAIL 7. a syllable is being accepted as the whole word:");
+        foreach (string line in accepted) log.AppendLine("        " + line);
+        return 1;
+    }
+
+    // 8 -----------------------------------------------------------------------
+    // A variant describes a whole recognizer result, so padding one with an
+    // extra word must not still be accepted. Checked by appending a word that
+    // is in no table at all: if "hello" is listed under Ilaw, then
+    // "hello zzgrunt" must be mali.
+    //
+    // A variant that CONTAINS the taught word is skipped - "salamat po" has
+    // "salamat" in it, and a child who says the word in the middle of a
+    // sentence is answering correctly whatever else the recognizer heard.
+    // That allowance belongs to the taught word, and #3 is what guards it.
+    private static int CheckVariantsNeedTheWholeUtterance(string[] words, StringBuilder log)
+    {
+        const string Padding = "zzgrunt";
+        List<string> accepted = new List<string>();
+        int tested = 0;
+
+        foreach (string word in words)
+        {
+            string[] variants = WordVariants.For(word);
+            if (variants == null) continue;
+
+            string wholeWord = PronunciationChecker.Canonicalize(word);
+
+            foreach (string variant in variants)
+            {
+                if (System.Array.IndexOf(
+                        PronunciationChecker.Canonicalize(variant).Split(' '), wholeWord) >= 0)
+                    continue;
+
+                tested++;
+                if (PronunciationChecker.IsCorrect(variant + " " + Padding, word))
+                    accepted.Add("\"" + variant + " " + Padding + "\" is accepted for \"" + word + "\"");
+            }
+        }
+
+        if (accepted.Count == 0)
+        {
+            log.AppendLine("ok   8. none of the " + tested + " variants is accepted with a stray word beside it");
+            return 0;
+        }
+
+        log.AppendLine("FAIL 8. a variant is matching one word inside a longer result:");
         foreach (string line in accepted) log.AppendLine("        " + line);
         return 1;
     }
