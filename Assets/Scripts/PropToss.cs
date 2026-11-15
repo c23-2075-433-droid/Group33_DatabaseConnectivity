@@ -35,8 +35,13 @@ using UnityEngine.Events;
 /// frame is the teleport the whole component exists to avoid - it would read
 /// as the wrapper bouncing off the rim.
 ///
-/// It is also used, with a shorter arc and no spin to speak of, for the
-/// pencil going into his bag in "Ligpit": same problem, same shape of answer.
+/// NOT FOR AN OBJECT THAT IS STILL IN A HAND. This was briefly used for the
+/// pencil going into the bag in Paaralan 4's "Ligpit", and that is the one
+/// thing it is wrong for: a toss has a duration of its own, so it arrives
+/// when its own clock says to rather than when the drawn hand gets there, and
+/// the pencil reached the bag after the hand had been in and come back out.
+/// PropCarry is the component for that case - a waypoint per drawn frame and
+/// no duration of its own. Use this one only once the object has been let go.
 /// </summary>
 public class PropToss : MonoBehaviour
 {

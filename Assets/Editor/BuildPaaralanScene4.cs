@@ -53,11 +53,28 @@
 // than hiding it. reach_bag_uniform is the only frame in the project with a
 // hand at the mouth of the bag, and it has the NOTEPAD drawn into it - a
 // pencil cannot be swapped over that footprint, because a pencil drawn big
-// enough to cover a notepad is not a pencil. So the pencil is picked up
-// (lapis_frame_1, which has his fingers closed round one because that is the
-// beat it was drawn for), raised (lapis_frame_2), and then DROPPED IN: the
-// prop leaves his drawn hand at the exact point the drawing had it and
-// travels into the bag on PropToss. The object is visible the whole way.
+// enough to cover a notepad is not a pencil. So there is no drawing of a
+// pencil in his hand at the bag, and the prop has to cross the gap between
+// the last frame that holds one and the frame his hand goes in.
+//
+// IT CROSSES IT ON THE POSE'S OWN CLOCK, which is the whole of the fix.
+// The pencil is picked up (lapis_frame_1, which has his fingers closed round
+// one because that is the beat it was drawn for), raised (lapis_frame_2),
+// and brought back down to the desk on lapis_frame_1 again - all of that is
+// DRAWN, the pencil is in the drawing, and nothing is a prop yet. Only then
+// does the prop take over, at the exact pixel the drawn pencil occupied, and
+// it travels to the bag on PropCarry: a waypoint per drawn frame at the
+// pose's own frame rate, so it is at his hand's own place in kuha_frame_2
+// and at the mouth of the bag on the frame his hand goes into it. It is let
+// go there and sinks out of sight inside, while his hand is still in the bag.
+// It never arcs, never tumbles and is never released into mid-air.
+//
+// THIS USED TO BE A PropToss AND THAT WAS WRONG. A toss is given two points
+// and a time of its own, so it got to the bag when its own clock said to -
+// which was after his hand had been in, come out and gone back to the desk -
+// having set off from his CHEST on the frame his hand was already down by
+// the bag. The pencil crossed the picture on its own with nothing holding
+// it. PropCarry has no duration of its own for exactly this reason.
 //
 // TAPON IS THE SAME MACHINERY DOING THE THING IT WAS WRITTEN FOR. The
 // wrapper is in his hand for three drawn frames, and then it is a prop on an
@@ -101,23 +118,75 @@ public class BuildPaaralanScene4
     //
     // Every pose of Kylo's is 663 x 921 pixels and this scene draws it 4.038
     // wide by 5.609 tall at x 0.84..4.88, y -3.009..2.600. So a pixel in any
-    // of the frames has a world position, and these are the three that
-    // matter: the places an object leaves his hand and has to carry on from
-    // under its own power.
+    // of the frames has a world position, and these are the ones that matter:
+    // the places a prop has to be in order to be in his hand.
     //
     // They are not guesses and they are not tuned by eye. Tools/
-    // make_recess_frames.py lists the same fists in pixels at the top of its
-    // frame table, and these are those numbers through the conversion above.
-    // If a pose is redrawn, change them together or the object will jump at
-    // the moment it is released - which is the one seam this whole scene is
-    // built to avoid.
+    // make_recess_frames.py lists his fists in pixels at the top of its frame
+    // table, and the rest were read off the drawings themselves - each one is
+    // written with the measurement it came from. If a pose is redrawn, change
+    // them together or the object will jump at the moment it is released -
+    // which is the one seam this whole scene is built to avoid.
     private const float HandHighX = 1.77f;            // lapis_frame_3: up beside his face
     private const float HandHighY = -1.09f;
-    private const float HandChestX = 2.09f;           // lapis_frame_2: at his chest
-    private const float HandChestY = -1.59f;
     // The mouth of his bag, drawn into the bottom right of reach_bag_uniform.
+    // This is where "Kuha" is marked, because reach_bag_uniform is the frame
+    // that word's run reaches into the bag on. The pencil does NOT use it -
+    // it goes in on kuha_frame_3, where he has leaned in and the bag is drawn
+    // somewhere else. See BagHandIn below.
     private const float BagMouthX = 4.01f;
     private const float BagMouthY = -2.58f;
+
+    // --- The pencil's journey into the bag, frame by frame ---
+    //
+    // WHERE THE DRAWN PENCIL IS IN lapis_frame_1, which is the frame the prop
+    // takes over from. The prop is put at this exact place, at this exact
+    // angle, on the next frame, so the hand-over is invisible.
+    //
+    // FITTED TO THE ERASER, not to the barrel and not to his fist. The pink
+    // eraser is the one part of the drawn pencil that is unmistakable by
+    // colour and fully in view - the point is inside his fingers and runs off
+    // the bottom of the canvas - and prop_lapis has its own eraser 0.394
+    // world units from its centre along its length. Put the two erasers
+    // together at the barrel's own angle and the prop's centre has to be
+    // here. Fitting to the barrel's centre of mass instead puts it 0.11 up
+    // and 0.10 left, because the barrel mask does not include the dark point
+    // and so is biased towards the eraser end; the prop then sat visibly
+    // above the drawing it was taking over from.
+    private const float PencilGripX = 2.54f;
+    private const float PencilGripY = -2.77f;
+    // The angle the drawn barrel lies at in that frame: its long axis runs at
+    // 133 degrees with the point at the lower end. prop_lapis is drawn flat
+    // with its POINT ON THE LEFT, so the prop turned 133 degrees lies exactly
+    // the way the drawing has it.
+    private const float PencilGripAngle = 133f;
+    // Halfway, which is where the prop is on the second of the two frames it
+    // spends crossing. It is the straight midpoint and not a hand: by
+    // kuha_frame_2 his reaching hand is already AT the bag, so there is no
+    // hand in between for the pencil to be in. What there is is his forearm,
+    // and the straight line passes just under it - the arm fills rows
+    // 760..840 at this column and this is row 852 - so the pencil travels
+    // along his own arm rather than through the air above it. That is why
+    // the carry has no arc: it does not need one, and an arc would lift it
+    // off the arm and make it look thrown.
+    private const float PencilCarryMidX = 2.87f;
+    private const float PencilCarryMidY = -2.59f;
+    // WHERE HIS HAND GOES INTO THE BAG IN kuha_frame_3, which is the frame
+    // the pencil is let go on. Measured as the place his forearm disappears
+    // behind the drawn bag: the skin that touches the navy runs x 297..435 by
+    // y 721..920 and the middle of that contact is (385,820).
+    //
+    // NOT THE BAG IN reach_bag_uniform, which is where the old arc ended. He
+    // has leaned into this one and it is drawn further left and higher; a
+    // pencil sent to reach_bag's mouth lands on the desk beside this bag.
+    private const float BagHandInX = 3.19f;
+    private const float BagHandInY = -2.40f;
+    // Point down as it goes in - prop_lapis points left at zero, so down is
+    // ninety. Forty-three degrees from the grip angle, spread over the whole
+    // carry: a wrist turning the point towards the bag, not a tumble. The
+    // old arc span it at forty-five degrees a second instead, which is a
+    // pencil that has been thrown.
+    private const float PencilDropAngle = 90f;
 
     // --- What is on the desk when the scene opens ---
     //
@@ -132,7 +201,23 @@ public class BuildPaaralanScene4
     private const float AklatBaseY = -3.84f;
     private const float AklatHeight = 1.00f;
 
-    private const float PencilX = 3.60f;
+    // THE PENCIL IS UNDER THE FIST THAT PICKS IT UP, and that is the one of
+    // these three numbers that is not simply Scene 3's - it is Scene 3's
+    // because Scene 3 was moved too, in the same change and for this reason.
+    //
+    // lapis_frame_1_uniform, the frame "Ligpit" grips on, draws his fingers
+    // closed round a pencil at pixel (265,872) of the 663x921 canvas, which
+    // is world x 2.45. The drawn pencil appears there the moment that frame
+    // does, wherever the resting one is, so the distance between the two is
+    // the pencil skidding sideways as he takes hold of it. At the old 3.60 -
+    // the notebook's right-hand page - that was 1.06 units, and he reached
+    // LEFT for a pencil lying to his RIGHT.
+    //
+    // It is PencilGripX below, so the pickup is now a straight lift with no
+    // sideways component at all: the pencil is directly under the pencil.
+    // BuildPaaralanScene3 has the full working; the two files must carry the
+    // same value or the pencil hops as the lesson becomes break.
+    private const float PencilX = 2.54f;
     private const float PencilBaseY = -3.35f;
     private const float PencilHeight = 0.30f;
 
@@ -197,6 +282,12 @@ public class BuildPaaralanScene4
     // anything PER SECOND multiplies by it. Matched to Scene 3's 0.65, since
     // it is the same boy at the same desk ten minutes later.
     private const float Pace = 0.65f;
+
+    // The rate every leg of "Ligpit" runs at, as one number rather than the
+    // same literal in five places. The pencil's PropCarry is given THIS, not
+    // a duration, which is what keeps the prop on his hand: change the Pace
+    // and the pose and the pencil slow down together.
+    private const float LigpitFps = 9f * Pace;
 
     private const int OrderKylo = 0;
     private const int OrderDeskFront = 10;            // the desk, drawn over him
@@ -339,19 +430,36 @@ public class BuildPaaralanScene4
 
         // --- The two objects that travel ---
         // Separate GameObjects from the ones that sit on the desk, because
-        // PropToss owns its target's position and puts it back where the
-        // throw started when it is done. Sharing one object with the desk
+        // both components own their target's position and put it back where
+        // it started when they are done. Sharing one object with the desk
         // would leave the desk's pencil hanging in mid-air on a replay.
-        PropToss pencilToss = CreateToss("Toss_Lapis", "prop_lapis", PencilHeight,
-                                          new Vector3(HandChestX, HandChestY, 0f),
-                                          new Vector3(BagMouthX, BagMouthY, 0f));
-        // Into a bag rather than across a room: a short arc, barely turning,
-        // which is a thing being put down rather than thrown.
-        pencilToss.arcHeight = 0.40f;
-        pencilToss.duration = 0.50f / Pace;
-        pencilToss.spin = 45f;
-        pencilToss.settleDrop = 0.30f;
-        pencilToss.settleScale = 0.75f;
+        //
+        // THE PENCIL IS CARRIED AND THE WRAPPER IS THROWN, and that is why
+        // they are two different components. See the note at the top of this
+        // file: a carry has a waypoint per drawn frame and no duration of its
+        // own, so it cannot get to the bag before or after his hand does.
+        PropCarry pencilCarry = CreateCarry("Carry_Lapis", "prop_lapis", PencilHeight,
+                                             new[]
+                                             {
+                                                 // kuha_frame_1: still where
+                                                 // lapis_frame_1 drew it.
+                                                 new Vector3(PencilGripX, PencilGripY, 0f),
+                                                 // kuha_frame_2: under his
+                                                 // reaching forearm.
+                                                 new Vector3(PencilCarryMidX, PencilCarryMidY, 0f),
+                                                 // kuha_frame_3: at the mouth
+                                                 // of the bag, as his hand
+                                                 // goes into it.
+                                                 new Vector3(BagHandInX, BagHandInY, 0f),
+                                             }, PencilGripAngle);
+        pencilCarry.framesPerSecond = LigpitFps;
+        pencilCarry.endAngle = PencilDropAngle;
+        // A frame and a half to go in, which lands it out of sight while his
+        // hand is still drawn inside the bag - the next frame after that is
+        // the hand coming back out, and it has to come out empty.
+        pencilCarry.insertDuration = 1.5f / LigpitFps;
+        pencilCarry.insertDrop = 0.30f;
+        pencilCarry.insertScale = 0.65f;
 
         PropToss basuraToss = CreateToss("Toss_Basura", "prop_basura", BasuraHeight,
                                           new Vector3(HandHighX, HandHighY, 0f),
@@ -370,8 +478,8 @@ public class BuildPaaralanScene4
         //
         //   A  the notebook   place_frame_*  +  reach_bag  +  kuha_frame_*
         //   B  the textbook   aklat_frame_*  in place of three of those
-        //   C1 the pencil     picked up off the desk and raised
-        //   C2               his hand goes to the bag and the pencil drops in
+        //   C1 the pencil     reached for, gripped and lifted off the desk
+        //   C2               carried to the bag, put in, let go, hand back
         //
         // Legs A and B are Paaralan Scene 2's "Kuha" with the frame list
         // written the other way round, and that is the whole trick: the
@@ -387,7 +495,7 @@ public class BuildPaaralanScene4
             "kuha_frame_2_uniform",     // coming back out
             "kuha_frame_1_uniform",     // and down by his side
             "place_frame_3_uniform",    // hands back on the desk for the next one
-        }, "place_frame_3_uniform", 9f * Pace);
+        }, "place_frame_3_uniform", LigpitFps);
         // Frame 1 is place_frame_2, where the notebook is IN HIS HANDS. That
         // is the frame it has to leave the desk on - one either side and it
         // is either in two places or in none, which is rule 5.
@@ -408,7 +516,7 @@ public class BuildPaaralanScene4
             "kuha_frame_2_uniform",
             "kuha_frame_1_uniform",
             "place_frame_3_uniform",
-        }, "place_frame_3_uniform", 9f * Pace);
+        }, "place_frame_3_uniform", LigpitFps);
         if (propAklat != null)
         {
             ligpitB.fireOnFrame = 1;
@@ -416,12 +524,18 @@ public class BuildPaaralanScene4
                 ligpitB.onFrameReached, propAklat.SetActive, false);
         }
 
+        // C1: HE REACHES FOR IT, CLOSES HIS FINGERS ON IT, AND LIFTS IT.
+        // All three beats are drawn and the pencil is in the drawing for two
+        // of them, so there is nothing for a prop to do here at all.
         PoseSequence ligpitC1 = AddPose(seatGO, seatSr, new[]
         {
-            "place_frame_3_uniform",
+            "place_frame_3_uniform",    // he reaches - both hands onto the desk
             "lapis_frame_1_uniform",    // fingers closed round the pencil, on the desk
-            "lapis_frame_2_uniform",    // raised to his chest
-        }, "lapis_frame_2_uniform", 9f * Pace);
+            "lapis_frame_2_uniform",    // and up off the desk, held at his chest
+        }, "lapis_frame_2_uniform", LigpitFps);
+        // Frame 1 is lapis_frame_1, where the pencil is drawn IN HIS FINGERS.
+        // That is the frame the desk's own pencil has to go on: one either
+        // side and it is either in two places or in none, which is rule 5.
         if (propPencil != null)
         {
             ligpitC1.fireOnFrame = 1;
@@ -429,21 +543,52 @@ public class BuildPaaralanScene4
                 ligpitC1.onFrameReached, propPencil.SetActive, false);
         }
 
+        // C2: HE TAKES IT TO THE BAG, PUTS IT IN, AND LETS GO INSIDE.
+        //
+        // IT OPENS ON lapis_frame_1 AGAIN, and that frame is the hinge of the
+        // whole beat. C1 left him holding the pencil up at his chest; this
+        // brings it back DOWN to the desk, where it is still drawn in his
+        // fingers, and that is the last place the drawing can put it. The
+        // prop is handed over from exactly there on the next frame, so the
+        // pencil is never in two places and never in none.
+        //
+        // Without it the prop had to start from his chest - a hand's breadth
+        // above and a hand's breadth across from where his hand actually was
+        // by then - and the pencil visibly jumped backwards as it set off.
+        // NO kuha_frame_1 ON THE WAY OUT, and that is a correction rather than
+        // a saving. It is the frame he turns to the bag on and it is the right
+        // drawing for the beat, but neither of his hands is anywhere near the
+        // pencil in it - one is up by the bag's handle and the other is away
+        // at the edge of the canvas - so the prop, which has to be where
+        // lapis_frame_1 left it, sat on his shirt with nothing holding it. It
+        // is still there on the way BACK, where his hand is empty and it does
+        // not matter. The reach out is kuha_frame_2 held for the two frames
+        // the pencil takes to cross, which is a boy reaching into a bag.
         PoseSequence ligpitC2 = AddPose(seatGO, seatSr, new[]
         {
-            "kuha_frame_1_uniform",     // he turns to the bag...
-            "kuha_frame_2_uniform",
-            "kuha_frame_3_uniform",     // ...hand in
-            "kuha_frame_2_uniform",     // ...and out
-            "kuha_frame_1_uniform",
-            "place_frame_3_uniform",
-        }, "sitting_front_uniform", 9f * Pace);
-        // Frame 0, the instant his drawn hand stops holding a pencil. The
-        // toss starts at HandChest, which is exactly where lapis_frame_2 had
-        // it, so the drawn pencil and the flying one are the same pencil in
-        // the same place on consecutive frames.
-        ligpitC2.fireOnFrame = 0;
-        UnityEventTools.AddPersistentListener(ligpitC2.onFrameReached, pencilToss.Play);
+            "lapis_frame_1_uniform",    // down to the desk again, pencil still drawn in his hand
+            "kuha_frame_2_uniform",     // he reaches for the bag - and the prop takes the pencil on
+            "kuha_frame_2_uniform",     // held: the pencil crosses, along the underside of his arm
+            "kuha_frame_3_uniform",     // his hand goes IN, and the pencil is at the mouth with it
+            "kuha_frame_3_uniform",     // held: it goes down inside, and he lets go of it there
+            "kuha_frame_2_uniform",     // only now does the hand come back out, empty
+            "kuha_frame_1_uniform",     // and he turns back
+            "place_frame_3_uniform",    // and down on the desk
+        }, "sitting_front_uniform", LigpitFps);
+        // Frame 1, the first frame whose drawing has no pencil in it. The
+        // carry's first waypoint is PencilGrip, which is exactly where
+        // lapis_frame_1 drew the pencil on the frame before, so the drawn
+        // pencil and the carried one are the same pencil in the same place on
+        // consecutive frames.
+        //
+        // The carry is three waypoints over two frames and then a frame and a
+        // half going in, so it reaches the bag exactly as frame 3 puts his
+        // hand in it and is out of sight partway through frame 4, while that
+        // hand is still drawn inside. Frame 5 brings the hand back out and
+        // there is nothing left in it. None of those are durations anyone
+        // chose: they fall out of LigpitFps, which is this pose's own rate.
+        ligpitC2.fireOnFrame = 1;
+        UnityEventTools.AddPersistentListener(ligpitC2.onFrameReached, pencilCarry.Play);
 
         // The chain. onFinished runs after the idle pose is set and after
         // running has gone false, so the next leg's Play() is free to take
@@ -744,8 +889,8 @@ public class BuildPaaralanScene4
         //
         // It is a safety cap on how long the sequence waits for an action to
         // finish before asking the next word anyway. "Ligpit" is four chained
-        // sequences and twenty-five frames at about six a second - a little
-        // over four seconds - and "Inom" has to end the eating before it can
+        // sequences and twenty-seven frames at about six a second - a little
+        // under five seconds - and "Inom" has to end the eating before it can
         // start. Eight gives both of them room without leaving a child
         // waiting if a sequence ever fails to land.
         //
@@ -886,6 +1031,45 @@ public class BuildPaaralanScene4
         toss.to = to;
         go.SetActive(false);
         return toss;
+    }
+
+    /// <summary>
+    /// An object that is CARRIED: its own GameObject, drawn in front of
+    /// everything, switched off until a hand picks it up.
+    ///
+    /// The same shape as CreateToss and for the same reasons - the component
+    /// on a parent that stays on, the scale read off the sprite's own bounds
+    /// - with two differences. It is laid at `startAngle` from the start, so
+    /// it is already lying the way the drawing it takes over from has it; and
+    /// it is given the renderer as well as the transform, because PropCarry
+    /// fades it out as the bag closes over it and PropToss has nothing to
+    /// fade.
+    /// </summary>
+    private static PropCarry CreateCarry(string name, string spriteFile,
+                                          float worldHeight, Vector3[] path,
+                                          float startAngle)
+    {
+        GameObject go = new GameObject(name);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = LoadSpriteOptional(spriteFile);
+        sr.sortingLayerName = "Player";
+        sr.sortingOrder = OrderFlying;
+
+        float s = 1f;
+        if (sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            s = worldHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(s, s, 1f);
+        go.transform.position = path[0];
+        go.transform.rotation = Quaternion.Euler(0f, 0f, startAngle);
+
+        GameObject holder = new GameObject(name + "_Driver");
+        PropCarry carry = holder.AddComponent<PropCarry>();
+        carry.prop = go.transform;
+        carry.propRenderer = sr;
+        carry.waypoints = path;
+        carry.startAngle = startAngle;
+        go.SetActive(false);
+        return carry;
     }
 
     /// <summary>

@@ -40,7 +40,7 @@ SIT_X, SIT_FEET_Y, SEATED_H = 2.86, -3.009, 5.609
 
 NOTEBOOK = (2.86, -3.84, 0.83)         # x, baseY, height
 AKLAT = (5.30, -3.84, 1.00)
-PENCIL = (3.60, -3.35, 0.30)
+PENCIL = (2.54, -3.35, 0.30)           # directly under the pencil lapis_frame_1 draws
 BOTTLE = (0.52, -3.62, 1.55)
 BAON = (2.86, -3.86, 1.45)
 BASURA = (4.45, -3.60, 0.70)
@@ -48,8 +48,15 @@ BASURA = (4.45, -3.60, 0.70)
 BIN_X, BIN_FOOT_Y, BIN_H, BIN_MOUTH_UP = -1.30, -6.55, 4.10, 0.825
 
 HAND_HIGH = (1.77, -1.09)
-HAND_CHEST = (2.09, -1.59)
-BAG_MOUTH = (4.01, -2.58)
+BAG_MOUTH = (4.01, -2.58)              # reach_bag_uniform's bag - "Kuha" is marked here
+
+# The pencil's journey into the bag, one point per drawn frame of Ligpit's
+# last leg. See the block of the same name in BuildPaaralanScene4.cs.
+PENCIL_GRIP = (2.54, -2.77)            # where lapis_frame_1 draws it, in his fingers
+PENCIL_CARRY_MID = (2.87, -2.59)       # under his reaching forearm in kuha_frame_2
+BAG_HAND_IN = (3.19, -2.40)            # where his hand goes in, in kuha_frame_3
+PENCIL_GRIP_ANGLE = 133.0
+PENCIL_DROP_ANGLE = 90.0
 
 
 def world_to_px(x, y):
@@ -99,8 +106,15 @@ def mark(canvas, x, y, label):
     d.text((px + 18, py - 8), label, fill=(255, 40, 40, 255))
 
 
-def frame(pose, on_desk, out, marks=(), flying=None):
-    """One moment of the scene: a pose of Kylo's and what is on the desk."""
+def frame(pose, on_desk, out, marks=(), flying=None, angle=0.0, shrink=1.0):
+    """One moment of the scene: a pose of Kylo's and what is on the desk.
+
+    `flying` is an object that is not resting on anything - a wrapper in the
+    air, or the pencil in his hand on its way to the bag. `angle` turns it,
+    which the pencil needs and the wrapper does not: PropCarry lays the prop
+    at the angle the DRAWING had it and turns it as it goes in, and a preview
+    that drew it flat would not show whether that lines up.
+    """
     canvas = Image.new("RGBA", (W, H), (0, 0, 0, 255))
     paste_full(canvas, "klasrum_interior_background")
     # The bin is beside the desk and nearer the camera than it is.
@@ -114,10 +128,16 @@ def frame(pose, on_desk, out, marks=(), flying=None):
         im = load(name)
         if im is not None:
             w = height * im.size[0] / im.size[1]
-            left, top = world_to_px(x - w / 2, y + height / 2)
-            canvas.alpha_composite(
-                im.resize((int(w * PX), int(height * PX)), Image.LANCZOS),
-                (int(left), int(top)))
+            im = im.resize((max(1, int(w * PX * shrink)),
+                            max(1, int(height * PX * shrink))), Image.LANCZOS)
+            if angle:
+                # expand=True so the corners are not clipped; the result is
+                # still centred on the same point, which is what Unity's own
+                # rotation about the sprite centre does.
+                im = im.rotate(angle, resample=Image.BICUBIC, expand=True)
+            px, py = world_to_px(x, y)
+            canvas.alpha_composite(im, (int(px - im.size[0] / 2),
+                                        int(py - im.size[1] / 2)))
     for x, y, label in marks:
         mark(canvas, x, y, label)
     canvas.convert("RGB").save(out)
@@ -137,12 +157,47 @@ def main():
     # The opening shot, with the hand positions and the bin's mouth marked.
     frame("sitting_front_uniform", lesson,
           os.path.join(outdir, "01_open.png"),
-          marks=[HAND_HIGH + ("hand high",), HAND_CHEST + ("hand chest",),
-                 BAG_MOUTH + ("bag",), (BIN_X, bin_mouth_y, "bin mouth")])
+          marks=[HAND_HIGH + ("hand high",), BAG_MOUTH + ("kuha bag",),
+                 PENCIL_GRIP + ("grip",), BAG_HAND_IN + ("hand in bag",),
+                 (BIN_X, bin_mouth_y, "bin mouth")])
     # Ligpit, mid-way: the notebook is in his hands and off the desk.
     frame("place_frame_2_uniform",
           [("prop_aklat_closed", AKLAT), ("prop_lapis", PENCIL), ("prop_bote", BOTTLE)],
           os.path.join(outdir, "02_ligpit.png"))
+
+    # --- Ligpit's last leg, frame by frame: the pencil into the bag ---
+    #
+    # THE BEAT MOST WORTH PREVIEWING, because it is the one where a prop has
+    # to meet a drawing. Each of these is one frame of ligpitC2 with the
+    # pencil where PropCarry puts it on that frame; if the prop is not on his
+    # hand in any of them, the waypoint for that frame is wrong.
+    pencil_gone = [("prop_bote", BOTTLE)]
+    # He has it, and the DRAWING has it - no prop at all. The desk's pencil
+    # is already off, which is the frame before this one.
+    frame("lapis_frame_1_uniform", pencil_gone,
+          os.path.join(outdir, "02a_pencil_grip.png"),
+          marks=[PENCIL_GRIP + ("grip",)])
+    frame("lapis_frame_2_uniform", pencil_gone,
+          os.path.join(outdir, "02b_pencil_lift.png"))
+    # And from here the prop carries it, a waypoint a frame.
+    frame("kuha_frame_2_uniform", pencil_gone,
+          os.path.join(outdir, "02c_pencil_carry_1.png"),
+          flying=("prop_lapis", PENCIL_GRIP, 0.30), angle=PENCIL_GRIP_ANGLE)
+    frame("kuha_frame_2_uniform", pencil_gone,
+          os.path.join(outdir, "02d_pencil_carry_2.png"),
+          flying=("prop_lapis", PENCIL_CARRY_MID, 0.30),
+          angle=(PENCIL_GRIP_ANGLE + PENCIL_DROP_ANGLE) / 2)
+    frame("kuha_frame_3_uniform", pencil_gone,
+          os.path.join(outdir, "02e_pencil_at_bag.png"),
+          flying=("prop_lapis", BAG_HAND_IN, 0.30), angle=PENCIL_DROP_ANGLE)
+    # Half way into the bag: down by half the insert drop and shrinking.
+    frame("kuha_frame_3_uniform", pencil_gone,
+          os.path.join(outdir, "02f_pencil_going_in.png"),
+          flying=("prop_lapis", (BAG_HAND_IN[0], BAG_HAND_IN[1] - 0.15), 0.30),
+          angle=PENCIL_DROP_ANGLE, shrink=0.82)
+    # And out of sight, with his hand still in the bag.
+    frame("kuha_frame_3_uniform", pencil_gone,
+          os.path.join(outdir, "02g_pencil_in.png"))
     # Ligpit done, Kuha: the baon arrives on a cleared desk.
     frame("kuha_baon_2_uniform", bottle_only, os.path.join(outdir, "03_kuha.png"))
     frame("sitting_front_uniform", bottle_only + [("prop_baon_open", BAON)],

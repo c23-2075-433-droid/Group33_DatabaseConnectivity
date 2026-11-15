@@ -181,13 +181,32 @@ public class BuildPaaralanScene3
     private const float AklatBaseY = -3.84f;
     private const float AklatHeight = 1.00f;
 
-    // The pencil, lying ON the open notebook's right-hand page rather than
-    // beside it. It used to be on the left strip; the glass needs that strip,
-    // and a pencil resting on the book he is writing in is where a pencil
-    // actually is. Drawn span: x 3.18..4.02, y -3.31..-3.16, inside the
-    // notebook's own -3.84..-3.01. Drawn one sorting order above the notebook
-    // so it is not a coin-flip which of the two wins.
-    private const float PencilX = 3.60f;
+    // The pencil, lying ON the open notebook and UNDER THE FIST THAT PICKS
+    // IT UP, which is the whole of why it is at this x and not a prettier one.
+    //
+    // lapis_frame_1_uniform is the only drawing in the project with his
+    // fingers closed round a pencil, and the pencil it draws there is centred
+    // on world x 2.54 - fitted by putting prop_lapis' own pink eraser on the
+    // drawn pink eraser at the drawn barrel's angle, which is the only part
+    // of that pencil fully in view. The instant the pose changes to that
+    // frame the drawn pencil is THERE, wherever the resting one happens to
+    // be, so the distance between the two is a pencil skidding across the
+    // desk as he picks it up and skidding back as he puts it down. This used
+    // to be 3.60, on the notebook's right-hand page, and that gap was 1.06
+    // units - a quarter of his own width, twice per "Sulat". At 2.54 the
+    // pickup is a straight lift with no sideways component at all.
+    //
+    // STILL ON THE NOTEBOOK, just left of the spine instead of on the right
+    // page. prop_notebook_open is 965x205 drawn 0.83 tall, so it runs x
+    // 0.91..4.81; the pencil's drawn span of x 2.12..2.96, y -3.31..-3.16
+    // sits inside it and inside its own -3.84..-3.01. Drawn one sorting order
+    // above the notebook so it is not a coin-flip which of the two wins.
+    //
+    // THE SAME NUMBER IS IN BuildPaaralanScene4, which is this desk ten
+    // minutes later and opens on the frame this scene closes on. Move one and
+    // not the other and the pencil hops as the scene changes - the same drift
+    // the staging constants above are written out to prevent.
+    private const float PencilX = 2.54f;
     private const float PencilBaseY = -3.35f;
     private const float PencilHeight = 0.30f;
 
