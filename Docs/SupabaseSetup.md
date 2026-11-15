@@ -243,11 +243,11 @@ is git-ignored on purpose.
 That's it — `SupabaseClient` reads from that asset at runtime.
 
 The tool gives the asset a fixed GUID, and that matters more than it sounds.
-Unity wires a scene reference by GUID rather than by path, and three committed
-scenes point at this asset: `MainMenu` (both clients), `Chapter1_Level5_Almusal`
-and `Chapter2_Level5_Uwian`. An asset created with a random GUID would be a
-perfectly good config that no scene refers to — every client reporting "not
-configured" while the asset sits in the Project window. If you made your config
+Unity wires a scene reference by GUID rather than by path, and four committed
+scenes point at this asset: `MainMenu` (both clients), `Chapter1_Level5_Almusal`,
+`Chapter2_Level5_Uwian` and `Chapter3_Level5_Uwi`. An asset created with a
+random GUID would be a perfectly good config that no scene refers to — every
+client reporting "not configured" while the asset sits in the Project window. If you made your config
 before the tool did this, run it again: it repoints the one you already have and
 leaves your URL and key alone.
 

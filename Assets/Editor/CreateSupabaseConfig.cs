@@ -28,11 +28,11 @@ public class CreateSupabaseConfig
     /// The GUID this asset always gets, on every machine.
     ///
     /// Unity wires a reference in a scene by the target's GUID, not by its
-    /// path, and three committed scenes hold a reference to this asset:
+    /// path, and four committed scenes hold a reference to this asset:
     /// MainMenu (SupabaseClient and LeaderboardClient both),
-    /// Chapter1_Level5_Almusal and Chapter2_Level5_Uwian. The asset itself is
-    /// git-ignored, so it is the one thing those scenes point at that does
-    /// not arrive with a clone.
+    /// Chapter1_Level5_Almusal, Chapter2_Level5_Uwian and
+    /// Chapter3_Level5_Uwi. The asset itself is git-ignored, so it is the one
+    /// thing those scenes point at that does not arrive with a clone.
     ///
     /// Left alone, Unity gives a newly created asset a random GUID. The
     /// member who ran this tool would then have a perfectly good config that
@@ -42,7 +42,7 @@ public class CreateSupabaseConfig
     /// config this tool creates the config those scenes were built against.
     ///
     /// The value is the one the committed scenes already carry, so it must
-    /// not be changed. If it ever has to be, the three scenes have to be
+    /// not be changed. If it ever has to be, the four scenes have to be
     /// rebuilt or re-wired in the same commit.
     /// </summary>
     private const string SharedGuid = "169aa69e25ca247ba9ca3f28c6179c71";
@@ -141,8 +141,9 @@ public class CreateSupabaseConfig
                             "expect (" + SharedGuid + ") but it came back as '" + landed +
                             "'. Until that is sorted the clients will say the leaderboard is " +
                             "not configured; dragging the asset onto SupabaseClient and " +
-                            "LeaderboardClient in MainMenu, Chapter1_Level5_Almusal and " +
-                            "Chapter2_Level5_Uwian is the way round it.");
+                            "LeaderboardClient in MainMenu, Chapter1_Level5_Almusal, " +
+                            "Chapter2_Level5_Uwian and Chapter3_Level5_Uwi is the way round " +
+                            "it.");
             return false;
         }
 
