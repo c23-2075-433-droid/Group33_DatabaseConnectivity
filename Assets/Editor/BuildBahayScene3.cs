@@ -76,6 +76,12 @@ public class BuildBahayScene3
     private const float FeetBelowPivot = (743.5f - 745f / 2f) / SpritePPU;   // 3.09
     private const float PlayerFeetY = FloorY + FeetBelowPivot * PlayerScale;
 
+    // The hole the cup was cut out of the painting: 61 pixels of a 1536x864
+    // background, which imports at 100 pixels per unit and is drawn at
+    // BgScale. (SpritePPU above is the character art, not this.) Kept as a
+    // number because item_baso is no longer that patch - see Item_Baso below.
+    private const float BasoPaintedHeight = 61f / 100f * BgScale;   // 0.7625
+
     // How far above an object's top edge its word badge floats, in canvas
     // units (world units x100). Big enough that the arrow fits underneath.
     private const float PromptLift = 110f;
@@ -129,7 +135,18 @@ public class BuildBahayScene3
         GameObject itemSuklay = CreateItem("Item_Suklay", "item_suklay", new Vector2(2.750f, 0.988f), 5);
         // The brush stands in the cup, so the cup has to draw over it.
         GameObject itemSipilyo = CreateItem("Item_Sipilyo", "item_sipilyo", new Vector2(4.225f, 1.694f), 4);
-        CreateItem("Item_Baso", "item_baso", new Vector2(3.931f, 1.188f), 5);
+        // The cup is the one item here that is no longer a cut-out. Bahay 5
+        // redrew item_baso at 400x480 for the breakfast table, where it is
+        // seen close up, and the file is shared. At BgScale that art is 4.0
+        // x 4.8 world units - seven times the 54x61 patch this room was
+        // painted around - which is the green tumbler standing taller than
+        // Kylo. So it is fitted to the painted height instead of scaled like
+        // the others: the base goes back on the shelf and the toothbrush
+        // rises out of it. Height is what is matched, not width, because the
+        // redraw is a shade narrower in proportion and the shelf and the
+        // brush are the edges that have to line up.
+        CreateItem("Item_Baso", "item_baso", new Vector2(3.931f, 1.188f), 5,
+                   BasoPaintedHeight);
         GameObject itemTuwalya = CreateItem("Item_Tuwalya", "item_tuwalya", new Vector2(7.262f, 1.019f), 5);
 
         PickUpItem useSabon = itemSabon.AddComponent<PickUpItem>();
@@ -437,16 +454,27 @@ public class BuildBahayScene3
         };
     }
 
-    /// <summary>One of the loose bathroom objects, at the spot it was painted.</summary>
-    private static GameObject CreateItem(string name, string spriteFile, Vector2 pos, int order)
+    /// <summary>
+    /// One of the loose bathroom objects, at the spot it was painted. These
+    /// were cut straight out of the background, so sharing its BgScale puts
+    /// them back in their holes pixel for pixel. Pass paintedHeight for one
+    /// whose art is no longer that cut-out: it is then scaled to stand that
+    /// many world units tall, whatever size the file happens to be.
+    /// </summary>
+    private static GameObject CreateItem(string name, string spriteFile, Vector2 pos, int order,
+                                         float paintedHeight = 0f)
     {
         GameObject go = new GameObject(name);
         go.transform.position = new Vector3(pos.x, pos.y, 0f);
-        go.transform.localScale = new Vector3(BgScale, BgScale, 1f);
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = LoadSprite(spriteFile);
         sr.sortingLayerName = "Props";
         sr.sortingOrder = order;
+
+        float scale = BgScale;
+        if (paintedHeight > 0f && sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            scale = paintedHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(scale, scale, 1f);
         return go;
     }
 
