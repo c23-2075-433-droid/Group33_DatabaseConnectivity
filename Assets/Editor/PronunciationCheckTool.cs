@@ -15,10 +15,16 @@
 // later, these checks port to EditMode tests close to as they stand.
 //
 // The check that matters most is #3: every taught word against every OTHER
-// taught word, all 53x52 of them, none of which may be accepted. That is the
+// taught word, every pair of them, none of which may be accepted. That is the
 // regression guard for the bug this tool was written for - "kaha" being scored
 // tama for "Kuha" - and for its worse cousin, "Kanin" being accepted for
 // "Kain" when both are taught in the same breakfast scene.
+//
+// Check #7 is the guard for the second bug found here: a curated variant that
+// is a split word ("sa got", "ba ti", "u po") used to be canonicalized with
+// its filler-looking syllable thrown away, leaving a bare "gut", "ti" or "u"
+// that any single word the child said would match. #7 says every piece of
+// every variant outright, and requires all of them to be scored mali.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -85,6 +91,34 @@ public static class PronunciationCheckTool
         new Case("sipilio",   "Sipilyo", true, "listed variant"),
         new Case("sapatol",   "Sapatos", true, "one consonant garbled on a 7+ letter word, vowels intact"),
 
+        // One syllable of the word is not the word. Each of these was scored
+        // tama before variants were canonicalized whole: the variant "sa got"
+        // lost its "sa" to the filler list and became a bare "gut".
+        new Case("u",       "Upo",    false, "the head of the 'u po' variant, alone"),
+        new Case("ti",      "Bati",   false, "the tail of 'ba ti', alone"),
+        new Case("ha",      "Kuha",   false, "the tail of 'ku ha', alone"),
+        new Case("nin",     "Kunin",  false, "the tail of 'ku nin', alone"),
+        new Case("gut",     "Sagot",  false, "the tail of 'sa got', alone"),
+        new Case("kay",     "Sakay",  false, "the tail of 'sa kay', alone"),
+        new Case("bun",     "Sabon",  false, "the tail of 'sa bon', alone"),
+        new Case("ngun",    "Bangon", false, "the tail of 'ba ngon', alone"),
+        new Case("ku",      "Kuha",   false, "the head of 'ku ha', alone"),
+        new Case("u wi",    "Upo",    false, "Uwi's variant is not an answer to Upo"),
+        new Case("u wi",    "Uwi",    true,  "but it IS Uwi, split in two"),
+        new Case("u ano",   "Upo",    false, "a fragment with a filler after it"),
+        new Case("ha ha",   "Kuha",   false, "laughing is not Kuha"),
+        new Case("si ti",   "Bati",   false, "a filler and a fragment"),
+
+        // The flip side: trimming filler only off the ENDS means a split word
+        // still counts when the recognizer wraps it in one.
+        new Case("ba ngon po", "Bangon",  true, "split word, and polite"),
+        new Case("ang sa got", "Sagot",   true, "filler first, then the split word"),
+        new Case("ku ha mo",   "Kuha",    true, "split word, filler after"),
+        new Case("u po po",    "Upo",     true, "split word plus a stray filler"),
+        new Case("sa patol po","Sapatos", true, "split long word, one consonant garbled"),
+        new Case("ngon po",    "Bangon",  false, "the tail of the word, even so"),
+        new Case("patos po",   "Sapatos", false, "the tail of a long word, even so"),
+
         // Nothing at all, and things that are not the word.
         new Case("mali",        "Kuha", false, "an unrelated word"),
         new Case("hello world", "Kain", false, "what the in-editor recognizer stub returns"),
@@ -110,6 +144,7 @@ public static class PronunciationCheckTool
         failures += CheckVariantsAreNotOtherWords(words, log);
         failures += CheckVariantsMatchTheirOwnWord(words, log);
         failures += CheckRegressionCases(log);
+        failures += CheckNoVariantPieceIsAccepted(words, log);
 
         ReportObjectiveWordsWithoutVariants(log);
 
@@ -283,6 +318,52 @@ public static class PronunciationCheckTool
 
         log.AppendLine("FAIL 6. " + wrong.Count + " of " + RegressionCases.Length + " named cases are wrong:");
         foreach (string line in wrong) log.AppendLine("        " + line);
+        return 1;
+    }
+
+    // 7 -----------------------------------------------------------------------
+    // Most curated variants are split words - "sa got", "ba ti", "u po" - and
+    // the child has to say the WHOLE word, not one syllable of it. This takes
+    // every variant apart and insists that each piece on its own is mali.
+    //
+    // A piece that happens to be the taught word itself is skipped, because it
+    // is a correct answer: "salamat po" has "salamat" in it.
+    private static int CheckNoVariantPieceIsAccepted(string[] words, StringBuilder log)
+    {
+        List<string> accepted = new List<string>();
+        int pieces = 0;
+
+        foreach (string word in words)
+        {
+            string[] variants = WordVariants.For(word);
+            if (variants == null) continue;
+
+            string wholeWord = PronunciationChecker.Canonicalize(word);
+
+            foreach (string variant in variants)
+            {
+                string[] parts = PronunciationChecker.Canonicalize(variant).Split(' ');
+                if (parts.Length < 2) continue;
+
+                foreach (string part in parts)
+                {
+                    if (part.Length == 0 || part == wholeWord) continue;
+                    pieces++;
+                    if (PronunciationChecker.IsCorrect(part, word))
+                        accepted.Add("\"" + part + "\" (one piece of \"" + variant +
+                                     "\") is accepted for \"" + word + "\"");
+                }
+            }
+        }
+
+        if (accepted.Count == 0)
+        {
+            log.AppendLine("ok   7. none of the " + pieces + " variant syllables is accepted on its own");
+            return 0;
+        }
+
+        log.AppendLine("FAIL 7. a syllable is being accepted as the whole word:");
+        foreach (string line in accepted) log.AppendLine("        " + line);
         return 1;
     }
 

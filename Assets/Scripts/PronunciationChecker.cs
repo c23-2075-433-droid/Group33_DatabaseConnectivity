@@ -39,22 +39,33 @@ using System.Text.RegularExpressions;
 ///      recognizer may write a Filipino word the Spanish way.
 ///   3. The uw/w glide is folded, so "tuwalya" and "twalya" are one word.
 ///   4. Doubled letters are collapsed ("oppo" -> "upu" matches "Upo").
-///   5. Filler words the recognizer tacks on are dropped ("po", "mo", "na"...).
+///   5. Filler words the recognizer tacks on ("po", "mo", "na"...) are trimmed
+///      off the ENDS of the utterance, never out of its middle - see
+///      WholeFormsOf. Half the filler list is also a Filipino first syllable
+///      (sa, si, ku, ba, mo, po, na), so dropping them anywhere would leave a
+///      fragment behind, and fragments are what this checker exists to reject.
 ///   6. Each word's known mistranscriptions are accepted outright - see
 ///      WordVariants, which is the layer that actually buys accuracy on a real
 ///      device, and which grows from the attempt log rather than from guesses.
+///      A variant is canonicalized WHOLE, with every one of its tokens kept:
+///      the curated list is full of split-word forms ("sa got", "ku ha",
+///      "ba ti"), and filler-stripping those collapsed them to a bare
+///      syllable - "gut", "ha", "ti" - which then matched any single word the
+///      child said. Saying one syllable of the word is not saying the word.
 ///   7. A reply the recognizer split into pieces is read as ONE word when
 ///      running it together spells another taught word: "pag kain" is
 ///      "Pagkain" badly split, so the "kain" in it is not an answer to
 ///      "Kain". Pagkain and Kain are asked one after the other in the
 ///      breakfast scene, which is where this would otherwise be felt.
 ///
-/// Folding all 53 taught words this way leaves 53 DISTINCT canonical forms, so
-/// exact matching can never make two taught words ambiguous. The editor tool
-/// Tools > SALINLAHI > Check Pronunciation Matching proves that every time it
-/// runs, by testing all 53x52 cross pairs. The count is the one the fifteen
-/// built scenes ask for, so it moves when the word list does - re-read it off
-/// the scenes (Tools/completeness_report.py) rather than trusting this line.
+/// Folding the taught words this way leaves every one of them with a DISTINCT
+/// canonical form, so exact matching can never make two of them ambiguous. The
+/// editor tool Tools > SALINLAHI > Check Pronunciation Matching proves that
+/// every time it runs, by testing every cross pair of the words in
+/// WordVariants - and, since the second bug found here, every syllable of every
+/// variant on its own. No count is written down on purpose: it moves when the
+/// word list does, so read it off the tool's own output (or the scenes, via
+/// Tools/completeness_report.py).
 ///
 /// The one remaining piece of fuzziness is deliberate and narrow: on a word of
 /// 7+ canonical letters, ONE consonant may be garbled, as long as every vowel
@@ -71,9 +82,10 @@ public static class PronunciationChecker
     private const int ConsonantSlipMinLength = 7;
 
     /// <summary>
-    /// Words the recognizer sprinkles around a one-word answer. Dropped before
-    /// matching so "Kuha mo" and "ang lakad na" still count. Canonicalized on
-    /// startup, so this list is written the way people spell it.
+    /// Words the recognizer sprinkles around a one-word answer. Trimmed off
+    /// the ends of the utterance before matching, so "Kuha mo" and "ang lakad
+    /// na" still count. Canonicalized on startup, so this list is written the
+    /// way people spell it.
     /// </summary>
     private static readonly string[] RawFillerWords =
     {
@@ -103,91 +115,170 @@ public static class PronunciationChecker
         if (string.IsNullOrWhiteSpace(spokenText) || string.IsNullOrWhiteSpace(targetWord))
             return false;
 
-        string[] allTokens, contentTokens;
-        Tokenize(spokenText, out allTokens, out contentTokens);
-        if (allTokens.Length == 0) return false;
+        Utterance said = Utterance.Of(spokenText);
+        if (said.IsEmpty) return false;
 
-        if (MatchesForm(allTokens, contentTokens, Canonicalize(targetWord)))
+        if (said.Matches(Canonicalize(targetWord)))
             return true;
 
         // A variant is just another spelling that counts as the word, so it is
-        // matched exactly like the target itself.
-        if (MatchesAnyVariant(allTokens, contentTokens, acceptedVariants)) return true;
-        if (MatchesAnyVariant(allTokens, contentTokens, WordVariants.For(targetWord))) return true;
+        // matched exactly like the target itself - and canonicalized exactly
+        // like it, whole, keeping every token it was written with.
+        if (MatchesAnyVariant(said, acceptedVariants)) return true;
+        if (MatchesAnyVariant(said, WordVariants.For(targetWord))) return true;
 
         return false;
     }
 
     /// <summary>
     /// The canonical form of a word or phrase - what matching actually compares.
+    /// Every token is kept, filler words included, because this is the form a
+    /// target word and its variants are compared AS: a two-token variant like
+    /// "u po" stays two tokens, and so is answered only by the whole thing.
+    ///
     /// Public because the attempt log records it next to the raw recognizer
     /// text: seeing "kaha" vs "kuha" side by side is how a mishearing gets
     /// spotted and added to WordVariants.
     /// </summary>
     public static string Canonicalize(string text)
     {
-        string[] allTokens, contentTokens;
-        Tokenize(text, out allTokens, out contentTokens);
-        return string.Join(" ", contentTokens);
+        return CanonicalForm(text);
     }
 
-    private static bool MatchesAnyVariant(string[] allTokens, string[] contentTokens, string[] variants)
+    private static bool MatchesAnyVariant(Utterance said, string[] variants)
     {
         if (variants == null) return false;
 
         foreach (string variant in variants)
         {
             if (string.IsNullOrWhiteSpace(variant)) continue;
-            if (MatchesForm(allTokens, contentTokens, Canonicalize(variant))) return true;
+            if (said.Matches(Canonicalize(variant))) return true;
         }
         return false;
     }
 
     /// <summary>
-    /// Compares an already-tokenized utterance against one canonical form
-    /// (the target word, or one of its accepted variants).
+    /// One recognizer result, canonicalized and held in the shapes matching
+    /// compares against: the whole utterance with filler words trimmed off its
+    /// ends (each window also run together, for a word the recognizer split),
+    /// and the individual content words.
     /// </summary>
-    private static bool MatchesForm(string[] allTokens, string[] contentTokens, string canonicalForm)
+    private sealed class Utterance
     {
-        if (string.IsNullOrEmpty(canonicalForm)) return false;
+        /// <summary>Every canonical token, filler words included.</summary>
+        private string[] allTokens;
 
-        // The whole phrase, once the recognizer's filler words are gone.
-        if (string.Join(" ", contentTokens) == canonicalForm) return true;
+        /// <summary>The tokens that are not filler words.</summary>
+        private string[] contentTokens;
 
-        // Any single word of it. The recognizer often returns a short sentence
-        // when the child said one word.
-        //
-        // Unless the utterance run together IS some OTHER taught word, in
-        // which case its pieces are halves of that word rather than an
-        // answer. "pag kain" is the recognizer splitting "Pagkain", and the
-        // "kain" inside it is not the child saying "Kain" - but both are
-        // taught in the breakfast scene, one straight after the other, so
-        // without this the second word could be answered by repeating the
-        // first. The same guard stops "ka nin" passing for "Kunin", "u wi"
-        // for "Upo", and "ti ngin" for "Bati".
-        if (!IsSomeOtherTaughtWord(string.Concat(allTokens), canonicalForm))
+        /// <summary>
+        /// Whole-utterance candidates: every edge-trimmed window, spaced and
+        /// run together. A canonical form must equal one of these outright.
+        /// </summary>
+        private List<string> wholeForms;
+
+        public bool IsEmpty { get { return allTokens.Length == 0; } }
+
+        public static Utterance Of(string text)
         {
-            foreach (string token in contentTokens)
-                if (token == canonicalForm) return true;
+            Utterance said = new Utterance();
+            Tokenize(text, out said.allTokens, out said.contentTokens);
+            said.wholeForms = WholeFormsOf(said.allTokens);
+            return said;
         }
 
-        // Everything run together, for when the recognizer splits one word in
-        // two ("u po" for "Upo"). Built from the UNFILTERED tokens, because the
-        // filler list would otherwise eat the "po" that is part of the word.
-        if (string.Concat(allTokens) == canonicalForm) return true;
-
-        // Long words only: one consonant garbled by the recognizer, with every
-        // vowel still in place. This is what keeps "kaha" out of "kuha" while
-        // still forgiving a smudged "Sapatos".
-        if (canonicalForm.Length >= ConsonantSlipMinLength)
+        /// <summary>
+        /// Compares this utterance against one canonical form (the target
+        /// word, or one of its accepted variants).
+        /// </summary>
+        public bool Matches(string canonicalForm)
         {
-            foreach (string token in contentTokens)
-                if (IsConsonantSlip(token, canonicalForm)) return true;
+            if (string.IsNullOrEmpty(canonicalForm)) return false;
 
-            if (IsConsonantSlip(string.Concat(allTokens), canonicalForm)) return true;
+            // The utterance as a whole, allowing the recognizer's filler words
+            // to be trimmed off either end and allowing a word it split in two
+            // to be run back together ("u po" -> "upu" for Upo).
+            foreach (string form in wholeForms)
+                if (form == canonicalForm) return true;
+
+            // Any single word of it: the recognizer often returns a short
+            // sentence when the child said one word. Only ever a whole word of
+            // the utterance against a whole single-token form - a piece of
+            // either side is not an answer.
+            //
+            // Unless the utterance run together IS some OTHER taught word, in
+            // which case its pieces are halves of that word rather than an
+            // answer. "pag kain" is the recognizer splitting "Pagkain", and
+            // the "kain" inside it is not the child saying "Kain" - but both
+            // are taught in the breakfast scene, one straight after the other,
+            // so without this the second word could be answered by repeating
+            // the first. The same guard stops "ka nin" passing for "Kunin"
+            // and "ti ngin" for "Bati".
+            if (canonicalForm.IndexOf(' ') < 0 &&
+                !IsSomeOtherTaughtWord(string.Concat(allTokens), canonicalForm))
+            {
+                foreach (string token in contentTokens)
+                    if (token == canonicalForm) return true;
+            }
+
+            // Long words only: one consonant garbled by the recognizer, with
+            // every vowel still in place. This is what keeps "kaha" out of
+            // "kuha" while still forgiving a smudged "Sapatos".
+            if (canonicalForm.Length >= ConsonantSlipMinLength)
+            {
+                foreach (string token in contentTokens)
+                    if (IsConsonantSlip(token, canonicalForm)) return true;
+
+                foreach (string form in wholeForms)
+                    if (form.IndexOf(' ') < 0 && IsConsonantSlip(form, canonicalForm)) return true;
+            }
+
+            return false;
         }
 
-        return false;
+        /// <summary>
+        /// Every way of reading the utterance as a single answer: the full run
+        /// of tokens, and the runs left after dropping filler words from the
+        /// FRONT and the BACK, each one both spaced and run together.
+        ///
+        /// Trimming only at the ends is the whole point. "ba", "sa", "si",
+        /// "ku", "mo", "po" and "na" are filler words AND Filipino first
+        /// syllables, so a rule that removed them wherever they appeared would
+        /// turn "ba ngon" into "ngun" and "sa got" into "gut". Here the
+        /// untrimmed run is always a candidate too, so "ba ngon po" still
+        /// reads as Bangon - once with "ba" kept and "po" dropped.
+        /// </summary>
+        private static List<string> WholeFormsOf(string[] tokens)
+        {
+            List<string> forms = new List<string>();
+
+            int afterLeadingFiller = 0;
+            while (afterLeadingFiller < tokens.Length && FillerWords.Contains(tokens[afterLeadingFiller]))
+                afterLeadingFiller++;
+
+            int beforeTrailingFiller = tokens.Length;
+            while (beforeTrailingFiller > 0 && FillerWords.Contains(tokens[beforeTrailingFiller - 1]))
+                beforeTrailingFiller--;
+
+            for (int start = 0; start <= afterLeadingFiller; start++)
+            {
+                for (int end = tokens.Length; end >= beforeTrailingFiller; end--)
+                {
+                    int count = end - start;
+                    if (count < 1) continue;
+
+                    Add(forms, string.Join(" ", tokens, start, count));
+                    Add(forms, string.Join("", tokens, start, count));
+                }
+            }
+
+            return forms;
+        }
+
+        private static void Add(List<string> forms, string form)
+        {
+            if (form.Length > 0 && !forms.Contains(form)) forms.Add(form);
+        }
     }
 
     /// <summary>
@@ -246,7 +337,8 @@ public static class PronunciationChecker
 
     /// <summary>
     /// Splits an utterance into canonical tokens. allTokens keeps everything;
-    /// contentTokens has the recognizer's filler words removed.
+    /// contentTokens has the recognizer's filler words removed, and is only
+    /// ever used to pick ONE whole word out of a longer sentence.
     /// </summary>
     private static void Tokenize(string text, out string[] allTokens, out string[] contentTokens)
     {
