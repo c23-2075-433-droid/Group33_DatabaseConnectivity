@@ -390,14 +390,24 @@ public static class PronunciationCheckTool
     // is in no table at all: if "hello" is listed under Ilaw, then
     // "hello zzgrunt" must be mali.
     //
-    // A variant that CONTAINS the taught word is skipped - "salamat po" has
-    // "salamat" in it, and a child who says the word in the middle of a
-    // sentence is answering correctly whatever else the recognizer heard.
-    // That allowance belongs to the taught word, and #3 is what guards it.
+    // A variant is skipped when one of its own words is ALREADY a correct
+    // answer without the table - judged by IsCorrectWithoutVariants, not by
+    // eye. Two kinds land there:
+    //
+    //   "salamat po"  - it contains the taught word outright
+    //   "pakain"      - it is a one-consonant slip of "pagkain", so a long
+    //                   word's own slack accepts it with the table empty
+    //
+    // Padding either of those tests the taught word's one-word-of-a-sentence
+    // allowance, which is deliberate and is guarded by #3, rather than the
+    // variant rule this check is about. The skipped entries are listed as a
+    // note: a variant the word already accepts by itself is dead weight in
+    // WordVariants, and worth knowing about.
     private static int CheckVariantsNeedTheWholeUtterance(string[] words, StringBuilder log)
     {
         const string Padding = "zzgrunt";
         List<string> accepted = new List<string>();
+        List<string> redundant = new List<string>();
         int tested = 0;
 
         foreach (string word in words)
@@ -405,13 +415,13 @@ public static class PronunciationCheckTool
             string[] variants = WordVariants.For(word);
             if (variants == null) continue;
 
-            string wholeWord = PronunciationChecker.Canonicalize(word);
-
             foreach (string variant in variants)
             {
-                if (System.Array.IndexOf(
-                        PronunciationChecker.Canonicalize(variant).Split(' '), wholeWord) >= 0)
+                if (IsAnswerWithoutTheTable(variant, word))
+                {
+                    redundant.Add("\"" + variant + "\" under \"" + word + "\"");
                     continue;
+                }
 
                 tested++;
                 if (PronunciationChecker.IsCorrect(variant + " " + Padding, word))
@@ -419,15 +429,33 @@ public static class PronunciationCheckTool
             }
         }
 
-        if (accepted.Count == 0)
+        if (accepted.Count > 0)
         {
-            log.AppendLine("ok   8. none of the " + tested + " variants is accepted with a stray word beside it");
-            return 0;
+            log.AppendLine("FAIL 8. a variant is matching one word inside a longer result:");
+            foreach (string line in accepted) log.AppendLine("        " + line);
+            return 1;
         }
 
-        log.AppendLine("FAIL 8. a variant is matching one word inside a longer result:");
-        foreach (string line in accepted) log.AppendLine("        " + line);
-        return 1;
+        log.AppendLine("ok   8. none of the " + tested + " variants is accepted with a stray word beside it");
+        if (redundant.Count > 0)
+        {
+            log.AppendLine("        (" + redundant.Count + " skipped - the word already accepts them with the table empty:");
+            log.AppendLine("        " + string.Join(", ", redundant.ToArray()) + ")");
+        }
+        return 0;
+    }
+
+    /// <summary>
+    /// True when any single word of this variant is already accepted for the
+    /// taught word with WordVariants out of the picture - so the variant adds
+    /// nothing, and padding it would exercise the taught word's own rules.
+    /// </summary>
+    private static bool IsAnswerWithoutTheTable(string variant, string word)
+    {
+        foreach (string piece in PronunciationChecker.Canonicalize(variant).Split(' '))
+            if (piece.Length > 0 && PronunciationChecker.IsCorrectWithoutVariants(piece, word))
+                return true;
+        return false;
     }
 
     // Informational ----------------------------------------------------------

@@ -134,6 +134,26 @@ public static class PronunciationChecker
     }
 
     /// <summary>
+    /// Like IsCorrect, but judged on the taught word ALONE - the curated
+    /// mistranscriptions are not consulted.
+    ///
+    /// Public for two reasons. The editor self-check needs to tell the two
+    /// layers apart: a variant that is also a one-consonant slip of its own
+    /// word ("pakain" for Pagkain) is reachable without the table at all, and
+    /// a check aimed at the table has to know that. And it is the honest way
+    /// to measure what WordVariants is buying - run the attempt log through
+    /// both and the difference is the table's contribution.
+    /// </summary>
+    public static bool IsCorrectWithoutVariants(string spokenText, string targetWord)
+    {
+        if (string.IsNullOrWhiteSpace(spokenText) || string.IsNullOrWhiteSpace(targetWord))
+            return false;
+
+        Utterance said = Utterance.Of(spokenText);
+        return !said.IsEmpty && said.MatchesTaughtWord(Canonicalize(targetWord));
+    }
+
+    /// <summary>
     /// The canonical form of a word or phrase - what matching actually compares.
     /// Every token is kept, filler words included, because this is the form a
     /// target word and its variants are compared AS: a two-token variant like
