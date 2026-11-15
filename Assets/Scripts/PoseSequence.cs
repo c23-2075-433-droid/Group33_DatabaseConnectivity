@@ -143,8 +143,46 @@ public class PoseSequence : MonoBehaviour
     [Tooltip("Runs as fireOnFrame is shown.")]
     public UnityEvent onFrameReached = new UnityEvent();
 
+    [Tooltip("A looping action this one TAKES OVER FROM. Set it and Play() " +
+             "ends that action first - Stop(), so its own ending movement " +
+             "plays - and starts this one only once it has landed.\n\n" +
+             "This is what joins two drawn beats that share a character. " +
+             "Paaralan Scene 3 reads with an endless loop and writes when " +
+             "the next word is said: without this, \"Sulat\" would cut the " +
+             "reading off wherever it happened to be, with the book still " +
+             "in his hands. With it, he closes the book, puts it down, and " +
+             "then picks the pencil up.\n\nLeave empty for an action that " +
+             "starts from the idle pose.")]
+    public PoseSequence interrupts;
+
+    [Tooltip("Safety cap in seconds on the wait for `interrupts` to finish, " +
+             "so an ending movement that never lands cannot stall this one " +
+             "for good.")]
+    public float interruptWait = 3f;
+
+    [Tooltip("A SECOND renderer, driven in step with loopFrames.\n\nFor the " +
+             "part of an action that has to be drawn in a different sorting " +
+             "order from the character. Paaralan Scene 3's \"Sulat\" is the " +
+             "case it exists for: Kylo is drawn BEHIND the desk, and the " +
+             "notebook lies on top of it, so no pixel of him can ever be on " +
+             "the page - his pencil stops at the desk's near edge with the " +
+             "wood between it and the paper. The point of the pencil is " +
+             "drawn on this instead, in front of both.\n\nIt is one " +
+             "component driving two renderers rather than two components, " +
+             "because two would be two coroutines and a frame of drift is a " +
+             "pencil point that lags the hand holding it.\n\nLeave empty " +
+             "and nothing here does anything.")]
+    public SpriteRenderer companion;
+
+    [Tooltip("What `companion` shows, frame for frame with loopFrames. Same " +
+             "length as that array; a shorter one simply stops being read. " +
+             "It is cleared before the lead-in and after the tail, so the " +
+             "second renderer is blank whenever the action is not running.")]
+    public Sprite[] companionLoopFrames;
+
     private Sprite fallback;
     private bool running;
+    private bool holding;
 
     /// <summary>
     /// Puts a frame on screen, through whichever route this pose uses - the
@@ -154,6 +192,19 @@ public class PoseSequence : MonoBehaviour
     {
         if (player != null) player.standingSprite = s;
         else if (target != null) target.sprite = s;
+    }
+
+    /// <summary>
+    /// Puts the matching frame on the second renderer, or clears it when
+    /// `i` is negative or past the end of the list. Safe to call with no
+    /// companion set, which is every action in the game but one.
+    /// </summary>
+    private void ShowCompanion(int i)
+    {
+        if (companion == null) return;
+        companion.sprite = (i >= 0 && companionLoopFrames != null
+                            && i < companionLoopFrames.Length)
+                           ? companionLoopFrames[i] : null;
     }
 
     /// <summary>What is showing now, for a sequence with no destination.</summary>
@@ -166,6 +217,19 @@ public class PoseSequence : MonoBehaviour
     /// <summary>True while an action is playing, for a caller that must wait.</summary>
     public bool IsPlaying { get { return running; } }
 
+    /// <summary>
+    /// True while this is sitting in an ENDLESS loop waiting for Stop() -
+    /// reading, walking, anything whose end comes from outside.
+    ///
+    /// It is still IsPlaying, and it still has an ending movement owed to it,
+    /// but nothing should WAIT for it: the thing it is waiting for is the
+    /// child speaking, and the child is not asked until the scene stops
+    /// waiting. SceneObjectiveController would hold the next word for its
+    /// whole safety cap and then ask it anyway, which is four seconds of
+    /// silence in the middle of a lesson. See IsPosePlaying there.
+    /// </summary>
+    public bool IsHoldingLoop { get { return running && holding; } }
+
     private void OnEnable()
     {
         if (playOnEnable) Play();
@@ -177,6 +241,59 @@ public class PoseSequence : MonoBehaviour
         if (player == null && target == null) target = GetComponent<SpriteRenderer>();
         if (player == null && target == null) return;
 
+        // HAND OVER FROM A LOOPING ACTION, rather than cutting it off.
+        //
+        // An endless loop is waiting for the next word, so the next word is
+        // exactly what ends it - and the two beats meet at a seam the child
+        // watches. Halting the loop here would start this action from
+        // whatever frame the other one had up, which for "Sulat" taking over
+        // from "Basa" means the pencil coming out while the book is still in
+        // his hands and the book then vanishing.
+        //
+        // Stop() instead, which lets the other action play its own ending
+        // movement - he closes the book and puts it back on the desk - and
+        // begin only once it has landed on its idle pose.
+        if (interrupts != null && interrupts != this && interrupts.IsPlaying
+            && isActiveAndEnabled)
+        {
+            StopAllCoroutines();
+            StartCoroutine(RunAfter(interrupts));
+            return;
+        }
+
+        Begin();
+    }
+
+    /// <summary>
+    /// Ends the looping action this one takes over from, waits for its ending
+    /// movement, and then runs. Capped, so an ending that never lands cannot
+    /// swallow the word that was just said.
+    /// </summary>
+    private System.Collections.IEnumerator RunAfter(PoseSequence other)
+    {
+        // Claimed from this moment on. The hand-over IS part of this action
+        // as far as the scene is concerned, so the next word is not asked
+        // while the book is still being put down.
+        running = true;
+        other.Stop();
+
+        float waited = 0f;
+        while (other != null && other.IsPlaying && waited < interruptWait)
+        {
+            waited += Time.deltaTime;
+            yield return null;
+        }
+
+        // It had its chance. Taking the renderer now is better than leaving
+        // the spoken word unanswered.
+        if (other != null && other.IsPlaying) other.Halt();
+
+        running = false;
+        Begin();
+    }
+
+    private void Begin()
+    {
         // TAKE THE RENDERER OFF ANY OTHER ACTION FIRST.
         //
         // StopAllCoroutines below stops THIS component's coroutines, not the
@@ -231,6 +348,8 @@ public class PoseSequence : MonoBehaviour
     {
         StopAllCoroutines();
         running = false;
+        holding = false;
+        ShowCompanion(-1);
     }
 
     /// <summary>
@@ -244,6 +363,10 @@ public class PoseSequence : MonoBehaviour
         // and also leave the component permanently endless for the next one,
         // because it is a serialized field the builder set on purpose.
         stopRequested = true;
+
+        // No longer merely holding: the ending movement is owed now, and
+        // anything waiting for this action to land should wait for it.
+        holding = false;
     }
 
     private bool stopRequested;
@@ -262,6 +385,7 @@ public class PoseSequence : MonoBehaviour
     {
         running = true;
         stopRequested = false;
+        ShowCompanion(-1);        // blank through the lead-in
 
         float hold = framesPerSecond > 0f ? 1f / framesPerSecond : 0.1f;
         float loopRate = loopFramesPerSecond > 0f ? loopFramesPerSecond : framesPerSecond;
@@ -283,17 +407,23 @@ public class PoseSequence : MonoBehaviour
         if (Count(loopFrames) > 0)
         {
             bool endless = loopCycles <= 0;
+            // Only an endless loop HOLDS: a counted one ends by itself and is
+            // worth waiting for. See IsHoldingLoop.
+            holding = endless && !stopRequested;
             for (int c = 0; endless || c < loopCycles; c++)
             {
                 for (int i = 0; i < loopFrames.Length; i++)
                 {
                     if (loopFrames[i] == null) continue;
                     Show(loopFrames[i]);
+                    ShowCompanion(i);
                     yield return new WaitForSeconds(loopHold);
                 }
                 if (stopRequested) break;
             }
+            holding = false;
         }
+        ShowCompanion(-1);
 
         // --- the ending movement ---
         for (int i = 0; i < Count(tailFrames); i++)
@@ -317,6 +447,8 @@ public class PoseSequence : MonoBehaviour
     {
         StopAllCoroutines();
         running = false;
+        holding = false;
+        ShowCompanion(-1);
         if (fallback != null && (player != null || target != null)) Show(fallback);
     }
 }

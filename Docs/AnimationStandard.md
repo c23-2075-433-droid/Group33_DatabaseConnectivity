@@ -58,6 +58,30 @@ component behaved before looping existed, so nothing already built changes.
 `loopCycles` of 0 or less repeats until `Stop()` — that is for walking, which
 ends when the character arrives rather than after a set count.
 
+### Loops that end on a word
+
+Rule 10 says loop what repeats in life, and reading repeats — but a child
+does not read for three tidy cycles, they read until something stops them.
+Paaralan 3's "Basa" is the first beat in the game whose END COMES FROM
+OUTSIDE: `loopCycles` of 0, which runs until `Stop()`, and the thing that
+calls `Stop()` is the next word being recognised.
+
+Three pieces make that work, and any future beat that waits on the player
+wants all three:
+
+- **`loopCycles = 0`** on the looping action.
+- **`PoseSequence.interrupts`** on the action that takes over. Setting it
+  makes `Play()` call `Stop()` on the other one and wait for its
+  `tailFrames` before starting — so the book is closed and back on the desk
+  before the pencil comes out. Without it, `Play()` would seize the renderer
+  mid-loop and the book would simply vanish from his hands. This is rule 8,
+  smooth joins between consecutive actions, for two beats that overlap in
+  time rather than merely follow one another.
+- **`PoseSequence.IsHoldingLoop`**, which `SceneObjectiveController` checks
+  so it does not *wait* for an endless loop. It otherwise holds the next word
+  back until `maxActionWait` expires — four seconds of a child being asked
+  nothing while waiting for a loop whose end is that very word.
+
 `fireOnFrame` / `onFrameReached` is rule 5: it makes a prop appear on a chosen
 frame of the lead-in, so the thing he puts down arrives as his hand reaches the
 desk. One frame late and it vanishes from his hand and pops into place, which
@@ -82,8 +106,8 @@ Counted from the builders, not estimated:
 
 - **70 word-actions** across 14 gameplay scenes
 - **49 distinct words**
-- **5 of them animated** — Lakad, Upo, Kuha, Lapis in Paaralan Scene 2;
-  Sipilyo in Bahay 3
+- **10 of them animated** — Bati, Upo, Kinig, Kuha, Lapis in Paaralan Scene 2;
+  Aklat, Basa, Sulat, Sagot in Paaralan Scene 3; Sipilyo in Bahay 3
 
 | scene | words | drawn frames? |
 |---|---|---|
@@ -92,8 +116,8 @@ Counted from the builders, not estimated:
 | Bahay 4 | Damit Medyas Sapatos Bag Kunin | no |
 | Bahay 5 | Upo Kanin Itlog Kain Inom | no |
 | Paaralan 1 | Lakad Bukas Kumusta Pasok Takbo | no — snaps |
-| **Paaralan 2** | **Lakad Upo Kuha Lapis** | **yes** |
-| Paaralan 3 | Sulat Basa Tanong Inom | in progress |
+| **Paaralan 2** | **Bati Upo Kinig Kuha Lapis** | **yes — all five** |
+| **Paaralan 3** | **Aklat Basa Sulat Sagot** | **yes — all four** |
 | Paaralan 4 | Labas Kain Laro Tawa Tulong | no — snaps |
 | Paaralan 5 | Pasok Upo Linis Bag Alis | no |
 | Parke 1 | Lakad Takbo Tingin Tuwa Pasok | no — snaps |
@@ -130,15 +154,161 @@ around that is more useful than pretending otherwise.
   normalising every frame to the base sprite's hair height is what keeps the
   character consistent across separately generated strips. See
   `Tools/fit_seated_pose.py` and `Tools/make_sit_frames.py`.
+- **Some frames are a part of him moved, not a new drawing of him.** A head
+  tilting, a head nodding, a forearm waving, a body turning — in each the body
+  is the shape it already was with one piece of it somewhere else, and a piece
+  can be cut out and moved in a script. `Tools/make_kinig_frames.py` swings his
+  head about his neck and `Tools/make_bati_front_frames.py` swings his forearm
+  about his elbow; both are seconds to run and seconds to re-tune, where a
+  strip is a generation and a manual download.
+
+  Rule 7 holds by construction this way: it is the same drawing, so his
+  proportions cannot drift. Two things make the cut invisible — put it where
+  the body is NARROW (the neck is 86 pixels across against 355 at the
+  shoulders), and clear the body a little further back than you cut the piece,
+  so the wedge a rotation opens lands on the body underneath instead of on the
+  room behind it.
+
+  **Cut at the right joint.** A wave is the WRIST, not the elbow. Rotating the
+  forearm moves the hand sideways and tears away from the sleeve past about 20
+  degrees, and it can never raise the hand, because rotating a bent arm about
+  its elbow does not extend it. The narrow cross-section finds the joint for
+  you: 34 pixels at the wrist against 63 at the elbow.
+
+  **What it cannot do** is invent. There is no three-quarter view of his face,
+  so he cannot turn his head to look at someone; there is no arm drawn at a new
+  angle, so a hand cannot go somewhere the existing hand does not reach. Moving
+  pixels is for a pose he is already in. A pose he is not in is still a
+  generation.
+
+- **The object in his hands is not him.** A whole action can be reused by
+  changing only what he is carrying. Paaralan 3's "Aklat" is Paaralan 2's
+  "Kuha" — the same reach into the same bag — with the notepad replaced by a
+  textbook: `Tools/make_aklat_frames.py` lays the book over the notepad's own
+  footprint and then puts his fingers back on top of it, found by skin
+  colour. Seven frames for one prop drawing. The limit is that it cannot
+  change his GRIP: the new object has to be the size and angle the old one
+  was, because that is where his fingers close.
+
+- **A prop is four shapes, so draw it.** The Canva API returns a ~150px
+  thumbnail and the full-size file has to be fetched by hand from Canva
+  Uploads. That is unavoidable for a drawing of a boy. It is not for a book,
+  a pencil or a notebook — use the generation as the DESIGN and redraw it in
+  code at whatever size is wanted, which is what `make_classroom_props.py`,
+  `make_open_notebook.py` and `make_aklat_book.py` all do.
+
+- **He can look at what he is doing.** `Tools/look_down.py` drops his head on
+  its own neck and slides his irises down inside his glasses, which is a
+  front-facing drawing's honest version of a bowed head. Both "Basa" and the
+  "Sulat" fix lean on it.
+
+- **CHECK THAT THE POSE HAS HANDS IN IT.** `fix_seated_hands.py` cuts every
+  seated pose off below the sleeve and replaces the hands with a forearm
+  cross-section, so the arms read as running down behind the desk. That is
+  right for sitting and wrong for anything the hands do. `sulat_frame_1..3`
+  were generated specifically to write, got the pencil point onto the page,
+  and inherited the cut — so what shipped was a pencil floating beside a
+  forearm with nothing holding it. The fix was not more head movement; it
+  was `lapis_frame_1`, which has his fingers closed round a pencil because
+  the beat it was drawn for is picking one up.
+
+- **A seated drawing and a standing one DO NOT JOIN.** "Sagot" was first
+  built by grafting `talking_uniform`'s hips onto the seated torso at the
+  desk line and easing the two widths into each other. It gave him a white
+  band round his waist like a sash and arms ending in mid-air: the seated
+  figure is 365px across at that line because his ARMS are in the number,
+  and the shirt stretched to meet it was a bare 270. No easing invents the
+  arm that should be in the gap. Use a WHOLE standing drawing and graft only
+  at a narrow joint — the shoulder — the way the rest of this section says.
+
+
+### His sprites do not line up sideways
+
+Every pose of Kylo's is 745 pixels tall, crown on the first row and feet on the
+last, so swapping one for another never moves him up or down. **Nothing makes
+that true across the canvas**, and measuring where his feet sit relative to the
+middle of each canvas:
+
+| sprite | feet, from the canvas centre |
+|---|---|
+| `standing_uniform_with_bag` | +28.5 px |
+| `talking_uniform_with_bag` | +16.5 px |
+| `walk_frame_1..4_uniform_with_bag` | +1.5 px |
+
+A sprite draws centred on its object, so those offsets are where his feet land.
+At the size Paaralan Scene 2 draws him, 27 pixels is **0.35 world units** — he
+jumps a third of a unit sideways the instant a walk starts, and a sixth of one
+when he turns to wave. In a walk the body is moving anyway and it mostly hides;
+in a turn on the spot it reads as a glitch, which is how it was found.
+
+`Tools/make_bati_front_frames.py` pads its own frames to the standing pose's
+offset, so that beat is square. **The four walk frames are still out**, in every
+scene that walks. Fixing them is padding, not drawing — the same `align_feet` —
+but they are shared by fourteen scenes, so it wants doing deliberately rather
+than as a side effect of something else.
 
 ### Order worth doing it in
 
-1. **Paaralan 3** — Sulat, Basa, Tanong, Inom. The scene in hand.
-2. **The repeated words** — Lakad, Upo, Pasok, Kain, Inom, Takbo. Each one
-   animated here pays off in two to four scenes.
-3. **The scenes that snap** — Bahay 3, Paaralan 1, Paaralan 4, Parke 1,
-   Parke 3, Parke 5. These actively break rule 1 today.
-4. **Everything else.**
+1. ~~**Paaralan 3**~~ — **done**. Aklat, Basa, Sulat and Sagot are all drawn,
+   and between them they cost ONE Canva generation: a book. Everything else
+   is Paaralan 2's poses and Tanong's hand-raise, moved. That is the method
+   below working, and it is worth reading what each one actually took before
+   budgeting a generation for the next scene:
+
+   | word | what it reuses | what was new |
+   |---|---|---|
+   | Aklat | Paaralan 2's whole Kuha run | the object in his hands |
+   | Basa | the frame Aklat carries the book in | an open book, and his gaze |
+   | Sulat | lapis_frame_1, the pencil pick-up | his gaze, and the hand travelling |
+   | Sagot | talking_uniform + Tanong's raised arm | a graft at the shoulder |
+
+   Two things came out of it that the next scene gets for free:
+   `Tools/look_down.py`, which drops his head and his gaze onto whatever is
+   in his hands, and `PoseSequence`'s endless loop with a clean hand-over -
+   see **Loops that end on a word** above.
+2. ~~**Paaralan 4**~~ — **done**. Ligpit, Kuha, Kain, Inom and Tapon are all
+   drawn, and between them they cost NO Canva generation at all: every pose
+   is one this project already had with something else in the hands, and
+   every object is drawn in code by `Tools/make_recess_props.py`.
+
+   | word | what it reuses | what was new |
+   |---|---|---|
+   | Ligpit | Paaralan 2's whole Kuha run, **reversed** | nothing |
+   | Kuha | the same run forwards | a lunchbox over the notepad |
+   | Kain | lapis_frame_1/2/3, the pencil being raised | the pencil erased, a sandwich in its place |
+   | Inom | the same three | a bottle, turned to reach his mouth |
+   | Tapon | the same three, plus PropToss | a wrapper, and a bin |
+
+   Three things came out of it that the scenes after it get for free:
+
+   - **An action can be run backwards.** Taking a flat object out of a bag
+     and putting one in are the same frames in the other order. Scene 4's
+     Ligpit is Scene 2's Kuha with the list reversed and not one new sprite.
+   - **`PropToss`** — a transform on an arc, for the object in an action
+     whose whole meaning is the object's journey. PoseSequence swaps
+     sprites, which is right for a character and absurd for a thrown
+     wrapper. Paaralan 5's Ligpit and any later "throw", "drop" or "put
+     in" can use it as it stands.
+   - **An object can be taken OUT of a pose, not only put into one.**
+     `Tools/make_recess_frames.py` erases the drawn pencil out of
+     lapis_frame_1..3 and leaves an empty grip to put anything in. What
+     that cost is written up there at length and is worth reading before
+     the next erase: the sharpened cone of a pencil is within two points of
+     his skin on every channel, so it survives every colour test that lets
+     his own fingers through, and it has to be told apart by what it is
+     JOINED to instead.
+
+   One limit found and not solved: a swap cannot change the SHAPE of the
+   footprint, only what is drawn in it. A lunchbox will not cover the tall
+   thin notepad in `place_frame_1`, so that frame is missing from Scene 4's
+   Kuha and the box goes straight from the bag to his chest.
+3. **The repeated words** — Lakad, Upo, Pasok, Takbo. Each one animated here
+   pays off in two to four scenes. Kain and Inom are drawn now, in Paaralan
+   4, and the frames are seated - Bahay 5 and Parke 4 sit at a table and a
+   picnic mat, so they may take them as they are.
+4. **The scenes that snap** — Bahay 3, Paaralan 1, Parke 1, Parke 3,
+   Parke 5. These actively break rule 1 today.
+5. **Everything else.**
 
 ## Pipeline for one action
 

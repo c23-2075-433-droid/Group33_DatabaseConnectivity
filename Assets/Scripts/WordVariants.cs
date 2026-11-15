@@ -75,6 +75,18 @@ public static class WordVariants
         { "Pasok",   new[] { "pa sok", "pasock", "pasuk" } },
         { "Takbo",   new[] { "tak bo", "tagbo", "takbu" } },
         { "Upo",     new[] { "oppo", "u po", "oh po", "upu" } },
+        // Taught in Paaralan Scene 2 and, until now, the one word on the list
+        // with no row here at all - so it was being matched by fuzzy distance
+        // alone, which is how "kaha" got accepted for "Kuha".
+        //
+        // "makinig" is deliberately NOT here, and it is the entry playtesting
+        // has to settle. It is the ordinary Filipino word for listening, so a
+        // recogniser set to Filipino may well return it for a child who said
+        // "Kinig" correctly - in which case it belongs in this list. It is
+        // equally what a child says INSTEAD of the word being taught. Only the
+        // rawSpokenText column of a real session can tell those apart, so it
+        // stays out until it has been seen there.
+        { "Kinig",   new[] { "ki nig", "kining", "keenig", "kinnig" } },
         { "Kuha",    new[] { "kua", "koha", "cooha", "ku ha" } },
         { "Lapis",   new[] { "lapiz", "la pis", "lappis" } },
         { "Aklat",   new[] { "ak lat", "aclat", "oclat" } },

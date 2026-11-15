@@ -320,8 +320,10 @@ public class VoiceNarrator : MonoBehaviour
         }
 
         // The word is always shown in capitals - it is the thing the child has
-        // to read and repeat, so it looks the same here as on the badge.
-        string spelled = string.IsNullOrEmpty(word) ? "" : word.Trim().ToUpperInvariant();
+        // to read and repeat, so it looks the same here as on the badge. Which
+        // is also why it is the MARKED spelling, accents and all, rather than
+        // the plain key the objective carries - see NarratorScript.SpellingFor.
+        string spelled = NarratorScript.SpellingFor(word).ToUpperInvariant();
         string caption = string.IsNullOrEmpty(text) ? spelled : text.Replace(Placeholder, spelled);
 
         // Recorded, the instruction says the word itself, so it plays whole
@@ -376,7 +378,9 @@ public class VoiceNarrator : MonoBehaviour
     /// </summary>
     private void AddAskedWord(Utterance u, string word, AudioClip overrideClip, string suffix)
     {
-        string spelled = string.IsNullOrEmpty(word) ? "" : word.Trim().ToUpperInvariant();
+        // Marked spelling, as on the badge: SpellingFor already falls back to
+        // the word itself when the bank has no row for it.
+        string spelled = NarratorScript.SpellingFor(word).ToUpperInvariant();
         AudioClip clip = overrideClip;
 
         if (clip == null)
@@ -531,7 +535,8 @@ public class VoiceNarrator : MonoBehaviour
             NarratorLine line = bank.Find(clip.name);
             if (line != null && !string.IsNullOrEmpty(line.text)) return line.text;
         }
-        return string.IsNullOrEmpty(fallbackWord) ? null : fallbackWord.Trim().ToUpperInvariant();
+        if (string.IsNullOrEmpty(fallbackWord)) return null;
+        return NarratorScript.SpellingFor(fallbackWord).ToUpperInvariant();
     }
 
     // ---------------------------------------------------------------------

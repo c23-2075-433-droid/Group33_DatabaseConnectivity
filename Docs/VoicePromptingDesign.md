@@ -680,6 +680,27 @@ The English meaning comes from the CSV's **English Gloss** column, which
 `NarratorLine.gloss`, and `NarratorScript.GlossFor` reads it. With no voice
 bank generated the meaning line is simply left out and the word still shows.
 
+### 7.4.1 Two spellings of every word, and which one goes where
+
+A word is written one way for the code and another for the child, and mixing
+them up breaks either the matching or the teaching.
+
+| | Looks like | Lives in | Read by |
+|---|---|---|---|
+| **Key** | `Bati` | `SceneObjective.word`, the narration ids (`rachel_l2_s2_bati_story`), `WordVariants`, the score rows and the database | nothing human |
+| **Marked** | `Bátì` | the **Script / Word** column of `Docs/VoiceOverScript.csv`, carried into `NarratorLine.text` | the badge, Rachel's captions, the words-learned board |
+
+The marks are stress and glottal marks — *Lápis*, not *lapís* — so they are
+exactly what a child has to see before saying the word, and exactly what must
+never reach a lookup. `NarratorScript.SpellingFor(word)` is the one way to get
+from the key to the marked spelling; it falls back to the key itself, so a word
+nobody has marked reads as itself rather than as nothing. `PronunciationChecker`
+folds accents away before matching in any case, so a marked spelling that leaks
+into a comparison fails safe rather than silently.
+
+The badge is baked in when a scene is built, so changing the CSV needs
+**Refresh Narrator Voice Bank** and then that scene's builder run again.
+
 ### 7.5 Art, and why there is a UITheme asset
 
 A runtime script cannot call `UIFont.Get()` or `AssetDatabase.LoadAssetAtPath` —

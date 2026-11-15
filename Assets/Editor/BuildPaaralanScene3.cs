@@ -52,32 +52,56 @@
 //   - The tee, not the polo. sitting_front_uniform is the pose Scene 2 ends
 //     on, so his shirt does not change between one scene and the next.
 //
-// WHAT EACH WORD DOES. Four of the five are things rather than actions, and
-// the only pose drawn so far is the seated one, so the feedback is carried by
-// what lights up rather than by what Kylo does:
+// WHAT EACH WORD DOES. All four are drawn now - this scene was the one the
+// animation standard listed as "in progress", and it is not any more:
 //
-//   Aklat    the textbook appears on the desk
-//   Basa     it lights up - he is reading it
-//   Aklat    the textbook arrives on the desk
-//   Basa     it lights up - he is reading it
-//   Sulat    DRAWN: he puts his hand on the desk, brings the pencil down,
-//            writes on the notebook with the point tracking across the
-//            page, lifts it and sits back.
-//   Sagot    he lights up - he is the one answering
+//   Aklat    he turns to his bag, reaches in, closes his hand on the
+//            textbook, lifts it clear, carries it round in front of him and
+//            lays it SHUT on the desk, then puts his hands down.
+//   Basa     he reaches to the desk, picks the shut book up, OPENS it in
+//            both hands, looks down at it - and KEEPS READING, with no end
+//            of its own, until the next word is said.
+//   Sulat    he puts his hands on the desk, takes up the pencil, and
+//            writes with his fingers closed round it and his head down -
+//            the point ON the page, tracking left to right across it.
+//   Sagot    his hand goes up off the desk, he gets to his feet, and leans
+//            towards the front of the class and nods as he answers.
 //
-// NOTHING APPEARS ANY MORE. With "Aklat" gone there is no word whose job is
-// to put an object on the desk, so the desk is laid out from the start -
-// notebook, pencil, textbook and glass - and all four words gleam something
-// already there. That is the right staging for a list of actions, and it is
-// also why this scene is not finished: a gleam can say WHICH thing a word is
-// about, but it cannot show reading, writing, asking or drinking. All four
-// want drawn poses, the way Scene 2's beats are carried by drawn frames.
-// Until those exist this is the honest staging, not the final one.
+// THE READING IS THE ONE THAT IS DIFFERENT, and it is worth knowing why
+// before changing anything here. Every other beat in the game is a run of
+// frames that ends. "Basa" is a loop with loopCycles of 0, which
+// PoseSequence runs until Stop() - and the thing that calls Stop is "Sulat"
+// being recognised. So the length of the reading is however long the child
+// takes, and the join between the two words is a hand-over rather than a
+// cut: the book goes back on the desk before the pencil comes out. Two
+// small pieces of machinery carry that, both documented where they live -
+// PoseSequence.interrupts and PoseSequence.IsHoldingLoop.
 //
-// Sprites expected in Assets/Sprites/:
-//   klasrum_interior_background (or menu_bg), sitting_front_uniform,
-//   prop_aklat, prop_notebook_open, prop_lapis, fx_gleam,
-//   ui_arrow, ui_word_badge, badge_paaralan
+// WHERE THE ART CAME FROM. Three of the four actions are built out of poses
+// this project already had, which is the cheap path Docs/AnimationStandard
+// lays out and the reason this scene could be finished at all:
+//
+//   Aklat    Paaralan Scene 2's "Kuha" - the same reach into the same bag -
+//            with the notepad in his hands swapped for a textbook.
+//            Tools/make_aklat_book.py draws the book from a Canva
+//            generation; Tools/make_aklat_frames.py puts it in his hands.
+//   Basa     the frame he carries the book in, with the shut book swapped
+//            for an open one and his head and eyes brought down onto it.
+//            Tools/make_aklat_open_book.py and make_basa_frames.py.
+//   Sulat    lapis_frame_1 - Scene 2's pencil pick-up, the ONLY pose in
+//            the project with his fingers closed round a pencil - looking
+//            down at the page, with his hand travelling, plus the point of
+//            the pencil on a layer in front of the desk so that it can
+//            reach the paper at all. Tools/make_sulat_hand_frames.py and
+//            make_sulat_point.py.
+//   Sagot    "Tanong"'s hand-raise, which was drawn for a word this scene
+//            no longer teaches, and then talking_uniform whole and
+//            untouched, head-matched to the seated poses and raised until
+//            the desk crosses him at the shorts.
+//            Tools/make_sagot_frames.py.
+//
+// Sprites expected in Assets/Sprites/: see the SpriteImportFixer.Verify call
+// in BuildScene, which is the list that is actually checked.
 //
 // Run via: Tools > SALINLAHI > Build Paaralan Scene 3
 
@@ -201,10 +225,25 @@ public class BuildPaaralanScene3
         {
             "sitting_front_uniform", "prop_aklat", "prop_notebook_open",
             "prop_lapis", "klasrum_desk_front_near", "fx_gleam",
-            // Paaralan Scene 2's pencil poses, the lead-in and tail of "Sulat".
-            "place_frame_3_uniform", "lapis_frame_1_uniform", "lapis_frame_2_uniform",
-            // Drawn for "Sulat" - the only poses with the pencil on the page.
-            "sulat_frame_1_uniform", "sulat_frame_2_uniform", "sulat_frame_3_uniform",
+            // "Aklat": Paaralan Scene 2's reach into the bag, with the
+            // textbook in his hands instead of the notepad.
+            "kuha_frame_1_uniform", "kuha_frame_2_uniform", "kuha_frame_3_uniform",
+            "aklat_bag_uniform", "aklat_frame_1_uniform", "aklat_frame_2_uniform",
+            "prop_aklat_closed",
+            // "Basa": he opens it, and looks down at it.
+            "aklat_open_a_uniform", "aklat_open_b_uniform",
+            "basa_frame_1_uniform", "basa_frame_2_uniform",
+            "basa_frame_3_uniform", "basa_frame_4_uniform",
+            // "Sulat": Paaralan Scene 2's pencil pick-up, which is the only
+            // pose in the project with his fingers closed round a pencil.
+            "place_frame_3_uniform", "lapis_frame_1_uniform",
+            "sulat_hand_1_uniform", "sulat_hand_2_uniform", "sulat_hand_3_uniform",
+            "sulat_point_uniform",
+            // "Sagot": his hand going up, and him getting to his feet.
+            "tanong_frame_1_uniform", "tanong_frame_2_uniform", "tanong_frame_3_uniform",
+            "sagot_rise_1_uniform", "sagot_rise_2_uniform", "sagot_rise_3_uniform",
+            "sagot_stand_uniform",
+            "sagot_answer_1_uniform", "sagot_answer_2_uniform",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 3");
 
@@ -308,7 +347,15 @@ public class BuildPaaralanScene3
         // "Aklat" is the word that puts it there, which is why that word
         // leads the lesson. CreatePropOptional builds a prop switched off,
         // so only the two he already owns are turned on here.
-        GameObject propAklat = CreatePropOptional("Prop_Aklat", "prop_aklat",
+        //
+        // prop_aklat_CLOSED, not prop_aklat. A book arrives on a desk shut,
+        // and opening it is what the NEXT word does - leaving the open one
+        // here meant "Basa" had nothing left to do but light up a book that
+        // was already open before he had touched it. Same box as prop_aklat
+        // (520x300) so AklatX and AklatHeight still mean what they meant,
+        // with a smaller drawing inside it, because a shut book covers less
+        // desk than an open one. Tools/make_aklat_open_book.py draws both.
+        GameObject propAklat = CreatePropOptional("Prop_Aklat", "prop_aklat_closed",
                                                    AklatX, AklatHeight, AklatBaseY);
         // prop_notebook_open, not prop_kuwaderno: the shut blue hardback is
         // the wrong object for a lesson being written in, and the open book is
@@ -326,67 +373,212 @@ public class BuildPaaralanScene3
         if (propPencil != null)
             propPencil.GetComponent<SpriteRenderer>().sortingOrder = OrderDeskProps + 1;
 
+        SpriteRenderer seatSr = seatGO.GetComponent<SpriteRenderer>();
+
+        // --- "Aklat": he takes the textbook out of his bag ---
+        //
+        //   lead-in   kuha_frame_1..3   he turns to the bag and reaches in
+        //             aklat_bag         his hand closes on the book
+        //             aklat_frame_1     it comes up clear of the bag
+        //             aklat_frame_2     carried in both hands at his chest
+        //             place_frame_3     laid down, hands back on the desk
+        //
+        // NONE OF THESE SEVEN FRAMES IS NEW ART. They are Paaralan Scene 2's
+        // "Kuha" - the same boy taking his NOTEPAD out of the same bag - with
+        // the object in his hands changed by Tools/make_aklat_frames.py. The
+        // movement of a child lifting a flat rectangular thing from a bag to
+        // a desk is the same movement whichever flat rectangular thing it is,
+        // and reusing it means his hands, his lean and his proportions cannot
+        // drift. See that file for how the swap is made and what it cannot do.
+        //
+        // The book itself is drawn by Tools/make_aklat_book.py from a Canva
+        // generation kept at Art/aklat_book_raw.png - deep red cover, cream
+        // pages, the shut version of the open prop_aklat that ends up on the
+        // desk.
+        PoseSequence aklatFrames = seatGO.AddComponent<PoseSequence>();
+        aklatFrames.target = seatSr;
+        aklatFrames.frames = new[]
+        {
+            LoadSpriteOptional("kuha_frame_1_uniform"),
+            LoadSpriteOptional("kuha_frame_2_uniform"),
+            LoadSpriteOptional("kuha_frame_3_uniform"),
+            LoadSpriteOptional("aklat_bag_uniform"),
+            LoadSpriteOptional("aklat_frame_1_uniform"),
+            LoadSpriteOptional("aklat_frame_2_uniform"),
+            LoadSpriteOptional("place_frame_3_uniform"),
+        };
+        aklatFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
+        aklatFrames.framesPerSecond = 11f * Pace;
+        aklatFrames.playOnEnable = false;
+        // Frame 6 is place_frame_3: his hands are flat on the desk and the
+        // book has left them. That is the frame the prop has to arrive on, so
+        // it passes from him to the desk in a single step. One frame either
+        // side and it either hangs in the air or vanishes and reappears -
+        // which is rule 5, and the whole reason fireOnFrame exists.
+        if (propAklat != null)
+        {
+            aklatFrames.fireOnFrame = 6;
+            UnityEventTools.AddBoolPersistentListener(
+                aklatFrames.onFrameReached, propAklat.SetActive, true);
+        }
+
+        // --- "Basa": he picks the book up and reads it, and KEEPS READING ---
+        //
+        //   lead-in   place_frame_3     his hands go to the desk
+        //             aklat_frame_2     the book comes up into both hands
+        //             basa_frame_1      his head and eyes come down to it
+        //   loop      basa_frame_2/3/4  reading - ENDLESS
+        //   tail      basa_frame_1      he looks up
+        //             aklat_frame_2     squares the book
+        //             place_frame_3     and lays it back on the desk
+        //
+        // LOOPCYCLES OF ZERO IS THE POINT OF THIS BEAT. Reading is one of the
+        // things Docs/AnimationStandard rule 10 lists as repeating in life,
+        // and a child does not stop reading after a tidy three cycles - they
+        // stop when something else happens. Zero means "until Stop()", and
+        // the thing that calls Stop is the next word being recognised. He
+        // will read for as long as the child takes to say "Sulat", whether
+        // that is four seconds or forty.
+        //
+        // Two things had to change elsewhere for that to work, and both are
+        // worth knowing about before touching this:
+        //
+        //   PoseSequence.IsHoldingLoop tells the scene that this particular
+        //   kind of "still playing" must not be waited for, or
+        //   SceneObjectiveController would hold the next word back for its
+        //   whole safety cap while waiting for a loop whose end IS that word.
+        //
+        //   PoseSequence.interrupts, set on "Sulat" below, is what ends it
+        //   cleanly - Stop() rather than a cut, so the tail above plays and
+        //   the book is back on the desk before the pencil comes out.
+        PoseSequence basaFrames = seatGO.AddComponent<PoseSequence>();
+        basaFrames.target = seatSr;
+        // HE OPENS IT. "Aklat" leaves a SHUT book on the desk, so the first
+        // thing reading needs is the cover coming back - he picks the shut
+        // book up (aklat_frame_2, the same frame he carried it in), the
+        // covers come apart (aklat_open_a), and it is open in both hands
+        // (aklat_open_b) before his head goes down. Three frames, and they
+        // are the difference between a boy reading a book and a boy holding
+        // one that was open when he found it.
+        basaFrames.frames = new[]
+        {
+            LoadSpriteOptional("place_frame_3_uniform"),
+            LoadSpriteOptional("aklat_frame_2_uniform"),
+            LoadSpriteOptional("aklat_open_a_uniform"),
+            LoadSpriteOptional("aklat_open_b_uniform"),
+            LoadSpriteOptional("basa_frame_1_uniform"),
+        };
+        basaFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("basa_frame_2_uniform"),
+            LoadSpriteOptional("basa_frame_3_uniform"),
+            LoadSpriteOptional("basa_frame_2_uniform"),
+            LoadSpriteOptional("basa_frame_4_uniform"),
+        };
+        basaFrames.loopCycles = 0;                 // until Stop() - see above
+        // And he shuts it again on the way out, in reverse, so the book that
+        // goes back on the desk is the same shut book that came off it.
+        basaFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("basa_frame_1_uniform"),
+            LoadSpriteOptional("aklat_open_b_uniform"),
+            LoadSpriteOptional("aklat_open_a_uniform"),
+            LoadSpriteOptional("aklat_frame_2_uniform"),
+            LoadSpriteOptional("place_frame_3_uniform"),
+        };
+        basaFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
+        basaFrames.framesPerSecond = 11f * Pace;
+        // Slow. Four frames of a head rocking two pixels is not a motion that
+        // wants speed, and this one may be on screen for half a minute.
+        basaFrames.loopFramesPerSecond = 6f * Pace;
+        basaFrames.playOnEnable = false;
+
+        // The book cannot be on the desk and in his hands at once. It leaves
+        // the desk on frame 1, where it appears in them, and comes back when
+        // he has put it down - which, because of the tail above, is also what
+        // happens when "Sulat" interrupts the reading.
+        if (propAklat != null)
+        {
+            basaFrames.fireOnFrame = 1;
+            UnityEventTools.AddBoolPersistentListener(
+                basaFrames.onFrameReached, propAklat.SetActive, false);
+            UnityEventTools.AddBoolPersistentListener(
+                basaFrames.onFinished, propAklat.SetActive, true);
+        }
+
         // --- "Sulat": the writing action, in four parts ---
         //
         //   lead-in   place_frame_3  hands come onto the desk
-        //             lapis_frame_2  the pencil is in his hand, chest height
-        //   loop      sulat_frame_1..3, the pencil tracking across the page
-        //   tail      lapis_frame_2  the pencil lifts away
-        //             place_frame_3  hands rest on the desk
+        //             lapis_frame_1  he takes the pencil up, point down
+        //   loop      sulat_hand_1..3, the point tracking across the page
+        //   tail      lapis_frame_1  he looks up, pencil still in hand
+        //             place_frame_3  and puts it back
         //   idle      sitting_front_uniform
         //
-        // WHY THE LOOP IS DRAWN ART AND THE REST IS NOT. The lead-in and tail
-        // are Paaralan Scene 2's pencil poses, which are the same boy by
-        // construction - same pipeline, same base sprite, crown on row 142
-        // and hair within two pixels of every other seated frame. Read in
-        // reverse they are a pencil coming down towards the page, which is
-        // the preparation writing needs, and they cost nothing.
+        // NOT sulat_frame_1..3, WHICH WERE DRAWN FOR THIS AND DO NOT WORK.
+        // They have the one thing no other pose in the project has - the
+        // pencil point on the bottom edge of the canvas, which is the
+        // notebook's far edge - and that is why they were generated. But
+        // there is NO HAND in them. Tools/fix_seated_hands.py cuts every
+        // seated pose off below the sleeve and replaces the hands with a
+        // forearm cross-section, so the arms read as running down behind the
+        // desk, and these three inherited it. What is on screen is a pencil
+        // hanging in the air beside his forearm with nothing holding it, and
+        // at the size this scene draws him that is plainly what it looks
+        // like. Dropping his head onto it did not help; nothing was going to.
         //
-        // The loop could NOT be built that way, and the reason is geometry
-        // rather than taste. This sprite is cropped at the desk's far edge,
-        // -3.01, and the open notebook lies entirely BELOW that line, from
-        // -3.84 to -3.01. So every pencil pose in the project holds the point
-        // in mid-air above the top edge of the page - lapis_frame_1, the
-        // lowest of them, still clears the book by about half a unit. Cycling
-        // those frames gave a pencil waving over a notebook it never touched.
+        // lapis_frame_1_uniform has what they do not: his fingers CLOSED
+        // ROUND the pencil, drawn, point down and leaning right - a writing
+        // grip, not the point-up "here is a pencil" grip of lapis_frame_2
+        // and _3 - and already at the bottom of the canvas around x 320,
+        // which is world 2.79, the middle of the desk in front of him. He
+        // has been holding a pencil over this notebook in a drawing the
+        // project has had since Scene 2.
         //
-        // sulat_frame_1..3 are drawn for this and for nothing else: the one
-        // thing they have that no other pose does is the PENCIL TIP ON THE
-        // BOTTOM EDGE OF THE CANVAS. That edge is -3.01, which is the
-        // notebook's far edge, so the point lands on the page. The three
-        // differ only in where along that edge the tip sits, which is what
-        // makes them a writing motion rather than a bob.
-        //
-        // It took three generations to get them. The first came back with a
-        // 6% short body, the second with the right pose but a hairstyle a
-        // tenth too large; Tools/check_pose_strip.py measured both and
-        // Tools/make_sulat_frames.py records what finally had to be pinned.
+        // Tools/make_sulat_hand_frames.py adds the two things it was
+        // missing: his head and eyes down on the page, and the hand
+        // travelling fourteen pixels each way with the forearm easing into
+        // the movement behind it.
         PoseSequence sulatFrames = seatGO.AddComponent<PoseSequence>();
-        sulatFrames.target = seatGO.GetComponent<SpriteRenderer>();
-        // Three steps down, not two. The pencil appears at chest height in
-        // lapis_frame_2 and the writing frames have it on the page; going
-        // straight between them skips the whole descent, which is the kind of
-        // jump the lead-in exists to avoid. lapis_frame_1 holds it lower and
-        // bridges them.
+        sulatFrames.target = seatSr;
+        // END THE READING FIRST. Without this, Play() would take the renderer
+        // off "Basa" wherever its loop happened to be - the book still up in
+        // his hands - and start the pencil coming down over it, and the book
+        // prop would then reappear on the desk from underneath. With it, the
+        // reading plays its own tail: he looks up, squares the book, lays it
+        // down, and only then does this begin. See PoseSequence.interrupts.
+        sulatFrames.interrupts = basaFrames;
+        // Two steps, not three. lapis_frame_2 is the pencil up at his chest -
+        // it belonged here while the loop had the point on the desk edge and
+        // something had to bridge the descent. The loop IS lapis_frame_1 now,
+        // so going through chest height and back down again would be him
+        // raising the pencil in order to lower it.
         sulatFrames.frames = new[]
         {
             LoadSpriteOptional("place_frame_3_uniform"),
-            LoadSpriteOptional("lapis_frame_2_uniform"),
             LoadSpriteOptional("lapis_frame_1_uniform"),
         };
+        // FOUR ENTRIES FROM THREE DRAWINGS. The point travels 1-2-3 across
+        // the page and 2 brings it back, so the stroke returns instead of
+        // snapping to the start of the line. The frames carry a degree and a
+        // half of head tilt each way with it, so his head follows his hand.
         sulatFrames.loopFrames = new[]
         {
-            LoadSpriteOptional("sulat_frame_1_uniform"),
-            LoadSpriteOptional("sulat_frame_2_uniform"),
-            LoadSpriteOptional("sulat_frame_3_uniform"),
+            LoadSpriteOptional("sulat_hand_1_uniform"),
+            LoadSpriteOptional("sulat_hand_2_uniform"),
+            LoadSpriteOptional("sulat_hand_3_uniform"),
+            LoadSpriteOptional("sulat_hand_2_uniform"),
         };
-        sulatFrames.loopCycles = 3;
-        // The same descent in reverse, so the pencil leaves the page the way
-        // it arrived rather than teleporting back to his chest.
+        // Four times round, which is about three seconds of writing. Three
+        // cycles of three frames was a line and a half and read as a sample
+        // of writing rather than as writing.
+        sulatFrames.loopCycles = 4;
+        // His head comes up off the page with the pencil still in his hand,
+        // and then he puts it down. The same two frames as the lead-in, in
+        // reverse.
         sulatFrames.tailFrames = new[]
         {
             LoadSpriteOptional("lapis_frame_1_uniform"),
-            LoadSpriteOptional("lapis_frame_2_uniform"),
             LoadSpriteOptional("place_frame_3_uniform"),
         };
         sulatFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
@@ -401,8 +593,55 @@ public class BuildPaaralanScene3
         // loaded.
         sulatFrames.playOnEnable = false;
 
+        // --- The point of the pencil, on a layer that may touch the page ---
+        //
+        // Kylo draws at order 0 and the near desk is laid over him at 10,
+        // which is what lets every seated pose be cut off flat at the desk's
+        // far edge and still read as a boy behind a desk. The notebook is a
+        // prop at 20, on the wood below that edge. So the lowest pixel of
+        // him that is ever SEEN is the desk's own painted top edge, about
+        // -2.94 here, and the page begins at -3.05: there is a tenth of a
+        // unit of desk between his hand and the paper, and nothing drawn
+        // into his sprite can cross it. That is why the writing frames had
+        // him holding a pencil over a notebook he never touched.
+        //
+        // Lowering him is not available - the desk would stop hiding the cut
+        // - and raising the notebook is not either, because it is in front
+        // of him and would be drawn over his hand rather than under it.
+        //
+        // So the last two centimetres of the pencil get their own renderer,
+        // on his exact transform but at order 22, in front of the desk AND
+        // in front of the notebook. It picks the pencil up where the drawn
+        // one goes behind the desk's edge and carries it down onto the page.
+        // Nothing of HIM is duplicated: see Tools/make_sulat_point.py.
+        //
+        // It is driven by sulatFrames itself rather than by a second
+        // PoseSequence, because two components would be two coroutines, and
+        // one frame of drift at five frames a second is a pencil point a
+        // fifth of a second behind the hand holding it.
+        GameObject pointGO = new GameObject("Kylo_PencilPoint");
+        SpriteRenderer pointSr = pointGO.AddComponent<SpriteRenderer>();
+        pointSr.sortingLayerName = "Player";
+        pointSr.sortingOrder = OrderDeskProps + 2;
+        // HIS transform, not its own: the point sprites are drawn on a
+        // canvas padded equally at both ends of the seated one, so sharing
+        // his position and scale is what puts every pixel of them exactly
+        // where the same pixel of his own sprite would have been.
+        pointGO.transform.position = seatGO.transform.position;
+        pointGO.transform.localScale = seatGO.transform.localScale;
+        pointSr.sprite = null;                 // blank until the loop runs
+
+        sulatFrames.companion = pointSr;
+        // ONE SPRITE, four times. His arm does not move - see the note on
+        // the loop frames above - so neither does the point. The entry is
+        // repeated rather than the array shortened, because this list is
+        // read frame for frame against loopFrames and a short one would
+        // simply blank the pencil for the rest of the cycle.
+        Sprite point = LoadSpriteOptional("sulat_point_uniform");
+        sulatFrames.companionLoopFrames = new[] { point, point, point, point };
+
         // The pencil cannot be in two places. It leaves the desk on the frame
-        // where it appears in his hand - frame 1, lapis_frame_2 - and comes
+        // where it appears in his hand - frame 1, lapis_frame_1 - and comes
         // back when he has finished and his hands are down again.
         if (propPencil != null)
         {
@@ -417,7 +656,93 @@ public class BuildPaaralanScene3
         // The restructure moves it to Parke 3, which also teaches it. The
         // three tanong_frame sprites stay in the project for that scene; they
         // are drawn, fitted and committed, and nothing about them is specific
-        // to this room.
+        // to this room - which is why "Sagot" below can use them. A hand
+        // going up is a hand going up whichever word asked for it.
+
+        // --- "Sagot": his hand goes up and he stands to answer ---
+        //
+        //   lead-in   tanong_frame_1..3   his hand rises off the desk, to
+        //                                 head height, to straight up
+        //             sagot_rise_1..3     he comes up out of the chair
+        //             sagot_stand         on his feet, answering
+        //   loop      sagot_answer_1/2    a lean towards the front of the
+        //                                 class and a nod - he is answering
+        //   tail      none                he stays standing
+        //
+        // HE DOES NOT SIT BACK DOWN, and that is deliberate: this is the last
+        // word of the lesson, and the scene ends with the result panel over a
+        // boy who has just answered his teacher.
+        //
+        // HE DOES NOT STAND WITH HIS HAND STILL UP, and that one is a limit
+        // rather than a choice. Tools/make_sagot_frames.py has the whole of
+        // it; the short version is that the raised arm cuts out of
+        // tanong_frame_3 cleanly but talking_uniform's own left arm will not
+        // come off to make room for it - the bare arm takes the shirt's
+        // outline with it and the SLEEVE cannot come off at all, so he ended
+        // up with a ragged side and an empty sleeve hanging off his
+        // shoulder. A torn shirt is worse than a hand already down.
+        //
+        // So the hand-raise stays in the chair, where it is drawn, and
+        // standing up is him getting to his feet to answer. The pose changes
+        // once, on the first frame of the rise, which is the fastest moment
+        // in the beat and where a change is least seen.
+        //
+        // THE STANDING FRAMES ARE A WHOLE DRAWING, not a construction, and
+        // the version before this one was the other thing. It grafted
+        // talking_uniform's hips onto the seated torso at the desk line and
+        // eased the two widths together; in the game that gave him a white
+        // band round his waist like a sash and arms that ended in mid-air
+        // above it. The seated figure is 365 pixels across at that line
+        // because his ARMS are in the number, and the shirt being stretched
+        // to meet it was a bare 270.
+        //
+        // A SEATED DRAWING AND A STANDING ONE DO NOT JOIN. They disagree
+        // about where his arms are, and no easing invents the arm that
+        // should be in the gap. Worth remembering for Paaralan 1 and 4 and
+        // the Parke scenes, which all still have a character who sits.
+        //
+        // So the body is talking_uniform entire, and nothing is added to it
+        // - the same boy, the same tee and shorts, standing, front on, hands
+        // up by his chest and mouth open, which is a child answering a
+        // question. It is scaled until its head matches the seated poses'
+        // head and placed so the desk crosses him at the top of his shorts.
+        //
+        // He rises 146 pixels, which is 0.89 world units. That number is not
+        // anatomy, it is the frame: the narration plaque owns the top of the
+        // shot from about +2.79, and this puts his crown at +2.62.
+        //
+        // PLAYED ONCE, not looped - rule 10 is explicit that putting a hand
+        // up and standing up happen once. Only the answering in the middle
+        // repeats, and only twice.
+        PoseSequence sagotFrames = seatGO.AddComponent<PoseSequence>();
+        sagotFrames.target = seatSr;
+        sagotFrames.frames = new[]
+        {
+            LoadSpriteOptional("tanong_frame_1_uniform"),
+            LoadSpriteOptional("tanong_frame_2_uniform"),
+            LoadSpriteOptional("tanong_frame_3_uniform"),
+            LoadSpriteOptional("sagot_rise_1_uniform"),
+            LoadSpriteOptional("sagot_rise_2_uniform"),
+            LoadSpriteOptional("sagot_rise_3_uniform"),
+            LoadSpriteOptional("sagot_stand_uniform"),
+        };
+        sagotFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("sagot_answer_1_uniform"),
+            LoadSpriteOptional("sagot_answer_2_uniform"),
+            LoadSpriteOptional("sagot_answer_1_uniform"),
+            LoadSpriteOptional("sagot_stand_uniform"),
+        };
+        sagotFrames.loopCycles = 2;
+        sagotFrames.loopFramesPerSecond = 6f * Pace;      // a nod is slower than a reach
+        // No tail. See above: he is left standing with his hand up, which is
+        // where the loop already is, so there is no ending movement owed.
+        sagotFrames.destinationSprite = LoadSpriteOptional("sagot_stand_uniform");
+        // Slower than the other three. Getting out of a chair takes longer
+        // than reaching across a desk, and nine frames at eleven would have
+        // him up before the child had finished saying the word.
+        sagotFrames.framesPerSecond = 9f * Pace;
+        sagotFrames.playOnEnable = false;
 
         // He is never completely still between words.
         seatGO.AddComponent<IdleBreath>();
@@ -498,12 +823,22 @@ public class BuildPaaralanScene3
         // In the order the lesson asks for them, which is also the order they
         // make sense in: the book has to be on the desk before he can read
         // from it, and he writes what he has read before he answers aloud.
+        // EVERY WORD DRIVES ITS OWN POSE SEQUENCE AND NOTHING ELSE'S. That is
+        // what keeps the four beats from overlapping: a word says Play on one
+        // component, and PoseSequence.Play takes the renderer off any other
+        // action running on it. The only crossing between two of them is the
+        // one that is wanted - sulatFrames.interrupts, set above - and it
+        // waits rather than cuts.
+        //
+        // The prop switching is NOT wired here. It belongs to the frame of
+        // the animation where the object changes hands, which is why it is on
+        // fireOnFrame / onFinished up with each sequence instead.
         var aklat = MakeObjective("Aklat", pAklat);
-        if (propAklat != null)
-            UnityEventTools.AddBoolPersistentListener(aklat.onCorrect, propAklat.SetActive, true);
+        UnityEventTools.AddPersistentListener(aklat.onCorrect, aklatFrames.Play);
         UnityEventTools.AddPersistentListener(aklat.onCorrect, gleamAklat.Play);
 
         var basa = MakeObjective("Basa", pBasa);
+        UnityEventTools.AddPersistentListener(basa.onCorrect, basaFrames.Play);
         UnityEventTools.AddPersistentListener(basa.onCorrect, gleamBasa.Play);
 
         var sulat = MakeObjective("Sulat", pSulat);
@@ -511,14 +846,46 @@ public class BuildPaaralanScene3
         UnityEventTools.AddPersistentListener(sulat.onCorrect, gleamSulat.Play);
 
         var sagot = MakeObjective("Sagot", pSagot);
+        UnityEventTools.AddPersistentListener(sagot.onCorrect, sagotFrames.Play);
         UnityEventTools.AddPersistentListener(sagot.onCorrect, gleamSagot.Play);
 
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
         controller.objectives = new[] { aklat, basa, sulat, sagot };
+        // The default four seconds is not enough for this scene any more.
+        //
+        // It is a safety cap on how long the sequence will wait for an action
+        // to finish before asking the next word anyway, and it was set when
+        // the longest thing in any scene was a walk. "Sulat" here is the end
+        // of the reading (about half a second), then the pencil coming down,
+        // then four cycles of writing, then the pencil going back - about
+        // four and a half seconds all told, and "Sagot" is not far behind it.
+        // Left at four, the next word went up while he was still writing.
+        //
+        // The endless reading loop does NOT eat this budget: PoseSequence
+        // reports it through IsHoldingLoop and SceneObjectiveController steps
+        // over it, so "Sulat" is asked for while he reads rather than four
+        // seconds later.
+        controller.maxActionWait = 7f;
 
-        VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
+        // OFF THE DESK, in this scene only.
+        //
+        // The mic and the replay button live bottom-centre in every scene,
+        // which is where a thumb is. In this one the desk fills the bottom
+        // of the frame and the notebook lies across the middle of it: the
+        // replay button sits at canvas x 140, and the notebook spans x 91 to
+        // 481, so the button came down squarely on the page he is supposed
+        // to be writing in.
+        //
+        // Moved left instead of up. Everything the child has to look at is
+        // to the RIGHT of centre - Kylo is at world 2.86 and covers canvas
+        // 84..488, the notebook 91..481, the textbook further right still -
+        // so the left of the frame is empty lockers and the far end of the
+        // desk, and nothing is lost by putting the buttons there. They stay
+        // at the same height, which is what makes them reachable.
+        VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller,
+                                     new Vector2(-620, -400), new Vector2(-370, -400));
         // Still needed in the scene: SceneResultPanel looks the fader up at
         // run time to fade out of whichever button is pressed.
         SceneFaderBuilder.Build();
@@ -543,12 +910,13 @@ public class BuildPaaralanScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 3 built and saved to " + ScenePath +
-                   ". Words: Aklat, Basa, Sulat, Sagot - all four new to the game. " +
-                   "Staged in Scene 2's locker corner: Scene 2's seat, Scene 2's tee, no " +
-                   "foreground desk layer and no teacher - see the notes at the top of " +
-                   "BuildPaaralanScene3 for why each of those went. The desk is laid out from " +
-                   "the start and every word gleams something already on it; all four want " +
-                   "drawn poses before this scene is finished. " +
+                   ". Words: Aklat, Basa, Sulat, Sagot - all four drawn. Aklat takes the " +
+                   "textbook out of his bag and lays it on the desk; Basa picks it up and " +
+                   "reads until Sulat is said, however long that takes; Sulat finishes the " +
+                   "reading, puts the book down and writes with his head on the page; Sagot " +
+                   "puts his hand up and stands. He is left standing - it is the last word. " +
+                   "Staged in Scene 2's locker corner: Scene 2's seat, Scene 2's tee and no " +
+                   "teacher - see the notes at the top of BuildPaaralanScene3 for why. " +
                    "It fades into " + NextScene + ", which ends the level - so build Paaralan " +
                    "Scene 4 as well, or the level runs into a scene that is not there.");
     }
