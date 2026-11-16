@@ -275,8 +275,14 @@ public static class GameplayHUDLayout
         p.statePlank = state;
         p.stateText = Label(state.transform, "StateText", "", display, 30,
             FontStyle.Bold, TextAnchor.MiddleCenter, Cream);
+        // Taller than the place plank's text box, and the reason is one label:
+        // "WALANG NARINIG! / SUBUKAN ULIT!" is the only state that needs two
+        // lines, and at 0.6 of the plank there was no room for the second one -
+        // best fit bottoms out at resizeTextMinSize and then clips rather than
+        // shrinking further. Nothing else moves: every other label is one short
+        // word and best fit still renders it at resizeTextMaxSize.
         Place(p.stateText.rectTransform, new Vector2(StateSize.x * 0.03f, 0f),
-            new Vector2(StateSize.x * 0.82f, StateSize.y * 0.6f));
+            new Vector2(StateSize.x * 0.88f, StateSize.y * 0.78f));
         p.stateText.resizeTextForBestFit = true;
         p.stateText.resizeTextMinSize = 14;
         p.stateText.resizeTextMaxSize = 30;

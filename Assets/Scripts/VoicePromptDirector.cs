@@ -37,6 +37,15 @@ public class VoicePromptDirector : MonoBehaviour
     [Tooltip("Seconds between repeats of the whole prompt after that first nudge.")]
     public float idleRepromptSeconds = 20f;
 
+    [Tooltip("Chirp the crickets when that first nudge goes off, as a joke about the quiet. " +
+             "Turn this off to get the nudge line on its own, as it was before.")]
+    public bool chirpOnSilence = true;
+
+    [Tooltip("How loud the crickets are against the other effects. Low on purpose: this plays " +
+             "straight into an open microphone and it is a joke, not an answer.")]
+    [Range(0f, 1f)]
+    public float silenceChirpVolume = 0.55f;
+
     [Header("Scene lines")]
     [Tooltip("Play the scene's intro and outro lines (rachel_lX_sY_intro/_outro) when they exist in the voice bank.")]
     public bool speakSceneLines = true;
@@ -49,6 +58,21 @@ public class VoicePromptDirector : MonoBehaviour
     [Tooltip("Say \"Nakikinig ako\" before the first word of a scene only. After that the pulsing mic says it without words.")]
     public bool cueListeningOnFirstWord = false;
 
+    /// <summary>The crickets, in Assets/Resources/Sfx.</summary>
+    public const string SilenceSfxId = "crickets";
+
+    /// <summary>
+    /// Ten seconds went by with nobody speaking. GameplayHUD listens for this
+    /// and puts "Walang narinig! Subukan ulit!" on the state plank, so the
+    /// message and the chirp are the same event rather than two timers that
+    /// can drift apart.
+    ///
+    /// Raised once per silent stretch, not once per recognizer timeout - see
+    /// the comment on OnNothingHeard in VoiceCommand for why those are not the
+    /// same thing. Nothing here is scored and nothing here advances anything.
+    /// </summary>
+    public event System.Action OnSilenceNoticed;
+
     private SceneObjectiveController controller;
     private VoiceCommand voiceCommand;
     private VoiceNarrator narrator;
@@ -59,6 +83,12 @@ public class VoicePromptDirector : MonoBehaviour
     private int promptsThisScene;
     private float silenceTimer;
     private bool nudged;
+
+    // Long enough to cover Assets/Resources/Sfx/crickets.wav (0.74 s). Only
+    // used to decide whether leaving the scene has to cut the chirp short, so
+    // being a shade generous costs nothing.
+    private const float SilenceChirpSeconds = 0.8f;
+    private float chirpingUntil;
 
     void Awake()
     {
@@ -107,6 +137,13 @@ public class VoicePromptDirector : MonoBehaviour
             voiceCommand.OnMicrophoneUnavailable -= HandleMicrophoneUnavailable;
         }
         if (narrator != null) narrator.StopSpeaking();
+
+        // The effects player outlives the scene, so a chirp fired in the last
+        // moments of one would otherwise go on sounding over the result panel
+        // or into the next scene. Only cut it if it is actually ours and still
+        // going: stopping unconditionally would also kill the correct-answer
+        // cue on the way out of a finished scene.
+        if (Time.time < chirpingUntil) SoundEffects.StopEffects();
     }
 
     // ---- A word goes live -------------------------------------------------
@@ -258,6 +295,24 @@ public class VoicePromptDirector : MonoBehaviour
             if (silenceTimer < idleNudgeSeconds) return;
             nudged = true;
             silenceTimer = 0f;
+
+            // The crickets go AHEAD of the line, not over it. Rachel's nudge
+            // is encouragement and the chirp is the joke it answers, in that
+            // order - and SpeakLine suspends the microphone for as long as she
+            // talks, so a chirp started afterwards would be the one sound in
+            // the game guaranteed to be heard by a live recognizer.
+            //
+            // `nudged` is the once-per-silence latch and it already exists:
+            // only ResetSilence clears it, and every speech event calls that.
+            // So one chirp per silent stretch, and the 20 s reprompt below
+            // never chirps at all.
+            if (chirpOnSilence)
+            {
+                SoundEffects.Play(SilenceSfxId, silenceChirpVolume);
+                chirpingUntil = Time.time + SilenceChirpSeconds;
+            }
+
+            OnSilenceNoticed?.Invoke();
             narrator.SpeakLine(NarratorScript.IdleNudge);
             return;
         }

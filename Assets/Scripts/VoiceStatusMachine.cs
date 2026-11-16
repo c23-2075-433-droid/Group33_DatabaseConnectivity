@@ -31,9 +31,9 @@ using UnityEngine;
 ///     at all.
 ///   - Any state is held for minDwell before another may replace it, so a
 ///     burst of recognizer activity cannot strobe the panel. Feedback -
-///     correct, try again, microphone blocked - ignores the dwell on the way
-///     IN, because an answer must be acknowledged immediately, and imposes
-///     its own longer hold on the way out.
+///     correct, try again, nothing heard, microphone blocked - ignores the
+///     dwell on the way IN, because an answer must be acknowledged
+///     immediately, and imposes its own longer hold on the way out.
 /// </summary>
 public class VoiceStatusMachine
 {
@@ -52,6 +52,13 @@ public class VoiceStatusMachine
         TryAgain,
         /// <summary>Permission denied, or the device has no recognizer at all.</summary>
         MicBlocked,
+        /// <summary>
+        /// Ten seconds went by with nobody speaking. Appended rather than
+        /// slotted in beside TryAgain on purpose: GameplayHUD.StateLabels is
+        /// indexed by this enum, so inserting a member in the middle would
+        /// silently relabel every state after it.
+        /// </summary>
+        NothingHeard,
     }
 
     [Tooltip("How long CORRECT / TRY AGAIN stay up, so an answer is readable before the next word.")]
@@ -72,7 +79,8 @@ public class VoiceStatusMachine
     public event System.Action<State> OnChanged;
 
     private float timeInState;
-    private float feedbackLeft;     // > 0 while CORRECT / TRY AGAIN is latched
+    private float feedbackLeft;     // > 0 while a feedback state is latched
+    private State feedbackState;    // which one, while feedbackLeft > 0
     private float graceLeft;        // > 0 while a drop in listening is being doubted
     private float processingLeft;   // > 0 while a result is outstanding
     private bool micBlocked;        // latched until the recognizer works again
@@ -82,16 +90,39 @@ public class VoiceStatusMachine
 
     public void NoteCorrect()
     {
-        feedbackLeft = feedbackHold;
-        processingLeft = 0f;
-        Force(State.Correct);
+        Latch(State.Correct);
     }
 
     public void NoteTryAgain()
     {
+        Latch(State.TryAgain);
+    }
+
+    /// <summary>
+    /// The idle nudge went off: ten seconds passed with nobody speaking. This
+    /// is NOT a miss and nothing about it is scored - it is the panel saying
+    /// out loud what the crickets are saying, and it clears itself the same
+    /// way CORRECT and TRY AGAIN do.
+    ///
+    /// Deliberately not raised by the recognizer timing out. VoiceCommand
+    /// listens continuously and the recognizer gives up every few seconds
+    /// while nobody is talking, so that event is the idle state rather than
+    /// news. VoicePromptDirector's silence timer is the one thing here that
+    /// means what a child would mean by silence.
+    /// </summary>
+    public void NoteNothingHeard()
+    {
+        if (micBlocked) return;
+        Latch(State.NothingHeard);
+    }
+
+    /// <summary>Puts up a feedback state and holds it for feedbackHold.</summary>
+    private void Latch(State state)
+    {
         feedbackLeft = feedbackHold;
+        feedbackState = state;
         processingLeft = 0f;
-        Force(State.TryAgain);
+        Force(state);
     }
 
     /// <summary>The child started talking; a result is now outstanding.</summary>
@@ -141,7 +172,7 @@ public class VoiceStatusMachine
     private State Decide(bool objectiveLive, bool narratorSpeaking, bool listening)
     {
         if (micBlocked) return State.MicBlocked;
-        if (feedbackLeft > 0f) return Current == State.Correct ? State.Correct : State.TryAgain;
+        if (feedbackLeft > 0f) return feedbackState;
         if (narratorSpeaking) return State.TeacherSpeaking;
         if (!objectiveLive) return State.Idle;
         if (processingLeft > 0f) return State.Processing;

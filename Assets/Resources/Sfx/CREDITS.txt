@@ -54,3 +54,7 @@ SALINLAHI_Incorrect  <- Pronunciation feedback (SALINLAHI_Incorrect, synthesised
   by       SALINLAHI (Tools/make_pronunciation_sfx.py)
   licence  CC0
 
+crickets  <- Awkward silence crickets (synthesised)
+  by       SALINLAHI (Tools/make_cricket_sfx.py)
+  licence  CC0
+

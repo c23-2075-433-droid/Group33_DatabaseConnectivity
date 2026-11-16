@@ -121,6 +121,22 @@ public class SoundEffects : MonoBehaviour
     }
 
     /// <summary>
+    /// Cuts short whatever world effect is sounding. The UI source is left
+    /// alone - a click belongs to the press that caused it, not to the scene.
+    ///
+    /// Added for one caller: VoicePromptDirector, leaving a scene while its
+    /// crickets are still chirping. This player is DontDestroyOnLoad, so a
+    /// sound started in the last moments of a scene otherwise carries on over
+    /// whatever opens next. Call it only when the effect is known to be
+    /// yours and still going - it cannot tell one clip from another.
+    /// </summary>
+    public static void StopEffects()
+    {
+        if (Instance == null || Instance.source == null) return;
+        Instance.source.Stop();
+    }
+
+    /// <summary>
     /// One of the footstep sounds for the surface being walked on. Only wood
     /// exists so far - the house. The set this came from also has stone,
     /// gravel, leaves and mud, so school and park are a drop-in away.

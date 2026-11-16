@@ -56,6 +56,10 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         "CORRECT!",
         "TRY AGAIN",
         "MIC IS OFF",
+        // The one label that needs two lines. See the note on stateText's box
+        // in GameplayHUDLayout - the plank is sized for one short word, and
+        // this is a whole sentence of encouragement.
+        "WALANG NARINIG!\nSUBUKAN ULIT!",
     };
 
     private static readonly Color StateNormal  = new Color(0.99f, 0.95f, 0.86f);
@@ -71,6 +75,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
     private VoiceCommand voice;
     private VoiceNarrator narrator;          // cached: never ask for Instance during teardown
     private VoiceInteractionUI voiceUI;
+    private VoicePromptDirector prompts;     // subscribed in Start, see below
 
     private SceneObjectiveController.SceneObjective shownObjective;
     private Coroutine narrationFade;
@@ -125,8 +130,20 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         if (narrator != null) narrator.CaptionPresenter = this;
     }
 
+    void Start()
+    {
+        // NOT Awake. This HUD and the VoicePromptDirector are both created by
+        // RuntimeInitializeOnLoadMethod bootstraps in the same pass, and which
+        // of the two goes first is not ours to decide - in Awake the director
+        // may not exist yet. Every Awake has run by the time any Start does,
+        // so this is the first moment it is certain to be there.
+        prompts = FindAnyObjectByType<VoicePromptDirector>();
+        if (prompts != null) prompts.OnSilenceNoticed += HandleSilenceNoticed;
+    }
+
     void OnDestroy()
     {
+        if (prompts != null) prompts.OnSilenceNoticed -= HandleSilenceNoticed;
         Unsubscribe();
         if (status != null) status.OnChanged -= ShowState;
 
@@ -322,6 +339,21 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         status.NoteMicBlocked();
     }
 
+    /// <summary>
+    /// Ten seconds of quiet. The plank says so for feedbackHold and then goes
+    /// back to whatever the microphone is doing, exactly as TRY AGAIN does -
+    /// and NoteObjectiveChanged drops it the moment a new word goes live, so
+    /// the message cannot outlive the silence it is about.
+    ///
+    /// The chirp is not played here. VoicePromptDirector plays it at the same
+    /// instant it raises this, because it is the thing that knows the
+    /// microphone is about to be suspended for Rachel's nudge.
+    /// </summary>
+    private void HandleSilenceNoticed()
+    {
+        status.NoteNothingHeard();
+    }
+
     private void ShowWord(bool show)
     {
         if (wordFade != null) StopCoroutine(wordFade);
@@ -381,6 +413,9 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         {
             case VoiceStatusMachine.State.Correct:    return StateCorrect;
             case VoiceStatusMachine.State.TryAgain:   return StateRetry;
+            // The same amber as TRY AGAIN, deliberately not the blocked red:
+            // nothing has gone wrong and nobody is being told off.
+            case VoiceStatusMachine.State.NothingHeard: return StateRetry;
             case VoiceStatusMachine.State.MicBlocked: return StateBlocked;
             default:                                  return StateNormal;
         }
