@@ -273,13 +273,13 @@ than as a side effect of something else.
 
    | word | what it reuses | what was new |
    |---|---|---|
-   | Ligpit | Paaralan 2's whole Kuha run, **reversed** | nothing |
+   | Ligpit | Paaralan 2's whole Kuha run, **reversed**, plus lapis_frame_1/2 and `PropCarry` for the pencil | nothing |
    | Kuha | the same run forwards | a lunchbox over the notepad |
    | Kain | lapis_frame_1/2/3, the pencil being raised | the pencil erased, a sandwich in its place |
    | Inom | the same three | a bottle, turned to reach his mouth |
    | Tapon | the same three, plus PropToss | a wrapper, and a bin |
 
-   Three things came out of it that the scenes after it get for free:
+   Four things came out of it that the scenes after it get for free:
 
    - **An action can be run backwards.** Taking a flat object out of a bag
      and putting one in are the same frames in the other order. Scene 4's
@@ -287,8 +287,19 @@ than as a side effect of something else.
    - **`PropToss`** — a transform on an arc, for the object in an action
      whose whole meaning is the object's journey. PoseSequence swaps
      sprites, which is right for a character and absurd for a thrown
-     wrapper. Paaralan 5's Ligpit and any later "throw", "drop" or "put
-     in" can use it as it stands.
+     wrapper. Any later "throw" or "drop" can use it as it stands — but
+     only once the object has been LET GO of. The next bullet is the other
+     half, and Scene 4 found out the hard way which half is which.
+   - **`PropCarry`** — the same idea for an object that is still IN A HAND,
+     which is what a "put in" actually is. The difference is the clock. A
+     toss is given a duration of its own and arrives when that says to; a
+     carry is given a **waypoint per drawn frame** and the pose's own
+     `framesPerSecond`, and spends one frame's worth of time on each leg,
+     so it is wherever the drawn hand is on every frame and the two cannot
+     drift however the scene's Pace is changed. Scene 4's Ligpit was
+     written as a toss first, and the pencil reached the bag after his hand
+     had been in and come back out again. Paaralan 5's Ligpit and any later
+     "put in" wants this one.
    - **An object can be taken OUT of a pose, not only put into one.**
      `Tools/make_recess_frames.py` erases the drawn pencil out of
      lapis_frame_1..3 and leaves an empty grip to put anything in. What
