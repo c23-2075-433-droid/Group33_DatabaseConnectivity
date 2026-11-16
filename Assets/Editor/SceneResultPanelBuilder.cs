@@ -7,10 +7,10 @@
 // Continue, with a cross in the corner back to the map.
 //
 // The LEVEL COMPLETE sheet has landed, so the stand-ins are gone. The board
-// prints SCORE: and TIME: itself, which is why this builder places only the
-// figures that follow them, and why the scene is timed at all - the label
-// came with the art. The banner is a sprite rather than text, and which of
-// the two it shows is SceneResultPanel's call once it knows the rating.
+// prints TOTAL POINTS: and TOTAL ATTEMPTS: itself, which is why this builder
+// places only the figures that follow them. The banner is a sprite rather
+// than text, and which of the two it shows is SceneResultPanel's call once it
+// knows the rating.
 //
 // Positions were measured off the composed mockup, kept beside the pieces as
 // Art/result_layout_reference.png, and scaled by 0.96 to the 1920x1080 canvas.
@@ -39,7 +39,7 @@ public static class SceneResultPanelBuilder
     private const string CloseSprite = "btn_result_close";
 
     // ui_result_board is 793x941; keeping the ratio stops the frame
-    // stretching. TOTAL POINTS: and WORDS COMPLETED: are printed into it, so
+    // stretching. TOTAL POINTS: and TOTAL ATTEMPTS: are printed into it, so
     // this builder places only the figures that follow them.
     private const float PanelWidth = 740f;
     private const float PanelHeight = 878f;
@@ -51,13 +51,19 @@ public static class SceneResultPanelBuilder
     private const float GreetingFrac = 0.4416f;
     private const float PlaceFrac = 0.5005f;
     private const float PointsFrac = 0.6307f;
-    private const float WordsFrac = 0.7508f;
+    private const float AttemptsFrac = 0.7508f;
     private const float ButtonFrac = 0.875f;
 
     // Fractions of the board, all checked against the mockup by compositing
     // the cut sprites at these numbers and diffing the result by eye.
     private const float TitleWidthFrac = 0.63f;
     private const float TitleXFrac = -0.015f;   // the banner sits a hair left of centre
+    // Both banners are cut at 661x193 now, so one aspect covers the slot.
+    // TRY AGAIN! used to come off a sheet of its own at 1164x397, a wider
+    // shape - and preserveAspect answers a wider sprite in a fixed slot by
+    // holding the height and losing the width, so the lowest rating's banner
+    // drew 399px against the other's 466. The two swapped sizes as well as
+    // words.
     private const float TitleAspect = 193f / 661f;
 
     private const float CloseXFrac = 0.395f;    // from the board's centre
@@ -65,8 +71,9 @@ public static class SceneResultPanelBuilder
     private const float CloseSizeFrac = 0.130f;
 
     // The figures are right-aligned near the plates' right edge, because the
-    // labels printed on the board are long - WORDS COMPLETED: reaches most of
-    // the way across its own plate - and what follows them is short.
+    // labels printed on the board are long - TOTAL ATTEMPTS: reaches two
+    // thirds of the way across its own plate - and what follows them is
+    // short.
     //
     // 0.92 put them ON the rim: the two plates end at 0.918 and 0.916 of the
     // board, measured off ui_result_board.png, so the last digit was touching
@@ -76,23 +83,29 @@ public static class SceneResultPanelBuilder
     private const float ValueRightFrac = 0.92f - WordsLearnedPanelBuilder.PlateInset;
     private const float ValueWidthFrac = 0.30f;
 
-    // "WORDS COMPLETED:" is the longer label by a wide margin. Measured off
-    // ui_result_board.png, its last pixel is at 0.730 of the board against
-    // 0.571 for "TOTAL POINTS:" - so where the points figure has 237px of
-    // bare plate to fill, the words figure has 120. This is that 120 less a
-    // gap, as a fraction of the board.
-    private const float WordsValueWidthFrac = 0.1405f;
+    // "TOTAL ATTEMPTS:" is the longer label. Measured off ui_result_board.png
+    // by Tools/cut_result_ui.py, which prints both, its last pixel is at
+    // 0.691 of the board against 0.571 for "TOTAL POINTS:" - so where the
+    // points figure has 254px of bare plate to fill, this one has 159. This
+    // is that 159 less the same gap, as a fraction of the board.
+    //
+    // It was 0.1405 while the plate read WORDS COMPLETED:, which ran 31px
+    // further right. The figure that follows is shorter now as well - a count
+    // rather than "5 / 6" - so the room is spare twice over, and it is here
+    // because best fit measures the box and cannot see the lettering painted
+    // beside it.
+    private const float AttemptsValueWidthFrac = 0.1796f;
 
     // Sized against the lettering printed beside them: those capitals are
     // 44px in the 941px-tall art, 41.1px at the size the panel is built, and
     // this font's capitals are 0.695 of its point size - so 59 would match
     // exactly. 52 is deliberately a little under that.
     //
-    // 52 is the largest ceiling at which the two rows agree. The words box
-    // is narrow, so a short score tops out near 53 however high the ceiling
-    // goes; at 59 the points figure took the full 59 and the words figure
-    // sat at 53 beside it, close enough to look like a mistake rather than a
-    // decision. At 52 a typical "60" and "3 / 5" are both 52.
+    // 52 is the largest ceiling at which the two rows agree. The attempts
+    // box is the narrow one, so a short figure tops out near 53 however high
+    // the ceiling goes; at 59 the points figure took the full 59 and the one
+    // beside it sat at 53, close enough to look like a mistake rather than a
+    // decision. At 52 a typical "60" and "6" are both 52.
     private const int ValueMaxSize = 52;
 
     // Above the figures, so the congratulation leads and the score follows.
@@ -299,9 +312,9 @@ public static class SceneResultPanelBuilder
         // The two boxes share a right edge and nothing else. Each one reaches
         // left only as far as its own printed label allows, because best fit
         // measures the BOX and knows nothing about the lettering in the art -
-        // give the words figure the room the points figure has and a run of
-        // "12 / 20" sets itself large enough to park on top of the D of
-        // COMPLETED.
+        // give the attempts figure the room the points figure has and a
+        // three-digit count sets itself large enough to park on top of the S
+        // of ATTEMPTS.
         float valueRight = PanelWidth * (ValueRightFrac - 0.5f);
 
         float pointsWidth = PanelWidth * ValueWidthFrac;
@@ -309,22 +322,23 @@ public static class SceneResultPanelBuilder
             new Vector2(valueRight - pointsWidth * 0.5f, FromTop(PointsFrac)),
             new Vector2(pointsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
-        float wordsWidth = PanelWidth * WordsValueWidthFrac;
-        Text wordsText = CreateText(panel.transform, "WordsText", "",
-            new Vector2(valueRight - wordsWidth * 0.5f, FromTop(WordsFrac)),
-            new Vector2(wordsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
+        float attemptsWidth = PanelWidth * AttemptsValueWidthFrac;
+        Text attemptsText = CreateText(panel.transform, "AttemptsText", "",
+            new Vector2(valueRight - attemptsWidth * 0.5f, FromTop(AttemptsFrac)),
+            new Vector2(attemptsWidth, ValueHeight), ValueMaxSize, TextAnchor.MiddleRight);
 
-        // A four-figure score, or "12 / 15", must not grow into its label.
+        // A four-figure score, or a three-figure count, must not grow into
+        // its label.
         //
         // These two, and ONLY these two, are set in the display face.
-        // "TOTAL POINTS:" and "WORDS COMPLETED:" are painted into
+        // "TOTAL POINTS:" and "TOTAL ATTEMPTS:" are painted into
         // ui_result_board in the same chunky distressed capitals as the
         // vocabulary board, so the figures that follow them sit on the same
         // plate, an inch away, in a different typeface - which is the one
         // place on this board where the mismatch is impossible to miss. The
         // greeting, the place line and the records strip are sentences to
         // read rather than lettering to match, and stay in the UI font.
-        foreach (Text figure in new[] { pointsText, wordsText })
+        foreach (Text figure in new[] { pointsText, attemptsText })
         {
             figure.resizeTextForBestFit = true;
             figure.resizeTextMinSize = 20;
@@ -334,7 +348,7 @@ public static class SceneResultPanelBuilder
             // board overflows downwards on purpose - the records strip grows
             // to however many rows came back - but that setting makes height
             // free, and free height is what lets best fit answer "too wide"
-            // by stacking "3 / 5" into "3 /" over "5". Truncate puts the
+            // by stacking "120" into "12" over "0". Truncate puts the
             // height back in play, and ValueHeight above keeps two lines
             // from ever being the better fit.
             figure.verticalOverflow = VerticalWrapMode.Truncate;
@@ -343,7 +357,7 @@ public static class SceneResultPanelBuilder
         }
 
         // No records strip. There is one empty band on ui_result_board,
-        // between the painted WORDS COMPLETED plate and the inner frame
+        // between the painted TOTAL ATTEMPTS plate and the inner frame
         // below it, and the buttons already live in it - a list of past
         // scores squeezed in above them was cramped at any size that left
         // the buttons where they belong, and read as stray text under the
@@ -378,7 +392,7 @@ public static class SceneResultPanelBuilder
         result.completeSprite = LoadSprite(TitleCompleteSprite);
         result.tryAgainSprite = LoadSprite(TitleTryAgainSprite);
         result.pointsText = pointsText;
-        result.wordsText = wordsText;
+        result.attemptsText = attemptsText;
         result.greetingText = greetingText;
         result.placeText = placeText;
         result.wordsLearned = WordsLearnedPanelBuilder.Build(canvasGO.transform, controller);

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -47,9 +48,10 @@ public class SceneResultPanel : MonoBehaviour
              "label itself, so only the figure goes here.")]
     public Text pointsText;
 
-    [Tooltip("This scene's words, e.g. \"5 / 6\". The board prints " +
-             "WORDS COMPLETED:.")]
-    public Text wordsText;
+    [Tooltip("How many tries this scene took. The board prints " +
+             "TOTAL ATTEMPTS:, so only the figure goes here.")]
+    [FormerlySerializedAs("wordsText")]
+    public Text attemptsText;
 
     [Tooltip("\"GREAT JOB, KYLA!\" - the child's own name, which is the one " +
              "thing on this board that is about them rather than the run.")]
@@ -255,8 +257,18 @@ public class SceneResultPanel : MonoBehaviour
         if (pointsText != null)
             pointsText.text = RunScore.PointsFor(correct, attempts).ToString();
 
-        if (wordsText != null)
-            wordsText.text = correct + " / " + Mathf.Max(attempts, correct);
+        // The row used to read "5 / 6" under a WORDS COMPLETED: label, which
+        // was never what it counted: the figure after the slash is tries, and
+        // a child who said six words in six goes and one who needed sixteen
+        // both read "6 / 6" as six words. The board now asks for the tries by
+        // name, so that is the one number it gets. What they actually learned
+        // is the Words Learned panel's job, and it lists the words themselves.
+        //
+        // Max because a scene can finish with nothing counted against it -
+        // EarnedStars has the same guard - and "3 words, 0 attempts" is not a
+        // thing that happened.
+        if (attemptsText != null)
+            attemptsText.text = Mathf.Max(attempts, correct).ToString();
 
         FillGreeting();
 

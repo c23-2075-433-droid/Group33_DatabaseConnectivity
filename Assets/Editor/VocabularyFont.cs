@@ -43,7 +43,7 @@ public static class VocabularyFont
     /// It lives here rather than in either builder because BOTH boards draw
     /// text next to lettering painted into their own art - the vocabulary
     /// rows on ui_words_board, the two figures after "TOTAL POINTS:" and
-    /// "WORDS COMPLETED:" on ui_result_board - and two copies of these four
+    /// "TOTAL ATTEMPTS:" on ui_result_board - and two copies of these four
     /// values are two copies that drift.
     ///
     /// Size, alignment and position are NOT set here. Those are the caller's:

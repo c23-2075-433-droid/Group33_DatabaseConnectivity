@@ -311,9 +311,9 @@ is repeated every twenty seconds after that. Any speech, right or wrong, resets 
 
 **Finishing a scene.** When the scene is finished, the summary panel opens. It greets the child by
 the nickname entered at the menu, names the place that was completed, and shows the points for the
-scene, the words completed, and a rating out of five stars earned on accuracy rather than on speed.
-Finishing the scene at all earns the first star, so a child who reaches the end is never shown
-nothing. Three buttons lead out of the panel: CONTINUE, which first shows the words the scene
+scene, how many attempts it took, and a rating out of five stars earned on accuracy rather than
+on speed. Finishing the scene at all earns the first star, so a child who reaches the end is never
+shown nothing. Three buttons lead out of the panel: CONTINUE, which first shows the words the scene
 taught and what each one means, and then opens the next scene; REPLAY, which runs the same scene
 again; and the cross, which returns to the journey map. Whichever of the three is pressed, the
 scene counts as finished and the next tile opens, because the child did reach the end and the
@@ -381,7 +381,7 @@ pressed a second time, says the word slowly.
 
 **Scene summary panel.** Opens when the scene is finished. A banner reading COMPLETE, or TRY AGAIN
 on the lowest rating, the greeting with the child's name, the line naming the place that was
-completed, the total points, the words completed, and five stars. The buttons are CONTINUE, REPLAY,
+completed, the total points, the total attempts, and five stars. The buttons are CONTINUE, REPLAY,
 and a cross that returns to the journey map.
 
 **Words learned panel.** Opens from CONTINUE, before the next scene. One row for each Filipino word
