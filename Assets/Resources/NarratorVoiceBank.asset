@@ -399,7 +399,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: a99f9485119242d2a17ac3e7721787f6, type: 3}
   - id: rachel_l2_s1_bati_ask
-    text: Greet him back — say {word}!
+    text: "Greet him back \u2014 say {word}!"
     gloss: 
     clip: {fileID: 8300000, guid: 134c6a24203a4539a9dc21aee3aeea13, type: 3}
   - id: rachel_l2_s1_bati_done
