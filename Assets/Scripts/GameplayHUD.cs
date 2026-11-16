@@ -111,10 +111,6 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         status = new VoiceStatusMachine
         {
             feedbackHold = feedbackHold,
-            // Taken from the clip's own length rather than typed again here,
-            // so the message and the crickets cannot drift apart if either is
-            // ever changed. The child speaking clears it early regardless.
-            nothingHeardHold = VoicePromptDirector.SilenceChirpSeconds,
             listeningGrace = listeningGrace,
             minDwell = minDwell,
         };
