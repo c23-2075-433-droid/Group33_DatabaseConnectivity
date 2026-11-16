@@ -141,7 +141,7 @@ MonoBehaviour:
   - id: rachel_l1_s3_tuwalya_done
     text: Good! Kylo has his towel ready for afterwards.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: bfceeaad56364b45a961733251728123, type: 3}
   - id: rachel_l1_s3_sabon_story
     text: Water alone will not get Kylo clean. He needs something that makes bubbles.
     gloss: 
@@ -305,15 +305,15 @@ MonoBehaviour:
   - id: rachel_l1_s5_pagkain_story
     text: He is in his chair now, but the table in front of him is still bare.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e53e030694614953a0a1d11fcde5fc3a, type: 3}
   - id: rachel_l1_s5_pagkain_ask
     text: "Ask Nanay for his breakfast \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 498d17126e4e496c92348255942f22a5, type: 3}
   - id: rachel_l1_s5_pagkain_done
     text: Here it comes! Rice, egg and a cool drink.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 7caf8accd0474db3a5320bfccf9fbd18, type: 3}
   - id: rachel_l1_s5_kain_story
     text: Everything is on the plate now, and Kylo's tummy is rumbling.
     gloss: 
@@ -341,15 +341,15 @@ MonoBehaviour:
   - id: rachel_l1_s5_linis_story
     text: The plates are empty and the cup is drained. The table needs clearing.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 42ae4e7007c84ddc8d4346c04e519af8, type: 3}
   - id: rachel_l1_s5_linis_ask
     text: "Help him tidy it all away \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d86a5f1023c840a89011c74ed82e3038, type: 3}
   - id: rachel_l1_s5_linis_done
     text: Thank you! The table is clean and ready again.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 4d7c84811c214201a438828687e98849, type: 3}
   - id: rachel_l1_s5_outro
     text: Breakfast is finished. It is time for Kylo to head off to school!
     gloss: 
@@ -429,15 +429,15 @@ MonoBehaviour:
   - id: rachel_l2_s2_bati_story
     text: Kylo has just stepped into the classroom, and nobody has greeted him yet.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 723fbd212d69441383dd0aa86c278685, type: 3}
   - id: rachel_l2_s2_bati_ask
     text: "Let him say hello before he sits \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: dc16bcda5d294692ba1bcc829990121a, type: 3}
   - id: rachel_l2_s2_bati_done
     text: He greeted the class, and walked right over to his desk.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a939d00c6954447b900298d53f027b73, type: 3}
   - id: rachel_l2_s2_lakad_story
     text: Kylo is inside the classroom, and his own chair is across the room by the window.
     gloss: 
@@ -465,15 +465,15 @@ MonoBehaviour:
   - id: rachel_l2_s2_kinig_story
     text: Teacher Rachel has started the lesson, and Kylo needs to pay attention.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 983ea65a76464a9d92f1b7e89e9114f2, type: 3}
   - id: rachel_l2_s2_kinig_ask
     text: "Help him listen with both ears \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 376b9e3e36b246c89eec39556dd3f330, type: 3}
   - id: rachel_l2_s2_kinig_done
     text: Well done! Kylo is listening to every word.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 71b9d61e6095441691f4b5f9409b5faa, type: 3}
   - id: rachel_l2_s2_kuha_story
     text: The lesson is starting, and Kylo's desk is completely empty.
     gloss: 
@@ -1287,13 +1287,13 @@ MonoBehaviour:
     gloss: Pencil
     clip: {fileID: 8300000, guid: a71b142f1da68401a8233ad341297af6, type: 3}
   - id: rachel_word_kinig_teach
-    text: "In Filipino, 'K\xEDnig' means to listen."
+    text: In Filipino, 'Kinig' means to listen.
     gloss: Listen
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 0a85ead08944440cac568a0cf341af83, type: 3}
   - id: rachel_word_kinig_recall
-    text: "Remember, 'K\xEDnig' means to listen."
+    text: Remember, 'Kinig' means to listen.
     gloss: Listen
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 2ba625d9277140b895968e3a9f7e6093, type: 3}
   - id: rachel_word_aklat_teach
     text: '''Aklat'' is the Filipino word for a book.'
     gloss: Book
@@ -1369,11 +1369,11 @@ MonoBehaviour:
   - id: rachel_word_pagkain_teach
     text: In Filipino, 'Pagkain' means food, or a meal.
     gloss: Food
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3c854290cb9c4fa58c254beaa6e26130, type: 3}
   - id: rachel_word_pagkain_recall
     text: Remember, 'Pagkain' means food.
     gloss: Food
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3a19dcdb039642158e4206f745101013, type: 3}
   - id: rachel_word_linis_teach
     text: In Filipino, 'Linis' means to clean up, or to tidy.
     gloss: Clean up
