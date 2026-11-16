@@ -1,15 +1,27 @@
 // Assets/Editor/BuildPaaralanScene2.cs
 //
 // One-click scene builder for Paaralan Scene 2 ("Entering the Classroom").
-// Teaches four words: Lakad, Upo, Kuha, Lapis.
+// Teaches five words, in this order:
 //
-// Only Kuha and Lapis are new. Bukas comes from Bahay Scene 2, Kumusta from
-// Paaralan Scene 1, Upo from Bahay Scene 5 - they are here because the design
-// document puts them here, and because a word is learned by meeting it again
-// rather than by being taught once. Paaralan Scene 1 took the opposite view
-// and dropped Lakad and Bukas from its own list. If the group settles on one
-// rule, this is the scene to change, not that one: here the repeats carry the
-// story - you open the door, you greet, you sit - rather than padding it.
+//   Bátì    greet          he says hello and crosses to his desk
+//   Upô     sit down       he sits, and the view goes in with him
+//   Kínig   listen         settled, before he unpacks
+//   Kúha    get something  he reaches into the bag for his notebook
+//   Lápis   pencil         he raises it over the open page
+//
+// The accents are stress and glottal marks and they are what a child READS;
+// every one of these words is keyed in the code by its plain ASCII spelling
+// ("Bati"), which is what the recogniser matches, what the narration ids are
+// built from and what the database stores. NarratorScript.SpellingFor holds
+// that distinction and reads the marked spelling out of the voice bank, so
+// the badge here, Rachel's captions and the end-of-scene words board cannot
+// disagree about how a word is written.
+//
+// Only Kuha, Lapis and Kinig are new here. Upo comes from Bahay Scene 5 and
+// Bati from Paaralan Scene 1 - they are here because the design document puts
+// them here, and because a word is learned by meeting it again rather than by
+// being taught once. Here the repeats carry the story - you greet, you sit -
+// rather than padding it.
 //
 // A MIDDLE SCENE OF LEVEL 2. Scene 1 starts the run and fades into this one;
 // this one fades into Scene 3, which ends the level and shows the result.
@@ -52,9 +64,23 @@
 //   walk_frame_1..4_uniform_with_bag, fx_gleam, ui_arrow, ui_word_badge,
 //   badge_paaralan
 //
-// Both of Kylo's poses here are PROFILES facing right, because that is where
-// Teacher Rachel stands. talking_uniform_with_bag is not used in this scene:
-// it is a front-facing pose, and it turned him away from her.
+// Optional, and the beat they belong to degrades without them:
+//   bati_turn_a/b_uniform_with_bag, bati_wave_mid/out/in_uniform_with_bag
+//                              "Bati" - he turns to the camera and waves, by
+//                              Tools/make_bati_front_frames.py. All five are
+//                              padded so his feet land where the profile's
+//                              feet land; do not swap in the unpadded
+//                              talking_uniform_with_bag, which is a sixth of
+//                              a unit off and slides him sideways on the spot.
+//                              Missing, he just walks, as he did before.
+//   kinig_frame_1..4_uniform   "Kinig" - the head tilt and the nod, by
+//                              Tools/make_kinig_frames.py. Missing, the word
+//                              is a gleam over a boy sitting still.
+//
+// He STANDS and WALKS in profile facing right, because that is the way across
+// the room. The two words that are not about crossing it turn him: "Bati"
+// swings him round to the camera to wave at the child playing, and "Upo" sits
+// him down facing the desk, which faces the viewer too.
 //
 // Run via: Tools > SALINLAHI > Build Paaralan Scene 2
 
@@ -303,14 +329,14 @@ public class BuildPaaralanScene2
         // Not "a ?? b": ?? ignores Unity's overloaded null, so a missing asset
         // can slip through it. Ask explicitly.
         // Two views of the same room, and the scene moves between them. The
-        // five words split in two: "Bukas" and "Kumusta" happen at the
-        // threshold, where a doorway shot is right; "Upo", "Kuha" and "Lapis"
+        // five words split in two: "Bati" happens on the way in, by the
+        // lockers, where a wide shot is right; "Kinig", "Kuha" and "Lapis"
         // happen at a desk, which that shot has no room for. So "Upo" swaps
         // the picture - he sits down AND the view goes in with him, which is
         // what makes the word read as entering rather than just crouching.
         // The locker corner, and only that. The scene used to open outside the
-        // room and swap pictures twice; with "Bukas" and "Kumusta" gone there
-        // is one room in one state.
+        // room and swap pictures twice; with "Bukas" and "Kumusta" gone from
+        // its word list there is one room in one state.
         Sprite roomSprite = LoadSpriteOptional("klasrum_interior_background");
         if (roomSprite == null) roomSprite = LoadSprite("menu_bg");
         bgSr.sprite = roomSprite;
@@ -383,7 +409,7 @@ public class BuildPaaralanScene2
         // No teacher here. She belonged to the version that showed the whole
         // classroom with her at the chalkboard; in a corner of lockers she had
         // nowhere to stand and floated against the doors. The storyboard has
-        // only Kylo, which is right: these four words are him getting ready.
+        // only Kylo, which is right: these five words are him getting ready.
 
         // --- Kylo ---
         // The listening rig is its own object and stays switched on. Bahay
@@ -396,12 +422,12 @@ public class BuildPaaralanScene2
         rig.transform.position = new Vector3(SitX, SitFeetY, 0f);
 
         // Both poses are PROFILES facing right, which is where the teacher is.
-        // The obvious pick for a word like "Kumusta" would be
+        // The obvious pick for a greeting word like "Bati" would be
         // talking_uniform_with_bag, but that pose faces the VIEWER - using it
         // here turns Kylo's back on the person he is greeting. Scene 1 uses it
         // deliberately, because there the greeting is aimed at the child
-        // playing; in this scene it is aimed at Teacher Rachel, so the profile
-        // art is the right one and "Kumusta" is answered by her instead.
+        // playing; in this scene it is aimed at the front of the class, so the
+        // profile art is the right one.
         GameObject standGO = CreateFigure("Kylo_Standing", "standing_uniform_with_bag",
                                            StandX, FloorY, PlayerHeight);
         standGO.tag = "Player";                        // the body, not the ear
@@ -510,6 +536,51 @@ public class BuildPaaralanScene2
         // these drawings exist to remove.
         reachFrames.fireOnFrame = 6;
 
+        // --- "Kinig": he listens, and stays in his chair doing it ---
+        //
+        // This word had no drawing either - a gleam over his head and a note
+        // saying it wanted an ear turned or a head lifted. It has a head now.
+        //
+        // He tilts towards the front of the class and nods twice. Nothing else
+        // about him moves and he does not leave the chair, which is the whole
+        // point: the word is listening, and a child who sees him stand up has
+        // been taught the wrong thing.
+        //
+        // IT IS SMALL ON PURPOSE. Five degrees of tilt and fourteen pixels of
+        // nod, played under Rachel's voice while the child is being asked to
+        // speak. A listen that waves its arms would pull attention off the word.
+        //
+        // Art by Tools/make_kinig_frames.py: his own head, rotated and slid,
+        // on a body that has not moved. The four frames are the two halves of
+        // the tilt and the two depths of the nod, so the lead-in can settle
+        // him and the loop can nod without either jumping.
+        PoseSequence listenFrames = seatGO.AddComponent<PoseSequence>();
+        listenFrames.target = seatSr;
+        listenFrames.frames = new[]
+        {
+            LoadSpriteOptional("kinig_frame_1_uniform"),   // his head starting over
+            LoadSpriteOptional("kinig_frame_2_uniform"),   // tilted, listening
+        };
+        listenFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("kinig_frame_3_uniform"),   // down
+            LoadSpriteOptional("kinig_frame_4_uniform"),   // the bottom of the nod
+            LoadSpriteOptional("kinig_frame_3_uniform"),   // and back up
+            LoadSpriteOptional("kinig_frame_2_uniform"),
+        };
+        // Two nods. Listening is rule 10's kind of thing that repeats, but a
+        // child nodding six times at a teacher is a different beat entirely.
+        listenFrames.loopCycles = 2;
+        listenFrames.loopFramesPerSecond = 6f * Pace;      // a nod is slower than a turn
+        listenFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("kinig_frame_1_uniform"),   // his head comes back
+        };
+        // Square to the desk again, which is where "Kuha" starts from.
+        listenFrames.destinationSprite = LoadSpriteOptional(seatedSprite);
+        listenFrames.framesPerSecond = 8f * Pace;
+        listenFrames.playOnEnable = false;
+
         // "Lapis" has drawn frames too now: he picks the pencil up low, lifts
         // it past his chest and raises it, landing on pencil_ready_uniform.
         // Like "Kuha" this acts on an object that is already visible, so the
@@ -584,6 +655,84 @@ public class BuildPaaralanScene2
         // moment he walks and never fights the walk cycle.
         standGO.AddComponent<IdleBreath>();
 
+        // --- "Bati": he turns to US and waves, THEN walks ---
+        //
+        // The greeting in this room used to be the word with no drawing: it
+        // called WalkForward and lit a gleam, and the note here said so - it
+        // wants either a drawn wave or somebody drawn to greet. It has the
+        // first now.
+        //
+        // WHY HE GREETS THE CAMERA. Scene 1's wave is a PROFILE wave because
+        // the guard is standing beside him. This room has nobody beside him -
+        // the teacher was cut from the locker-corner view - so the greeting is
+        // aimed at the child playing, which means he has to come out of his
+        // profile and face them. That makes talking_uniform_with_bag the right
+        // pose here for exactly the reason it is the wrong one at the gate.
+        //
+        // THE FOUR PARTS (AnimationStandard rule 2):
+        //
+        //   frames      the quarter turn, landing on him facing us, hand up
+        //   loopFrames  the wave itself, out and back, twice
+        //   tailFrames  the turn again, the other way
+        //   destination his profile, which is what the walk needs
+        //
+        // Waving is not on rule 10's list of things that loop - "raising a
+        // hand" is a play-once - but the WAVE is, in the same way writing is:
+        // the hand going up happens once and the hand going side to side is
+        // what repeats while it is up. So the raise lives in frames and only
+        // the swing is in loopFrames.
+        //
+        // IT DRIVES standingSprite, NOT THE RENDERER. PlayerMovement rewrites
+        // its renderer from standingSprite on every frame it is not moving, so
+        // a sequence writing to the renderer is overwritten before one frame of
+        // it is seen. Scene 1's greeting is wired the same way.
+        //
+        // Art by Tools/make_bati_front_frames.py, all of it moved pixels from
+        // sprites that already existed. Missing, the whole thing degrades to
+        // what this beat did before - LoadSpriteOptional returns null, every
+        // null frame is skipped rather than stalling, and he simply walks.
+        GameObject greetGO = new GameObject("Pose_Greet");
+        PoseSequence greetFrames = greetGO.AddComponent<PoseSequence>();
+        greetFrames.player = player;
+        // TWO in-between frames for the turn, not one. A single squashed frame
+        // held a third of a second is long enough to read as a squashed boy
+        // rather than as a boy turning; a turn has to pass THROUGH narrow
+        // instead of stopping there. His profile narrows, the front view is
+        // still narrow, then he is facing us - and all three go past quickly.
+        greetFrames.frames = new[]
+        {
+            LoadSpriteOptional("bati_turn_a_uniform_with_bag"),
+            LoadSpriteOptional("bati_turn_b_uniform_with_bag"),
+            LoadSpriteOptional("bati_wave_mid_uniform_with_bag"),
+        };
+        greetFrames.loopFrames = new[]
+        {
+            LoadSpriteOptional("bati_wave_out_uniform_with_bag"),
+            LoadSpriteOptional("bati_wave_mid_uniform_with_bag"),
+            LoadSpriteOptional("bati_wave_in_uniform_with_bag"),
+            LoadSpriteOptional("bati_wave_mid_uniform_with_bag"),
+        };
+        // Three swings at a sixth of a second each: about six tenths of a
+        // second per wave, which is what a wave takes. Two was a twitch once
+        // the frames stopped being held.
+        greetFrames.loopCycles = 3;
+        greetFrames.tailFrames = new[]
+        {
+            LoadSpriteOptional("bati_turn_b_uniform_with_bag"),
+            LoadSpriteOptional("bati_turn_a_uniform_with_bag"),
+        };
+        // Back to the profile, which is rule 8: this ending pose is the
+        // starting pose of the walk that follows it.
+        //
+        // bati_wave_mid is talking_uniform_with_bag re-centred rather than the
+        // sprite itself, and that is not tidiness. Every frame of this run is
+        // padded so his FEET land where the profile's feet land; the unpadded
+        // pose puts them a sixth of a unit to the side, and swapping to it
+        // slid him sideways on the spot. See make_bati_front_frames.py.
+        greetFrames.destinationSprite = LoadSprite("standing_uniform_with_bag");
+        greetFrames.framesPerSecond = 10f * Pace;
+        greetFrames.playOnEnable = false;
+
         // A marker, not a duration: he walks until he arrives, however far
         // that is.
         //
@@ -627,10 +776,10 @@ public class BuildPaaralanScene2
         // --- Something has to light up for every word that only names a thing ---
         TimedOverlay gleamBati = CreateGleamAt("Gleam_Bati", StandX,
                                                 FloorY + PlayerHeight * 0.62f, 3.6f);
-        // "Kinig" is listening, which has no object at all. It lands on his
-        // head, seated, which is at least where the listening happens. Like
-        // Bati it wants a drawn pose - an ear turned, a head lifted - and
-        // until there is one the staging is thin and says so.
+        // "Kinig" is listening, which has no object at all, so the gleam lands
+        // on his head - which is both where the listening happens and, now
+        // that the word has drawn frames, where the movement is. It marks the
+        // tilt and the nod rather than standing in for them.
         TimedOverlay gleamKinig = CreateGleamAt("Gleam_Kinig", SitX,
                                                  SitFeetY + SeatedHeight * 0.80f, 2.6f);
         TimedOverlay gleamKuha = CreateGleamAt("Gleam_Kuwaderno", NotebookX,
@@ -675,11 +824,21 @@ public class BuildPaaralanScene2
         // teaching, so it has to point at what the word means.
         // Only one is ever on screen at a time, so they can overlap each other
         // freely - each sits directly over the thing its word acts on.
-        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-700, 60, 0));
-        GameObject pKinig = CreatePromptUI(uiRoot.transform, "Prompt_Kinig", "Kinig", new Vector3(260, 10, 0));
-        GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", "Upo", new Vector3(260, 120, 0));
-        GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", "Kuha", new Vector3(120, -150, 0));
-        GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", "Lapis", new Vector3(420, -40, 0));
+        //
+        // The badge shows the MARKED spelling - Bati with its stress accents -
+        // which is read out of the voice bank rather than typed here, so the
+        // badge, Rachel's captions and the words board cannot drift apart. The
+        // objectives below keep the plain key: see NarratorScript.SpellingFor.
+        //
+        // The spelling is baked into the scene when it is built, so a change to
+        // the Script / Word column of Docs/VoiceOverScript.csv needs
+        // Tools > SALINLAHI > Refresh Narrator Voice Bank and then this builder
+        // run again before it shows on the badge.
+        GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", Spelled("Bati"), new Vector3(-700, 60, 0));
+        GameObject pKinig = CreatePromptUI(uiRoot.transform, "Prompt_Kinig", Spelled("Kinig"), new Vector3(260, 10, 0));
+        GameObject pUpo = CreatePromptUI(uiRoot.transform, "Prompt_Upo", Spelled("Upo"), new Vector3(260, 120, 0));
+        GameObject pKuha = CreatePromptUI(uiRoot.transform, "Prompt_Kuha", Spelled("Kuha"), new Vector3(120, -150, 0));
+        GameObject pLapis = CreatePromptUI(uiRoot.transform, "Prompt_Lapis", Spelled("Lapis"), new Vector3(420, -40, 0));
 
         // --- Objectives: greet, sit, listen, unpack ---
         // The scene begins with Kylo already inside, by the lockers, and is
@@ -694,18 +853,22 @@ public class BuildPaaralanScene2
         // will not ask the next word until he has - which is what keeps the
         // sitting from happening halfway across.
         //
-        // "Bati" HAS NOBODY TO GREET IN THIS ROOM. Teacher Rachel was cut
-        // from this view - she is a waist-up drawing made for the chalkboard
-        // shot and floats against the lockers - so the greeting lands on
-        // Kylo, who is the one doing it. It wants either a drawn wave or
-        // somebody drawn to greet; until then the word is taught and the
-        // staging is thin, and saying so is better than quietly dropping it.
+        // "Bati" HAS NOBODY TO GREET IN THIS ROOM, so he greets the child
+        // playing. Teacher Rachel was cut from this view - she is a waist-up
+        // drawing made for the chalkboard shot and floats against the lockers -
+        // and rather than wave at an empty room he turns out of his profile and
+        // waves at the camera. See the greeting frames where they are built.
+        //
+        // THE WALK HANGS OFF THE WAVE, not off the word. Both still happen, and
+        // in that order: he greets us, turns back, and only then crosses the
+        // room. Starting the walk on the word instead would have him wave while
+        // sliding sideways past the lockers, and the turn would never be seen -
+        // PlayerMovement takes the renderer for its walk cycle the moment it
+        // starts moving.
         var bati = MakeObjective("Bati", pBati);
-        UnityEventTools.AddPersistentListener(bati.onCorrect, player.WalkForward);
+        UnityEventTools.AddPersistentListener(bati.onCorrect, greetFrames.Play);
+        UnityEventTools.AddPersistentListener(greetFrames.onFinished, player.WalkForward);
         UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
-
-        // Kylo stays in profile, facing her, and SHE answers the greeting - she
-        // is drawn mid-wave, so the gleam reads as the wave landing.
 
         // The view goes inside with him. Swapped before the poses change so
         // the room is already the classroom in the frame he first appears
@@ -719,8 +882,11 @@ public class BuildPaaralanScene2
         if (deskFrontSr.sprite != null)
             UnityEventTools.AddBoolPersistentListener(upo.onCorrect, deskFront.SetActive, true);
 
-        // Settled in his chair, before he unpacks.
+        // Settled in his chair, before he unpacks. He tilts his head towards
+        // the front of the class and nods - he stays seated, and the gleam over
+        // his head now marks a head that is actually doing something.
         var kinig = MakeObjective("Kinig", pKinig);
+        UnityEventTools.AddPersistentListener(kinig.onCorrect, listenFrames.Play);
         UnityEventTools.AddPersistentListener(kinig.onCorrect, gleamKinig.Play);
 
         // "Kuha" is him pulling the notepad OUT of the bag - the notepad is
@@ -753,6 +919,18 @@ public class BuildPaaralanScene2
         controller.playerMovement = player;
         controller.objectives = new[] { bati, upo, kinig, kuha, lapis };
 
+        // "Bati" is now the longest action in the game: a turn, two waves,
+        // the turn back, and only then the walk across the room - about seven
+        // seconds, against a default cap of four. The cap is a safety net for
+        // an action that never ends, not a schedule, so it has to clear the
+        // longest one that does. The walk's own cap is voiceWalkDuration
+        // (9.2s here) and the greeting ahead of it runs 2.7, so fourteen
+        // leaves the net well outside anything that can legitimately happen.
+        //
+        // Left at four, the next word went up while he was still walking, and
+        // "Upo" would sit a boy down in the middle of the floor.
+        controller.maxActionWait = 14f;
+
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
         // run time to fade out of whichever button is pressed.
@@ -779,7 +957,9 @@ public class BuildPaaralanScene2
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Paaralan Scene 2 built and saved to " + ScenePath +
-                   ". Words: Lakad, Upo, Kuha, Lapis - walking to his chair, sitting, and " +
+                   ". Words: " + Spelled("Bati") + ", " + Spelled("Upo") + ", " +
+                   Spelled("Kinig") + ", " + Spelled("Kuha") + ", " + Spelled("Lapis") +
+                   " - greeting the class and crossing to his chair, sitting, listening, and " +
                    "getting his things out. It fades into " + NextScene +
                    ", which ends the level - so build Paaralan Scene 3 as well, or the " +
                    "level runs into a scene that is not there. Missing art is optional and is " +
@@ -959,6 +1139,17 @@ public class BuildPaaralanScene2
 
         root.SetActive(false);
         return root;
+    }
+
+    /// <summary>
+    /// How the word is spelled on the badge: the marked spelling from the
+    /// voice bank - "Bati" -> "Bátì" - and the word itself if the bank has
+    /// no row for it yet. Only the badge uses this; the objective, the
+    /// recogniser and the database all keep the plain key.
+    /// </summary>
+    private static string Spelled(string word)
+    {
+        return NarratorScript.SpellingFor(word);
     }
 
     private static Sprite LoadSprite(string spriteFile)

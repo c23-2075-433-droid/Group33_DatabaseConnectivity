@@ -452,12 +452,21 @@ public class SceneObjectiveController : MonoBehaviour
     /// True while any drawn action is still running. Destroyed components are
     /// skipped rather than throwing: a scene transition can tear one down
     /// while this is still counting.
+    ///
+    /// AN ENDLESS LOOP DOES NOT COUNT. Paaralan Scene 3's "Basa" reads until
+    /// the next word is said, which is a loop with no end of its own - so
+    /// waiting for it to finish is waiting for the word this method is
+    /// holding up. That deadlock resolves itself after maxActionWait, but
+    /// four seconds of a child being asked nothing while Kylo reads is the
+    /// scene stalling, not pacing. PoseSequence.IsHoldingLoop is exactly
+    /// that case, and it goes false the moment Stop() is called, so the
+    /// ending movement IS waited for.
     /// </summary>
     private static bool IsPosePlaying(PoseSequence[] poses)
     {
         if (poses == null) return false;
         foreach (PoseSequence p in poses)
-            if (p != null && p.IsPlaying) return true;
+            if (p != null && p.IsPlaying && !p.IsHoldingLoop) return true;
         return false;
     }
 

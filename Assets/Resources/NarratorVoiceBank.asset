@@ -426,6 +426,18 @@ MonoBehaviour:
     text: Here is Kylo's classroom. His chair is waiting for him by the window.
     gloss: 
     clip: {fileID: 8300000, guid: 72ada230a0857429d9dfa97ce5d49a3d, type: 3}
+  - id: rachel_l2_s2_bati_story
+    text: Kylo has just stepped into the classroom, and nobody has greeted him yet.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_bati_ask
+    text: "Let him say hello before he sits \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_bati_done
+    text: He greeted the class, and walked right over to his desk.
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l2_s2_lakad_story
     text: Kylo is inside the classroom, and his own chair is across the room by the window.
     gloss: 
@@ -450,6 +462,18 @@ MonoBehaviour:
     text: Good! Kylo is in his seat, ready to learn.
     gloss: 
     clip: {fileID: 8300000, guid: 3653bbe6b655f4fccaf50359c1e9f359, type: 3}
+  - id: rachel_l2_s2_kinig_story
+    text: Teacher Rachel has started the lesson, and Kylo needs to pay attention.
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kinig_ask
+    text: "Help him listen with both ears \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 0}
+  - id: rachel_l2_s2_kinig_done
+    text: Well done! Kylo is listening to every word.
+    gloss: 
+    clip: {fileID: 0}
   - id: rachel_l2_s2_kuha_story
     text: The lesson is starting, and Kylo's desk is completely empty.
     gloss: 
@@ -1183,11 +1207,11 @@ MonoBehaviour:
     gloss: Take / get
     clip: {fileID: 8300000, guid: 77189b521add843f497525b12c109e0a, type: 3}
   - id: rachel_word_upo_teach
-    text: In Filipino, 'Upo' means to sit down.
+    text: "In Filipino, 'Up\xF4' means to sit down."
     gloss: Sit down
     clip: {fileID: 8300000, guid: 873b4c658a6ba4370bd11d7e393e0e32, type: 3}
   - id: rachel_word_upo_recall
-    text: Remember, 'Upo' means to sit down.
+    text: "Remember, 'Up\xF4' means to sit down."
     gloss: Sit down
     clip: {fileID: 8300000, guid: fc749f01967c84eb882bf878e070a944, type: 3}
   - id: rachel_word_kanin_teach
@@ -1247,21 +1271,29 @@ MonoBehaviour:
     gloss: Run
     clip: {fileID: 8300000, guid: 3227bcaa755f7427c9c19a48b9ed0d2e, type: 3}
   - id: rachel_word_kuha_teach
-    text: In Filipino, 'Kuha' means to get something, or to fetch it.
+    text: "In Filipino, 'K\xFAha' means to get something, or to fetch it."
     gloss: Get / take
     clip: {fileID: 8300000, guid: 6cbda64b16be54066b6273ecc0decc63, type: 3}
   - id: rachel_word_kuha_recall
-    text: Remember, 'Kuha' means to get it.
+    text: "Remember, 'K\xFAha' means to get it."
     gloss: Get / take
     clip: {fileID: 8300000, guid: 52e44a3ffb0d9415893af9951ab33ff3, type: 3}
   - id: rachel_word_lapis_teach
-    text: '''Lapis'' is the Filipino word for a pencil.'
+    text: "'L\xE1pis' is the Filipino word for a pencil."
     gloss: Pencil
     clip: {fileID: 8300000, guid: b7e117b0bdd4b46e0970869e31b2c683, type: 3}
   - id: rachel_word_lapis_recall
-    text: Remember, 'Lapis' means pencil.
+    text: "Remember, 'L\xE1pis' means pencil."
     gloss: Pencil
     clip: {fileID: 8300000, guid: a71b142f1da68401a8233ad341297af6, type: 3}
+  - id: rachel_word_kinig_teach
+    text: "In Filipino, 'K\xEDnig' means to listen."
+    gloss: Listen
+    clip: {fileID: 0}
+  - id: rachel_word_kinig_recall
+    text: "Remember, 'K\xEDnig' means to listen."
+    gloss: Listen
+    clip: {fileID: 0}
   - id: rachel_word_aklat_teach
     text: '''Aklat'' is the Filipino word for a book.'
     gloss: Book
@@ -1431,11 +1463,11 @@ MonoBehaviour:
     gloss: Smile
     clip: {fileID: 8300000, guid: 214fb80a663cf4b6b99baf3d73ecb257, type: 3}
   - id: rachel_word_bati_teach
-    text: In Filipino, 'Bati' means to greet someone kindly.
+    text: "In Filipino, 'B\xE1t\xEC' means to greet someone kindly."
     gloss: Greet
     clip: {fileID: 8300000, guid: baba912f13bc640c5b6816aaaf9c69a3, type: 3}
   - id: rachel_word_bati_recall
-    text: Remember, 'Bati' means to greet.
+    text: "Remember, 'B\xE1t\xEC' means to greet."
     gloss: Greet
     clip: {fileID: 8300000, guid: 12e001c94914c42a38023e5c085bae6f, type: 3}
   - id: rachel_word_ibahagi_teach
@@ -1599,7 +1631,7 @@ MonoBehaviour:
     gloss: Take / get
     clip: {fileID: 8300000, guid: f6f27a4541a184c9bb83375d9461f724, type: 3}
   - id: word_upo
-    text: Upo
+    text: "Up\xF4"
     gloss: Sit down
     clip: {fileID: 8300000, guid: 92fa11ad6dd674ac0a6cbc4ffba07670, type: 3}
   - id: word_kanin
@@ -1635,11 +1667,11 @@ MonoBehaviour:
     gloss: Run
     clip: {fileID: 8300000, guid: 4771cd2c6973348f992c117ad5a77b67, type: 3}
   - id: word_kuha
-    text: Kuha
+    text: "K\xFAha"
     gloss: Get / take
     clip: {fileID: 8300000, guid: 8a3a347a9c49f495ba1d35d181f073b8, type: 3}
   - id: word_lapis
-    text: Lapis
+    text: "L\xE1pis"
     gloss: Pencil
     clip: {fileID: 8300000, guid: de92a959b887548a190b41fbdc4f5ee7, type: 3}
   - id: word_aklat
@@ -1723,7 +1755,7 @@ MonoBehaviour:
     gloss: Smile
     clip: {fileID: 8300000, guid: 0511a5cb88be5402aa753d0634ca6493, type: 3}
   - id: word_bati
-    text: Bati
+    text: "B\xE1t\xEC"
     gloss: Greet
     clip: {fileID: 8300000, guid: 0f3e4e63489054b39810e3b8fa504272, type: 3}
   - id: word_ibahagi

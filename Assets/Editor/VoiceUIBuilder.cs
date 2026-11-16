@@ -27,7 +27,15 @@ public static class VoiceUIBuilder
     /// VoiceCommand/SceneObjectiveController, or reuses it if one already
     /// exists in the currently open scene (safe to call more than once).
     /// </summary>
-    public static VoiceInteractionUI BuildVoiceUI(VoiceCommand voiceCommand, SceneObjectiveController controller)
+    /// <param name="micPos">Where the microphone sits on the 1920x1080
+    /// canvas, measured from its centre. The default is the bottom-centre
+    /// spot every scene has used since Level 1 - pass something else only
+    /// when that spot lands on something the player needs to see.
+    /// Paaralan Scene 3 does: its desk fills the bottom of the frame and the
+    /// replay button came down squarely on the open notebook.</param>
+    /// <param name="replayPos">Likewise for the replay/speaker button.</param>
+    public static VoiceInteractionUI BuildVoiceUI(VoiceCommand voiceCommand, SceneObjectiveController controller,
+                                                   Vector2? micPos = null, Vector2? replayPos = null)
     {
         GameObject existingCanvasGO = GameObject.Find(CanvasName);
         if (existingCanvasGO != null)
@@ -58,13 +66,15 @@ public static class VoiceUIBuilder
 
         // --- Microphone button: prominent, centered icon; VoiceInteractionUI
         //     pulses it while VoiceCommand reports it's actively listening. ---
-        GameObject micGO = CreateImage(canvasT, "MicButton", "mic_icon", new Vector2(-110, -420), new Vector2(220, 220));
+        GameObject micGO = CreateImage(canvasT, "MicButton", "mic_icon",
+                                        micPos ?? new Vector2(-110, -420), new Vector2(220, 220));
         Button micButton = micGO.AddComponent<Button>();
         micButton.targetGraphic = micGO.GetComponent<Image>();
 
         // --- Replay/speaker button: re-plays the current word's instruction
         //     audio (SceneObjectiveController.PlayCurrentInstruction()). ---
-        GameObject replayGO = CreateImage(canvasT, "ReplayButton", "btn_replay", new Vector2(140, -420), new Vector2(150, 150));
+        GameObject replayGO = CreateImage(canvasT, "ReplayButton", "btn_replay",
+                                           replayPos ?? new Vector2(140, -420), new Vector2(150, 150));
         Button replayButton = replayGO.AddComponent<Button>();
         replayButton.targetGraphic = replayGO.GetComponent<Image>();
 

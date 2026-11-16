@@ -1,10 +1,20 @@
 # Recording script — Filipino words and cues
 
-Generated from `Docs/VoiceOverScript.csv`. 49 words and 15 cue lines, all of which need a human voice.
+Generated from `Docs/VoiceOverScript.csv`. 50 words and 15 cue lines, all of which need a human voice.
 
 ## Why these and not the rest
 
 The English narration is generated. These are not, because the model puts Filipino stress in the wrong place — six attempts could not make it say *tayo* (us) rather than *taYO* (get up) — and a cloned voice saying it wrong is worse than a stranger saying it wrong, because the child believes it.
+
+## The accents
+
+Some words are written with marks: **Bátì**, **Upô**, **Kínig**, **Kúha**, **Lápis**. They are not spelling — they say how to say it, and the game now prints them on the badge the child reads, so the recording and the badge have to agree.
+
+- **´** is where the voice lands: *Lápis*, not *lapís*.
+- **ˆ** on the last letter is a stress there plus a catch in the throat at the end: *Upô*.
+- **`** on the last letter is a catch with no stress there: *Bátì* — stress on BA, then the throat closes on the second syllable.
+
+A word printed plain has no mark because nobody has marked it yet, not because it has no stress. Say those the way you normally would.
 
 ## How to record
 
@@ -23,7 +33,7 @@ python3 Tools/voice_changer.py --words
 
 ---
 
-## Part 1 — the 49 words
+## Part 1 — the 50 words
 
 Say each word on its own, clearly, with a pause after it.
 
@@ -43,7 +53,7 @@ Say each word on its own, clearly, with a pause after it.
 | 12 | **Sapatos** | Shoes |
 | 13 | **Bag** | Bag |
 | 14 | **Kunin** | Take / get |
-| 15 | **Upo** | Sit down |
+| 15 | **Upô** | Sit down |
 | 16 | **Kanin** | Rice |
 | 17 | **Itlog** | Egg |
 | 18 | **Kain** | Eat |
@@ -51,8 +61,8 @@ Say each word on its own, clearly, with a pause after it.
 | 20 | **Kumusta** | Hello / how are you |
 | 21 | **Pasok** | Enter |
 | 22 | **Takbo** | Run |
-| 23 | **Kuha** | Get / take |
-| 24 | **Lapis** | Pencil |
+| 23 | **Kúha** | Get / take |
+| 24 | **Lápis** | Pencil |
 | 25 | **Aklat** | Book |
 | 26 | **Basa** | Read |
 | 27 | **Sulat** | Write |
@@ -73,11 +83,12 @@ Say each word on its own, clearly, with a pause after it.
 | 42 | **Tulak** | Push |
 | 43 | **Talon** | Jump |
 | 44 | **Ngiti** | Smile |
-| 45 | **Bati** | Greet |
+| 45 | **Bátì** | Greet |
 | 46 | **Ibahagi** | Share |
 | 47 | **Salamat** | Thank you |
 | 48 | **Pagod** | Tired |
 | 49 | **Uwi** | Go home |
+| 50 | **Kínig** | Listen |
 
 ---
 

@@ -133,6 +133,42 @@ public static class NarratorScript
     }
 
     /// <summary>
+    /// How a vocabulary word is SPELLED for the child to read - "Bati" ->
+    /// "Bátì" - read from the Script / Word column of
+    /// Docs/VoiceOverScript.csv by way of the voice bank.
+    ///
+    /// The game keeps two spellings of every word on purpose, and they are
+    /// not interchangeable:
+    ///
+    ///   The PLAIN one - "Bati" - is the key. Objectives carry it, the
+    ///   narration ids are built from it (rachel_l2_s2_bati_story), the
+    ///   recogniser matches against it, WordVariants is keyed by it and the
+    ///   database stores it. It is ASCII and it never changes.
+    ///
+    ///   The MARKED one - "Bátì" - is what a reader sees. The accents are
+    ///   stress and glottal marks: they say where the voice lands, which is
+    ///   the whole difference between báta and batá, so a child learning to
+    ///   say the word needs them in front of them.
+    ///
+    /// Only the second belongs on a badge, in a caption or on the words board.
+    /// Anything that LOOKS UP or COMPARES a word must stay on the first, and
+    /// PronunciationChecker folds accents away before matching in any case.
+    ///
+    /// Falls back to the word exactly as given - so a word with no row in the
+    /// bank, or a bank that has not been generated yet, reads as itself rather
+    /// than as nothing.
+    /// </summary>
+    public static string SpellingFor(string word)
+    {
+        if (string.IsNullOrEmpty(word)) return "";
+        string plain = word.Trim();
+
+        NarratorVoiceBank bank = NarratorVoiceBank.Load();
+        NarratorLine line = bank != null ? bank.Find(WordId(plain)) : null;
+        return line != null && !string.IsNullOrEmpty(line.text) ? line.text.Trim() : plain;
+    }
+
+    /// <summary>
     /// The id of a scene's intro or outro line, worked out from the scene
     /// name: Chapter2_Level3_Aralin -> rachel_l2_s3_intro. The game's
     /// "Chapter" is the VoiceOverScript's "Level", and its "Level" is that
