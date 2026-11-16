@@ -1505,63 +1505,63 @@ MonoBehaviour:
   - id: rachel_frame_sabihin
     text: 'Sabihin mo:'
     gloss: 'Say:'
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a9175f99e20041769993e118ee9bae2f, type: 3}
   - id: rachel_frame_ngayon
     text: 'Ngayon naman, sabihin mo:'
     gloss: 'Now, say:'
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 3da5145796994527a9b708fefbc8a45d, type: 3}
   - id: rachel_frame_ulitin
     text: 'Pakinggan mo ulit:'
     gloss: 'Listen again:'
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5aaef6a8c40b4a488099a1b00f204d5f, type: 3}
   - id: rachel_cue_listening
     text: Nakikinig ako. I am listening!
     gloss: I am listening.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 741050855928491cbf35f6938dd767fe, type: 3}
   - id: rachel_hint_pakinggan
     text: Pakinggan mong mabuti. Listen carefully.
     gloss: Listen carefully.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e8ba13e9b0ce4ad98921cbb909637e5f, type: 3}
   - id: rachel_hint_replay
     text: Press the blue button to hear the word again.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: cdc7f3d8efc1410a91ff4ad5eddb3bda, type: 3}
   - id: rachel_nudge_idle
     text: Kaya mo 'yan! Go on, you can do it.
     gloss: You can do it!
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 75bfeba967a6436db8fdd38f5b8a5276, type: 3}
   - id: rachel_mic_blocked
     text: Press the microphone button so Kylo can hear you.
     gloss: 
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 70210fb5e335472d877299fcb008e9fd, type: 3}
   - id: rachel_feedback_correct_1
     text: Tama! That's right!
     gloss: Correct!
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: e4e4225b6f804c1a91dbcd3d04fc1e7f, type: 3}
   - id: rachel_feedback_correct_2
     text: Magaling! Well done!
     gloss: Well done!
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 9df1bc639ac742429b6938db7ba5fe5f, type: 3}
   - id: rachel_feedback_correct_3
     text: Ang galing mo! You did it!
     gloss: Great job!
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 1dc4e7dff6714870bf9bf226eda800bc, type: 3}
   - id: rachel_feedback_incorrect_1
     text: Hindi pa tama. Let's try that one again.
     gloss: Not quite. Try again.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 5c005da4a4db4242b2b166351c233547, type: 3}
   - id: rachel_feedback_incorrect_2
     text: Malapit na! You are very close. One more try.
     gloss: Almost! Say it again.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: da5d9ca3dc5a42ab8be51401ee20066f, type: 3}
   - id: rachel_feedback_nothear_1
     text: Hindi kita narinig. I did not hear you - try once more.
     gloss: I did not hear you.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: b6dd5ff2e0ad4954ab21f9f8da6adddc, type: 3}
   - id: rachel_feedback_nothear_2
     text: Pakilakasan mo ang boses mo. A little louder, please!
     gloss: Speak a bit louder.
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: d6b1cf9151174f6fac33dd9188139b4d, type: 3}
   - id: word_bangon
     text: Bangon
     gloss: Get up

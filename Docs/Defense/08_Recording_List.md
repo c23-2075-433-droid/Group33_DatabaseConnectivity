@@ -83,3 +83,30 @@ practical, not corrective.
 
 Step 4 is worth doing for its own sake: it gives you a dated, re-runnable number
 to quote in the defense instead of a claim.
+
+---
+
+## Recorded — 17 November 2026
+
+All 15 are in `Assets/Audio/VO/`, cut from one 96-second take by
+`Tools/split_cue_feedback_recording.py` and levelled to the same −20 dBFS RMS
+as the other 424 clips. `Tools/completeness_report.py` now reads:
+
+| Measure | Before | After |
+|---|---:|---:|
+| Script lines voiced | 401 / 444 | **416 / 444** |
+| Cue segment | 0 / 8 | **8 / 8** |
+| Feedback segment | 0 / 7 | **7 / 7** |
+
+The take holds the two sections in the order **Feedback (9–15) first, then Cue
+(1–8)** — not the order printed above. The splitter does not assume it: it
+scores each line's phrase structure against the script's own punctuation and
+picks the better of the two section orders, which is why the three-chunk
+`incorrect_2`, the em-dash pause in `nothear_1` and the two English-only lines
+all land where they do. It reported a fit of 1.77 against 0.87 for the other
+way round.
+
+These 15 have no mouth track, because tracks come from the text-to-speech
+alignment and these are recordings. `RachelPortraitAnimator` falls back to the
+talking cycle, which is the same thing the recorded `sabon`, `sipilyo` and
+`tuwalya` lines already do.
