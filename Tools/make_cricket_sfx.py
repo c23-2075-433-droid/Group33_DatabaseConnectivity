@@ -10,20 +10,38 @@ whatever comes out of the phone's speaker is heard by the recognizer and could
 be scored as the child's own attempt. Two properties keep that from happening,
 and both of them are specifications rather than search terms:
 
-  SHORT      0.75 s, against a restartDelay of 0.5 s. GameplayHUD's note on
-             SALINLAHI_Incorrect works the same sum out for its 0.58 s cue.
-             Only a decaying tail sounds into a reopened microphone, and a
-             tail is nothing for a recognizer to match a word against.
   HIGH       the carrier sits at 4.6 kHz. A six-year-old's vowels live below
              about 3 kHz, so this is clear of the band the recognizer is
              actually weighing - unlike a sampled "night ambience", which is
-             mostly broadband hiss sitting right on top of it.
+             mostly broadband hiss sitting right on top of it. This is the
+             property that does the real work, and it is why five seconds of
+             this is safer than one second of a sampled chirp would be.
+  GAPPED     nearly five seconds, but only about a fifth of that is sound.
+             The chirps are brief and the gaps between them are long, so the
+             recognizer is never listening THROUGH a continuous tone - and a
+             child who starts talking lands in a gap more often than not.
+             A relentless five-second drone would be a different sound and a
+             much worse one.
+
+Length is a deliberate choice and it has a cost. At 0.75 s the sound was over
+before anything else happened; at five seconds it outlives Rachel's nudge, so
+it has to be STOPPABLE. VoicePromptDirector cuts it the instant the child
+starts speaking (VoiceCommand.OnSpeechBegan) and again on the way out of the
+scene. Without that the crickets would chirp over the child's answer, which
+is the one thing this effect must never do.
 
 A cricket is not a tone. It is a PULSE TRAIN: the insect files one wing over
 the other and each stroke is a click, four or five to a chirp, and it is the
 pulse rate that the ear hears as a cricket rather than as a whistle. Built
 here as a 4.6 kHz carrier gated by a 34 Hz pulse envelope, four pulses to a
-chirp, three chirps spaced about 0.28 s apart.
+chirp, and the chirps about two thirds of a second apart - the unhurried
+spacing of a field cricket on a cool night, which is the joke. Fast chirping
+sounds like an alarm; it is the PAUSE between them that sounds like nobody
+is saying anything.
+
+The chirps also fade as they go, the near insect ending about a third below
+where it started. A joke that is exactly as loud at five seconds as it was at
+one is a joke that has outstayed its welcome.
 
 Two insects, not one. "Crickets" is plural, and one cricket on its own reads
 as a smoke alarm two rooms away. The second is detuned a little, quieter, and
@@ -58,7 +76,10 @@ STAGE = os.path.join(ROOT, "Recordings", "sfx")
 RATE = 44100
 SEED = 33
 
-LENGTH = 0.75
+# Just under five seconds. The last chirp deliberately ends close to the end
+# of the clip: Tools/import_sfx.py trims trailing silence, so a long quiet
+# tail would simply be cut back off again.
+LENGTH = 5.0
 
 
 def seconds(n):
@@ -151,34 +172,36 @@ def crickets(rng):
 
     y = np.zeros_like(t)
 
-    # The near cricket. Three chirps, 0.28 s apart, which is about the spacing
-    # of a field cricket on a cool night - fast enough to read as "crickets"
-    # inside three quarters of a second.
-    for i, start in enumerate((0.015, 0.295, 0.575)):
-        y += (1.0 - 0.12 * i) * chirp(t, start, 4600.0)
+    # The near cricket. Eight chirps across the five seconds, spaced a little
+    # unevenly on purpose - a metronome is not an insect. Each one a shade
+    # quieter than the last, so the joke fades out rather than stopping.
+    near = (0.08, 0.70, 1.33, 2.00, 2.66, 3.33, 4.05, 4.76)
+    for i, start in enumerate(near):
+        y += (1.0 - 0.042 * i) * chirp(t, start, 4600.0)
 
     # The far one. Quieter, detuned down a little so the two are audibly two
     # insects, and deliberately off the first's beat so they never land
     # together. Its own low-passing is what puts it further away.
     far = np.zeros_like(t)
-    for start in (0.155, 0.435):
-        far += chirp(t, start, 4180.0, pulses=3, rate=31.0)
+    for i, start in enumerate((0.38, 1.02, 1.68, 2.40, 3.10, 3.78, 4.45)):
+        far += (1.0 - 0.05 * i) * chirp(t, start, 4180.0, pulses=3, rate=31.0)
     far = lowpass(far, 5200.0)
     y += 0.42 * far
 
     # The faintest breath of air under it, band-passed well above a child's
-    # vowels and gone by the end. Enough to stop the chirps sounding as though
-    # they are happening in a vacuum; not enough to be a hiss of its own.
+    # vowels. It thins out over the first couple of seconds rather than
+    # running the whole length: five seconds of even the quietest hiss is a
+    # hiss, and this one has to stay out of the recognizer's way.
     air = rng.standard_normal(len(t))
     air = lowpass(air, 7000.0) - lowpass(air, 3400.0)
-    air *= np.exp(-t / 0.42)
+    air *= np.exp(-t / 1.1)
     y += 0.05 * air
 
-    # Lets go rather than stops, so the last chirp is already fading by the
-    # time the microphone reopens.
-    env = np.minimum(smoothstep(t / 0.010), smoothstep((t[-1] - t) / 0.090))
+    # Lets go rather than stops. The fade is long enough to round off the last
+    # chirp without eating the one before it.
+    env = np.minimum(smoothstep(t / 0.010), smoothstep((t[-1] - t) / 0.120))
 
-    return finish(y * env, attack=0.004, release=0.030)
+    return finish(y * env, attack=0.004, release=0.040)
 
 
 def write(name, y):

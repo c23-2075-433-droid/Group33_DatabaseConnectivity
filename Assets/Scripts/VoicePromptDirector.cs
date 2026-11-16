@@ -41,8 +41,8 @@ public class VoicePromptDirector : MonoBehaviour
              "Turn this off to get the nudge line on its own, as it was before.")]
     public bool chirpOnSilence = true;
 
-    [Tooltip("How loud the crickets are against the other effects. Low on purpose: this plays " +
-             "straight into an open microphone and it is a joke, not an answer.")]
+    [Tooltip("How loud the crickets are against the other effects. Low on purpose: this runs for " +
+             "about five seconds into an open microphone, and it is a joke, not an answer.")]
     [Range(0f, 1f)]
     public float silenceChirpVolume = 0.55f;
 
@@ -84,11 +84,28 @@ public class VoicePromptDirector : MonoBehaviour
     private float silenceTimer;
     private bool nudged;
 
-    // Long enough to cover Assets/Resources/Sfx/crickets.wav (0.74 s). Only
-    // used to decide whether leaving the scene has to cut the chirp short, so
-    // being a shade generous costs nothing.
-    private const float SilenceChirpSeconds = 0.8f;
+    /// <summary>
+    /// How long Assets/Resources/Sfx/crickets.wav runs (4.89 s, rounded up).
+    /// Two things read it: whether a chirp is still going and therefore has to
+    /// be cut short, and how long GameplayHUD holds the matching message up -
+    /// the sound and the message are one event and should end together.
+    /// </summary>
+    public const float SilenceChirpSeconds = 4.9f;
+
     private float chirpingUntil;
+
+    /// <summary>
+    /// Cuts the crickets off if they are still chirping. At five seconds the
+    /// sound outlives Rachel's nudge, so anything that ends the silence has to
+    /// end the sound too - otherwise the child answers over the top of it,
+    /// which is the one thing Step 4 of the brief rules out.
+    /// </summary>
+    private void StopChirp()
+    {
+        if (Time.time >= chirpingUntil) return;
+        chirpingUntil = 0f;
+        SoundEffects.StopEffects();
+    }
 
     void Awake()
     {
@@ -114,6 +131,11 @@ public class VoicePromptDirector : MonoBehaviour
             voiceCommand.OnAnswerChecked += HandleAnswerChecked;
             voiceCommand.OnNothingHeard += HandleNothingHeard;
             voiceCommand.OnMicrophoneUnavailable += HandleMicrophoneUnavailable;
+
+            // Not ResetSilence: this fires the moment the recognizer notices
+            // the child has started talking, seconds before a result comes
+            // back. That is the right moment to stop chirping over them.
+            voiceCommand.OnSpeechBegan += StopChirp;
         }
 
         // Queued in Awake, which runs before any Start, so the intro is
@@ -135,6 +157,7 @@ public class VoicePromptDirector : MonoBehaviour
             voiceCommand.OnAnswerChecked -= HandleAnswerChecked;
             voiceCommand.OnNothingHeard -= HandleNothingHeard;
             voiceCommand.OnMicrophoneUnavailable -= HandleMicrophoneUnavailable;
+            voiceCommand.OnSpeechBegan -= StopChirp;
         }
         if (narrator != null) narrator.StopSpeaking();
 
@@ -143,7 +166,7 @@ public class VoicePromptDirector : MonoBehaviour
         // or into the next scene. Only cut it if it is actually ours and still
         // going: stopping unconditionally would also kill the correct-answer
         // cue on the way out of a finished scene.
-        if (Time.time < chirpingUntil) SoundEffects.StopEffects();
+        StopChirp();
     }
 
     // ---- A word goes live -------------------------------------------------
@@ -324,6 +347,11 @@ public class VoicePromptDirector : MonoBehaviour
 
     private void ResetSilence()
     {
+        // Belt and braces alongside OnSpeechBegan: the Editor's keyboard
+        // fallback never raises that event, and neither does a word being
+        // completed, so the chirp is stopped here as well.
+        StopChirp();
+
         silenceTimer = 0f;
         nudged = false;
     }

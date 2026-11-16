@@ -64,6 +64,11 @@ public class VoiceStatusMachine
     [Tooltip("How long CORRECT / TRY AGAIN stay up, so an answer is readable before the next word.")]
     public float feedbackHold = 1.2f;
 
+    [Tooltip("How long the silence message stays up. Longer than the others because it is paired " +
+             "with a sound that runs for about five seconds, and the two are one event. It does " +
+             "not hold the plank hostage: the child speaking clears it at once.")]
+    public float nothingHeardHold = 1.2f;
+
     [Tooltip("How long a drop in listening is ignored for, to cover the gap between recognizer sessions.")]
     public float listeningGrace = 1.2f;
 
@@ -90,12 +95,12 @@ public class VoiceStatusMachine
 
     public void NoteCorrect()
     {
-        Latch(State.Correct);
+        Latch(State.Correct, feedbackHold);
     }
 
     public void NoteTryAgain()
     {
-        Latch(State.TryAgain);
+        Latch(State.TryAgain, feedbackHold);
     }
 
     /// <summary>
@@ -113,13 +118,13 @@ public class VoiceStatusMachine
     public void NoteNothingHeard()
     {
         if (micBlocked) return;
-        Latch(State.NothingHeard);
+        Latch(State.NothingHeard, nothingHeardHold);
     }
 
-    /// <summary>Puts up a feedback state and holds it for feedbackHold.</summary>
-    private void Latch(State state)
+    /// <summary>Puts up a feedback state and holds it for `hold` seconds.</summary>
+    private void Latch(State state, float hold)
     {
-        feedbackLeft = feedbackHold;
+        feedbackLeft = hold;
         feedbackState = state;
         processingLeft = 0f;
         Force(state);
@@ -129,6 +134,14 @@ public class VoiceStatusMachine
     public void NoteSpeechBegan()
     {
         if (micBlocked) return;
+
+        // The child talking ends the silence, so the message about it goes
+        // immediately rather than sitting over PROCESSING for the rest of its
+        // hold. Only that one: CORRECT and TRY AGAIN are about an answer and
+        // have to stay readable for their full time, even if the child is
+        // already saying the next thing.
+        if (feedbackState == State.NothingHeard) feedbackLeft = 0f;
+
         processingLeft = processingTimeout;
         graceLeft = 0f;
     }
