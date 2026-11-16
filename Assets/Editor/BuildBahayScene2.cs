@@ -40,6 +40,15 @@ public class BuildBahayScene2
     // background is scaled up to fill exactly one screen with no gaps.
     private const float BgScale = 10.8f / 8.64f;      // 1.25
     private const float ScreenWidth = 19.2f;          // 15.36 * 1.25
+
+    // item_baso was redrawn at 400x480 for the breakfast table in Almusal, so
+    // it is no longer the little patch that was cut out of this bathroom
+    // painting. Drawn at BgScale like the other items it is six world units
+    // tall and covers the mirror and the sink. Scene 3 already forces it back
+    // to the size of the hole it came from - 61 pixels of a 1536x864
+    // background at 100 pixels per unit, drawn at BgScale - and this is the
+    // same number for the same reason.
+    private const float BasoPaintedHeight = 61f / 100f * BgScale;   // 0.7625
     // Where Kylo's feet go. -2.98 is the wall/floor junction in the painting,
     // measured as the darkest row of the shadow at the base of the panelling,
     // and standing him there pins him flat against the back wall with no floor
@@ -115,7 +124,8 @@ public class BuildBahayScene2
         CreateBathroomItem(bathroom.transform, "Item_Suklay",  "item_suklay",  new Vector2( 2.750f, 0.988f), 5);
         // The brush stands in the cup, so the cup has to draw over it.
         CreateBathroomItem(bathroom.transform, "Item_Sipilyo", "item_sipilyo", new Vector2( 4.225f, 1.694f), 4);
-        CreateBathroomItem(bathroom.transform, "Item_Baso",    "item_baso",    new Vector2( 3.931f, 1.188f), 5);
+        CreateBathroomItem(bathroom.transform, "Item_Baso",    "item_baso",    new Vector2( 3.931f, 1.188f), 5,
+                           BasoPaintedHeight);
         CreateBathroomItem(bathroom.transform, "Item_Tuwalya", "item_tuwalya", new Vector2( 7.262f, 1.019f), 5);
 
         // NOTHING IS PICKED UP IN THIS SCENE ANY MORE. Sabon, Sipilyo and
@@ -366,14 +376,22 @@ public class BuildBahayScene2
     /// the darkness overlay so the room's objects stay dark until "Ilaw".
     /// </summary>
     private static GameObject CreateBathroomItem(Transform parent, string name,
-                                                 string spriteFile, Vector2 pos, int order)
+                                                 string spriteFile, Vector2 pos, int order,
+                                                 float paintedHeight = 0f)
     {
         GameObject go = new GameObject(name);
         go.transform.SetParent(parent, false);
         go.transform.localPosition = new Vector3(pos.x, pos.y, 0f);
-        go.transform.localScale = new Vector3(BgScale, BgScale, 1f);
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = LoadSprite(spriteFile);
+
+        // Items cut from the painting are drawn at BgScale like the painting
+        // itself. An item that has since been redrawn at its own size says so
+        // with paintedHeight, and is scaled back to the hole it came from.
+        float scale = BgScale;
+        if (paintedHeight > 0f && sr.sprite != null && sr.sprite.bounds.size.y > 0.0001f)
+            scale = paintedHeight / sr.sprite.bounds.size.y;
+        go.transform.localScale = new Vector3(scale, scale, 1f);
         sr.sortingLayerName = "Props";
         sr.sortingOrder = order;
         return go;
