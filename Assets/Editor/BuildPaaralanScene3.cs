@@ -257,7 +257,9 @@ public class BuildPaaralanScene3
             // pose in the project with his fingers closed round a pencil.
             "place_frame_3_uniform", "lapis_frame_1_uniform",
             "sulat_hand_1_uniform", "sulat_hand_2_uniform", "sulat_hand_3_uniform",
-            "sulat_point_uniform",
+            "sulat_hand_4_uniform", "sulat_hand_5_uniform",
+            "sulat_point_1_uniform", "sulat_point_2_uniform", "sulat_point_3_uniform",
+            "sulat_point_4_uniform", "sulat_point_5_uniform",
             // "Sagot": his hand going up, and him getting to his feet.
             "tanong_frame_1_uniform", "tanong_frame_2_uniform", "tanong_frame_3_uniform",
             "sagot_rise_1_uniform", "sagot_rise_2_uniform", "sagot_rise_3_uniform",
@@ -529,8 +531,11 @@ public class BuildPaaralanScene3
         //
         //   lead-in   place_frame_3  hands come onto the desk
         //             lapis_frame_1  he takes the pencil up, point down
-        //   loop      sulat_hand_1..3, the point tracking across the page
-        //   tail      lapis_frame_1  he looks up, pencil still in hand
+        //             sulat_hand_3   and puts his head down over the page
+        //   loop      sulat_hand_1..5, his hand and the point carried across
+        //             the line and back to the margin for the next one
+        //   tail      sulat_hand_3   the stroke ends in the middle
+        //             lapis_frame_1  he looks up, pencil still in hand
         //             place_frame_3  and puts it back
         //   idle      sitting_front_uniform
         //
@@ -555,9 +560,13 @@ public class BuildPaaralanScene3
         // project has had since Scene 2.
         //
         // Tools/make_sulat_hand_frames.py adds the two things it was
-        // missing: his head and eyes down on the page, and the hand
-        // travelling fourteen pixels each way with the forearm easing into
-        // the movement behind it.
+        // missing: his head down on the page, and the hand travelling -
+        // forearm, fingers and pencil sliding fourteen pixels each way, eased
+        // in from the sleeve so the arm swings from the elbow rather than
+        // shearing off it. THE TRAVEL IS THE WHOLE POINT. That file promised
+        // it in its own docstring for a while and did not do it, and what
+        // was on screen was a boy nodding a degree and a half over a pencil
+        // nailed to the page.
         PoseSequence sulatFrames = seatGO.AddComponent<PoseSequence>();
         sulatFrames.target = seatSr;
         // END THE READING FIRST. Without this, Play() would take the renderer
@@ -567,44 +576,57 @@ public class BuildPaaralanScene3
         // reading plays its own tail: he looks up, squares the book, lays it
         // down, and only then does this begin. See PoseSequence.interrupts.
         sulatFrames.interrupts = basaFrames;
-        // Two steps, not three. lapis_frame_2 is the pencil up at his chest -
-        // it belonged here while the loop had the point on the desk edge and
-        // something had to bridge the descent. The loop IS lapis_frame_1 now,
-        // so going through chest height and back down again would be him
-        // raising the pencil in order to lower it.
+        // No lapis_frame_2 in here. That is the pencil up at his chest - it
+        // belonged while the loop had the point on the desk edge and
+        // something had to bridge the descent. The loop IS lapis_frame_1
+        // with the hand moved now, so going through chest height and back
+        // down again would be him raising the pencil in order to lower it.
+        //
+        // sulat_hand_3 closes the lead-in because it is lapis_frame_1 with
+        // his head down and his hand at the middle of the line: the frame
+        // before it is the same drawing with his head up, so the last thing
+        // that happens before he writes is that he looks at the page.
         sulatFrames.frames = new[]
         {
             LoadSpriteOptional("place_frame_3_uniform"),
             LoadSpriteOptional("lapis_frame_1_uniform"),
+            LoadSpriteOptional("sulat_hand_3_uniform"),
         };
-        // FOUR ENTRIES FROM THREE DRAWINGS. The point travels 1-2-3 across
-        // the page and 2 brings it back, so the stroke returns instead of
-        // snapping to the start of the line. The frames carry a degree and a
-        // half of head tilt each way with it, so his head follows his hand.
+        // ONE LINE OF WRITING, LEFT TO RIGHT, and then the jump back to the
+        // first frame IS THE CARRIAGE RETURN - his hand going back to the
+        // margin to start the next one. That jump is why the list is not
+        // played out and back the way three frames had to be: out and back
+        // along one line is a boy scrubbing at a single word.
+        //
+        // Each frame carries the head tilt that goes with it, a degree and a
+        // half at either end, so his head follows his hand across the page.
         sulatFrames.loopFrames = new[]
         {
             LoadSpriteOptional("sulat_hand_1_uniform"),
             LoadSpriteOptional("sulat_hand_2_uniform"),
             LoadSpriteOptional("sulat_hand_3_uniform"),
-            LoadSpriteOptional("sulat_hand_2_uniform"),
+            LoadSpriteOptional("sulat_hand_4_uniform"),
+            LoadSpriteOptional("sulat_hand_5_uniform"),
         };
-        // Four times round, which is about three seconds of writing. Three
-        // cycles of three frames was a line and a half and read as a sample
-        // of writing rather than as writing.
+        // Four lines, which is about four seconds of writing. One line reads
+        // as a sample of writing rather than as writing, and the safety cap
+        // on the word below has room for this - see maxActionWait.
         sulatFrames.loopCycles = 4;
-        // His head comes up off the page with the pencil still in his hand,
-        // and then he puts it down. The same two frames as the lead-in, in
-        // reverse.
+        // The stroke stops in the middle of a line rather than at the end of
+        // one, his head comes up off the page with the pencil still in his
+        // hand, and then he puts it down. The lead-in in reverse.
         sulatFrames.tailFrames = new[]
         {
+            LoadSpriteOptional("sulat_hand_3_uniform"),
             LoadSpriteOptional("lapis_frame_1_uniform"),
             LoadSpriteOptional("place_frame_3_uniform"),
         };
         sulatFrames.destinationSprite = LoadSpriteOptional("sitting_front_uniform");
         sulatFrames.framesPerSecond = 11f * Pace;
-        // A little quicker than the lead-in. The three frames differ only by
-        // where the point is along one line, so the motion is small and needs
-        // the rate to carry it; too slow and it reads as three still poses.
+        // A little quicker than the lead-in. The five frames differ only by
+        // where the hand is along one line, so the motion is small and needs
+        // the rate to carry it; too slow and it reads as five still poses.
+        // At this rate a line takes just under a second.
         sulatFrames.loopFramesPerSecond = 8f * Pace;
         // OFF, so nothing runs until the child says the word and the voice
         // recogniser accepts it. The seated Kylo is already on screen, so
@@ -628,11 +650,21 @@ public class BuildPaaralanScene3
         // - and raising the notebook is not either, because it is in front
         // of him and would be drawn over his hand rather than under it.
         //
-        // So the last two centimetres of the pencil get their own renderer,
+        // So the last few centimetres of the pencil get their own renderer,
         // on his exact transform but at order 22, in front of the desk AND
         // in front of the notebook. It picks the pencil up where the drawn
         // one goes behind the desk's edge and carries it down onto the page.
         // Nothing of HIM is duplicated: see Tools/make_sulat_point.py.
+        //
+        // ALONG THE DRAWN PENCIL'S OWN LINE, which is the thing that makes
+        // it the same pencil: 0.90 of a pixel right for every pixel down, 42
+        // degrees off vertical, measured through the middle of the eraser
+        // and the middle of the tip. It used to come down the vertical
+        // instead - to keep the point out of the notebook's gutter - and
+        // what that bought was a second pencil standing straight up out of
+        // his fist while the drawn one leaned away from it. Followed
+        // honestly, the line lands on the right-hand page just past the
+        // fold, which is where a line of writing starts anyway.
         //
         // It is driven by sulatFrames itself rather than by a second
         // PoseSequence, because two components would be two coroutines, and
@@ -651,13 +683,21 @@ public class BuildPaaralanScene3
         pointSr.sprite = null;                 // blank until the loop runs
 
         sulatFrames.companion = pointSr;
-        // ONE SPRITE, four times. His arm does not move - see the note on
-        // the loop frames above - so neither does the point. The entry is
-        // repeated rather than the array shortened, because this list is
-        // read frame for frame against loopFrames and a short one would
-        // simply blank the pencil for the rest of the cycle.
-        Sprite point = LoadSpriteOptional("sulat_point_uniform");
-        sulatFrames.companionLoopFrames = new[] { point, point, point, point };
+        // ONE POINT PER WRITING FRAME, shifted by the same number of pixels
+        // as the hand holding it - the two lists are generated from the same
+        // SHIFTS in Tools/make_sulat_hand_frames.py and make_sulat_point.py,
+        // and they have to stay in step or the point walks away from the
+        // hand. This list is read frame for frame against loopFrames, so it
+        // is the same length as that one; a shorter one would simply blank
+        // the pencil for the rest of the cycle.
+        sulatFrames.companionLoopFrames = new[]
+        {
+            LoadSpriteOptional("sulat_point_1_uniform"),
+            LoadSpriteOptional("sulat_point_2_uniform"),
+            LoadSpriteOptional("sulat_point_3_uniform"),
+            LoadSpriteOptional("sulat_point_4_uniform"),
+            LoadSpriteOptional("sulat_point_5_uniform"),
+        };
 
         // The pencil cannot be in two places. It leaves the desk on the frame
         // where it appears in his hand - frame 1, lapis_frame_1 - and comes
@@ -878,8 +918,9 @@ public class BuildPaaralanScene3
         // to finish before asking the next word anyway, and it was set when
         // the longest thing in any scene was a walk. "Sulat" here is the end
         // of the reading (about half a second), then the pencil coming down,
-        // then four cycles of writing, then the pencil going back - about
-        // four and a half seconds all told, and "Sagot" is not far behind it.
+        // then four lines of writing at just under a second each, then the
+        // pencil going back - about five and a half seconds all told, and
+        // "Sagot" is not far behind it.
         // Left at four, the next word went up while he was still writing.
         //
         // The endless reading loop does NOT eat this budget: PoseSequence
