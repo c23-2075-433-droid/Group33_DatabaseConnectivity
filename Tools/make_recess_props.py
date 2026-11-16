@@ -19,7 +19,13 @@ ones that do not:
   prop_baon           his lunchbox, shut, as it comes out of the bag.
   prop_baon_open      the same box open with a sandwich in it, on the desk.
   prop_baon_empty     open and empty, after he has eaten.
-  prop_sandwich       one sandwich, for his hand.
+  prop_sandwich       his hotdog, whole, for his hand. Still called
+                      "sandwich" because the scene, the frames and the
+                      Unity GUID all point at that name and a rename buys
+                      nothing but broken references.
+  prop_sandwich_bitten  the same hotdog with a mouthful out of the end,
+                      for every frame of the eating loop.
+  prop_sandwich_stub  what is left of it on the way back down.
   prop_basura         the crumpled wrapper - the thing that gets thrown.
 
 WHY THESE ARE DRAWN RATHER THAN GENERATED. Docs/AnimationStandard.md's "a
@@ -42,7 +48,9 @@ Writes, overwriting, into Assets/Sprites/.
 
 Run from the repository root:  python Tools/make_recess_props.py
 """
-from PIL import Image, ImageDraw, ImageFilter
+import math
+
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 OUT = "Assets/Sprites/"
 
@@ -83,13 +91,56 @@ BOX_LIGHT = (122, 180, 136)
 BOX_DARK = (66, 114, 80)
 BOX_IN = (226, 232, 226)
 
-# The food. Toast crust and a pale crumb, with a slice of cheese and a leaf
-# of lettuce so it is plainly a sandwich at the size this is seen.
-CRUST = (206, 154, 84)
-CRUST_DARK = (176, 124, 60)
-CRUMB = (246, 226, 186)
-CHEESE = (240, 198, 86)
-LETTUCE = (134, 176, 92)
+# The food: a hotdog in a bun.
+#
+# WHY A HOTDOG AND NOT THE SANDWICH THIS USED TO DRAW. Two things, and the
+# second is the one that mattered. A sandwich seen from the side is a stack
+# of flat bands, and at the ninety screen pixels this is drawn at the bands
+# merge into a tan block - the old one needed a dome, a lettuce ruffle and a
+# cheese overhang before it stopped reading as a painted ruler. A hotdog is
+# two ROUND things lying in each other, and roundness survives being small:
+# the sausage turning over along its top and the bun swelling under it are
+# still legible when the detail on them is not. It is also the food a child
+# in this scene would actually have in their baon.
+#
+# The bun browns from the top down and the sausage is the one warm red in
+# the room that is not the textbook, so the two read apart at any size.
+BUN_LIGHT = (252, 232, 190)       # the top of the bun, facing the window
+BUN_PALE = (246, 214, 156)
+BUN_BODY = (232, 188, 126)
+BUN_TOAST = (198, 143, 82)        # the underside, where it sat on the pan
+BUN_BACK_LIGHT = (224, 176, 118)  # the far wall, which the sausage shades
+BUN_BACK = (206, 156, 100)
+BUN_BACK_DARK = (176, 126, 76)
+BUN_CRUMB = (250, 236, 206)       # what a bite exposes
+BUN_TOAST_DEEP = (168, 112, 58)
+BUN_CREASE = (158, 106, 58)       # where the sausage shadows the bun
+BUN_SHEEN = (255, 246, 216)
+SAUSAGE_TOP = (238, 152, 118)
+SAUSAGE_LIGHT = (218, 116, 86)
+SAUSAGE = (188, 80, 56)
+SAUSAGE_DARK = (132, 48, 34)
+SAUSAGE_GLOSS = (255, 212, 186, 215)
+SAUSAGE_CHAR = (104, 36, 28)      # the grill marks
+SAUSAGE_CUT = (226, 158, 134)     # the cross-section a bite leaves
+SAUSAGE_CUT_DARK = (178, 96, 74)
+MUSTARD = (250, 198, 44)
+MUSTARD_DARK = (206, 148, 22)
+
+# The canvas every length of the hotdog is drawn on. One size for all three
+# so a bite cannot move his fist - see the note in _hotdog.
+#
+# NEARLY FOUR TO ONE, and the ratio is forced rather than chosen. His drawn
+# fist is 189 pixels from his drawn mouth and nothing in this project can
+# move it closer, so the food has to be long enough to span that gap from
+# wherever he is holding it - about 260 pixels of hotdog. The only free
+# choice left is how DEEP 260 pixels of it are, and the first pass drew it
+# at three to one: 87 pixels deep, which at his mouth covered his chin, his
+# jaw and the bottom half of the open mouth it was going into. A hotdog in
+# a bun is about three and a half to one in life and reads thinner still
+# because the sausage tapers past the bread, so four to one is both honest
+# and the thing that lets the mouth under it be seen.
+W_DOG, H_DOG = 480, 122
 
 # The wrapper. A crumpled snack wrapper, warm red.
 #
@@ -337,93 +388,400 @@ def make_bottle_held():
 
 # ----------------------------------------------------------- the lunchbox
 
-def _sandwich(d, x0, y0, x1, y1):
+def _ramp_colour(stops, t):
+    """The colour `t` of the way along a list of (position, colour) stops."""
+    for k in range(len(stops) - 1):
+        p0, c0 = stops[k]
+        p1, c1 = stops[k + 1]
+        if t <= p1 or k == len(stops) - 2:
+            u = 0.0 if p1 <= p0 else (t - p0) / (p1 - p0)
+            u = min(1.0, max(0.0, u))
+            return tuple(int(round(c0[j] + (c1[j] - c0[j]) * u)) for j in range(3))
+    return stops[-1][1]
+
+
+def _shaded(size, box, stops):
+    """A vertical colour ramp, as an image the size of the whole canvas.
+
+    make_bin() shades its tub by drawing sixty-four vertical slices, each one
+    a step along a list of colours, and that works because a tub is a
+    polygon with straight sides. A sausage and a bun are CAPSULES - rounded
+    at both ends - and a rectangular slice would square those ends off.
+
+    So the same ramp is built as a picture instead and pasted THROUGH the
+    capsule's own shape. Identical shading, any silhouette, and the rounded
+    end keeps its colour from the row it is on rather than from the slice it
+    happens to fall in.
     """
-    A sandwich seen edge on: bottom slice, filling, domed top slice.
+    x0, y0, x1, y1 = box
+    h = max(1, int(y1 - y0))
+    strip = Image.new("RGB", (1, h))
+    px = strip.load()
+    for i in range(h):
+        px[0, i] = _ramp_colour(stops, i / max(1, h - 1))
+    out = Image.new("RGB", size, stops[0][1])
+    out.paste(strip.resize((size[0], h), Image.BILINEAR), (0, int(y0)))
+    return out
 
-    SEEN FROM THE SIDE, not from above, because it spends most of its life
-    held in a fist on its way to his mouth and the thing that says "food"
-    from the side is the FILLING showing between two slices of bread.
 
-    THE FIRST VERSION OF THIS WAS THREE FLAT BANDS and at the size the game
-    draws it - about a hundred and twenty screen pixels, half the width of
-    his head - it read as a painted ruler. Three things fix that, and all
-    three are about breaking the straight lines:
+def _capsule_mask(size, box, grow=0):
+    """A capsule - a rectangle with semicircular ends - as an alpha mask."""
+    x0, y0, x1, y1 = box
+    m = Image.new("L", size, 0)
+    r = (y1 - y0) / 2.0 + grow
+    ImageDraw.Draw(m).rounded_rectangle(
+        [x0 - grow, y0 - grow, x1 + grow, y1 + grow], radius=r, fill=255)
+    return m
 
-      the dome      the top slice is a loaf, rounded over, not a rectangle.
-                    One curve is the difference between bread and a plank.
-      the ruffle    the lettuce is a wave with leaf tips pushing out past
-                    the bread on both edges, rather than a green stripe.
-      the overhang  the cheese pokes out at one corner and droops.
 
-    Drawn bottom up, so each layer sits over the one below it.
+def _lay(img, box, stops, grow=0):
+    """Paste a shaded capsule onto `img`, and hand back its mask."""
+    m = _capsule_mask(img.size, box, grow)
+    img.paste(_shaded(img.size, box, stops), (0, 0), m)
+    return m
+
+
+def _stroke_capsule(d, box, width):
+    """The character art's dark edge, round a capsule."""
+    x0, y0, x1, y1 = box
+    d.rounded_rectangle([x0, y0, x1, y1], radius=(y1 - y0) / 2.0,
+                        outline=OUTLINE, width=width)
+
+
+def _union(*masks):
+    """One mask covering all of them."""
+    out = masks[0].copy()
+    for m in masks[1:]:
+        out = ImageChops.lighter(out, m)
+    return out
+
+
+def _bun_mask(size, x0, x1, y_mid, y_end, y_bot, right_end=True):
+    """The near wall of a split bun: a loaf whose ENDS RISE round the sausage.
+
+    THE TOP LINE OF A BUN IS NOT STRAIGHT, and the first pass of this drawing
+    found out what happens when it is. A plain capsule has a flat top with
+    the ends curving DOWN, so a sausage laid over one came out as a red bar
+    resting on a tan bar - two stacked slabs, which is a pencil case.
+
+    A sliced bun does the opposite: the cut faces at the two ends stand UP
+    round the sausage, and the middle of the bun is where it sags. That one
+    curve is most of what says the sausage is IN something.
+
+    It is built as a union rather than drawn as one outline, because the
+    shape is exactly a capsule with a bigger circle stuck on each end, and a
+    union of three masks is shorter to read than eighty points of polygon.
+    `right_end` drops the right circle, for the end a mouthful has gone from.
     """
-    h = y1 - y0
-    top_h = int(h * 0.46)
-    fill_h = int(h * 0.20)
-    fill_y0 = y0 + top_h
-    fill_y1 = fill_y0 + fill_h
+    body = _capsule_mask(size, (x0, y_mid, x1, y_bot))
+    r = (y_bot - y_end) / 2.0
+    parts = [body]
+    cl = Image.new("L", size, 0)
+    ImageDraw.Draw(cl).ellipse([x0, y_bot - 2 * r, x0 + 2 * r, y_bot], fill=255)
+    parts.append(cl)
+    if right_end:
+        cr = Image.new("L", size, 0)
+        ImageDraw.Draw(cr).ellipse([x1 - 2 * r, y_bot - 2 * r, x1, y_bot], fill=255)
+        parts.append(cr)
+    return _union(*parts)
 
-    # --- bottom slice ---
-    d.rounded_rectangle([x0, fill_y1 - 4, x1, y1], radius=12, fill=CRUMB)
-    d.rounded_rectangle([x0, y1 - 13, x1, y1], radius=11, fill=CRUST)
 
-    # --- the filling ---
-    # Cheese first, with a corner hanging out past the bread.
-    d.polygon([(x0 - 7, fill_y0 + 2), (x1 + 9, fill_y0 - 2),
-               (x1 + 16, fill_y1 + 10), (x1 - 30, fill_y1 + 2),
-               (x0 - 7, fill_y1 + 4)], fill=CHEESE)
-    # Lettuce: a wave along the bottom of the filling with the leaf tips
-    # pushing out below the bread line.
-    wave = [(x0 - 9, fill_y0 + 6)]
-    n = 9
+def _through(img, layer, mask, blur=0):
+    """Composite `layer` onto `img`, clipped to `mask`.
+
+    Everything soft in this drawing - the gloss on the sausage, the shadow
+    it casts into the bun, the toasting underneath - is painted on its own
+    transparent sheet and then pushed through the shape it belongs to. Drawn
+    straight onto the picture instead, a blurred streak runs off the rounded
+    end of the thing it is meant to be lying on, and what that looks like is
+    a scratch hanging in the air beside the food.
+    """
+    if blur:
+        layer = layer.filter(ImageFilter.GaussianBlur(blur))
+    img.paste(layer, (0, 0),
+              Image.composite(layer.split()[3], Image.new("L", img.size, 0), mask))
+
+
+def _outline_mask(d_size, mask, width):
+    """The dark edge of a shape, as a mask: the shape minus itself eroded."""
+    inner = mask.filter(ImageFilter.MinFilter(max(3, int(width) | 1)))
+    return ImageChops.subtract(mask, inner)
+
+
+def _hotdog(box_w, box_h, eaten=0.0, ss=3):
+    """A hotdog in a split bun, lying along its length, ANCHORED LEFT.
+
+    WHY A HOTDOG IS DRAWN DIFFERENTLY FROM THE SANDWICH IT REPLACES. The
+    sandwich this file used to make was three flat bands with a domed lid -
+    a stack of slabs, which is what a sandwich is. A hotdog is not a stack.
+    It is two ROUND things lying in each other, and everything that makes it
+    read as food at ninety screen pixels is roundness: the sausage turning
+    over along its top, the bun swelling under it, the shadow one casts into
+    the other. Flat bands give a yellow stripe on a tan stripe.
+
+    So nothing here is a flat fill. Each piece is a shape filled through a
+    VERTICAL COLOUR RAMP - bright along the top where the classroom window
+    is, the body colour across the middle, dark underneath - and the pieces
+    are stacked so the bun hides the sausage's lower half:
+
+      the far bun wall   darker, behind everything, showing as a rim above
+                         the bun line where the sausage curves down towards
+                         its ends. One sliver of it is the difference
+                         between a sausage IN a bun and one lying on top.
+      the sausage        poking out past both ends of the bun, because a
+                         hotdog that stops where its bun stops is a
+                         baguette. Grill marks across the lit half only - a
+                         mark on the shaded underside of a round thing is
+                         not visible from here - and one long highlight.
+      the mustard        a zigzag down the length. The one saturated yellow
+                         in the scene, and what breaks the two long parallel
+                         lines the sausage and the bun would otherwise draw.
+      the near bun wall  over the sausage's lower half, with its two cut
+                         ends standing up round it (see _bun_mask), a
+                         toasted underside, and the sausage's own shadow
+                         laid into the crease where they meet.
+
+    LEFT-ANCHORED, which is what lets a bite change the drawing without
+    moving his hand. Tools/make_recess_frames.py places this canvas by its
+    CENTRE, so if the food were centred too, a shorter hotdog would pull its
+    own held end out of his fist and the fist would close on air. Drawn from
+    the left margin instead, the held end is at the same canvas pixel in all
+    three states and only the mouth end moves - which is the end the bites
+    are coming out of.
+
+    `eaten` is how much of the length is gone, 0 to 1. Anything above zero
+    gives the right-hand end a bitten edge instead of a round one.
+
+    DRAWN AT THREE TIMES SIZE AND REDUCED. Every curve here is either a
+    circle or a blur, and both alias badly at the size the canvas is kept
+    at. Supersampling is cheaper than anti-aliasing each of them by hand.
+    """
+    S = ss
+    W, H = box_w * S, box_h * S
+    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+
+    m = int(8 * S)
+    full = W - 2 * m
+    body = full * (1.0 - eaten)
+    left = m
+    right = m + body
+    bitten = eaten > 0.001
+
+    poke = 0.060 * full                 # how far the sausage clears the bun
+    bun_x0 = left + poke
+    bun_x1 = (right - poke) if not bitten else right
+    line_w = max(2, int(round(1.8 * S)))
+
+    def fy(t):
+        return H * t
+
+    sau_box = (left, fy(0.05), right, fy(0.56))
+    back_box = (bun_x0 + poke * 0.5, fy(0.26), bun_x1 - poke * 0.5, fy(0.76))
+    bun_mid, bun_end, bun_bot = fy(0.49), fy(0.425), fy(0.95)
+
+    zero = Image.new("L", (W, H), 0)
+
+    def sheet():
+        return Image.new("RGBA", (W, H), (0, 0, 0, 0))
+
+    def ink(mask, width=None):
+        """Lay the character art's dark edge round a mask."""
+        edge = _outline_mask((W, H), mask, width or (line_w * 2 + 1))
+        img.paste(Image.new("RGBA", (W, H), OUTLINE + (255,)), (0, 0), edge)
+
+    # --- the far wall of the bun -------------------------------------
+    back = _capsule_mask((W, H), back_box)
+    img.paste(_shaded((W, H), back_box,
+                      [(0.0, BUN_BACK_LIGHT), (0.5, BUN_BACK), (1.0, BUN_BACK_DARK)]),
+              (0, 0), back)
+    ink(back)
+
+    # --- the sausage --------------------------------------------------
+    sau = _capsule_mask((W, H), sau_box)
+    img.paste(_shaded((W, H), sau_box,
+                      [(0.0, SAUSAGE_TOP), (0.16, SAUSAGE_LIGHT),
+                       (0.44, SAUSAGE), (0.80, SAUSAGE_DARK), (1.0, SAUSAGE_DARK)]),
+              (0, 0), sau)
+
+    sy0, sy1 = sau_box[1], sau_box[3]
+    # Grill marks. Slanted hard, because a mark that is nearly vertical on a
+    # nearly horizontal sausage reads as a seam in the plastic - which is
+    # what the first pass of these looked like at game size.
+    marks = sheet()
+    md = ImageDraw.Draw(marks)
+    for i in range(6):
+        mx = left + body * (0.12 + 0.148 * i)
+        md.line([(mx - 7.0 * S, sy0 + (sy1 - sy0) * 0.10),
+                 (mx + 7.0 * S, sy0 + (sy1 - sy0) * 0.62)],
+                fill=SAUSAGE_CHAR + (120,), width=int(3.4 * S))
+    _through(img, marks, sau, blur=1.6 * S)
+
+    # The long highlight along the top, where the sausage turns over.
+    gloss = sheet()
+    gd = ImageDraw.Draw(gloss)
+    gy = sy0 + (sy1 - sy0) * 0.21
+    gd.rounded_rectangle([left + 0.12 * body, gy - 2.2 * S,
+                          right - 0.13 * body, gy + 2.2 * S],
+                         radius=2.2 * S, fill=SAUSAGE_GLOSS)
+    _through(img, gloss, sau, blur=1.8 * S)
+
+    # --- the mustard --------------------------------------------------
+    zig = sheet()
+    zd = ImageDraw.Draw(zig)
+    pts = []
+    n = 11
     for i in range(n + 1):
         t = i / n
-        lx = x0 - 9 + (x1 - x0 + 20) * t
-        wave.append((lx, fill_y1 + (14 if i % 2 else 1)))
-    wave.append((x1 + 11, fill_y0 + 2))
-    d.polygon(wave, fill=LETTUCE)
+        zx = left + 0.06 * body + body * 0.88 * t
+        zy = sy0 + (sy1 - sy0) * (0.16 if i % 2 == 0 else 0.52)
+        pts.append((zx, zy))
+    zd.line(pts, fill=MUSTARD, width=int(4.2 * S), joint="curve")
+    for p in pts:
+        zd.ellipse([p[0] - 2.1 * S, p[1] - 2.1 * S,
+                    p[0] + 2.1 * S, p[1] + 2.1 * S], fill=MUSTARD)
+    # A darker underside on the zigzag, so the mustard is a bead sitting on
+    # the sausage rather than a decal printed on it.
+    shade = sheet()
+    sd = ImageDraw.Draw(shade)
+    sd.line([(x, y + 1.6 * S) for x, y in pts], fill=MUSTARD_DARK + (190,),
+            width=int(4.2 * S), joint="curve")
+    _through(img, shade, sau, blur=1.1 * S)
+    _through(img, zig, sau)
+    ink(sau)
 
-    # --- top slice, domed ---
-    dome = int(top_h * 0.72)
-    d.rounded_rectangle([x0, y0, x1, fill_y0 + 6], radius=dome, fill=CRUMB)
-    # The crust is the baked face: along the dome, and a little way down the
-    # two ends. Drawn as a ring, then the crumb punched back out of it.
-    d.rounded_rectangle([x0, y0, x1, fill_y0 + 6], radius=dome,
-                        outline=CRUST, width=11)
-    d.rounded_rectangle([x0 + 11, y0 + 11, x1 - 11, fill_y0 + 6],
-                        radius=max(4, dome - 11), fill=CRUMB)
-    # A lighter band just inside the top crust, so the loaf turns over.
-    d.arc([x0 + 14, y0 + 8, x1 - 14, y0 + dome * 2], 190, 350,
-          fill=(252, 238, 208), width=7)
+    # --- the near wall of the bun ---------------------------------------
+    bun = _bun_mask((W, H), bun_x0, bun_x1, bun_mid, bun_end, bun_bot,
+                    right_end=not bitten)
+    img.paste(_shaded((W, H), (0, bun_end, 0, bun_bot),
+                      [(0.0, BUN_LIGHT), (0.20, BUN_PALE),
+                       (0.58, BUN_BODY), (1.0, BUN_TOAST)]),
+              (0, 0), bun)
 
-    # One outline round each slice. NOT round the whole stack: the filling
-    # stands out past the bread on both edges, and a single outline round all
-    # of it would draw a line through the lettuce.
-    d.rounded_rectangle([x0, y0, x1, fill_y0 + 6], radius=dome,
-                        outline=OUTLINE, width=5)
-    d.rounded_rectangle([x0, fill_y1 - 4, x1, y1], radius=12,
-                        outline=OUTLINE, width=5)
+    # The toasted underside: a soft dark band low in the loaf, so it browns
+    # where it sat on the pan instead of all over.
+    crust = sheet()
+    ImageDraw.Draw(crust).rounded_rectangle(
+        [bun_x0 + 3 * S, bun_mid + (bun_bot - bun_mid) * 0.58,
+         bun_x1 - 3 * S, bun_bot + 3 * S],
+        radius=(bun_bot - bun_mid) * 0.3, fill=BUN_TOAST_DEEP + (175,))
+    _through(img, crust, bun, blur=3.4 * S)
+
+    # The shadow the sausage casts into the bun, in the crease where the two
+    # meet. Without it the sausage sits ON the bun; with it, it sits IN it.
+    crease = sheet()
+    ImageDraw.Draw(crease).rounded_rectangle(
+        [bun_x0 + 6 * S, bun_mid - 5 * S, bun_x1 - 6 * S, bun_mid + 9 * S],
+        radius=7 * S, fill=BUN_CREASE + (205,))
+    _through(img, crease, bun, blur=3.0 * S)
+
+    # And a pale lip along the very top of the cut face, which is the one
+    # part of a bun that catches a hard light.
+    lip = sheet()
+    ImageDraw.Draw(lip).rounded_rectangle(
+        [bun_x0 + 14 * S, bun_mid + 12 * S, bun_x1 - 14 * S, bun_mid + 16 * S],
+        radius=2 * S, fill=BUN_SHEEN + (95,))
+    _through(img, lip, bun, blur=3.4 * S)
+    ink(bun)
+
+    # --- the bite -------------------------------------------------------
+    if bitten:
+        img = _bite_off(img, right, fy(0.05), bun_bot, full, line_w,
+                        (sy0, sy1), S)
+
+    return img.resize((box_w, box_h), Image.LANCZOS)
 
 
-def make_sandwich():
-    """One sandwich, long axis across, for his hand.
+def _bite_off(img, right, y0, y1, full, line_w, sausage_band, S):
+    """Take a mouthful out of the right-hand end.
 
-    Drawn horizontally for the same reason the held bottle is - it is rotated
-    into his grip by Tools/make_recess_frames.py and has to reach from his
-    fist to his mouth.
+    THE SILHOUETTE IS WHAT SELLS IT. A hotdog that has simply been drawn
+    shorter is a shorter hotdog; one whose end is CONCAVE, in a couple of
+    rounded scoops, is one somebody has had a bite of. So the edge is a
+    cosine with a lobe and a quarter in it, the picture is cut off along
+    that line, and what the cut exposes is painted in behind it: pale dry
+    crumb where the bun was and a ring of cut meat where the sausage was.
 
-    SHORTER AND DEEPER THAN THE FIRST VERSION. That one was drawn 312 by 162,
-    nearly two to one, and a sandwich twice as long as it is tall is a
-    sandwich nobody made. Three to two reads as food and still spans the gap
-    between his fist and his mouth, because the span is set by how big it is
-    drawn in the frame and not by the shape of this canvas.
+    Done with masks rather than shapes, for the same reason the pieces are
+    shaded through masks: the exposed face has to follow the scallops
+    exactly, and a polygon approximating them leaves a hairline of the
+    outside colour showing past the cut.
     """
-    W, H = 360, 260
-    img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    _sandwich(ImageDraw.Draw(img), 30, 30, W - 30, H - 30)
-    img.save(OUT + "prop_sandwich.png")
-    return img.size
+    W, H = img.size
+    depth = 0.105 * full
+
+    def x_at(t):
+        return right - depth * (0.5 + 0.5 * math.cos(2.0 * math.pi * 2.1 * t + 0.6))
+
+    curve = [(x_at(i / 72.0), y0 + (y1 - y0) * (i / 72.0)) for i in range(73)]
+    skirt = [(0, y1 + 8 * S), (0, y0 - 8 * S)]
+
+    def side(dx):
+        m = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(m).polygon(
+            [(0, y0 - 8 * S)] + [(x + dx, y) for x, y in curve] + skirt, fill=255)
+        return m
+
+    keep = side(0)
+    inner = side(-11.0 * S)
+
+    # What the bite exposed, as a flat picture the cut band is taken from.
+    face = Image.new("RGBA", (W, H), BUN_CRUMB + (255,))
+    fd = ImageDraw.Draw(face)
+    sy0, sy1 = sausage_band
+    fd.rectangle([0, sy0 + 2 * S, W, sy1], fill=SAUSAGE_CUT)
+    fd.rectangle([0, sy0 + 2 * S, W, sy0 + 7 * S], fill=SAUSAGE_CUT_DARK)
+    fd.rectangle([0, sy1 - 5 * S, W, sy1], fill=SAUSAGE_CUT_DARK)
+
+    solid = img.split()[3].point(lambda v: 255 if v > 40 else 0)
+    band = ImageChops.subtract(keep, inner)
+    out = img.copy()
+    out.paste(face, (0, 0), ImageChops.multiply(band, solid))
+
+    # Cut the silhouette, then run the dark edge back along the cut.
+    out.putalpha(ImageChops.multiply(out.split()[3], keep))
+    edge = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(edge).line(curve, fill=OUTLINE + (255,),
+                              width=line_w * 2, joint="curve")
+    out.paste(edge, (0, 0), ImageChops.multiply(
+        edge.split()[3], out.split()[3].point(lambda v: 255 if v > 40 else 0)))
+    return out
+
+
+def make_hotdog():
+    """Three lengths of the same hotdog, for his hand.
+
+    Drawn horizontally for the same reason the held bottle is - it is
+    rotated into his grip by Tools/make_recess_frames.py and has to reach
+    from his fist to his mouth.
+
+    THREE OF THEM BECAUSE HE IS EATING IT. The scene used to put one whole
+    sandwich at his mouth, loop it forever, and then hand him half of one on
+    the way down. A hotdog that is still whole on the ninth bite is the same
+    problem rule 5 is about at the other end: food that does not change is
+    food nobody is eating. So the lead-in holds the whole one, every frame of
+    the loop holds the bitten one, and the tail holds the stub.
+
+    THE CANVAS DOES NOT CHANGE SIZE between them, and the drawing stays
+    pinned to its left margin, so his fist closes on the same canvas pixel in
+    all three. See the note in _hotdog.
+    """
+    sizes = {}
+    # TWELVE PER CENT, AND THE NUMBER IS NOT ABOUT APPETITE. The bitten one
+    # has to reach his mouth from the SAME DRAWN FIST as the whole one, and
+    # the only thing that can give is where along the food his hand is -
+    # 25% of the way up the whole one, 15% of the way up the bitten one,
+    # which is a regrip between mouthfuls and is what people do. Past about
+    # an eighth gone there is no grip left that reaches, and the frame comes
+    # out as a boy biting the air six inches short of his lunch. The stub
+    # never goes near his mouth - it is the frame his hand comes DOWN on -
+    # so it can lose as much as it likes.
+    for name, eaten in (("prop_sandwich", 0.0),
+                        ("prop_sandwich_bitten", 0.12),
+                        ("prop_sandwich_stub", 0.45)):
+        img = _hotdog(W_DOG, H_DOG, eaten)
+        img.save(OUT + name + ".png")
+        sizes[name] = img.size
+    return sizes
 
 
 def _box_shell(d, x0, y0, x1, y1, open_lid):
@@ -530,7 +888,16 @@ def make_lunchbox():
         x0, y0, x1, y1 = 40, 150, W - 40, H - 46
         _box_shell(d, x0, y0, x1, y1, True)
         if food:
-            _sandwich(d, x0 + 62, y0 - 8, x1 - 62, y0 + 74)
+            # The same hotdog that goes in his hand, lying in the tray.
+            # Pasted rather than redrawn: two drawings of one object drift
+            # apart the first time either is touched, and the child watches
+            # this one come out of that box.
+            food_w = int((x1 - x0) - 124)
+            food = _hotdog(food_w, int(food_w * H_DOG / W_DOG))
+            # Inside the tray, not across its hinge: the opening runs from
+            # y0 down to front_y, and a hotdog pasted level with y0 sits on
+            # the fold with its sausage over the lid.
+            img.alpha_composite(food, (x0 + 62, y0 + 14))
         img = shadow_under(img, (x0, y0, x1, y1))
         img.save(OUT + name + ".png")
         sizes[name] = img.size
@@ -613,7 +980,8 @@ if __name__ == "__main__":
     print("prop_basurahan.png ", make_bin())
     print("prop_bote.png      ", make_bottle())
     print("prop_bote_held.png ", make_bottle_held())
-    print("prop_sandwich.png  ", make_sandwich())
+    for k, v in make_hotdog().items():
+        print("%-19s" % (k + ".png"), v)
     for k, v in make_lunchbox().items():
         print("%-19s" % (k + ".png"), v)
     print("prop_basura.png    ", make_wrapper())

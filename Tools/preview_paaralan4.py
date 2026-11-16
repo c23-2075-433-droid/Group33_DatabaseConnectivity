@@ -202,12 +202,22 @@ def main():
     frame("kuha_baon_2_uniform", bottle_only, os.path.join(outdir, "03_kuha.png"))
     frame("sitting_front_uniform", bottle_only + [("prop_baon_open", BAON)],
           os.path.join(outdir, "04_baon_on_desk.png"))
-    # Kain, at his mouth.
+    # Kain, the whole mouthful: open, bite, chew. Three frames rather than
+    # one because what this scene has to check about eating is no longer
+    # only "does the food land on his face" - it is whether the mouth under
+    # it is open when the food arrives and shut while he chews, and whether
+    # the hotdog is visibly shorter afterwards.
+    frame("kain_open_uniform", bottle_only + [("prop_baon_empty", BAON)],
+          os.path.join(outdir, "05a_kain_open.png"))
     frame("kain_bite_1_uniform", bottle_only + [("prop_baon_empty", BAON)],
-          os.path.join(outdir, "05_kain.png"))
+          os.path.join(outdir, "05b_kain_bite.png"))
+    frame("kain_chew_1_uniform", bottle_only + [("prop_baon_empty", BAON)],
+          os.path.join(outdir, "05c_kain_chew.png"))
     # Inom: the bottle is in his hand, so it is off the desk.
     frame("inom_drink_1_uniform", [("prop_baon_empty", BAON)],
           os.path.join(outdir, "06_inom.png"))
+    frame("inom_swallow_uniform", [("prop_baon_empty", BAON)],
+          os.path.join(outdir, "06a_inom_swallow.png"))
     # The wrapper on the desk, which is where Kain leaves it.
     frame("sitting_front_uniform",
           bottle_only + [("prop_baon_empty", BAON), ("prop_basura", BASURA)],

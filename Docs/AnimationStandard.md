@@ -275,11 +275,11 @@ than as a side effect of something else.
    |---|---|---|
    | Ligpit | Paaralan 2's whole Kuha run, **reversed**, plus lapis_frame_1/2 and `PropCarry` for the pencil | nothing |
    | Kuha | the same run forwards | a lunchbox over the notepad |
-   | Kain | lapis_frame_1/2/3, the pencil being raised | the pencil erased, a sandwich in its place |
-   | Inom | the same three | a bottle, turned to reach his mouth |
+   | Kain | lapis_frame_1/2/3, the pencil being raised | the pencil erased, a hotdog in its place, and **a mouth that opens, bites and chews** |
+   | Inom | the same three | a bottle, turned to reach his mouth, and lips that purse and swallow |
    | Tapon | the same three, plus PropToss | a wrapper, and a bin |
 
-   Four things came out of it that the scenes after it get for free:
+   Five things came out of it that the scenes after it get for free:
 
    - **An action can be run backwards.** Taking a flat object out of a bag
      and putting one in are the same frames in the other order. Scene 4's
@@ -304,10 +304,56 @@ than as a side effect of something else.
      `Tools/make_recess_frames.py` erases the drawn pencil out of
      lapis_frame_1..3 and leaves an empty grip to put anything in. What
      that cost is written up there at length and is worth reading before
-     the next erase: the sharpened cone of a pencil is within two points of
-     his skin on every channel, so it survives every colour test that lets
-     his own fingers through, and it has to be told apart by what it is
-     JOINED to instead.
+     the next erase, because the obvious method is the wrong one. Only the
+     barrel of a pencil can be found by colour - the cone is within two
+     points of his skin, the point is the same black as every outline, the
+     ferrule is his glasses and the eraser is his lip - so the first three
+     versions FLOODED outwards from the barrel through "anything that is
+     not him". The flood does not stop at the pencil, because the drawn
+     lines of his own hand are not "him" by any colour test either: it
+     walked every crease in his fist and returned a mask the size and
+     shape of his hand, which was then erased and filled with the average
+     of its surroundings. Every frame of that scene had a smeared,
+     edgeless mitten in it for three passes. **A rigid object is found by
+     geometry, not by connectivity** - fit an axis to the part you CAN see
+     and take the capsule round it - and the hand is put back as a REGION
+     rather than as a list of pixels that passed a colour test, or it
+     comes back without its own outline.
+
+     **The capsule erases the BACKGROUND. It does not restore the HAND**,
+     and using it for both is the second mistake, which survived three
+     passes after the first was fixed. A capsule is a straight band, and
+     his fingers are drawn in FRONT of the barrel: through the fist, 3,175
+     of its 4,281 pixels are his own skin and his own outlines and barely
+     a hundred are pencil at all. Taking his hand from the erased copy
+     over that whole band put a pale straight-sided slab down the back of
+     it - no creases, no knuckle, no edge on one side - in every frame
+     that lifts food to his face. His hand comes back from the DRAWING,
+     untouched, and the only thing painted out of it is the pencil where
+     it is actually drawn: the sliver of barrel between thumb and
+     forefinger and the eraser below his little finger, which is all of a
+     pencil you can see once a fist closes round it. Three other things
+     fell out of the same confusion and are worth knowing by name: an
+     eraser left behind because the "pencil" stopped at the end of the
+     BARREL and the pink is forty pixels further on, inside his palm; a
+     skin-coloured spike standing above his knuckles because a hole-filler
+     that calls anything 8px from transparency "inside him" believes a
+     50px-wide trench open to the sky; and a faceted, folded-paper palm
+     because a spread creeping in from both sides of a hole that wide
+     meets in the middle, and the two sides of a drawn hand are not the
+     same colour. Fill a slot the width of the OBJECT, not the width of
+     the search, and ask whether the drawing is still there on BOTH sides
+     across it before filling anything at all.
+   - **His face can be redrawn, which is new.** `Tools/mouth.py` paints the
+     drawn smile out and puts an open mouth, a chewing one, pursed lips or
+     a swallow in its place, and warps the face for a full cheek or a
+     dropped chin. Rule 4 asks for facial expression "where it helps", and
+     eating is the case where the face IS the action - a boy holding food
+     against a closed smile is not eating, however well the arm moves. The
+     colours and the proportions are sampled from `eat_bite_bahay`, the one
+     drawing in the project of this boy with his mouth open, so a mouth
+     drawn in code and one that was generated are the same mouth. Any later
+     Kain, Inom, Tawa or Kanta can use it.
 
    One limit found and not solved: a swap cannot change the SHAPE of the
    footprint, only what is drawn in it. A lunchbox will not cover the tall
