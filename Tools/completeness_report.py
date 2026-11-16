@@ -37,12 +37,10 @@ VO = os.path.join(ROOT, "Assets", "Audio", "VO")
 SCENES = os.path.join(ROOT, "Assets", "Scenes")
 TRACKS = os.path.join(ROOT, "Assets", "Resources", "VisemeTracks.json")
 
-# The design document lays out sixteen scenes across four environments.
-# Bahay's sixth, "Leaving for School", has a slot on the journey map
-# (JourneyMap.cs) and no scene behind it; Palengke is a marker with no scenes
-# at all. Both are counted as missing rather than quietly dropped.
-DESIGNED_SCENES = 16
-DESIGNED_ENVIRONMENTS = 4
+# Final capstone scope: five scenes in each of Bahay, Paaralan, and Parke.
+# The earlier sixth Bahay scene and Palengke are outside this scope.
+DESIGNED_SCENES = 15
+DESIGNED_ENVIRONMENTS = 3
 
 # The segments that carry the teaching, as opposed to the narration around it.
 # A pre-reader cannot read a caption, so a word whose Prompt, Teach, Recall and
