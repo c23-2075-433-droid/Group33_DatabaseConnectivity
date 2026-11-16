@@ -1815,7 +1815,7 @@ MonoBehaviour:
     gloss: Wash
     clip: {fileID: 0}
   - id: word_kinig
-    text: "K\xEDnig"
+    text: Kinig
     gloss: Listen
     clip: {fileID: 0}
   - id: word_sali
