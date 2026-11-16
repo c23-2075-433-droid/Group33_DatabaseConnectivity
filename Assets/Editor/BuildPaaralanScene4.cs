@@ -24,10 +24,11 @@
 //            his bag, in that order, one at a time.
 //   Kuha     he reaches into the same bag and takes his baon out, and puts
 //            it on the desk he has just cleared.
-//   Kain     he takes a sandwich out of the box and eats it, and KEEPS
-//            EATING until the next word is said.
-//   Inom     he picks his water bottle up off the desk, tips it to his
-//            mouth, drinks, and puts it back.
+//   Kain     he takes a hotdog out of the box and eats it - mouth open,
+//            bite, chew, bite - and KEEPS EATING until the next word is
+//            said. The hotdog gets shorter as he does.
+//   Inom     he picks his water bottle up off the desk, puts his lips to
+//            it, drinks, swallows, and puts it back.
 //   Tapon    he picks up the wrapper, cocks his hand, and throws it - and
 //            the wrapper itself crosses the room and drops into the bin.
 //
@@ -323,11 +324,14 @@ public class BuildPaaralanScene4
             "lapis_frame_1_uniform", "lapis_frame_2_uniform",
             // "Kuha": the same movement forwards, with his baon in it.
             "kuha_baon_bag_uniform", "kuha_baon_2_uniform",
-            // "Kain", "Inom", "Tapon": one arm, three things in it.
-            "kain_hold_uniform", "kain_lift_uniform", "kain_bite_1_uniform",
-            "kain_bite_2_uniform", "kain_last_uniform",
+            // "Kain", "Inom", "Tapon": one arm, three things in it - and,
+            // for the two that go to his MOUTH, a mouth that moves with it.
+            "kain_hold_uniform", "kain_lift_uniform", "kain_open_uniform",
+            "kain_bite_1_uniform", "kain_chew_1_uniform", "kain_chew_2_uniform",
+            "kain_open_2_uniform", "kain_bite_2_uniform", "kain_last_uniform",
             "inom_hold_uniform", "inom_lift_uniform",
             "inom_drink_1_uniform", "inom_drink_2_uniform",
+            "inom_swallow_uniform",
             "tapon_hold_uniform", "tapon_lift_uniform", "tapon_cock_uniform",
             // The recess objects themselves.
             "prop_baon", "prop_baon_open", "prop_baon_empty",
@@ -626,10 +630,11 @@ public class BuildPaaralanScene4
         // ================= "Kain": he eats, and KEEPS eating =================
         //
         //   lead-in   place_frame_3   hands to the desk
-        //             kain_hold       a sandwich out of the box
-        //             kain_lift       raised
-        //             kain_bite_1     at his mouth, head down to meet it
-        //   loop      bite_2, bite_1, lift, bite_1   - ENDLESS
+        //             kain_hold       the hotdog out of the box, mouth shut
+        //             kain_lift       raised, lips parting
+        //             kain_open       mouth WIDE, food just below it
+        //             kain_bite_1     the bun in his mouth, closing on it
+        //   loop      chew_1, chew_2, open_2, bite_2   - ENDLESS
         //   tail      kain_last       the last of it, coming down
         //             place_frame_3   hands back on the desk
         //
@@ -639,25 +644,38 @@ public class BuildPaaralanScene4
         // next word. Zero means "until Stop()", and Inom below is what calls
         // it. So he eats for as long as the child takes.
         //
-        // THE LOOP GOES BACK DOWN TO kain_lift EACH TIME ROUND, which is the
-        // difference between eating and a hand vibrating at a face: bite,
-        // chew, hand down, bite again.
+        // THE LOOP IS A WHOLE MOUTHFUL AND NOT A GESTURE. It used to be
+        // bite, chew, hand down, bite - four frames of one arm moving, with
+        // the same shut smile on his face throughout, which is a boy
+        // tapping a sandwich against his chin. Now the face carries it:
+        //
+        //   chew_1   hand down at his chest, left cheek full
+        //   chew_2   right cheek full, so the mouthful moves across
+        //   open_2   hand up, mouth wide open and empty
+        //   bite_2   the bun back in it
+        //
+        // TWO CHEWS BEFORE EACH BITE, because one is a twitch and three
+        // outlast the arm movement either side of them. And every frame of
+        // the loop holds the BITTEN hotdog: the whole one is only ever seen
+        // in the lead-in, which is correct, since he bites it at the end of
+        // the lead-in and the loop is everything after that.
         PoseSequence kainFrames = AddPose(seatGO, seatSr, new[]
         {
             "place_frame_3_uniform",
             "kain_hold_uniform",
             "kain_lift_uniform",
+            "kain_open_uniform",
             "kain_bite_1_uniform",
         }, "sitting_front_uniform", 10f * Pace);
         kainFrames.loopFrames = Sprites(
-            "kain_bite_2_uniform",      // chewing, head back up
-            "kain_bite_1_uniform",      // another bite
-            "kain_lift_uniform",        // hand down between mouthfuls
-            "kain_bite_1_uniform");
+            "kain_chew_1_uniform",      // chewing, hand down, left cheek
+            "kain_chew_2_uniform",      // the mouthful crosses to the right
+            "kain_open_2_uniform",      // hand up, mouth open for the next
+            "kain_bite_2_uniform");     // and another bite
         kainFrames.loopCycles = 0;                     // until Stop() - see above
-        // He finishes what is in his hand on the way down, so the sandwich
-        // does not vanish whole. kain_last is the same grip with half the
-        // bread in it.
+        // He finishes what is in his hand on the way down, so the hotdog
+        // does not vanish whole. kain_last is the same grip with a stub of
+        // it and his cheek still working.
         kainFrames.tailFrames = Sprites("kain_last_uniform", "place_frame_3_uniform");
         // Slow. This may be on screen for half a minute while the scene waits
         // for the next word, and a fast chew becomes the thing being watched
@@ -689,10 +707,19 @@ public class BuildPaaralanScene4
         {
             "place_frame_3_uniform",
             "inom_hold_uniform",        // the bottle comes off the desk
-            "inom_lift_uniform",        // raised, tipping
-            "inom_drink_1_uniform",     // at his mouth, head back
+            "inom_lift_uniform",        // raised, lips coming apart
+            "inom_drink_1_uniform",     // at his mouth, lips round the cap
         }, "sitting_front_uniform", 10f * Pace);
-        inomFrames.loopFrames = Sprites("inom_drink_2_uniform", "inom_drink_1_uniform");
+        // A GULP IS A MOUTHFUL AND THEN A SWALLOW, and the swallow is the
+        // half that was missing. Two frames of a bottle rocking at a face
+        // is a boy holding a bottle; the third frame takes it an inch down,
+        // shuts his lips and puts the lump in his throat, and the three
+        // together are drinking. See Tools/mouth.py for what "swallow"
+        // draws and why half of it is a warp rather than paint.
+        inomFrames.loopFrames = Sprites(
+            "inom_drink_2_uniform",     // tipped further, still drawing
+            "inom_swallow_uniform",     // bottle down, throat working
+            "inom_drink_1_uniform");    // and back to it
         inomFrames.loopCycles = 2;
         inomFrames.loopFramesPerSecond = 5f * Pace;    // a swallow is slower than a reach
         inomFrames.tailFrames = Sprites(
