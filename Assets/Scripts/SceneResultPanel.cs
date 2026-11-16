@@ -48,8 +48,8 @@ public class SceneResultPanel : MonoBehaviour
              "label itself, so only the figure goes here.")]
     public Text pointsText;
 
-    [Tooltip("How many tries this scene took. The board prints " +
-             "TOTAL ATTEMPTS:, so only the figure goes here.")]
+    [Tooltip("This scene's words over its tries, e.g. \"5 / 6\". The board " +
+             "prints TOTAL ATTEMPTS:, so only the figure goes here.")]
     [FormerlySerializedAs("wordsText")]
     public Text attemptsText;
 
@@ -257,18 +257,16 @@ public class SceneResultPanel : MonoBehaviour
         if (pointsText != null)
             pointsText.text = RunScore.PointsFor(correct, attempts).ToString();
 
-        // The row used to read "5 / 6" under a WORDS COMPLETED: label, which
-        // was never what it counted: the figure after the slash is tries, and
-        // a child who said six words in six goes and one who needed sixteen
-        // both read "6 / 6" as six words. The board now asks for the tries by
-        // name, so that is the one number it gets. What they actually learned
-        // is the Words Learned panel's job, and it lists the words themselves.
+        // "5 / 6" - words completed over tries taken. The plate beside it says
+        // TOTAL ATTEMPTS:, so the figure after the slash is the one the label
+        // names; the one before it is what the tries were spent on, and a
+        // child reads the pair as how close the two came.
         //
         // Max because a scene can finish with nothing counted against it -
         // EarnedStars has the same guard - and "3 words, 0 attempts" is not a
         // thing that happened.
         if (attemptsText != null)
-            attemptsText.text = Mathf.Max(attempts, correct).ToString();
+            attemptsText.text = correct + " / " + Mathf.Max(attempts, correct);
 
         FillGreeting();
 
