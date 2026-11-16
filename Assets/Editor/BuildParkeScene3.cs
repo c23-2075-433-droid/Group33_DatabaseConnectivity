@@ -1,17 +1,13 @@
 // Assets/Editor/BuildParkeScene3.cs
 //
 // One-click scene builder for Parke Scene 3 ("Meeting New Friends").
-// Teaches five words: Bati, Ngiti, Tanong, Sali, Paalam.
+// Teaches five words: Kumusta, Ngiti, Tanong, Laro, Bati.
 //
-// Ngiti and Sali are new. Bati, Tanong and Paalam return from the school
-// gate, the vocabulary lesson and the end of the school day - and they
-// return CHANGED, which is the point of them being here. Bati at the gate
-// was said to a guard on duty; here it is said to a stranger his own age.
-// Tanong in the lesson was putting a hand up; here it is asking somebody
-// their name.
-//
-// Kumusta used to lead this scene and is gone: it and Bati were two words
-// for the same thing in one room, both running greet.Apply.
+// Ngiti and Bati are new. Kumusta, Tanong and Laro return from the school
+// gate, the vocabulary lesson and recess - and they return CHANGED, which is
+// the point of them being here. Kumusta at the gate was said to a guard on
+// duty; here it is said to a stranger his own age. Tanong in the lesson was
+// putting a hand up; here it is asking somebody their name.
 //
 // A MIDDLE SCENE OF LEVEL 3. Scene 2 fades into this one; this one fades into
 // Scene 4, the picnic, which ends the level.
@@ -23,11 +19,11 @@
 //
 // WHAT EACH WORD DOES:
 //
-//   Bati      Kylo turns to greet him; the other boy lights up
+//   Kumusta   Kylo turns to greet him; the other boy lights up
 //   Ngiti     Kylo lights up, still in the greeting pose - he is smiling
 //   Tanong    the other boy lights up: he is the one being asked
-//   Sali      BOTH throw their arms up - he has joined the game
-//   Paalam    both settle back, and the space between them lights up
+//   Laro      BOTH throw their arms up - they are playing
+//   Bati      both settle back, and the space between them lights up
 //
 // Ngiti is the weakest of the five and it is worth being plain about why. A
 // smile is a face, and the character set has no face that is only a smile -
@@ -173,10 +169,10 @@ public class BuildParkeScene3
         CreateWall("Wall_Right", 9.3f);
 
         // --- What lights up ---
-        TimedOverlay gleamPaalam = CreateGleamAt("Gleam_Paalam", FriendX, FloorY + 1.6f, 3.4f);
+        TimedOverlay gleamKumusta = CreateGleamAt("Gleam_Kumusta", FriendX, FloorY + 1.6f, 3.4f);
         TimedOverlay gleamNgiti = CreateGleamAt("Gleam_Ngiti", KyloX, FloorY + 2.4f, 2.2f);
         TimedOverlay gleamTanong = CreateGleamAt("Gleam_Tanong", FriendX, FloorY + 2.4f, 2.4f);
-        TimedOverlay gleamSali = CreateGleamAt("Gleam_Sali", (KyloX + FriendX) * 0.5f,
+        TimedOverlay gleamLaro = CreateGleamAt("Gleam_Laro", (KyloX + FriendX) * 0.5f,
                                                 FloorY + 1.8f, 6.2f);
         // Between them, where two hands would meet.
         TimedOverlay gleamBati = CreateGleamAt("Gleam_Bati", (KyloX + FriendX) * 0.5f,
@@ -201,18 +197,17 @@ public class BuildParkeScene3
             es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
         }
 
-
+        GameObject pKumusta = CreatePromptUI(uiRoot.transform, "Prompt_Kumusta", "Kumusta", new Vector3(170, -60, 0));
         GameObject pNgiti = CreatePromptUI(uiRoot.transform, "Prompt_Ngiti", "Ngiti", new Vector3(-230, 30, 0));
         GameObject pTanong = CreatePromptUI(uiRoot.transform, "Prompt_Tanong", "Tanong", new Vector3(170, 40, 0));
-        GameObject pSali = CreatePromptUI(uiRoot.transform, "Prompt_Sali", "Sali", new Vector3(-30, 150, 0));
+        GameObject pLaro = CreatePromptUI(uiRoot.transform, "Prompt_Laro", "Laro", new Vector3(-30, 150, 0));
         GameObject pBati = CreatePromptUI(uiRoot.transform, "Prompt_Bati", "Bati", new Vector3(-30, -20, 0));
-        GameObject pPaalam = CreatePromptUI(uiRoot.transform, "Prompt_Paalam", "Paalam", new Vector3(170, -60, 0));
 
-        // --- Objectives: greet, smile, ask, play, say goodbye ---
-        // Kumusta is gone. It and Bati were two words for the same thing in
-        // one scene - both ran greet.Apply - and the restructure keeps Bati,
-        // which is the word the rest of the game now uses for greeting.
-        //
+        // --- Objectives: greet, smile, ask, play, high-five ---
+        var kumusta = MakeObjective("Kumusta", pKumusta);
+        UnityEventTools.AddPersistentListener(kumusta.onCorrect, greet.Apply);
+        UnityEventTools.AddPersistentListener(kumusta.onCorrect, gleamKumusta.Play);
+
         // Holds the greeting pose - see the note at the top about why there is
         // no smiling pose of its own.
         var ngiti = MakeObjective("Ngiti", pNgiti);
@@ -221,11 +216,11 @@ public class BuildParkeScene3
         var tanong = MakeObjective("Tanong", pTanong);
         UnityEventTools.AddPersistentListener(tanong.onCorrect, gleamTanong.Play);
 
-        var sali = MakeObjective("Sali", pSali);
-        UnityEventTools.AddPersistentListener(sali.onCorrect, cheer.Apply);
-        UnityEventTools.AddBoolPersistentListener(sali.onCorrect, friend.SetActive, false);
-        UnityEventTools.AddBoolPersistentListener(sali.onCorrect, friendCheer.SetActive, true);
-        UnityEventTools.AddPersistentListener(sali.onCorrect, gleamSali.Play);
+        var laro = MakeObjective("Laro", pLaro);
+        UnityEventTools.AddPersistentListener(laro.onCorrect, cheer.Apply);
+        UnityEventTools.AddBoolPersistentListener(laro.onCorrect, friend.SetActive, false);
+        UnityEventTools.AddBoolPersistentListener(laro.onCorrect, friendCheer.SetActive, true);
+        UnityEventTools.AddPersistentListener(laro.onCorrect, gleamLaro.Play);
 
         var bati = MakeObjective("Bati", pBati);
         UnityEventTools.AddPersistentListener(bati.onCorrect, greet.Apply);
@@ -233,16 +228,10 @@ public class BuildParkeScene3
         UnityEventTools.AddBoolPersistentListener(bati.onCorrect, friend.SetActive, true);
         UnityEventTools.AddPersistentListener(bati.onCorrect, gleamBati.Play);
 
-        // Leaving. The friend lights up one last time - the same gleam the
-        // greeting used, which is the right symmetry for hello and goodbye.
-        var paalam = MakeObjective("Paalam", pPaalam);
-        UnityEventTools.AddPersistentListener(paalam.onCorrect, greet.Apply);
-        UnityEventTools.AddPersistentListener(paalam.onCorrect, gleamPaalam.Play);
-
         SceneObjectiveController controller = uiRoot.AddComponent<SceneObjectiveController>();
         controller.voiceCommand = voiceCommand;
         controller.playerMovement = player;
-        controller.objectives = new[] { bati, ngiti, tanong, sali, paalam };
+        controller.objectives = new[] { kumusta, ngiti, tanong, laro, bati };
 
         VoiceUIBuilder.BuildVoiceUI(voiceCommand, controller);
         // Still needed in the scene: SceneResultPanel looks the fader up at
@@ -268,7 +257,7 @@ public class BuildParkeScene3
         AddToBuildSettings();
 
         Debug.Log("[SALINLAHI] Parke Scene 3 built and saved to " + ScenePath +
-                   ". Words: Bati, Ngiti, Tanong, Sali, Paalam - Ngiti and Sali new. " +
+                   ". Words: Kumusta, Ngiti, Tanong, Laro, Bati - Ngiti and Bati new. " +
                    "It fades into " + NextScene + ", which ends the level - so build Parke " +
                    "Scene 4 as well, or the level runs into a scene that is not there.");
     }
