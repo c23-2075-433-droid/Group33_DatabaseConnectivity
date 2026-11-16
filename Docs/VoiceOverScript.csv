@@ -91,9 +91,12 @@ rachel_l2_s1_lakad_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Ar
 rachel_l2_s1_bukas_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"The guard is standing beside the gate, waiting to let him in.",-,,Bukas,Story,2
 rachel_l2_s1_bukas_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Ask him to open it — say {word}!,-,,Bukas,Prompt,2
 rachel_l2_s1_bukas_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,The gate swings open!,-,,Bukas,Praise,2
-rachel_l2_s1_kumusta_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,The guard at the gate smiles at Kylo every single morning.,-,A - what is happening in the story,Kumusta,Story,3
-rachel_l2_s1_kumusta_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Greet him back — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_kumusta.wav.",Kumusta,Prompt,3
-rachel_l2_s1_kumusta_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Lovely manners! The guard waves Kylo through.,-,D - praise once the word is recognised,Kumusta,Praise,3
+rachel_l2_s1_kumusta_story.wav,Rachel Line (Unused),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,The guard at the gate smiles at Kylo every single morning.,-,UNUSED - Scene 1 teaches Bati now; see rachel_l2_s1_bati_story.,Kumusta,Story,3
+rachel_l2_s1_kumusta_ask.wav,Rachel Line (Unused),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Greet him back — say {word}!,-,"UNUSED - Scene 1 teaches Bati now; see rachel_l2_s1_bati_ask.",Kumusta,Prompt,3
+rachel_l2_s1_kumusta_done.wav,Rachel Line (Unused),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Lovely manners! The guard waves Kylo through.,-,UNUSED - Scene 1 teaches Bati now; see rachel_l2_s1_bati_done.,Kumusta,Praise,3
+rachel_l2_s1_bati_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,The guard at the gate smiles at Kylo every single morning.,-,A - what is happening in the story,Bati,Story,3
+rachel_l2_s1_bati_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Greet him back — say {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_bati.wav.",Bati,Prompt,3
+rachel_l2_s1_bati_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Lovely manners! The guard waves Kylo through.,-,D - praise once the word is recognised,Bati,Praise,3
 rachel_l2_s1_pasok_story.wav,Rachel Line (Story),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,"The gate is open, and the school building is just across the yard.",-,A - what is happening in the story,Pasok,Story,4
 rachel_l2_s1_pasok_ask.wav,Rachel Line (Prompt),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Take him inside with {word}!,-,"C - the instruction. {word} is replaced by the word, spoken from word_pasok.wav.",Pasok,Prompt,4
 rachel_l2_s1_pasok_done.wav,Rachel Line (Praise),Level 2 - Paaralan,Scene 1 - Arriving at School,Teacher Rachel,Good! Kylo is through the gate.,-,D - praise once the word is recognised,Pasok,Praise,4
@@ -409,7 +412,7 @@ word_itlog.wav,Word,All Levels,Level 1 Scene 5,-,Itlog,Egg,First taught in Level
 word_pagkain.wav,Word,All Levels,Level 1 Scene 5,-,Pagkain,Food,"First taught in Level 1 Scene 5, where it is the word that brings the meal out onto the table. NOT YET RECORDED.",Pagkain,Word,0
 word_kain.wav,Word,All Levels,Level 1 Scene 5,-,Kain,Eat,First taught in Level 1 Scene 5.,Kain,Word,0
 word_inom.wav,Word,All Levels,Level 1 Scene 5,-,Inom,Drink,First taught in Level 1 Scene 5.,Inom,Word,0
-word_kumusta.wav,Word,All Levels,Level 2 Scene 1,-,Kumusta,Hello / how are you,First taught in Level 2 Scene 1.,Kumusta,Word,0
+word_kumusta.wav,Word,All Levels,Level 3 Scene 3,-,Kumusta,Hello / how are you,First taught in Level 3 Scene 3.,Kumusta,Word,0
 word_pasok.wav,Word,All Levels,Level 2 Scene 1,-,Pasok,Enter,First taught in Level 2 Scene 1.,Pasok,Word,0
 word_takbo.wav,Word,All Levels,Level 2 Scene 1,-,Takbo,Run,First taught in Level 2 Scene 1.,Takbo,Word,0
 word_kuha.wav,Word,All Levels,Level 2 Scene 2,-,Kúha,Get / take,First taught in Level 2 Scene 2.,Kuha,Word,0

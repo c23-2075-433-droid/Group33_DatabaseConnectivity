@@ -394,6 +394,18 @@ MonoBehaviour:
     text: Lovely manners! The guard waves Kylo through.
     gloss: 
     clip: {fileID: 8300000, guid: 40300ba9607e449d080b95c612eb8278, type: 3}
+  - id: rachel_l2_s1_bati_story
+    text: The guard at the gate smiles at Kylo every single morning.
+    gloss: 
+    clip: {fileID: 8300000, guid: a99f9485119242d2a17ac3e7721787f6, type: 3}
+  - id: rachel_l2_s1_bati_ask
+    text: Greet him back — say {word}!
+    gloss: 
+    clip: {fileID: 8300000, guid: 134c6a24203a4539a9dc21aee3aeea13, type: 3}
+  - id: rachel_l2_s1_bati_done
+    text: Lovely manners! The guard waves Kylo through.
+    gloss: 
+    clip: {fileID: 8300000, guid: 719b09cdc2d3499a8b5af3a2815838ea, type: 3}
   - id: rachel_l2_s1_pasok_story
     text: The gate is open, and the school building is just across the yard.
     gloss: 
