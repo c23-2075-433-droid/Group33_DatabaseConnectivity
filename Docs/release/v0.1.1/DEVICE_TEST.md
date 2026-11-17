@@ -84,6 +84,69 @@ Until those are done, Chapter 4 should claim that the game prompts and teaches
 the vocabulary and that wrong pronunciation was rejected in testing — not that
 the system reliably corrects pronunciation.
 
+## Objective count, settled
+
+Counted against the v0.1.1 scenes on 17 November, after the release notes had
+claimed otherwise: **72 spoken objectives, 51 distinct words, 21 re-asks.** The
+paper's 3.2.4 and 3.6 and Addendum A are correct and need no change.
+
+The count comes from the `objectives` array on each scene's
+`SceneObjectiveController` — the list the game actually walks through:
+
+| Scene | Objectives |
+|---|---|
+| Bahay 1 UmagaNa | Bangon, Tayo, Lakad |
+| Bahay 2 Banyo | Lakad, Kaliwa, Kanan, Bukas, Ilaw |
+| Bahay 3 Maligo | Tuwalya, Sabon, Maligo, Sipilyo, Suklay |
+| Bahay 4 Damit | Damit, Medyas, Sapatos, Bag, Kunin |
+| Bahay 5 Almusal | Upo, Pagkain, Kain, Inom, Linis |
+| Paaralan 1 | Lakad, Bukas, Bati, Pasok, Takbo |
+| Paaralan 2 Klasrum | Bati, Upo, Kinig, Kuha, Lapis |
+| Paaralan 3 Aralin | Aklat, Basa, Sulat, Sagot |
+| Paaralan 4 Recess | Ligpit, Kuha, Kain, Inom, Tapon |
+| Paaralan 5 Uwian | Ligpit, Tayo, Kunin, Paalam, Alis |
+| Parke 1 | Lakad, Takbo, Tingin, Tuwa, Pasok |
+| Parke 2 Palaruan | Akyat, Dausdos, Sakay, Tulak, Talon |
+| Parke 3 Kaibigan | Kumusta, Ngiti, Tanong, Laro, Bati |
+| Parke 4 Piknik | Upo, Kain, Ibahagi, Inom, Salamat |
+| Parke 5 Uwi | Paalam, Lakad, Tingin, Pagod, Uwi |
+
+Thirteen scenes of five, two of three and four: Bahay 1 and Paaralan 3.
+
+### Where 73 came from
+
+An earlier count here used the `Prompt_<Word>` GameObjects in each scene file
+instead of the objectives array. Bahay 1 holds four of them — Alis, Bangon,
+Lakad, Tayo — but only three objectives. `Prompt_Alis` is an orphan: its
+fileID is not the `promptRoot` of any objective, so nothing ever activates it,
+and it is saved inactive like every other prompt. It has no effect on play, and
+Alis is still taught, in Paaralan 5. It is dead weight in the scene and could be
+deleted next time Bahay 1 is touched; it is not worth a change to a tagged
+release.
+
+The lesson for anyone counting again: count `objectives`, not `Prompt_` objects,
+and do not count `Docs/VoiceOverScript.csv`, which is a recording script and
+covers words the scenes no longer ask for.
+
+## Artifact size, verified
+
+| | Bytes | MiB | MB as Android and Finder show it |
+|---|---|---|---|
+| `SALINLAHI-v0.1.1.apk` | 175,995,123 | 167.8 | 176.0 |
+| `SALINLAHI-v0.1.1.zip` | 174,487,995 | 166.4 | 174.5 |
+
+`BUILD_INFO.txt` prints `167.8 MB`, which is MiB under a loose label — the same
+convention v0.1.0 used when it printed `151.3 MB`. On that like-for-like basis
+the release grew **16.5 MiB**, which is the 45 voice clips added since v0.1.0.
+
+Quote one convention and say which. If the manuscript follows Android's own
+display, the number is **176.0 MB**.
+
+> `Docs/Activity10_Performance.md` still carries v0.1.0's storage figures — a
+> 151.3 MB package and 423 narration clips at 124.7 MB. Those describe the
+> previous release. The current numbers are 167.8 MiB and 468 clips. That report
+> has been submitted as a PDF, so it is flagged here rather than edited.
+
 ## Still open after this test
 
 - Minimum RAM and free storage for 3.4.1 of the paper — readable off the test

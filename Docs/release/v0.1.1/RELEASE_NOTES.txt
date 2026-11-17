@@ -7,6 +7,10 @@ Release Date : 17 November 2026
 Release Type : Development milestone (testing build, not a stable release)
 Platform     : Android 8.0+ (minSdk 26), ARM64
 Artifact     : SALINLAHI-v0.1.1.apk  (versionCode 3)
+Artifact size: 175,995,123 bytes - 167.8 MiB, which Android and Finder show
+               as 176.0 MB. v0.1.0 was 151.3 MiB, so the release is 16.5 MiB
+               larger, which is the 45 added voice clips.
+Package size : SALINLAHI-v0.1.1.zip, 174,487,995 bytes (166.4 MiB / 174.5 MB)
 Package id   : ph.edu.uphsl.group33.salinlahi
 Built with   : Unity 6000.6.2f1
 
@@ -43,13 +47,12 @@ Teacher Rachel is no longer silent anywhere.
     behind her because no sprite was assigned.
 
 Vocabulary and objectives.
-  51 distinct Filipino words across 73 spoken objectives in 15 scenes, with
-    22 of the objectives re-asking a word taught earlier.
-    [CONFIRM: 3.2.4 and 3.6 of the paper, and Addendum A to the vocabulary
-    validation, say 72 objectives and 21 re-asks. Counted from the committed
-    scene files and the builders that generate them, it is 73 and 22 - one
-    objective more than the paper claims. Reconcile the two before the
-    evaluator signs Addendum A.]
+  51 distinct Filipino words across 72 spoken objectives in 15 scenes, with
+    21 of the objectives re-asking a word taught earlier. This agrees with
+    3.2.4 and 3.6 of the paper and with Addendum A to the vocabulary
+    validation; it was counted from the `objectives` array of each scene's
+    SceneObjectiveController in the v0.1.1 scene files, which is the list the
+    game actually walks through.
   Parke's full word list is back. A restructure on 9-12 November had cut the
     five Parke builders down to 19 objectives; the scene files had been kept
     on the fuller list, and re-running the builders on 17 November took eight
