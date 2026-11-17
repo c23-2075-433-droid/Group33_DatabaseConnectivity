@@ -64,7 +64,7 @@ Vocabulary and objectives.
   Kanin and Itlog are no longer separate objectives: "Pagkain" brings the
     whole meal out and "Linis" clears it away.
 
-Pronunciation checking - tightened, NOT yet re-tested on a device.
+Pronunciation checking - tightened, and the phone agreed.
   The whole word now has to be said. Saying the first syllable - "ba" for
     "Bangon" - used to pass; it does not now.
   An accepted variant has to be the whole recognizer result, not a substring
@@ -72,8 +72,10 @@ Pronunciation checking - tightened, NOT yet re-tested on a device.
   The editor's own emulator no longer answers on the child's behalf, which
     was masking failures during development.
   The stress mark came off Kinig, which is not one of the ambiguous pairs.
-  READ THIS: none of the above has been confirmed on a phone. See Known
-    Issues, first entry.
+  The tenth release check, which v0.1.0 failed, PASSED on 17 November: a word
+    said wrong on purpose was refused on a real phone and the prompt asked
+    again. Read the entry under Known Issues before treating this as settled -
+    it is one phone and a handful of words, which is evidence, not proof.
 
 Animation and sound.
   Bahay 3 rebuilt around the bath: Kylo faces the child, brushes the teeth
@@ -131,24 +133,33 @@ Under the hood.
 KNOWN ISSUES
 ------------
 
-  WRONG PRONUNCIATION MAY STILL BE ACCEPTED, AND THIS RELEASE DOES NOT PROVE
-    OTHERWISE. This was the most serious issue in v0.1.0 and it is not closed.
-    The checker has been tightened since - whole word required, variants
-    matched against the whole recognizer result, the editor emulator stopped
-    from answering - but NO DEVICE TEST HAS BEEN RUN AGAINST THOSE CHANGES.
-    The v0.1.0 device test found a mispronounced word still accepted during
-    play, and the suspected cause is untouched by any of this: the device's
-    Filipino dictation service appears to return the nearest real Filipino
-    word rather than the sounds the child actually made, so the checker is
-    handed an already-corrected word and never sees the mistake. If that is
-    what is happening, it cannot be fixed inside the checker at all and needs
-    a different recognition approach.
-    Treat the right/wrong judgement as unreliable until a phone says
-    otherwise. The game teaches and prompts the vocabulary; it is not proven
-    to correct pronunciation. This is why v0.1.1 is a testing build and not a
-    stable release.
-    v0.1.0 claimed this fixed once on the strength of unit tests and had to
-    retract it. That is not being repeated here.
+  WRONG PRONUNCIATION IS REJECTED ON A PHONE NOW - ON ONE PHONE, ON THE WORDS
+    THAT WERE TRIED. This was the most serious issue in v0.1.0 and the state
+    of it has changed, so read what the change is and is not.
+    What happened: the device test on 17 November deliberately mispronounced a
+    word - a swapped vowel, the same kind of mistake v0.1.0 waved through - and
+    the game refused it and asked again. v0.1.0 accepted it.
+    What that means: the feared explanation did not bite here. It was thought
+    the device's Filipino dictation service might be returning the nearest real
+    Filipino word rather than the sounds the child made, handing the checker an
+    already-corrected word so the mistake never reached it. On this phone, with
+    this word, the mistake reached the checker and the checker caught it. The
+    tightening in this release - whole word required, a variant having to be
+    the whole recognizer result - is doing something real on a device, not only
+    in its own unit tests.
+    What that does NOT mean: that the system is proven to correct pronunciation.
+    One phone, one recognizer, one Android version, a handful of words. The
+    recognizer's behaviour varies by device, by language pack and by how noisy
+    the room is, and the v0.1.0 failure was found by trying exactly once. Before
+    Chapter 4 or the defense claims the game corrects a child's pronunciation,
+    this check wants running across several words, on at least one other phone,
+    with VoiceAttemptLog read back to see what the recognizer actually returned
+    each time. That log is already being written on the device.
+    v0.1.1 therefore stays a testing build. Not because the judgement is known
+    to be broken - it is not, any more - but because one pass is not yet the
+    evidence a claim of this size needs.
+    v0.1.0 claimed this fixed on unit tests alone and had to retract it. The
+    difference here is that a phone said so. The caution is the same.
 
   11 words have no recording of the word itself. Pagkain, Tapon, Suot,
     Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara and Salamin have no
@@ -223,6 +234,7 @@ NEXT VERSION
   A bug fix on top of this release becomes 0.1.2.
   The next working feature - most likely the Palengke level, the eleven
   remaining word recordings, or a mini-game - becomes 0.2.0.
-  A recognition approach that actually catches a mispronounced word is the
-  one change this project most needs, and it is a feature, not a fix.
+  Widening the pronunciation check - more words, another phone, the attempt
+  logs read back - is not a release at all. It is the next thing to do, and
+  it decides what Chapter 4 is allowed to claim.
   The conditions for 1.0.0 are written down in Docs/RELEASE_PROCESS.md.

@@ -92,10 +92,11 @@ Known issues in this build
 
 See RELEASE_NOTES.txt. The ones most likely to be noticed:
 
-  WRONG PRONUNCIATION MAY STILL BE ACCEPTED. The checker was tightened for
-  this release, but that has not yet been re-tested on a phone. Until it is,
-  do not rely on the right/wrong judgement. This is the whole reason v0.1.1
-  is still a testing build.
+  Wrong pronunciation is caught now, as far as anyone has checked. The phone
+  test on 17 November said a word wrong on purpose and the game refused it,
+  where v0.1.0 accepted it. That is one phone and a few words, so if a wrong
+  answer is let through while you are playing, it is worth writing down which
+  word and which phone - that is the one result this build is gathering.
 
   Eleven words have no recording of the word itself, so Rachel teaches them
   by caption while she speaks the sentence around them: Pagkain, Tapon, Suot,
