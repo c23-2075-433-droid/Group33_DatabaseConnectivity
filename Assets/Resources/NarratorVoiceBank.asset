@@ -654,54 +654,54 @@ MonoBehaviour:
     text: Recess is over. There is one more lesson before home time.
     gloss: 
     clip: {fileID: 8300000, guid: f8f047b1351fc4674b6984fed16d3b6e, type: 3}
-  - id: rachel_l2_s5_pasok_story
-    text: The classroom door is open, and the afternoon lesson is waiting.
+  - id: rachel_l2_s5_ligpit_story
+    text: Kylo's book, notebook and pencil are still out from the afternoon lesson.
     gloss: 
-    clip: {fileID: 8300000, guid: 361e5b8bf2a1b41aa83832cdebdfbd20, type: 3}
-  - id: rachel_l2_s5_pasok_ask
-    text: "Take him back inside \u2014 say {word}!"
-    gloss: 
-    clip: {fileID: 8300000, guid: fa1cd8ed6412e44eb9caca8ced34ec60, type: 3}
-  - id: rachel_l2_s5_pasok_done
-    text: Good! Kylo is back in the classroom.
-    gloss: 
-    clip: {fileID: 8300000, guid: 69aeae3adc78048a68cfb46cc49940b9, type: 3}
-  - id: rachel_l2_s5_upo_story
-    text: Kylo's desk is just where he left it before recess.
-    gloss: 
-    clip: {fileID: 8300000, guid: b9f1e6b87c61b4a508675dfa3391f61a, type: 3}
-  - id: rachel_l2_s5_upo_ask
-    text: Settle him down with {word}!
-    gloss: 
-    clip: {fileID: 8300000, guid: 9f52380b240284419ad1112970b4c928, type: 3}
-  - id: rachel_l2_s5_upo_done
-    text: Good! Kylo is sitting at his desk again.
-    gloss: 
-    clip: {fileID: 8300000, guid: cd4bf1dc25adb408c9542655fa0b5f11, type: 3}
-  - id: rachel_l2_s5_linis_story
-    text: The lesson is over, and there are papers and crayons all over the desk.
-    gloss: 
-    clip: {fileID: 8300000, guid: 5f5f369ef33a241779478802ff3fbd7e, type: 3}
-  - id: rachel_l2_s5_linis_ask
+    clip: {fileID: 8300000, guid: 3bd80374794a59247bc9e17c3c8ca0cd, type: 3}
+  - id: rachel_l2_s5_ligpit_ask
     text: "Tidy it up with him \u2014 say {word}!"
     gloss: 
     clip: {fileID: 8300000, guid: eb838fef9c69b44168f54faccee894cb, type: 3}
-  - id: rachel_l2_s5_linis_done
+  - id: rachel_l2_s5_ligpit_done
     text: Spotless! Kylo's desk is neat again.
     gloss: 
     clip: {fileID: 8300000, guid: 1cb25b3fd27b8421cb00bbb032ee5ca7, type: 3}
-  - id: rachel_l2_s5_bag_story
-    text: Kylo's things are tidy, but they still need somewhere to go.
+  - id: rachel_l2_s5_tayo_story
+    text: The desk is clear, and it is time for Kylo to get out of his chair.
     gloss: 
-    clip: {fileID: 8300000, guid: 3df67ffb1065d4506bc8292690356791, type: 3}
-  - id: rachel_l2_s5_bag_ask
-    text: "Point him at it \u2014 say {word}!"
+    clip: {fileID: 8300000, guid: 74966b2bcc12c134ca785e6c805d2a18, type: 3}
+  - id: rachel_l2_s5_tayo_ask
+    text: "Bring him to his feet \u2014 say {word}!"
     gloss: 
-    clip: {fileID: 8300000, guid: c9b3404d04e664e6a9da83ed2b22ca83, type: 3}
-  - id: rachel_l2_s5_bag_done
+    clip: {fileID: 8300000, guid: 24d8eff15cd4a934d8269a318cbb79a8, type: 3}
+  - id: rachel_l2_s5_tayo_done
+    text: Good! Kylo is standing up, ready to go home.
+    gloss: 
+    clip: {fileID: 8300000, guid: df4c721e1ac497f4c938ceeeca1acd8b, type: 3}
+  - id: rachel_l2_s5_kunin_story
+    text: Everything is packed, and Kylo's bag is waiting under the desk.
+    gloss: 
+    clip: {fileID: 8300000, guid: e1a9dfc183eed674a99f021e1cdde619, type: 3}
+  - id: rachel_l2_s5_kunin_ask
+    text: "Have him pick it up \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 8300000, guid: f8761c2bc61e8ff45b3bcdbb5b7c9ce5, type: 3}
+  - id: rachel_l2_s5_kunin_done
     text: Good! Everything is packed away safely.
     gloss: 
     clip: {fileID: 8300000, guid: e49096bd43d0a40a58e13c0275189097, type: 3}
+  - id: rachel_l2_s5_paalam_story
+    text: Kylo has his bag, and there is one thing left to say to his class.
+    gloss: 
+    clip: {fileID: 8300000, guid: 38c8b5184fbf4d443bc1b2f6d6184f4b, type: 3}
+  - id: rachel_l2_s5_paalam_ask
+    text: "Send him off politely \u2014 say {word}!"
+    gloss: 
+    clip: {fileID: 8300000, guid: 871c2e898cd78ca448bedc2289d60412, type: 3}
+  - id: rachel_l2_s5_paalam_done
+    text: Good! Kylo has said goodbye to his class.
+    gloss: 
+    clip: {fileID: 8300000, guid: 40c23651fe13edc46920f6eeb831378e, type: 3}
   - id: rachel_l2_s5_alis_story
     text: The last bell has rung, and Nanay is waiting outside the gate.
     gloss: 
@@ -1805,7 +1805,7 @@ MonoBehaviour:
   - id: word_ligpit
     text: Ligpit
     gloss: Tidy up
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 50ef3f8acf5014d47810c63b3f969cf1, type: 3}
   - id: word_suot
     text: Suot
     gloss: Wear / put on
@@ -1894,6 +1894,42 @@ MonoBehaviour:
     text: 
     gloss: 
     clip: {fileID: 8300000, guid: f36757b9509bb46eea13fe51629a3919, type: 3}
+  - id: rachel_l2_s5_bag_ask
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: c9b3404d04e664e6a9da83ed2b22ca83, type: 3}
+  - id: rachel_l2_s5_bag_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 3df67ffb1065d4506bc8292690356791, type: 3}
+  - id: rachel_l2_s5_linis_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 5f5f369ef33a241779478802ff3fbd7e, type: 3}
+  - id: rachel_l2_s5_pasok_ask
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: fa1cd8ed6412e44eb9caca8ced34ec60, type: 3}
+  - id: rachel_l2_s5_pasok_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 69aeae3adc78048a68cfb46cc49940b9, type: 3}
+  - id: rachel_l2_s5_pasok_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 361e5b8bf2a1b41aa83832cdebdfbd20, type: 3}
+  - id: rachel_l2_s5_upo_ask
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: 9f52380b240284419ad1112970b4c928, type: 3}
+  - id: rachel_l2_s5_upo_done
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: cd4bf1dc25adb408c9542655fa0b5f11, type: 3}
+  - id: rachel_l2_s5_upo_story
+    text: 
+    gloss: 
+    clip: {fileID: 8300000, guid: b9f1e6b87c61b4a508675dfa3391f61a, type: 3}
   - id: rachel_word_tabo_recall
     text: 
     gloss: 

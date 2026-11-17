@@ -29,12 +29,30 @@ Run from the repository root:
 
 Plain python3, not `python3 -I`: that flag drops the user site directory,
 where numpy lives.
+
+TEACHER RACHEL IS   HSDKNpbnyYlTuNnu4May   ("Teacher Rachel (Kyla)"), and it is
+written here because it was written nowhere. Every other input to this
+pipeline is reproducible - the CSV says what she says, the file names say
+which clip is which, NarratorVoiceBankTool re-attaches them all by name - but
+the VOICE that produced the 916 clips in Assets/Audio/VO lived only in
+whoever ran this last, and --voice has no default. Recovering it costs an API
+key with voices_read on it, which is a strange thing to need in order to add
+one line to a scene.
+
+It is not a secret: a voice id identifies a voice on the account and cannot
+be used without the key. The key is the secret, it is in Tools/elevenlabs.key,
+and that file is gitignored.
+
+If the clone is ever rebuilt, Tools/clone_voice.py prints the new id - put it
+here. Tools/splice_word_lines.py needs no help: it finds the sole voice whose
+category is "cloned", which works as long as there is exactly one.
 """
 import argparse
 import base64
 import csv
 import json
 import os
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -95,6 +113,51 @@ LANGUAGE = "fil"
 TARGET_DBFS = -20.0
 FLOOR = 0.004
 
+# --------------------------------------------------------------------------
+# Getting the API's audio into a 16-bit mono WAV, on whatever machine this is
+#
+# THIS USED TO BE ONE HARD-CODED LINE and it only ran on a Mac. The call was
+# `/usr/bin/afconvert`, which exists on macOS and nowhere else, so on Windows
+# the script asked for the audio, was BILLED for it, wrote the mp3 into
+# Recordings/vo and then died with WinError 2 on the very first clip. The
+# money went and the clip did not arrive, which is the worst of both.
+#
+# So the converter is chosen first and the OUTPUT FORMAT follows from it,
+# rather than the other way round:
+#
+#   afconvert   macOS. mp3_44100_128, exactly as before - this path is
+#               unchanged, so clips made on the Mac are bit-for-bit what
+#               they always were.
+#   ffmpeg      anywhere it is installed. Same mp3, same 44.1 kHz.
+#   neither     ask for RAW PCM and write the WAV header here, with Python's
+#               own wave module. No decoder needed, because nothing has to
+#               decode anything.
+#
+# THE LAST PATH COSTS BANDWIDTH, and it is worth being plain about why. PCM
+# at 44.1 kHz is a Pro-tier output format - a Starter key gets
+# `output_format_not_allowed` for it - so the best a Starter key can ask for
+# without an mp3 decoder is pcm_24000. That is a 12 kHz ceiling against the
+# mp3's ~20, which on a short sentence of speech reads as slightly duller
+# sibilance and nothing else. It is NOT resampled up to 44100 to hide the
+# difference: the rate written is the rate that arrived, shape() reads the
+# rate off the file, match_word_loudness.py does too, and Unity resamples on
+# import anyway. A clip that claims 44.1 kHz and carries 12 kHz of signal is
+# a worse artefact than an honest 24 kHz one.
+#
+# Install ffmpeg and this path is never taken.
+AFCONVERT = "/usr/bin/afconvert"
+PCM_RATE = 24000
+
+
+def converter():
+    """(name, path) for the mp3 decoder on this machine, or ("pcm", None)."""
+    if os.path.exists(AFCONVERT):
+        return ("afconvert", AFCONVERT)
+    found = shutil.which("ffmpeg")
+    if found:
+        return ("ffmpeg", found)
+    return ("pcm", None)
+
 # The two lines a voice is judged on: one English sentence of Rachel's, and
 # the bare Filipino word - the hardest thing to get right and the one a child
 # actually copies.
@@ -151,6 +214,18 @@ def main():
         sys.exit("Not enough credits: need %d, have %d." % (need, left))
 
     os.makedirs(STAGE, exist_ok=True)
+
+    # Say which decoder is being used and what it means for the clips, BEFORE
+    # anything is billed. A run that quietly produces 24 kHz clips where the
+    # rest of the folder is 44.1 is the kind of thing that gets noticed much
+    # later, by ear, in a scene.
+    tool, _ = converter()
+    if tool == "pcm":
+        print("converter: none found - asking for pcm_%d and writing the WAV here.\n"
+              "           Clips will be %d Hz, not the 44100 an mp3 path gives.\n"
+              "           Install ffmpeg for full-bandwidth clips." % (PCM_RATE, PCM_RATE))
+    else:
+        print("converter: %s - mp3_44100_128, clips at 44100 Hz" % tool)
 
     if args.audition:
         d = os.path.join(STAGE, "audition")
@@ -278,6 +353,9 @@ def speak(key, voice, text, dst):
     the plain one: without this, Rachel's mouth can only be animated on a
     timer, which is what made it move at random.
     """
+    tool, path = converter()
+    fmt = "mp3_44100_128" if tool != "pcm" else "pcm_%d" % PCM_RATE
+
     body = json.dumps({
         "text": text,
         "model_id": MODEL,
@@ -286,7 +364,7 @@ def speak(key, voice, text, dst):
                            "style": 0.0, "use_speaker_boost": True},
     }).encode()
     req = urllib.request.Request(
-        TTS + voice + "/with-timestamps?output_format=mp3_44100_128", data=body,
+        TTS + voice + "/with-timestamps?output_format=" + fmt, data=body,
         headers={"xi-api-key": key, "Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
@@ -300,11 +378,30 @@ def speak(key, voice, text, dst):
 
     speak.track = mouth_track(payload.get("alignment") or {})
 
-    mp3 = dst + ".mp3"
-    open(mp3, "wb").write(audio)
-    subprocess.run(["/usr/bin/afconvert", "-f", "WAVE", "-d", "LEI16@44100", "-c", "1",
-                    mp3, dst], check=True, capture_output=True)
-    os.remove(mp3)
+    if tool == "pcm":
+        # Signed 16-bit little-endian mono at PCM_RATE, which is exactly what
+        # wave wants - so this is a header and nothing else. A trailing odd
+        # byte would desync every frame after it, so it is dropped rather
+        # than written.
+        if len(audio) % 2:
+            audio = audio[:-1]
+        with wave.open(dst, "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(PCM_RATE)
+            w.writeframes(audio)
+    else:
+        mp3 = dst + ".mp3"
+        open(mp3, "wb").write(audio)
+        if tool == "afconvert":
+            cmd = [path, "-f", "WAVE", "-d", "LEI16@44100", "-c", "1", mp3, dst]
+        else:
+            # -y to overwrite a stale staged wav, -ac 1 mono, -ar 44100 to
+            # match what afconvert produces, so the two paths agree.
+            cmd = [path, "-y", "-loglevel", "error", "-i", mp3,
+                   "-ac", "1", "-ar", "44100", "-sample_fmt", "s16", dst]
+        subprocess.run(cmd, check=True, capture_output=True)
+        os.remove(mp3)
     shape(dst)
 
 

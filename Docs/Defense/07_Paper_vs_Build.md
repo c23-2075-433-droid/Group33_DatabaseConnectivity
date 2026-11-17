@@ -62,7 +62,7 @@ This is the one a panelist can disprove by playing one scene.
 | 7 | Klasrum | **Bukas, Kumusta**, Upo, Kuha, Lapis | **Bati**, Upo, **Kinig**, Kuha, Lapis |
 | 8 | Aralin | Aklat, Basa, Sulat, **Tanong**, Sagot (5) | Aklat, Basa, Sulat, Sagot **(4)** |
 | 9 | Recess | Labas, Kain, **Laro, Tawa, Tulong** | **Hugas**, Labas, Kain, **Inom, Tapon** |
-| 10 | Uwian | **Pasok**, Upo, **Linis, Bag**, Alis | Upo, **Kunin, Ligpit, Paalam**, Alis |
+| 10 | Uwian | **Pasok**, Upo, **Linis, Bag**, Alis | **Ligpit, Tayo, Kunin, Paalam**, Alis |
 | 11–15 | Parke scenes | — | ✅ all five match |
 
 **Consequences that must be fixed with it:**
