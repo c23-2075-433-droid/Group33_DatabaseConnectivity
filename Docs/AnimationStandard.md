@@ -119,7 +119,7 @@ Counted from the builders, not estimated:
 | **Paaralan 2** | **Bati Upo Kinig Kuha Lapis** | **yes — all five** |
 | **Paaralan 3** | **Aklat Basa Sulat Sagot** | **yes — all four** |
 | Paaralan 4 | Labas Kain Laro Tawa Tulong | no — snaps |
-| Paaralan 5 | Pasok Upo Linis Bag Alis | no |
+| **Paaralan 5** | **Ligpit Tayo** Kunin Paalam Alis | **two of five — Ligpit, Tayo** |
 | Parke 1 | Lakad Takbo Tingin Tuwa Pasok | no — snaps |
 | Parke 2 | Akyat Dausdos Sakay Tulak Talon | no |
 | Parke 3 | Kumusta Ngiti Tanong Laro Bati | no — snaps |
@@ -359,13 +359,45 @@ than as a side effect of something else.
    footprint, only what is drawn in it. A lunchbox will not cover the tall
    thin notepad in `place_frame_1`, so that frame is missing from Scene 4's
    Kuha and the box goes straight from the bag to his chest.
-3. **The repeated words** — Lakad, Upo, Pasok, Takbo. Each one animated here
+3. **Paaralan 5** — **two of five, and the rest is one strip away.** Ligpit
+   and Tayo are drawn and cost NO new art whatsoever, not even a code-drawn
+   prop: Ligpit is Scene 4's pack-away chain entire, `PropCarry` and all, and
+   Tayo is Scene 3's rise out of the chair with the hand-raise lead-in
+   dropped - the hand goes up for "Sagot", not for going home.
+
+   The scene was moved into Scene 4's room in the same change. It used to
+   open on `klasrum_background`, the wide shot of the whole room, so Scene 4
+   faded from a boy at his desk to a boy across a different classroom with
+   nothing in the story having moved him. Every placement in
+   `BuildPaaralanScene5.cs` is now Scene 4's, copied the way Scene 4 copied
+   Scene 3's.
+
+   | word | what it reuses | what was new |
+   |---|---|---|
+   | Ligpit | Scene 4's four chained legs and its `PropCarry`, whole | nothing |
+   | Tayo | Scene 3's `sagot_rise_1..3` + `sagot_stand`, lead-in dropped | nothing |
+   | Kunin | — prop and gleam only | — |
+   | Paalam | — gleam only | — |
+   | Alis | — gleam, and the room empties | — |
+
+   **The three that are left all want the same one thing**, which is why they
+   are worth doing together: a STANDING figure at this desk that can do
+   something. Every reach in this project is seated - `kuha_frame_*`,
+   `reach_bag_*`, `aklat_*` - and every wave and walk is a full-body
+   wide-shot figure built for a scene with a floor in it.
+   `klasrum_interior_background` has no floor; the shot is cut at the
+   lockers' lower rows. `sagot_stand_uniform` is the only standing drawing
+   anyone ever fitted to this desk, and it was fitted by hand.
+
+   So one strip of three from that pose - **a lift, a wave, and a turn away**
+   - finishes Paaralan 5 and is the cheapest remaining win in Level 2.
+4. **The repeated words** — Lakad, Upo, Pasok, Takbo. Each one animated here
    pays off in two to four scenes. Kain and Inom are drawn now, in Paaralan
    4, and the frames are seated - Bahay 5 and Parke 4 sit at a table and a
    picnic mat, so they may take them as they are.
-4. **The scenes that snap** — Bahay 3, Paaralan 1, Parke 1, Parke 3,
+5. **The scenes that snap** — Bahay 3, Paaralan 1, Parke 1, Parke 3,
    Parke 5. These actively break rule 1 today.
-5. **Everything else.**
+6. **Everything else.**
 
 ## Pipeline for one action
 
