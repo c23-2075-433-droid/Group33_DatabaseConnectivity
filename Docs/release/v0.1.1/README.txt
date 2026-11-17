@@ -97,9 +97,9 @@ See RELEASE_NOTES.txt. The ones most likely to be noticed:
   do not rely on the right/wrong judgement. This is the whole reason v0.1.1
   is still a testing build.
 
-  Twelve words have no recording of the word itself, so Rachel teaches them
-  by caption while she speaks the sentence around them: Pagkain, Tapon,
-  Ligpit, Suot, Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara, Salamin.
+  Eleven words have no recording of the word itself, so Rachel teaches them
+  by caption while she speaks the sentence around them: Pagkain, Tapon, Suot,
+  Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara, Salamin.
 
   The MINI GAME button on the main menu does nothing yet.
 

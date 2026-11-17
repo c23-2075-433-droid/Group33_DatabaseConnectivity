@@ -35,8 +35,8 @@ Teacher Rachel is no longer silent anywhere.
     heard most often in a session, and they were the loudest gap in v0.1.0.
   The 17 lines that were still being read in English are now spoken in
     Filipino.
-  458 voice clips, up from 423. 458 of the voice bank's 473 entries are
-    wired; the 15 that are not are listed under Known Issues.
+  468 voice clips, up from 423. 468 of the voice bank's 482 entries are
+    wired; the 14 that are not are listed under Known Issues.
   Her portrait is drawn in the narration panel and her mouth moves while she
     speaks, driven by the narrator's own state rather than a timer, so she
     stops the instant a line is cut off. In v0.1.0 the ring framed the room
@@ -90,6 +90,10 @@ Animation and sound.
     on its jambs, Kylo turns before he walks through, and the school bell he
     is running to beat rings when he beats it.
   Paaralan 3: Kylo writes, with one pencil instead of two.
+  Paaralan 4: Kylo eats with a mouth that moves, on sandwich art drawn for it.
+  Paaralan 5 has moved into Paaralan 4's classroom, and its five objectives
+    are recorded through: Alis, Kunin, Ligpit, Paalam and Tayo. Upo is no
+    longer asked for there; Tayo is, which is the word the new staging needs.
   Paaralan 4: the lesson desk is animated for Ligpit, Kuha, Kain, Inom and
     Tapon, and the Ligpit pencil is carried into the bag on the pose's own
     clock.
@@ -146,14 +150,16 @@ KNOWN ISSUES
     v0.1.0 claimed this fixed once on the strength of unit tests and had to
     retract it. That is not being repeated here.
 
-  12 words have no recording of the word itself. Pagkain, Tapon, Ligpit,
-    Suot, Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara and Salamin have no
+  11 words have no recording of the word itself. Pagkain, Tapon, Suot,
+    Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara and Salamin have no
     word_<word>.wav, so their entries in the voice bank are empty. Rachel
     speaks the sentence around the word and the word is shown as a caption
     while the pause is held, so the game stays playable and the scene keeps
-    its timing - it is quieter at the moment that matters most.
+    its timing - it is quieter at the moment that matters most. Ligpit, which
+    was on this list, has its recording now.
 
-  3 more voice bank entries are empty, for the Bahay scene that was dropped.
+  3 more voice bank entries are empty, for the Bahay scene that was dropped -
+    14 unwired in all, out of 482.
     They are harmless: the scene is off the journey map, so nothing asks for
     them. They are left in rather than deleted, against the scene being built.
 
@@ -188,7 +194,7 @@ NOT YET INCLUDED
   The sixth Bahay scene, "Leaving for School" - dropped from the map for this
     release. Its three voice-over lines exist as empty bank entries; the
     scene does not.
-  Recordings of the twelve words listed under Known Issues.
+  Recordings of the eleven words listed under Known Issues.
   A mini-game.
   Per-player filtering and paging on the leaderboard.
   The usability and usefulness evaluation with real pupils.
@@ -215,7 +221,7 @@ NEXT VERSION
 ------------
 
   A bug fix on top of this release becomes 0.1.2.
-  The next working feature - most likely the Palengke level, the twelve
+  The next working feature - most likely the Palengke level, the eleven
   remaining word recordings, or a mini-game - becomes 0.2.0.
   A recognition approach that actually catches a mispronounced word is the
   one change this project most needs, and it is a feature, not a fix.
