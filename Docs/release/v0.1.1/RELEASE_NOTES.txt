@@ -1,0 +1,222 @@
+SALINLAHI - RELEASE NOTES
+=========================
+
+Project      : SALINLAHI - A Voice-Interactive Filipino Language Learning Game
+Version      : 0.1.1
+Release Date : 17 November 2026
+Release Type : Development milestone (testing build, not a stable release)
+Platform     : Android 8.0+ (minSdk 26), ARM64
+Artifact     : SALINLAHI-v0.1.1.apk  (versionCode 3)
+Package id   : ph.edu.uphsl.group33.salinlahi
+Built with   : Unity 6000.6.2f1
+
+Source version / branch / changeset
+  Branch : main
+  Commit : recorded in BUILD_INFO.txt beside this file, written by the build
+           itself rather than typed in by hand
+  Tag    : v0.1.1
+
+Why 0.1.1. [CONFIRM: the group's reason for numbering this a PATCH. The
+Numbering table in Docs/RELEASE_PROCESS.md puts "the remaining narrator
+recordings" under MINOR, which would make this 0.2.0, and 137 commits have
+landed since v0.1.0. The number is set in one place - Player Settings >
+Version - and changing it means renaming this folder; decide before building,
+not after.]
+
+
+WHAT CHANGED SINCE v0.1.0
+-------------------------
+
+Teacher Rachel is no longer silent anywhere.
+  The 15 repeated lines that had no recording in v0.1.0 are recorded and
+    wired: the framing lines ("Sabihin", "Ngayon", "Ulitin"), the listening
+    cue, both hints, the idle nudge, the mic-blocked line, and the three
+    correct / two incorrect / two not-heard replies. These are the lines
+    heard most often in a session, and they were the loudest gap in v0.1.0.
+  The 17 lines that were still being read in English are now spoken in
+    Filipino.
+  458 voice clips, up from 423. 458 of the voice bank's 473 entries are
+    wired; the 15 that are not are listed under Known Issues.
+  Her portrait is drawn in the narration panel and her mouth moves while she
+    speaks, driven by the narrator's own state rather than a timer, so she
+    stops the instant a line is cut off. In v0.1.0 the ring framed the room
+    behind her because no sprite was assigned.
+
+Vocabulary and objectives.
+  51 distinct Filipino words across 73 spoken objectives in 15 scenes, with
+    22 of the objectives re-asking a word taught earlier.
+    [CONFIRM: 3.2.4 and 3.6 of the paper, and Addendum A to the vocabulary
+    validation, say 72 objectives and 21 re-asks. Counted from the committed
+    scene files and the builders that generate them, it is 73 and 22 - one
+    objective more than the paper claims. Reconcile the two before the
+    evaluator signs Addendum A.]
+  Parke's full word list is back. A restructure on 9-12 November had cut the
+    five Parke builders down to 19 objectives; the scene files had been kept
+    on the fuller list, and re-running the builders on 17 November took eight
+    words out of the game - Tingin, Tuwa, Tulak, Kumusta, Laro, Ibahagi,
+    Pagod and Talon. Talon mattered most: it is the one worked example quoted
+    in 1.1 of the paper, and for a few hours it was a word with nothing to be
+    the answer to. The builders and the scenes now agree again.
+  The home chapter ends at breakfast. The sixth Bahay scene, "Leaving for
+    School", was designed but never built and sat on the map as a locked
+    tile; it is off the map now, along with the Palengke marker. The journey
+    therefore no longer ends on a tile nobody can enter.
+  Kanin and Itlog are no longer separate objectives: "Pagkain" brings the
+    whole meal out and "Linis" clears it away.
+
+Pronunciation checking - tightened, NOT yet re-tested on a device.
+  The whole word now has to be said. Saying the first syllable - "ba" for
+    "Bangon" - used to pass; it does not now.
+  An accepted variant has to be the whole recognizer result, not a substring
+    of it.
+  The editor's own emulator no longer answers on the child's behalf, which
+    was masking failures during development.
+  The stress mark came off Kinig, which is not one of the ambiguous pairs.
+  READ THIS: none of the above has been confirmed on a phone. See Known
+    Issues, first entry.
+
+Animation and sound.
+  Bahay 3 rebuilt around the bath: Kylo faces the child, brushes the teeth
+    that are actually there, combs hair that moves, and drips instead of
+    changing his hair to show he is wet. The bath hides the change it makes.
+  Bahay 4: the folded uniform is cut from the painted art and sits on the
+    flat top of the mattress, at the socks' real size. The bag comes out on
+    the answer rather than on the question, and is picked up as its own beat.
+  Bahay 5: Kylo sits on a drawn sitting pose instead of a standing picture
+    slid down, sized to the chair, and eats and drinks with real recorded
+    sounds - smacks for chewing, glugs for drinking. The Pagkain badge is on
+    the table, not on his chest.
+  Paaralan 1: the guard pushes the gate open in six frames, the gate hinges
+    on its jambs, Kylo turns before he walks through, and the school bell he
+    is running to beat rings when he beats it.
+  Paaralan 3: Kylo writes, with one pencil instead of two.
+  Paaralan 4: the lesson desk is animated for Ligpit, Kuha, Kain, Inom and
+    Tapon, and the Ligpit pencil is carried into the bag on the pose's own
+    clock.
+  Ten seconds of silence brings out crickets - three quarters of a second,
+    stoppable - and a wordless "yes" and "oops" answer right and wrong.
+  Kylo no longer swells by a fifth every time he waves, and breathing no
+    longer undoes the walk.
+
+Screen and layout.
+  The background covers screens wider than 16:9 instead of letterboxing.
+  Landscape either way up.
+  The bathroom cup is back to the size the room was painted around.
+  The summary panel says TOTAL ATTEMPTS on the plate that always counted
+    tries, and the words-learned board prints the word in front of the slash.
+  The recent-scores list no longer prints through the Replay and Continue
+    buttons.
+
+Main menu and leaderboard.
+  The About popup is the drawn board it was given, and the leaderboard closes
+    on an X in its corner rather than an OKAY button underneath it.
+  Both boards scroll, so ten children sharing a tablet can all find their
+    names. Per-player filtering is still not there.
+  Volume settings are applied when a gameplay scene is entered directly, not
+    only on the one Start() in the main menu.
+
+Under the hood.
+  Parke's SupabaseClient has the config the other levels have.
+  The save file, the publishable key and the package are treated as
+    untrusted input; 19 input-validation rules are enforced and tested.
+  Tools/secret_scan.sh and Tools/test_security_rules.sh both pass clean on
+    this source: no credential in anything tracked, 19 of 19 rules holding.
+  .gitattributes stops Git rewriting the PDFs as text on Windows.
+
+
+KNOWN ISSUES
+------------
+
+  WRONG PRONUNCIATION MAY STILL BE ACCEPTED, AND THIS RELEASE DOES NOT PROVE
+    OTHERWISE. This was the most serious issue in v0.1.0 and it is not closed.
+    The checker has been tightened since - whole word required, variants
+    matched against the whole recognizer result, the editor emulator stopped
+    from answering - but NO DEVICE TEST HAS BEEN RUN AGAINST THOSE CHANGES.
+    The v0.1.0 device test found a mispronounced word still accepted during
+    play, and the suspected cause is untouched by any of this: the device's
+    Filipino dictation service appears to return the nearest real Filipino
+    word rather than the sounds the child actually made, so the checker is
+    handed an already-corrected word and never sees the mistake. If that is
+    what is happening, it cannot be fixed inside the checker at all and needs
+    a different recognition approach.
+    Treat the right/wrong judgement as unreliable until a phone says
+    otherwise. The game teaches and prompts the vocabulary; it is not proven
+    to correct pronunciation. This is why v0.1.1 is a testing build and not a
+    stable release.
+    v0.1.0 claimed this fixed once on the strength of unit tests and had to
+    retract it. That is not being repeated here.
+
+  12 words have no recording of the word itself. Pagkain, Tapon, Ligpit,
+    Suot, Padyak, Alok, Apir, Hugas, Kinig, Sali, Tara and Salamin have no
+    word_<word>.wav, so their entries in the voice bank are empty. Rachel
+    speaks the sentence around the word and the word is shown as a caption
+    while the pause is held, so the game stays playable and the scene keeps
+    its timing - it is quieter at the moment that matters most.
+
+  3 more voice bank entries are empty, for the Bahay scene that was dropped.
+    They are harmless: the scene is off the journey map, so nothing asks for
+    them. They are left in rather than deleted, against the scene being built.
+
+  The opening prompt of a scene holds a long silent pause before the child is
+    allowed to speak. Unchanged from v0.1.0.
+
+  The MINI GAME button on the main menu is drawn and clickable but does
+    nothing. Deliberate: there is no mini game to open, and a button that
+    loads a stub is worse than one that waits.
+
+  A word badge sits low on the screen in Paaralan 5, at y = -350. Paaralan 2
+    and Parke 4, also listed in v0.1.0, no longer do.
+
+  No voice input without an internet connection; offline recognition is off.
+
+  Suspend and resume behaviour has not been tested on a phone with the
+    speaker at full volume. Unchanged from v0.1.0.
+
+  The game cannot be answered by voice on desktop at all; the speech plugin
+    is Android and iOS only. A desktop build is not released for this reason.
+
+  The leaderboard shows every player on the device with no way to filter to
+    one child. It scrolls now, which is what made ten profiles usable, but
+    filtering and paging are still not implemented.
+
+
+NOT YET INCLUDED
+----------------
+
+  The Palengke (market) level - designed, no longer shown on the map, not
+    built.
+  The sixth Bahay scene, "Leaving for School" - dropped from the map for this
+    release. Its three voice-over lines exist as empty bank entries; the
+    scene does not.
+  Recordings of the twelve words listed under Known Issues.
+  A mini-game.
+  Per-player filtering and paging on the leaderboard.
+  The usability and usefulness evaluation with real pupils.
+  Minimum RAM and free storage figures for 3.4.1 of the paper, and the
+    Appendix E table of development computers and test devices. Both need
+    this APK on real phones; this release is the chance to fill them in.
+
+
+INSTALLATION / RUNNING INSTRUCTIONS
+-----------------------------------
+
+See README.txt in this folder. In short:
+
+  1. v0.1.0 can be upgraded in place. Anything older than v0.1.0 must be
+     uninstalled first - the package name changed at v0.1.0.
+  2. Copy SALINLAHI-v0.1.1.apk to an Android 8.0+ device and open it.
+  3. Allow installation from this source, then allow the microphone.
+  4. Stay online, turn the volume up, and say the Filipino word on screen.
+
+Confirm the build by opening SETTINGS > ABOUT; it should read v0.1.1.
+
+
+NEXT VERSION
+------------
+
+  A bug fix on top of this release becomes 0.1.2.
+  The next working feature - most likely the Palengke level, the twelve
+  remaining word recordings, or a mini-game - becomes 0.2.0.
+  A recognition approach that actually catches a mispronounced word is the
+  one change this project most needs, and it is a feature, not a fix.
+  The conditions for 1.0.0 are written down in Docs/RELEASE_PROCESS.md.

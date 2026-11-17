@@ -259,6 +259,7 @@ conditions for 1.0.0 above.
 | Version | Date | Type | Source | Notes |
 |---|---|---|---|---|
 | v0.1.0 | 12 Nov 2026 | Development milestone | tag `v0.1.0` | First controlled release. 15 scenes, 54 words, leaderboard, 423 voice clips. |
+| v0.1.1 | 17 Nov 2026 | Development milestone | tag `v0.1.1` | Every narrator line recorded (458 clips), Rachel's portrait and lip-sync, Parke's word list restored, pronunciation checker tightened but not re-tested on a device. |
 
 Earlier artifacts — `SALINLAHI_VoiceTest.apk`, `_v2`, `_v3` (Sep 2026) and the
 Mid-Act7 `SALINLAHI.apk` (Nov 2026) — predate this process. They carry no
