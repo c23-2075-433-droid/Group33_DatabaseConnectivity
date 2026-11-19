@@ -357,6 +357,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         SetStatusText("Listening...");
         speechStartedThisSession = false;
+        ResetLatency();
         SpeechToText.Start(this, useFreeFormLanguageModel, preferOfflineRecognition: false);
 #endif
     }
@@ -368,6 +369,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     void ISpeechToTextListener.OnReadyForSpeech()
     {
         if (isShuttingDown || this == null) return;
+        readyAtMs = NowMs;
         SetListening(true);
     }
 
@@ -375,10 +377,79 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     // "said something I couldn't make out" apart from "said nothing at all".
     private bool speechStartedThisSession = false;
 
+    // ---- Latency measurement -------------------------------------------
+    //
+    // Activity 10 lists the voice round trip as unmeasured, and its monitoring
+    // plan says to read it "from the timestamps in
+    // salinlahi_voice_attempts.csv" - which was not possible, because that
+    // column is a wall clock stamp per row. These four marks are the actual
+    // measurement, taken from the recognizer's own callbacks and written to the
+    // CSV's latency columns. VoiceAttemptLog documents what each column means
+    // and which one is honest to quote.
+    //
+    // A Stopwatch rather than Time.realtimeSinceStartup: it is monotonic, it
+    // does not care which thread the plugin delivers a callback on, and it does
+    // not stop when the game is paused. One static clock for the whole run, so
+    // the marks below are all on the same timebase.
+    private static readonly System.Diagnostics.Stopwatch latencyClock =
+        System.Diagnostics.Stopwatch.StartNew();
+
+    private static double NowMs
+    {
+        get { return latencyClock.Elapsed.TotalMilliseconds; }
+    }
+
+    private double readyAtMs = -1;        // OnReadyForSpeech
+    private double speechBeganAtMs = -1;  // OnBeginningOfSpeech
+    private double lastPartialAtMs = -1;  // the most recent partial transcript
+    private double resultAtMs = -1;       // OnResultReceived
+    private int partialsThisSession;
+
+    // False for simulated speech (the Editor keyboard fallback), where there is
+    // no recognizer to time and every latency column must stay empty.
+    private bool latencyIsReal;
+
+    private void ResetLatency()
+    {
+        readyAtMs = -1;
+        speechBeganAtMs = -1;
+        lastPartialAtMs = -1;
+        resultAtMs = -1;
+        partialsThisSession = 0;
+        latencyIsReal = false;
+    }
+
+    /// <summary>
+    /// The timings for the attempt being logged right now. verdictMs is closed
+    /// here, at the moment of logging, because logging happens immediately
+    /// after the verdict is decided - so it measures this project's own
+    /// canonicalisation and variant match and nothing else.
+    /// </summary>
+    private VoiceAttemptLog.Latency CurrentLatency()
+    {
+        if (!latencyIsReal) return VoiceAttemptLog.Latency.None;
+
+        VoiceAttemptLog.Latency l = VoiceAttemptLog.Latency.None;
+        l.partialCount = partialsThisSession;
+
+        if (resultAtMs >= 0)
+        {
+            if (readyAtMs >= 0) l.listenToResultMs = resultAtMs - readyAtMs;
+            if (speechBeganAtMs >= 0) l.speechToResultMs = resultAtMs - speechBeganAtMs;
+            if (lastPartialAtMs >= 0) l.lastPartialToResultMs = resultAtMs - lastPartialAtMs;
+            l.verdictMs = NowMs - resultAtMs;
+        }
+
+        return l;
+    }
+
     void ISpeechToTextListener.OnBeginningOfSpeech()
     {
         if (isShuttingDown || this == null) return;
         speechStartedThisSession = true;
+        // Only the first one: the recognizer can report speech beginning more
+        // than once in a cycle, and the first is when the child started.
+        if (speechBeganAtMs < 0) speechBeganAtMs = NowMs;
         OnSpeechBegan?.Invoke();
     }
 
@@ -388,12 +459,21 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     {
         if (isShuttingDown || this == null) return;
 
+        // Partials stop arriving when the talking stops, so the last one is the
+        // closest this plugin gets to an end-of-speech mark.
+        lastPartialAtMs = NowMs;
+        partialsThisSession++;
+
         // Live partial results, shown as they come in (before the final result).
         SetStatusText("Recognized (partial):\n\"" + spokenText + "\"");
     }
 
     void ISpeechToTextListener.OnResultReceived(string spokenText, int? errorCode)
     {
+        // Stamped first, before any handling at all, so verdictMs measures
+        // this project's work rather than this method's own bookkeeping.
+        double arrivedAtMs = NowMs;
+
         // A result can land after this object was destroyed (Play stopped or
         // scene changed while the recognizer was still working) - bail out
         // rather than touching a dead object.
@@ -413,6 +493,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // shortly once StartListening() runs again below.
         SetListening(false);
 
+        resultAtMs = arrivedAtMs;
+        latencyIsReal = true;
+
         if (errorCode.HasValue)
         {
             // Recognition failed for this attempt (e.g. no speech detected, no
@@ -425,7 +508,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
                 // Worth recording: a word the recognizer never manages to
                 // transcribe needs a clearer prompt, not a new variant.
                 if (logAttempts && !string.IsNullOrEmpty(currentTargetWord))
-                    VoiceAttemptLog.RecordNothingHeard(currentTargetWord);
+                    VoiceAttemptLog.RecordNothingHeard(currentTargetWord, CurrentLatency());
 
                 if (OnNothingHeard != null) OnNothingHeard();
             }
@@ -451,6 +534,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     public void SimulateSpeech(string spokenText)
     {
         Debug.Log("VoiceCommand: simulating recognized speech \"" + spokenText + "\"");
+        // No recognizer was involved, so there is nothing to time and the
+        // latency columns stay empty rather than reporting a flattering zero.
+        ResetLatency();
         ProcessRecognizedText(spokenText);
     }
 
@@ -487,7 +573,8 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             // Only while an objective is live. Listening restarts every few
             // seconds whether or not anyone is talking, so logging outside a
             // lesson would bury the real attempts in idle noise.
-            if (logAttempts) VoiceAttemptLog.Record(currentTargetWord, spokenText, isCorrect);
+            if (logAttempts)
+                VoiceAttemptLog.Record(currentTargetWord, spokenText, isCorrect, CurrentLatency());
 
             OnAnswerChecked?.Invoke(spokenText, isCorrect);
         }
