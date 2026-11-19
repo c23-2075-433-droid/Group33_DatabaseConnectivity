@@ -418,6 +418,14 @@ public class SceneObjectiveController : MonoBehaviour
         // he was still in the gateway.
         WalkIntoScene[] entries = FindObjectsByType<WalkIntoScene>(FindObjectsSortMode.None);
 
+        // And the fourth: a walk OUT of the picture. Paaralan Scene 5's
+        // "Alis" hands Kylo to a WalkOffAndFade, which carries him across the
+        // room and off the side of it and then takes the room to black. Same
+        // blind spot as the one above and a worse symptom, because it is the
+        // last word of the level: without this the summary panel came up over
+        // a boy still halfway to the door.
+        WalkOffAndFade[] exits = FindObjectsByType<WalkOffAndFade>(FindObjectsSortMode.None);
+
         float waited = 0f;
 
         // The other half of the same problem: "Bangon" starts a sit-up
@@ -426,7 +434,8 @@ public class SceneObjectiveController : MonoBehaviour
         // and Rachel started introducing it, while Kylo was still half out of
         // bed. That one reports itself through PlayerMovement.IsPosing rather
         // than a PoseSequence, so both have to be asked.
-        while (waited < maxActionWait && (IsActing() || IsPosePlaying(poses) || IsEntering(entries)))
+        while (waited < maxActionWait && (IsActing() || IsPosePlaying(poses) ||
+                                          IsEntering(entries) || IsLeaving(exits)))
         {
             waited += Time.deltaTime;
             yield return null;
@@ -474,6 +483,14 @@ public class SceneObjectiveController : MonoBehaviour
     {
         if (entries == null) return false;
         foreach (WalkIntoScene e in entries)
+            if (e != null && e.IsMoving) return true;
+        return false;
+    }
+
+    private static bool IsLeaving(WalkOffAndFade[] exits)
+    {
+        if (exits == null) return false;
+        foreach (WalkOffAndFade e in exits)
             if (e != null && e.IsMoving) return true;
         return false;
     }

@@ -19,6 +19,44 @@ easy to state and the work is not — see **How big this is**.
 5. **Objects meet his hands.** A prop appears as the hand reaches it, not
    before and not after.
 6. **No floating props, no clipping, no stiffness, no teleporting.**
+   - **A prop STANDING on a surface needs a shadow, a contact and a
+     perspective**, or it is a sticker on the glass however exactly it is
+     placed. A cut-out lifted out of a character sheet is lit evenly,
+     drawn dead square on and has nothing under it — three things no
+     object in a room has. Give it the room's light (dark away from the
+     window, a warm line towards it), a soft wide cast shadow on the
+     surface plus a tighter darker one where it touches, a few degrees of
+     lean, a few per cent of taper so the far end goes away from us, and a
+     little spread where it takes its own weight. Keep its own colours and
+     drawing: this is lighting, not redrawing.
+   - **And check the cut for borrowed pixels.** A prop found as a region
+     and grown to pick up the line round it has grown that far into
+     whatever it was lying against — here his white shirt, invisible
+     against pale lockers and a white rind down one side against dark
+     wood. Fill the thing's own outline and drop every solid pixel outside
+     it, rather than hunting pale colours, which takes the zip off too.
+   - **CUT, THEN SCALE, IS THE WRONG ORDER.** A cut-out's transparent
+     pixels still carry whatever RGB was there before, and no resampling
+     filter knows that alpha means "ignore this colour". Enlarge a cut-out
+     and the filter drags that colour out across every edge of it: the
+     worn backpack came out with an orange fringe down both straps and a
+     dotted line for an outline, which is what "broken" looked like on
+     screen. Either scale the source and cut at the final size, or replace
+     every soft pixel's colour with its nearest solid neighbour's first.
+   - **A THING HIS OWN ARM COVERS IS NOT A DRAWING YOU HAVE.** In
+     `talking_uniform_with_bag` his forearm lies across the right strap, so
+     the difference that gives the bag has a hole in it, and the file that
+     built it filled the hole by laying one row of strap along a
+     hand-measured path. That band — too wide, splayed, not the shape
+     anyone drew — was the navy mass swallowing his sleeve. His LEFT strap
+     is drawn whole, because his left arm is raised in that pose, so the
+     right one is **the left one mirrored**: same band, same buckle, same
+     outline weight. Take the mirror axis from the two drawn straps, row by
+     row over the rows they share, and NOT from his silhouette — his
+     outline at chest height has a raised arm in it, which puts the middle
+     of him nineteen pixels out and crosses the straps in the centre of his
+     chest. Mirror what is behind him too, or the bag peeks over one
+     shoulder only and reads as a fin stuck to it.
 7. **Consistent proportions and appearance** in every frame of every action.
 8. **Smooth joins between consecutive actions**: one action's ending pose is
    the next one's starting pose.
@@ -119,7 +157,7 @@ Counted from the builders, not estimated:
 | **Paaralan 2** | **Bati Upo Kinig Kuha Lapis** | **yes — all five** |
 | **Paaralan 3** | **Aklat Basa Sulat Sagot** | **yes — all four** |
 | Paaralan 4 | Labas Kain Laro Tawa Tulong | no — snaps |
-| **Paaralan 5** | **Ligpit Tayo** Kunin Paalam Alis | **two of five — Ligpit, Tayo** |
+| **Paaralan 5** | **Ligpit Tayo Kunin Paalam Alis** | **yes — all five** |
 | Parke 1 | Lakad Takbo Tingin Tuwa Pasok | no — snaps |
 | Parke 2 | Akyat Dausdos Sakay Tulak Talon | no |
 | Parke 3 | Kumusta Ngiti Tanong Laro Bati | no — snaps |
@@ -359,11 +397,19 @@ than as a side effect of something else.
    footprint, only what is drawn in it. A lunchbox will not cover the tall
    thin notepad in `place_frame_1`, so that frame is missing from Scene 4's
    Kuha and the box goes straight from the bag to his chest.
-3. **Paaralan 5** — **two of five, and the rest is one strip away.** Ligpit
-   and Tayo are drawn and cost NO new art whatsoever, not even a code-drawn
-   prop: Ligpit is Scene 4's pack-away chain entire, `PropCarry` and all, and
-   Tayo is Scene 3's rise out of the chair with the hand-raise lead-in
-   dropped - the hand goes up for "Sagot", not for going home.
+3. **Paaralan 5** — **all five, and not one new drawing.** Every word in the
+   scene is drawn and none of them cost art, not even a code-drawn prop:
+   Ligpit is Scene 4's pack-away chain entire, `PropCarry` and all; Tayo is a
+   figure assembled out of three drawings this desk already had; and Kunin,
+   Paalam and Alis are that figure cut at its joints and turned.
+
+   Tayo began as Scene 3's rise with the hand-raise lead-in dropped — the
+   hand goes up for "Sagot", not for going home — and that was wrong in the
+   way a borrowed ending usually is. Scene 3's rise ends on
+   `sagot_stand_uniform`, which is `talking_uniform` entire: hands up by his
+   chest and his mouth open. He stood up to go home and then held the pose of
+   a boy mid-sentence for the three words after it. What standing up should
+   leave is **his idle, facing forward**, and no such drawing existed.
 
    The scene was moved into Scene 4's room in the same change. It used to
    open on `klasrum_background`, the wide shot of the whole room, so Scene 4
@@ -375,22 +421,216 @@ than as a side effect of something else.
    | word | what it reuses | what was new |
    |---|---|---|
    | Ligpit | Scene 4's four chained legs and its `PropCarry`, whole | nothing |
-   | Tayo | Scene 3's `sagot_rise_1..3` + `sagot_stand`, lead-in dropped | nothing |
-   | Kunin | — prop and gleam only | — |
-   | Paalam | — gleam only | — |
-   | Alis | — gleam, and the room empties | — |
+   | Tayo | `sitting_front_uniform` + `talking_uniform`'s shorts + `standing_uniform`'s hand | nothing |
+   | Kunin | Tayo's figure, cut at the elbow and turned; `talking_uniform_with_bag`'s backpack | nothing |
+   | Paalam | the same arm, turned further, over the worn bag | nothing |
+   | Alis | the same figure, cut at the hems of his shorts; `WalkOffAndFade` | nothing |
 
-   **The three that are left all want the same one thing**, which is why they
-   are worth doing together: a STANDING figure at this desk that can do
-   something. Every reach in this project is seated - `kuha_frame_*`,
-   `reach_bag_*`, `aklat_*` - and every wave and walk is a full-body
-   wide-shot figure built for a scene with a floor in it.
-   `klasrum_interior_background` has no floor; the shot is cut at the
-   lockers' lower rows. `sagot_stand_uniform` is the only standing drawing
-   anyone ever fitted to this desk, and it was fitted by hand.
+   `Tools/make_tayo_frames.py` builds it, and two things came out of it that
+   the scenes after it get for free:
 
-   So one strip of three from that pose - **a lift, a wave, and a turn away**
-   - finishes Paaralan 5 and is the cheapest remaining win in Level 2.
+   - **GRAFT WHERE TWO DRAWINGS ARE THE SAME PART OF HIM**, which is the
+     rule the Sagot note above was reaching for and did not quite state.
+     Sagot tried to join a seated figure to a standing one at the DESK LINE,
+     where the seated one is 407 pixels across because his ARMS are in that
+     number against talking_uniform's 264 hips, and got a white sash and
+     arms ending in mid-air. Join the same two drawings at the SHIRT, 745
+     rows below his crown, and they measure within six pixels of each other
+     at every row — because his shirt is his shirt whether he is sitting or
+     standing, and his arms are not. His own forearms then carry down out of
+     the seated drawing: they are vertical and a constant 67 pixels wide for
+     its last hundred rows, so continuing them is copying a row.
+
+     Two things the join still needs. **The two drawings are not lit the
+     same** — the seated shirt averages (254,254,254) and
+     `talking_uniform`'s (231,232,236) — so the graft shows up as a tone
+     step across his waist even when the silhouettes line up, and the fix is
+     a per-channel GAIN on pale neutral pixels, which keeps the hem's
+     shading as shading. And **redraw the outside line rather than rescue
+     it**: whatever survives of a drawn outline through a cut is thinner
+     than the one on the limb it joins, so stroke the finished silhouette at
+     the forearm's own colour and width instead. Pad the mask upward before
+     eroding it, or the stroke closes across the wrist as a bracelet.
+
+   - **A PROFILE'S HAND IS NOT A PROFILE.** A hand hanging loose at a side
+     is drawn broad-face-on even in a side view — fingers down, the back of
+     it to the camera — so `standing_uniform`'s is usable front on, and it
+     is the only relaxed hanging hand in the project. Scale it by hair cap,
+     not by matching the forearm's WIDTH: the profile forearm is narrow
+     because it is seen edge-on and the hand beside it is not, and matching
+     widths makes the hand half again too big.
+
+   And one thing that did not have to be solved at all: **his fingertips go
+   behind the desk.** Standing, the desk crosses him 910 rows below his
+   crown and his fingertips land at 945, so the last third of each hand was
+   never drawn and never needed to be.
+
+   **A LIMB THIS PROJECT DREW CAN BE DRAWN GOING SOMEWHERE ELSE**, and that
+   is Kunin, which was written off in the paragraph this one replaces.
+
+   The claim was that `tayo_stand_uniform` is a pose to start and end on and
+   nothing more, because the method that built it can only put him where
+   some drawing already has him, and nothing in the project has him reaching
+   on his feet at this scale. Both halves are still true of the DRAWINGS.
+   What they miss is that **his forearms are not a drawing**: the seated
+   sprite stops flat at the desk's far edge, so `make_tayo_frames.py` had to
+   synthesise them out of one copied row, a taper and a borrowed hand just
+   to get him standing. `Tools/make_kunin_frames.py` lays that same row
+   along a path that bends away from his side and turns the same hand
+   rigidly to point along it, and he reaches.
+
+   Four things make that work, and they generalise to any reach from any
+   pose this project assembles rather than imports:
+
+   - **Bend where nothing is drawn to contradict.** The bend starts 24 rows
+     INSIDE the seated drawing's own arm, so the corner it opens is under
+     pixels composited over it afterwards, and the angle eases in over the
+     next fifty rows instead of switching on. Nothing is cut, so the
+     20-degree tearing limit further up this document — which is about
+     rotating a DRAWN forearm inside a drawing — does not apply: 52 degrees
+     is fine.
+   - **A limb of horizontal strips must be cut off square to ITSELF.** Each
+     strip is widened by 1/cos of the angle, or the arm goes thin as it
+     swings. It then ends on a horizontal line while the hand on the end of
+     it has been turned, which leaves a wedge of nothing on the outside of
+     the bend — so the strips run past the wrist and everything beyond the
+     line ACROSS the arm there is erased.
+   - **A pose with and without a thing is that thing.** `talking_uniform`
+     and `talking_uniform_with_bag` are one drawing with and without the
+     backpack, so subtracting them is the whole bag — straps, buckles and
+     all — and no part of it has to be drawn. Split it by HIS OWN
+     silhouette in the plain drawing and you get the two layers a worn bag
+     needs: inside it goes over him, outside it goes behind him. Composited
+     as one, the bag sits on top of the arm hanging in front of it.
+   - **What the subtraction cannot give, lay down the same way as the
+     limb.** His own forearm crosses the right strap in the source, so the
+     difference has a hole in it where his arms are DOWN. One row of the
+     strap, laid along a path read off the drawing above and below his arm,
+     fills it — and the line down each side is REDRAWN at the project's own
+     outline colour and width rather than stretched, because one pixel of
+     outline stretched to a band's width comes out as a grey smear.
+
+   **AND THEN THE BEND TURNED OUT TO BE THE WRONG TOOL.** The paragraph
+   above ends by saying that a wave and a turn away are what is left of
+   Paaralan 5, because a wave is above his shoulder and the bend is below
+   his elbow. That was right about the bend and wrong about the scene, and
+   the thing that showed it was Kunin itself failing in play.
+
+   The bend starts at the desk line, which on a STANDING boy is the top of
+   his shorts — two thirds of the way down his forearm. So "52 degrees of
+   reach" was 52 degrees of WRIST: his hand moved about twenty pixels, the
+   bag slid a third of a unit sideways and a fifth of one DOWNWARD behind
+   the desk, and the frame after that had the backpack on his shoulders.
+   Every number in it was right and the beat was unreadable.
+
+   `Tools/make_uwian_frames.py` replaces it, and the finding is one line:
+
+   > **CUT HIM AT THE JOINT AND TURN THE PIECE WHOLE.** A bend can only go
+   > where nothing is drawn to contradict it. A rotation about a real joint
+   > can go anywhere, because nothing inside a rigidly rotated piece moves
+   > relative to anything else inside it.
+
+   That is `make_bati_front_frames.py`'s technique — written up there for
+   the wide-shot figure — brought to this desk, and it reaches every pose
+   the bend could not:
+
+   - **An arm turned about ONE point is ONE BONE**, whatever the point is
+     called, and the first version of this file called it an elbow. It
+     reached out and down to a bag on a desk at 48 degrees and lifted it
+     clear at 76, and both of those were fine, because a child reaching
+     across a desk does straighten his arm. Past that it was not: at the
+     130 degrees the wave asked for, the drawing that arrived was a single
+     straight stick running from his armpit to his fingertips with a
+     RELAXED HANGING HAND on the end of it, upside down, thumb outboard.
+     That is the "broken arm" the revision notes describe, and no angle
+     fixes it, because the drawing in those frames is a drawing of an arm
+     at rest.
+
+     **TWO BONES AND TWO BALLS.** The arm is cut at the hem of his sleeve
+     and again at the crease of his elbow, and each piece turns about its
+     own joint — abduction at the shoulder, flexion at the elbow. Each
+     joint is a DISC centred on the point of rotation, cut out of both
+     pieces at the same radius, because a disc about its own centre is the
+     one shape a rotation leaves exactly where it was: the two bones mate
+     at every angle with no wedge to hide and no seam to ease. Three things
+     this cost an afternoon each, and all three generalise:
+
+     - **Measure the joint on the SKIN, not on the grown piece.** The piece
+       carries six pixels of slack on each side so the drawn line comes
+       away with the limb; a radius read off it is a dozen pixels too big,
+       and here that was the difference between two joints and one — the
+       elbow's disc swallowed the shoulder's and the upper bone with it.
+     - **The shoulder's width is measured BELOW the hem and the disc is
+       centred back up ON it.** At the hem the cloth is over the arm, so
+       the skin there is only as wide as the gap in the sleeve, and a disc
+       cut to that leaves the outer corner of the hem with nothing under
+       it — a grey triangle that opens the moment he reaches.
+     - **Six pixels above the top of a bare arm is not the line round the
+       arm. It is the SLEEVE.** Carried along with the piece and turned, a
+       sleeve hem is a black bar across his shoulder at every angle but
+       zero. Start the drawn limb a few rows clear of the cloth and let the
+       ball fill what is left.
+
+   - **A WAVE IS NOT AN ANGLE OF A HANGING ARM. IT IS A DIFFERENT
+     DRAWING.** `talking_uniform` is this same boy at this same scale with
+     one arm already up: a drawn sleeve, a drawn upper arm, a drawn elbow
+     bent square, and a drawn open palm with the fingers apart. Mirrored
+     and head-matched it lands on the standing figure's shoulders within a
+     few pixels, because `make_tayo_frames` already grafts that drawing's
+     lower body on at the waist. Graft its ARM on as well and the wave is
+     one rotation of the forearm about a joint somebody drew — which is
+     `make_bati_front_frames`' mechanism, on the drawing it was written
+     for. The sweep is a loop of three positions of it, which is what makes
+     it a wave rather than a hand held up: the project's rules list waving
+     among the things that REPEAT, and a raised hand that does not come
+     back is a salute.
+
+     **GRAFT ONLY WHAT DIFFERS.** Two drawings of one boy in one white
+     shirt are the same colour nearly everywhere, and a rectangle of one
+     laid over the other shows up as a tone step across his chest. Take the
+     union of what is NOT shirt-white in either, close it, fill it, and add
+     the sleeve's own rows; everywhere else there was nothing to carry
+     across. Then match the white once more against the chest the graft
+     will actually sit next to — two hundredths of a stop, and the
+     difference between a seam you cannot find and one you can.
+
+     **AND A FILL THAT HUNTS HAS TO BE LEASHED.** Filling what a lifted arm
+     leaves behind from its own edges is right where the arm lay against
+     his body and nonsense where it hung in the open: with no limit the
+     search finds the nearest solid pixel however far away it is, and the
+     room fills with fans of smeared shirt and a lump of his own hair,
+     hanging in the air beside his hand. Past a dozen pixels the hole is a
+     hole, because past a dozen pixels there was nothing behind the arm.
+   - **Legs turned about the HEMS OF HIS SHORTS** walk. The hem is the
+     joint to use rather than the hip inside him: a leg turned about the hip
+     slides sideways where it leaves the cloth and leaves a step in it,
+     while a leg turned about the hem keeps the cloth where the cloth was,
+     which is what a loose school short does over a moving leg anyway.
+   - **ASSEMBLE THE BODY WITHOUT THE LIMB; DO NOT CUT THE LIMB OUT OF THE
+     BODY.** `make_bati_front_frames` lifts the arm off a finished drawing
+     and fills what it was covering from its own edges, because on an
+     imported drawing there is nothing else to do — and the fill smears
+     shirt-white out into the room wherever the limb hung against nothing.
+     A figure this project ASSEMBLES can simply be assembled without that
+     limb, and then what is behind it is the thing that was behind it. The
+     first version of this file had a white block beside his hip in every
+     frame of the reach; that is the whole of the fix.
+   - **A front view turns by getting narrower**, which is that file's cheat
+     again and is used here for ONE frame — the moment he turns to go. Held
+     for the whole walk it stops being a boy who has turned and becomes a
+     boy with different proportions.
+
+   One thing the walk needed that the turning did not give: **his legs had
+   to reach the bottom of the picture.** The `tayo_*` canvas ends at world y
+   -4.84, half a unit above this camera's bottom edge — invisible while the
+   desk is in front of him, and a flat cut across his shins the moment he
+   walks out from behind it. The `uwian_*` canvas is 120 rows taller at each
+   end and his shins are carried down out of frame by copying their own last
+   row, which is `make_tayo_frames`' forearm trick applied to the other end
+   of him. Pad SYMMETRICALLY or the figure slides sideways, and keep the
+   crown the same distance above the canvas centre as the older frames have
+   it — do both and sprites of different sizes register pixel for pixel and
+   a `PoseSequence` can cut between them.
 4. **The repeated words** — Lakad, Upo, Pasok, Takbo. Each one animated here
    pays off in two to four scenes. Kain and Inom are drawn now, in Paaralan
    4, and the frames are seated - Bahay 5 and Parke 4 sit at a table and a
