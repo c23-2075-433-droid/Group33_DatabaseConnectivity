@@ -27,7 +27,13 @@ Skin that lies mostly inside it is head (the face behind the glasses is half
 a dozen pieces of skin, which is why it cannot be found as one); every other
 piece is an arm or a hand, however close to his face it comes, and is laid
 back over the new head afterwards, because a hand waving beside a face is in
-front of it. The bag and its straps are kept by colour, as long as they run
+front of it.
+
+THAT TEST IS PER PIECE, SO THE PIECES HAVE TO BE RIGHT. A hand drawn right
+up against an ear joins it, and a face joined to a hand is measured as a
+hand and kept - which is how the generator's ears once came through the
+swap and sat out behind his own. skin_pieces separates skin that is only
+touching before any of this is asked. The bag and its straps are kept by colour, as long as they run
 down past the neck - Canva's hair has blue in its highlights, and that kept
 stray tufts of it the first time.
 
@@ -130,6 +136,39 @@ def head_ellipse(a, neck_row, top):
     return ((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2 <= 1.0
 
 
+BRIDGE = 5          # the widest skin join that is a touch and not a limb
+
+
+def skin_pieces(skin):
+    """`skin` labelled, with pieces that merely TOUCH told apart.
+
+    A HAND WAVING BESIDE A FACE IS DRAWN AGAINST IT. On paalam_in the palm
+    comes in to his ear and the two runs of skin join through a bridge
+    about five pixels wide, where the outline between them is thin enough
+    to lose - and cut_background's pocket clearing, which takes the pale
+    anti-aliasing with the background it finds shut in there, is what
+    wears it through. Labelled as it lies, that is ONE piece: a hand with
+    a face on it. take_head_off then measures the whole of it against the
+    head ellipse, finds it half outside, and keeps it as an arm - so the
+    generated head's lower face and both its ears survive, and his own
+    head goes on over them with the generator's bigger ears still showing
+    round the sides of his.
+
+    So the pieces are found on an OPENED copy, which drops any join
+    narrower than twice BRIDGE, and every skin pixel then takes the label
+    of the nearest surviving piece. Nothing drawn here is that thin on
+    purpose - the narrowest real part is a finger, about 25 pixels across
+    at this scale - so an opening this size separates what is only
+    touching and cuts nothing that is actually joined.
+    """
+    seeds, n = ndimage.label(ndimage.binary_opening(skin, iterations=BRIDGE))
+    if n == 0:
+        return ndimage.label(skin)
+    idx = ndimage.distance_transform_edt(seeds == 0, return_distances=False,
+                                          return_indices=True)
+    return seeds[tuple(idx)] * skin, n
+
+
 def take_head_off(a, neck_row, top):
     """The figure without its generated head, and what goes back over the new
     one: the arms and hands that were up beside it."""
@@ -137,7 +176,7 @@ def take_head_off(a, neck_row, top):
     head = head_ellipse(a, neck_row, top)
     region = ndimage.binary_dilation(head, iterations=14)
     skin = skin_weight(a) > 0.3
-    lab, n = ndimage.label(skin)
+    lab, n = skin_pieces(skin)
     keep = np.zeros(al.shape, bool)
     for i in range(1, n + 1):
         piece = lab == i
