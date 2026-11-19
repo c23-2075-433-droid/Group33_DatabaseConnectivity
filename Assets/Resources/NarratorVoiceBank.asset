@@ -679,7 +679,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: df4c721e1ac497f4c938ceeeca1acd8b, type: 3}
   - id: rachel_l2_s5_kunin_story
-    text: Everything is packed, and Kylo's bag is waiting under the desk.
+    text: Everything is packed, and Kylo's bag is on the desk beside him.
     gloss: 
     clip: {fileID: 8300000, guid: e1a9dfc183eed674a99f021e1cdde619, type: 3}
   - id: rachel_l2_s5_kunin_ask
@@ -687,7 +687,7 @@ MonoBehaviour:
     gloss: 
     clip: {fileID: 8300000, guid: f8761c2bc61e8ff45b3bcdbb5b7c9ce5, type: 3}
   - id: rachel_l2_s5_kunin_done
-    text: Good! Everything is packed away safely.
+    text: Good! Kylo has his bag on his back.
     gloss: 
     clip: {fileID: 8300000, guid: e49096bd43d0a40a58e13c0275189097, type: 3}
   - id: rachel_l2_s5_paalam_story
@@ -1394,6 +1394,14 @@ MonoBehaviour:
     text: Remember, 'Linis' means to clean up.
     gloss: Clean up
     clip: {fileID: 8300000, guid: ddd882985224843f6bbb316094f7b083, type: 3}
+  - id: rachel_word_ligpit_teach
+    text: In Filipino, 'Ligpit' means to tidy up, or to put things away.
+    gloss: Tidy up
+    clip: {fileID: 8300000, guid: c19248259b634157ae54ef826af78830, type: 3}
+  - id: rachel_word_ligpit_recall
+    text: Remember, 'Ligpit' means to tidy up.
+    gloss: Tidy up
+    clip: {fileID: 8300000, guid: b60f9c2c889444e68d4deb4607c830fc, type: 3}
   - id: rachel_word_alis_teach
     text: In Filipino, 'Alis' means to leave, or to go away from a place.
     gloss: Leave / go

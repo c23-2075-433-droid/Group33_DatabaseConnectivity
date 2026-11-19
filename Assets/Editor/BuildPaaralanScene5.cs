@@ -131,10 +131,11 @@
 // "Paalam" and "Alis" are not pairs and so are shown unmarked, which is that
 // file's rule - a mark appears exactly where it is doing work.
 //
-// ONE WORD IS NOT YET VOICED. word_ligpit.wav has never been recorded (see
-// Docs/VoiceOverScript.csv, which lists it and says so), so Ligpit is taught
-// by caption here as it is in Scene 4. Everything else in the list has its
-// word clip. The narration around each word - story, ask, done - comes from
+// EVERY WORD IS VOICED, Ligpit included: word_ligpit.wav and Ligpit's own
+// teach and recall lines exist now. A recorded _ask clip SAYS its word, so
+// renaming a word means re-voicing its _ask line, not renaming the file -
+// rachel_l2_s5_ligpit_ask was Linis's clip renamed, and told the child to
+// say Linis until it was re-voiced. The narration around each word - story, ask, done - comes from
 // NarratorVoiceBank keyed on this scene's name and the word, so renaming
 // Upo to Tayo renames the lines it looks for; Docs/VoiceOverScript.csv has
 // been updated to match and the bank needs refreshing after this builds.
