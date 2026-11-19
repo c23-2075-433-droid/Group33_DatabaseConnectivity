@@ -726,8 +726,21 @@ public class BuildPaaralanScene5
         paalamFrames.loopCycles = PaalamWaves;
         paalamFrames.loopFramesPerSecond = PaalamWaveFps;
         // DOWN IN ORDER: back through the raise to the hanging arm.
-        paalamFrames.tailFrames = Sprites("paalam_up_canva",
-                                           "paalam_raise_canva",
+        //
+        // AND IT DOES NOT BEGIN ON paalam_up, which is what it did and what
+        // made the wave hitch at the end of its last sweep. The loop's LAST
+        // frame is ALREADY paalam_up - out, up, in, up - so a tail starting
+        // there drew the same open palm twice running, once at the loop's
+        // rate and once at the lead-in's: 0.363 seconds of a hand held
+        // perfectly still, half a sweep's worth, in the middle of the one
+        // movement whose whole point is that the hand keeps going back.
+        //
+        // The tail is the LEAD-IN REVERSED MINUS whatever frame the loop has
+        // already left on screen. Write it the other way round - reverse the
+        // lead-in and stop - and this is the frame that comes back, because
+        // the lead-in ends where the loop ends. The same is true of any
+        // sequence here whose loop passes back through its own lead-in.
+        paalamFrames.tailFrames = Sprites("paalam_raise_canva",
                                            "kunin_wear_canva");
 
         // ================= "Alis": he goes ==================================

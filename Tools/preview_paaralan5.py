@@ -153,7 +153,9 @@ KUNIN_BAG_UNTIL = 5      # the desk bag goes on kunin_lift
 PAALAM_UP = ["kunin_wear_canva", "paalam_raise_canva", "paalam_up_canva"]
 PAALAM_WAVE = ["paalam_out_canva", "paalam_up_canva", "paalam_in_canva",
                "paalam_up_canva"]
-PAALAM_DOWN = ["paalam_up_canva", "paalam_raise_canva", "kunin_wear_canva"]
+# No paalam_up at the head of this: the wave's last frame IS paalam_up, and
+# repeating it here is the hitch the builder's tail no longer has.
+PAALAM_DOWN = ["paalam_raise_canva", "kunin_wear_canva"]
 ALIS_TURN = ["kunin_wear_canva", "alis_turn_canva", "alis_side_canva",
              "alis_step_canva"]
 ALIS_CYCLE = ["alis_walk_%d_canva" % i for i in (1, 2, 3, 4)]
