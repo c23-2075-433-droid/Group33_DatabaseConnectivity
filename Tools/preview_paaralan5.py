@@ -48,14 +48,10 @@ BAG_X, BAG_BASE_Y, BAG_H = 4.90, -3.84, 1.66
 BAG_DESK_H = BAG_H * 1.08597
 BAG_DESK_BASE_Y = BAG_BASE_Y - BAG_H * 0.08597
 
-# One waypoint per drawn frame of "Kunin", from the frame his fist closes on
-# the bag. The fists are printed by Tools/make_uwian_frames.py; the third
-# number is how much of the hanging offset still applies, because a bag
-# swung onto a back comes UP against the hand as it goes round.
-KUNIN_FIST = [(5.34, -1.92, 1.00), (4.28, -2.73, 0.95),
-              (2.68, -1.97, 0.15), (2.65, -1.99, 0.00)]
-GRIP_DX = BAG_X - KUNIN_FIST[0][0]
-GRIP_DY = (BAG_BASE_Y + BAG_H * 0.5) - KUNIN_FIST[0][1]
+# The rates, copied from BuildPaaralanScene5 (Pace 0.65). Used by --gif.
+PACE = 0.65
+KUNIN_FPS, PAALAM_FPS, PAALAM_WAVE_FPS = 9 * PACE, 8 * PACE, 9 * PACE
+ALIS_FPS, ALIS_WALK = 7 * PACE, 3.2
 
 # Where he walks to - BuildPaaralanScene5's AlisEndX, half a sprite width
 # past the left edge of the view.
@@ -149,9 +145,73 @@ def frame(pose, on_desk, out, x=SIT_X, carried=None, shrink=1.0, fade=0.0,
     print("  wrote", os.path.basename(out))
 
 
+KUNIN = ["tayo_stand_uniform", "kunin_look_canva", "kunin_look_canva",
+         "kunin_reach_canva", "kunin_reach_canva", "kunin_lift_canva",
+         "kunin_shoulder_canva", "kunin_straps_canva", "kunin_straps_canva",
+         "kunin_wear_canva"]
+KUNIN_BAG_UNTIL = 5      # the desk bag goes on kunin_lift
+PAALAM_UP = ["kunin_wear_canva", "paalam_raise_canva", "paalam_up_canva"]
+PAALAM_WAVE = ["paalam_out_canva", "paalam_up_canva", "paalam_in_canva",
+               "paalam_up_canva"]
+PAALAM_DOWN = ["paalam_up_canva", "paalam_raise_canva", "kunin_wear_canva"]
+ALIS_TURN = ["kunin_wear_canva", "alis_turn_canva", "alis_side_canva",
+             "alis_step_canva"]
+ALIS_CYCLE = ["alis_walk_%d_canva" % i for i in (1, 2, 3, 4)]
+
+
+def gif(outdir):
+    """The three beats as animated GIFs, at the builder's own rates.
+
+    Stills show whether a frame is right; only the frames played at speed
+    show whether the ACTION is - a hand that jumps, a body that slides, a
+    walk whose legs and travel disagree.
+    """
+    tmp = os.path.join(outdir, "_gif.png")
+    bag = [("prop_bag_desk_uniform", (BAG_X, BAG_DESK_BASE_Y, BAG_DESK_H))]
+
+    def shot(pose, desk=(), x=SIT_X, black=0.0):
+        frame(pose, list(desk), tmp, x=x, black=black)
+        return Image.open(tmp).convert("RGB").resize((W // 2, H // 2), Image.LANCZOS)
+
+    def write(name, shots):
+        ims = [s for s, _ in shots]
+        ims[0].save(os.path.join(outdir, name), save_all=True, append_images=ims[1:],
+                    duration=[int(d * 1000) for _, d in shots], loop=0)
+        print("  wrote", name)
+
+    hold = 0.8
+    k = [(shot(n, bag if i < KUNIN_BAG_UNTIL else ()), 1 / KUNIN_FPS)
+         for i, n in enumerate(KUNIN)]
+    k[0] = (k[0][0], hold)
+    k[-1] = (k[-1][0], hold)
+    write("kunin.gif", k)
+
+    up = [(shot(n), 1 / PAALAM_FPS) for n in PAALAM_UP]
+    up[0] = (up[0][0], hold)
+    wave = [(shot(n), 1 / PAALAM_WAVE_FPS) for n in PAALAM_WAVE] * 3
+    down = [(shot(n), 1 / PAALAM_FPS) for n in PAALAM_DOWN]
+    down[-1] = (down[-1][0], hold)
+    write("paalam.gif", up + wave + down)
+
+    a = [(shot(n), 1 / ALIS_FPS) for n in ALIS_TURN]
+    a[0] = (a[0][0], hold)
+    steps = int(round(ALIS_WALK * ALIS_FPS))
+    for i in range(steps + 1):
+        t = i / float(steps)
+        x = SIT_X + (ALIS_END_X - SIT_X) * t
+        a.append((shot(ALIS_CYCLE[i % 4], x=x), 1 / ALIS_FPS))
+    for b in (0.35, 0.7, 1.0):
+        a.append((shot(None, black=b), 0.3))
+    write("alis.gif", a)
+    os.remove(tmp)
+
+
 def main():
     outdir = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "preview_p5")
     os.makedirs(outdir, exist_ok=True)
+    if "--gif" in sys.argv:
+        gif(outdir)
+        return
     lesson = [("prop_notebook_open", NOTEBOOK), ("prop_aklat_closed", AKLAT),
               ("prop_lapis", PENCIL)]
     bag_on_desk = [("prop_bag_desk_uniform",
@@ -161,52 +221,28 @@ def main():
     frame("sitting_front_uniform", lesson, os.path.join(outdir, "01_open.png"))
     frame("tayo_stand_uniform", [], os.path.join(outdir, "02_tayo.png"))
 
-    # --- Kunin, frame by frame: the bag from the desk onto his back ---
-    # The beat most worth previewing, because it is the one where a prop has
-    # to meet a drawing. If the bag is not on his fist in any of these, the
-    # waypoint for that frame is wrong.
-    frame("tayo_stand_uniform", bag_on_desk,
-          os.path.join(outdir, "03a_kunin_bag_on_desk.png"))
-    for n in ("kunin_reach_1_uniform", "kunin_reach_2_uniform",
-              "kunin_grip_uniform"):
-        frame(n, bag_on_desk, os.path.join(outdir, "03b_%s.png" % n.split("_", 1)[1]))
-    # From the grip on, the bag is in his hand. The last of them, settle, is
-    # the hand-over: the straps are drawn on his shoulders and PropCarry fades
-    # the bag in his hand out over that one frame, so both are on screen
-    # together and neither of them is the whole of it.
-    held = ("kunin_lift_uniform", "kunin_carry_1_uniform",
-            "kunin_carry_2_uniform", "kunin_settle_uniform")
-    for i, (name, fist) in enumerate(zip(held, KUNIN_FIST)):
-        frame(name, [], os.path.join(outdir, "03%s_%s.png"
-                                     % ("defg"[i], name.split("_", 1)[1])),
-              carried=("prop_bag_uniform",
-                       (fist[0] + GRIP_DX, fist[1] + GRIP_DY * fist[2]), BAG_H),
-              shrink=1.0 if i < 3 else 0.88)
-    for i, n in enumerate(("kunin_strap_1_uniform", "kunin_strap_2_uniform",
-                           "kunin_stand_uniform")):
-        frame(n, [], os.path.join(outdir, "03%s_%s.png"
-                                  % ("hij"[i], n.split("_", 1)[1])))
+    # --- Kunin: the bag stands on the desk until the lift, then is his ---
+    for i, n in enumerate(dict.fromkeys(KUNIN)):
+        frame(n, bag_on_desk if KUNIN.index(n) < KUNIN_BAG_UNTIL else [],
+              os.path.join(outdir, "03%s_%s.png" % ("abcdefghij"[i], n)))
 
     # --- Paalam: the wave, with the bag on ---
-    for name in ("paalam_lift_1_uniform", "paalam_lift_2_uniform",
-                 "paalam_lift_3_uniform",
-                 "paalam_wave_in_uniform", "paalam_wave_mid_uniform",
-                 "paalam_wave_out_uniform", "paalam_down_uniform"):
-        frame(name, [], os.path.join(outdir, "04_%s.png" % name.split("_", 1)[1]))
+    for i, n in enumerate(dict.fromkeys(PAALAM_UP + PAALAM_WAVE)):
+        frame(n, [], os.path.join(outdir, "04%s_%s.png" % ("abcdef"[i], n)))
 
     # --- Alis: out of the left of the frame, and the room goes dark ---
     # The turn, then four places along the walk, then the empty room going
-    # black. The one worth looking hardest at is the third: it is the first
-    # frame in which the desk is no longer in front of his legs, and it is
-    # where a figure cut off at mid-shin would show it.
-    for i, (name, x, black) in enumerate((
-            ("alis_turn_uniform", SIT_X, 0.0),
-            ("alis_walk_1_uniform", SIT_X - 0.9, 0.0),
-            ("alis_walk_3_uniform", -1.6, 0.0),
-            ("alis_walk_2_uniform", -5.4, 0.0),
-            ("alis_walk_4_uniform", -9.4, 0.0),
-            (None, ALIS_END_X, 0.9))):
-        frame(name, [], os.path.join(outdir, "05%s_alis.png" % "abcdef"[i]),
+    # black. The third walking frame is the first with the desk no longer in
+    # front of his legs, which is where a figure cut off at mid-shin would
+    # show it.
+    shots = [(n, SIT_X, 0.0) for n in ALIS_TURN[1:]] + [
+        ("alis_walk_1_canva", SIT_X - 0.9, 0.0),
+        ("alis_walk_3_canva", -1.6, 0.0),
+        ("alis_walk_2_canva", -5.4, 0.0),
+        ("alis_walk_4_canva", -9.4, 0.0),
+        (None, ALIS_END_X, 0.9)]
+    for i, (name, x, black) in enumerate(shots):
+        frame(name, [], os.path.join(outdir, "05%s_alis.png" % "abcdefgh"[i]),
               x=x, black=black)
 
 

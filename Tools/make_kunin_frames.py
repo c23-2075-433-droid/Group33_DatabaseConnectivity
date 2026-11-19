@@ -1,13 +1,10 @@
 """Draw the "Kunin" frames - Kylo takes his bag off the desk and puts it on.
 
-SUPERSEDED AS A SCRIPT, STILL USED AS A MODULE. Running this no longer writes
-the kunin_* frames: Tools/make_uwian_frames.py writes them now, along with
-"Paalam" and "Alis", and it would overwrite its work with the version
-described below - which bends him near the WRIST rather than at the elbow and
-whose reach is about twenty pixels of hand travel. The long note at the top of
-make_uwian_frames has the whole of why that failed and what replaced it, and
-Docs/AnimationStandard.md has the finding in one line: cut him at the joint
-and turn the piece whole.
+SUPERSEDED AS A SCRIPT, STILL USED AS A MODULE. Running this writes nothing.
+"Kunin" is now drawn from Canva strips by Tools/make_uwian_canva_frames.py,
+with Kylo's own head and skin put back by Tools/kylo_own_head.py; the version
+described below bent him near the WRIST and its reach was about twenty pixels
+of hand travel. Docs/AnimationStandard.md has the history.
 
 What stays is everything this file worked out about HIS BAG, which the new one
 imports rather than reimplements - loose_bag, bag_layers, placed_bag,
@@ -108,10 +105,9 @@ prop is HIS bag, cut out of standing_uniform_with_bag_back - him from behind,
 where it is drawn square on with nothing in front of it - at the size that
 drawing has it, which is the size he wears it.
 
-Writes  nothing. Tools/make_uwian_frames.py draws every frame this file
-        used to, and Tools/make_desk_bag.py writes the bag - both of them
-        out of loose_bag, bag_layers and placed_bag below, which is what
-        this file is kept for.
+Writes  nothing. Tools/make_desk_bag.py writes the desk bag out of
+        loose_bag, bag_layers and placed_bag below, which is what this file
+        is kept for.
 
 It prints the fist on every frame in Paaralan Scene 5's world units.
 BuildPaaralanScene5 needs those to put the bag where the hand is, and the
@@ -531,14 +527,14 @@ FRAMES = (("kunin_reach_1_uniform", REACH_1, False),
 def main():
     # IT DOES NOT WRITE ANY MORE. See the note at the top of this file: the
     # frames below are the version whose reach is a wrist bend, and
-    # Tools/make_uwian_frames.py has replaced every one of them. Writing them
+    # Tools/make_uwian_canva_frames.py has replaced every one of them. Writing them
     # from here would quietly undo that, and the symptom - a bag that slides
     # off a desk instead of being lifted off it - is one that reads as a
     # timing problem rather than as a file having been re-run.
-    print("make_kunin_frames: superseded - run Tools/make_uwian_frames.py "
-          "instead, which writes the kunin_* frames along with Paalam's and "
-          "Alis's. This file is kept for the bag it works out (loose_bag, "
-          "bag_layers, placed_bag), which make_uwian_frames imports.")
+    print("make_kunin_frames: superseded - run Tools/make_uwian_canva_frames.py "
+          "instead, which writes the Kunin, Paalam and Alis frames. This file "
+          "is kept for the bag it works out (loose_bag, bag_layers, "
+          "placed_bag), which Tools/make_desk_bag.py imports.")
     return
 
 

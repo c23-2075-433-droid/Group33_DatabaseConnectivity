@@ -631,6 +631,56 @@ than as a side effect of something else.
    crown the same distance above the canvas centre as the older frames have
    it — do both and sprites of different sizes register pixel for pixel and
    a `PoseSequence` can cut between them.
+
+   **AND THEN ALL OF THAT WAS REPLACED BY DRAWINGS.** In play, Kunin, Paalam
+   and Alis still read as what they were: an arm pasted on at a seam, strap
+   ends standing up off his shoulders like wings because the straps were
+   painted on in code, and a "walk" that was two legs swinging under a boy
+   who never turned round. Moving pieces of one front-on drawing cannot put
+   a bag on a back or turn a body. `Tools/make_uwian_canva_frames.py` cuts
+   them from six Canva generations instead - four poses each, from the
+   Paaralan sprites as the reference - and `make_uwian_frames.py` is gone.
+   What it took, all of which generalises:
+
+   - **Four poses in one generation, in a 16:9 strip.** One pose per image
+     gives a better head size but four images of four slightly different
+     boys; a strip of four matches itself, and at 1680x944 each head still
+     comes out about 170px. Feed the previous strip back in as a reference
+     and the next one matches that too.
+   - **The full-size file comes out through a design.** A copy of "SALINLAHI
+     Art Export" resized to the generation's size, its picture swapped,
+     saved and exported as PNG - `make_guard_push_frames.py` has the steps.
+     The generation itself is only ever a 200px thumbnail. Canva also cools
+     down after every generation, for a few minutes, so a strip is a sitting.
+   - **Measure a strip by a pose with its hands down.** `hair_cap` takes the
+     first ink from the top as the crown, and on the wave that was his
+     fingertips: the strip came out 4.6% too big. Size the first strip by
+     head, to the frames before it, and every later one by BODY HEIGHT to
+     that, because separate generations do not quite agree on proportion.
+   - **Anchor by whatever is SEEN.** Stood by his feet, the reach - which
+     leans his whole body out over planted feet - slid his torso a fifth of
+     a unit sideways, and his feet are behind the desk in this shot. Stood
+     by the top of his shorts, he holds still and leans.
+   - **A drawn prop has the generator's size, not the scene's.** The bag it
+     drew is 2.9 units; the one Ligpit packs on the desk is 1.66, and that
+     one cannot change. So the frame where one bag replaces the other draws
+     his at 2.0, and the swing onto his shoulder a frame later takes it the
+     rest of the way.
+   - **Background shut inside the figure survives the flood fill** - between
+     a raised arm and his head, between an arm and a bag held out. Here the
+     background is 254 and his shirt 251, so the test that clears it has to
+     be strict, and even then it is only safe per strip: in the walk strip
+     the lit side of his sleeve is 254 too, and clearing pockets there cut
+     holes in his shirt. `POCKET_STRIPS` lists where it runs.
+   - **The generator draws the movement; Kylo's head and skin are his own.**
+     Canva redrew his hair a different shape, his face rounder and his skin
+     paler, and the group's rule is that those do not change. So
+     `Tools/kylo_own_head.py` takes each generated head off by its outline
+     and puts back `tayo_stand_uniform`'s (front) or
+     `standing_uniform_with_bag`'s (profile) at the neck, and matches the
+     skin to his per channel. Arms and hands beside the head are kept and
+     laid back over it. Do this for any generated pose of him, not only
+     these.
 4. **The repeated words** — Lakad, Upo, Pasok, Takbo. Each one animated here
    pays off in two to four scenes. Kain and Inom are drawn now, in Paaralan
    4, and the frames are seated - Bahay 5 and Parke 4 sit at a table and a

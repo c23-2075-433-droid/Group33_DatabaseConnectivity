@@ -48,81 +48,51 @@
 //            Tools/make_tayo_frames.py out of drawings this desk already
 //            had. The same figure at five heights, so the pose never
 //            changes while he rises; see the block at "Tayo" below.
-//   Kunin    DRAWN. His bag is standing on the strip of desk Ligpit
-//            cleared - lit by this room's window and with its own shadow
-//            under it, so it is an object on the wood rather than a sticker
-//            on the glass. His arm comes off his side, out and down to it,
-//            his fist closes on its handle, he LIFTS it clear of the desk,
-//            brings it in and up across his body, and it goes on his back;
-//            then he pulls the strap down to sit, which is what everybody
-//            does. He ends the level WEARING it, which is how Kylo is drawn
-//            for the whole of Paaralan Scene 2. kunin_reach_1..2,
-//            kunin_grip, kunin_lift, kunin_carry_1..2, kunin_settle,
-//            kunin_strap_1..2 and kunin_stand.
-//   Paalam   DRAWN. His arm comes up with the elbow bending, his open palm
-//            arrives beside his head, and it WAVES - out, back, out, three
-//            times over - and comes down again, with the bag on his back
-//            for all of it. paalam_lift_1..3, paalam_wave_in/mid/out and
-//            paalam_down.
-//   Alis     DRAWN. He turns, walks the whole width of the room and off the
-//            left of the picture on his own legs, and the classroom fades to
-//            black behind him. alis_turn and alis_walk_1..4, plus
+//   Kunin    DRAWN. He looks down at his bag, standing on the strip of
+//            desk Ligpit cleared, leans out and puts his hand on it, lifts
+//            it by its handle at his side, swings it up over his left
+//            shoulder, gets both straps on and pulls them to fit, and
+//            stands wearing it. kunin_look, kunin_reach, kunin_lift,
+//            kunin_shoulder, kunin_straps and kunin_wear (all _canva).
+//   Paalam   DRAWN. His right arm comes up with the elbow bending, the open
+//            palm arrives beside his head and WAVES - out, up, in, up, three
+//            times over - and comes down again, the other arm hanging
+//            relaxed and the bag on his back throughout. paalam_raise,
+//            paalam_up, paalam_out and paalam_in.
+//   Alis     DRAWN. He turns to his right through three-quarters into
+//            profile, facing the left of the picture, takes a first step,
+//            and walks the width of the room and off the left edge on a
+//            four-frame cycle while the classroom fades to black behind
+//            him. alis_turn, alis_side, alis_step and alis_walk_1..4, plus
 //            WalkOffAndFade, which carries him and takes the light out.
 //
-// ALL THREE ARE BUILT BY Tools/make_uwian_frames.py AND NONE OF THEM IS NEW
-// ART. The note this replaces said the opposite, and was right at the time:
-// every reaching, waving and walking pose in the project was either SEATED -
-// kuha_frame_*, reach_bag_*, aklat_* - or a full-body wide-shot figure built
-// for a scene with a floor in it - bati_*_with_bag, walk_frame_*_with_bag,
-// standing_uniform_with_bag. He is STANDING from "Tayo" on, and
-// klasrum_interior_background has no floor. A wide-shot figure dropped in
-// here stands on nothing at the wrong scale, and a seated reach cannot be
-// played by a boy on his feet; Tools/make_sagot_frames.py is where "A SEATED
-// DRAWING AND A STANDING ONE DO NOT JOIN" is written out at length, and it
-// is about this exact shot.
+// ALL THREE ARE CANVA DRAWINGS, cut by Tools/make_uwian_canva_frames.py.
+// The version before this one made them by cutting the front-on standing
+// figure at its shoulder and elbow and turning the pieces, and painting the
+// straps on in code: an arm pasted on at a seam, strap ends standing up off
+// his shoulders like wings, and a walk that was two legs swinging under a
+// boy who never turned round. Moving pieces of one drawing cannot put a bag
+// on a back or turn a body. So every pose is now a drawing - six Canva
+// generations of four poses each, generated from the Paaralan sprites as
+// the design reference so he is the boy the other Paaralan scenes draw, and
+// all four poses of an action drawn in ONE pass so they match each other.
+// That file says how the full-size pixels get out of Canva, and how the
+// frames are registered: one scale per strip, his head at the tayo_*
+// frames' size, and every pose stood on one floor and centred by his
+// waistband, which is the part of him above the desk that has to hold still.
 //
-// WHAT CHANGED IS WHERE HE IS CUT. make_tayo_frames builds the standing
-// figure by grafting, and make_kunin_frames then bent the invented part of
-// his forearm to reach for the bag - but the invented part starts at the
-// DESK LINE, which on a standing boy is the top of his shorts, so "fifty-two
-// degrees of reach" was fifty-two degrees of wrist. His hand moved twenty
-// pixels, the bag slid sideways and down behind the desk, and the next frame
-// had the backpack on his shoulders.
+// THE CANVAS IS WIDER, 1263 against the tayo_* frames' 663, for an arm
+// that leaves his body and a bag held out beside him - padded equally each
+// side, because a sprite draws centred on its object. His crown is the same
+// distance above its centre as in every frame before Kunin, so the scene
+// can cut between them. His legs run off the bottom of it, which is what a
+// close-up does when he walks out from behind the desk.
 //
-// make_uwian_frames cuts him at the joints instead and turns each piece
-// WHOLE, which is Tools/make_bati_front_frames.py's technique brought over
-// to this desk: nothing inside a rigidly rotated piece can deform, so the
-// hand in every frame is the hand that was drawn. Legs that turn about the
-// hems of his shorts walk.
-//
-// AND THE ARM HAS TWO BONES IN IT NOW. The first pass of that file had one -
-// the whole bare limb turning about a single point - and one point is one
-// bone however it is labelled: a stiff stick from the armpit to the
-// fingertips. It was enough for a reach, because a child reaching across a
-// desk does straighten his arm, and it was hopeless for the wave, which
-// arrived as that same stick pointing at the ceiling with a RELAXED HANGING
-// HAND upside down on the end of it. So the arm is cut at the sleeve's hem
-// and again at the elbow, each piece turns about its own joint, and each
-// joint is a disc that a rotation about its own centre cannot move - which
-// is what lets the two mate at any angle with nothing to hide.
-//
-// AND THE WAVE IS A DIFFERENT DRAWING, not an angle of this one.
-// talking_uniform is the same boy at the same scale with one arm already
-// up - drawn sleeve, drawn upper arm, drawn bent elbow, drawn open palm -
-// and mirrored it lands on this figure's shoulder within a few pixels,
-// because make_tayo_frames already grafts that drawing's lower body on at
-// the waist. Its arm is grafted on too, and the wave is then one rotation of
-// a forearm about an elbow somebody drew.
-//
-// That is the whole of why three gleams became three drawn beats, and it
-// still cost no new drawings.
-//
-// AND HIS LEGS NOW REACH THE BOTTOM OF THE PICTURE. The tayo_* canvas ends
-// half a unit above this camera's bottom edge, which is invisible while the
-// desk is in front of him and a flat cut across his shins the moment he
-// walks out from behind it. The uwian_* canvas is taller and his shins are
-// carried out of frame; he leaves the picture at the side with his legs
-// running off the bottom of it, which is what a close-up does.
+// HIS HEAD AND SKIN ARE HIS OWN. Canva drew the bodies; on every frame its
+// head is taken off and Kylo's own put back at the neck - tayo_stand's front
+// head, the one he has a moment before Kunin, and Paaralan 2's profile for
+// the walk - and the skin is matched to his. Tools/kylo_own_head.py. So the
+// join from Tayo into Kunin is the same face, hair and colour.
 //
 // WHAT THE WORDS LOOK LIKE ON SCREEN is not decided here. SceneObjective
 // carries the plain spelling, which is what recognition, WordVariants and the
@@ -227,21 +197,24 @@ public class BuildPaaralanScene5
     // drawn for Bahay Scene 4; Kylo's bag, the one he wears for the whole of
     // Paaralan Scene 2 and the one he is wearing by the end of this scene, is
     // NAVY. Picking up one and standing up wearing the other is a cut a child
-    // would catch. prop_bag_uniform is that navy bag lifted straight out of
-    // standing_uniform_with_bag_back by Tools/make_kunin_frames.py, where it
-    // is drawn square on with nothing in front of it.
+    // would catch. prop_bag_desk_uniform is that navy bag, by
+    // Tools/make_desk_bag.py, with this room's light and a shadow on it - and
+    // it is the same design as the one Canva drew in his hands and on his
+    // back for "Kunin": front zip, front pocket, top handle.
     //
-    // ITS HEIGHT IS THE HEIGHT HE WEARS IT AT. 221 rows of a drawing where he
-    // is 745 rows for this desk's 5.609 world units, which is 1.66 - so the
-    // bag on the desk and the bag on his back are the same size, because they
-    // are the same bag.
+    // THE DRAWN ONE IS BIGGER. The generator drew the backpack about 2.9
+    // units tall, the size a real one is on a boy this size, and this one is
+    // 1.66. It is not made bigger, because Ligpit has just packed the lesson
+    // into it at this size and the pencil's carry is aimed at its mouth.
+    // Instead kunin_lift, the frame that replaces this bag with his, draws
+    // his at 2.0, and the shoulder frame after it takes it the rest of the
+    // way - a bag growing a fifth a frame while it is swinging is not seen.
+    // Tools/make_uwian_canva_frames.py, LIFT_BAG_UNITS.
     //
-    // HIS FIST LANDS ON ITS HANDLE, and that is what decides x rather than
-    // the strip. Tools/make_uwian_frames.py measures the fist on every frame
-    // it draws and prints it; on the frame he closes on the bag it is at
-    // 4.90, -2.48, so a centre of 4.90 puts the drawn handle under the drawn
-    // hand. Rule 5 of Docs/AnimationStandard.md - objects meet his hands - is
-    // this one number.
+    // HIS HAND LANDS ON IT, and the reach was drawn before the bag was put
+    // here: that file prints kunin_reach's fingertips at 5.51, -2.70, on the
+    // top right of the bag at this x, where its strap is. Rule 5 of
+    // Docs/AnimationStandard.md - objects meet his hands - is met there.
     private const float BagX = 4.90f;
     private const float BagBaseY = -3.84f;
     private const float BagHeight = 1.66f;
@@ -256,54 +229,17 @@ public class BuildPaaralanScene5
     // A SHADOW IS PART OF THE OBJECT HERE AND NOT A PROP OF ITS OWN. It
     // could be a second sprite under the first, and for a thing that moves
     // it would have to be - but this one stands still until his fist closes
-    // on it, and is then replaced by the carried bag, which has no shadow
-    // because it is in the air. One sprite is one base line to get right
+    // on it, and is then replaced by the bag drawn in his hand, which has no
+    // shadow because it is in the air. One sprite is one base line to get right
     // instead of three.
     private const float BagDeskHeight = BagHeight * 1.08597f;
     private const float BagDeskBaseY = BagBaseY - BagHeight * 0.08597f;
 
-    // WHERE THE BAG IS RELATIVE TO THE FIST HOLDING IT, and it CHANGES over
-    // the beat, which is the whole of what makes this a bag being put on
-    // rather than a bag being towed about.
-    //
-    // A bag lifted by its handle hangs below the hand - half its own height,
-    // near enough, which is BagGripDY. A bag being SWUNG ONTO A BACK does
-    // not: the hand goes to the strap and the bag comes UP as it goes round,
-    // until by the time the straps are on his shoulders the bag is level
-    // with his hand rather than under it. So the offset is interpolated from
-    // the first number to nearly nothing across the carry.
-    //
-    // It also has to be. His fist at his hip is at y -2.60; a bag hung the
-    // full 0.51 below that has its base at -3.95, which is under the desk's
-    // own top edge, and the last third of the beat played out behind the
-    // wood in the one scene whose job is to teach the word for taking it.
-    private const float BagGripDX = BagX - 4.90f;
-    private const float BagGripDY = (BagBaseY + BagHeight * 0.5f) - -2.48f;
-
-    // The fist on each drawn frame of "Kunin" from the grip on, printed by
-    // Tools/make_uwian_frames.py, with how much of BagGripDY still applies.
-    //
-    // READ THEM AS THE SHAPE OF THE BEAT: his hand closes on the handle where
-    // the bag already is, the bag comes UP 0.56 of a unit as he takes its
-    // weight - clear of the wood, which is what makes this a lift rather than
-    // a slide - then in across his body, rising against his hand as it goes
-    // round, and onto his back.
-    //
-    // THE HAND-OVER IS ON THE LIFT, NOT ON THE GRIP, and that is what the
-    // first waypoint being kunin_lift's rather than kunin_grip's means. Only
-    // the bag standing on the desk has a shadow drawn under it - the one in
-    // the air must not have one - so the frame the two are swapped on is the
-    // frame the shadow disappears, and that has to be the frame the bag
-    // leaves the wood. Swapped a frame earlier, while it is still standing
-    // there with his fist closed on the handle, the shadow blinks out from
-    // under a bag that has not moved.
-    private static readonly Vector3[] KuninFist =
-    {
-        new Vector3(5.34f, -1.92f, 1.00f),   // lift     clear of the desk
-        new Vector3(4.28f, -2.73f, 0.95f),   // carry_1  swinging in, past the desk
-        new Vector3(2.68f, -1.97f, 0.15f),   // carry_2  up at his chest
-        new Vector3(2.65f, -1.99f, 0.00f),   // settle   round onto his back
-    };
+    // WHERE HIS HAND ARRIVES, printed by Tools/make_uwian_canva_frames.py:
+    // kunin_reach's fingertips at (5.51, -2.70), on the top right of the
+    // bag where its shoulder strap is. That is close enough to read as
+    // taking hold of it, so the bag stays where Ligpit left it and the
+    // drawing is not bent to meet it.
 
     // One knob for the speed of every drawn action in this scene, the same
     // way Paaralan 2, 3 and 4 do it. Anything in SECONDS divides by Pace,
@@ -324,26 +260,19 @@ public class BuildPaaralanScene5
     // to stand up without being told to hurry.
     private const float TayoFps = 9f * Pace;
 
-    // TAKING A BAG OFF A DESK IS SLOWER AGAIN. Ten frames of arm at eight a
-    // second is about 1.9 seconds, which is a reach, a grip, a lift, a swing
-    // and a tug at the strap rather than a swipe. It is also the rate the
-    // bag's carry is given, so the prop and the hand share one clock.
-    //
-    // IT WAS SEVEN FRAMES AT SEVEN. The three that were added are the grip -
-    // a beat of its own, because a bag lifted on the same frame the hand
-    // arrives is a bag nobody saw him take hold of - and the two where he
-    // pulls the strap down to sit on his shoulder, which is what everybody
-    // does and what makes the bag his rather than a sprite that landed on
-    // him. The rate went up with the count so the beat is the same length a
-    // child's patience was measured against.
-    private const float KuninFps = 8f * Pace;
+    // TAKING A BAG OFF A DESK IS SLOWER AGAIN. Nine frames at six a second
+    // is about 1.5 seconds: a look, a reach, a beat with his hand on it, a
+    // lift, a swing, both straps and a tug at them. The look and the hand on
+    // the bag are each held for two frames, because a bag lifted on the
+    // frame the hand arrives is a bag nobody saw him take hold of.
+    private const float KuninFps = 9f * Pace;
 
     // A WAVE IS FASTER THAN A LIFT and has to be, or it is a hand being held
     // up and moved rather than a wave. The hand goes up at the scene's
-    // ordinary rate and then sweeps at eleven a second, which carries it
-    // across and back in about three-quarters of a second - a child's wave.
+    // ordinary rate and then sweeps at nine a second: out, up, in, up is a
+    // full wave in about seven tenths of a second - a child's wave.
     private const float PaalamFps = 8f * Pace;
-    private const float PaalamWaveFps = 11f * Pace;
+    private const float PaalamWaveFps = 9f * Pace;
     private const int PaalamWaves = 3;
 
     // AND A WALK IS SLOWER THAN EITHER. Four drawn frames are two steps, so
@@ -354,16 +283,17 @@ public class BuildPaaralanScene5
     // the legs stop when the boy does however either is retuned.
     private const float AlisFps = 7f * Pace;
     private const float AlisWalk = 3.2f;
-    // ONE FRAME OF STANDING STILL AND TURNING, which is what alis_turn is, so
-    // he sets off exactly as the first frame of the walk cycle comes up. It
-    // is written as a frame rather than as a number of seconds for that
-    // reason: change AlisFps and this follows it.
-    private const float AlisTurn = 1f / AlisFps;
+    // HE TURNS ON THE SPOT AND MOVES ON HIS FIRST STEP. The turn is two
+    // drawn frames - three-quarters, then profile - and WalkOffAndFade is
+    // started on the frame after them, alis_step, where his front foot goes
+    // out. So the body does not move while it is turning and starts moving
+    // the moment a leg does, and nothing has to be timed in seconds for it.
 
     // OFF THE SIDE OF THE PICTURE, not level with it. The view is 19.2 wide,
-    // so its left edge is at -9.6; his sprite is 1063 px on a canvas that
-    // draws 921 of them to 5.609 units, which is 6.5 units wide, and half of
-    // that past the edge is -12.8. He is gone before the fade begins rather
+    // so its left edge is at -9.6; the widest walking frame's ink is about
+    // 720 px on a canvas that draws 921 of them to 5.609 units, 4.4 units
+    // wide, so his trailing heel clears the edge at about -11.8, and -12.8
+    // leaves a margin. He is gone before the fade begins rather
     // than dissolving with one arm still in shot.
     private const float AlisEndX = -12.8f;
 
@@ -402,31 +332,17 @@ public class BuildPaaralanScene5
             // the drawings this desk already had. Also no new art.
             "tayo_rise_1_uniform", "tayo_rise_2_uniform", "tayo_rise_3_uniform",
             "tayo_over_uniform", "tayo_stand_uniform",
-            // "Kunin", "Paalam" and "Alis": the bag, and the arm, legs and
-            // turn that handle it, all built by Tools/make_uwian_frames.py -
-            // the arm in TWO BONES about a shoulder and an elbow, the legs
-            // about their hems, and the wave on a raised arm grafted whole
-            // out of talking_uniform.
-            //
-            // TWO BAGS, ONE DRAWING. prop_bag_desk_uniform is the one
-            // standing on the wood, with this room's light and its own
-            // shadow on it; prop_bag_uniform is the same cut-out in the air,
-            // riding his fist, where a shadow would be wrong. Both come out
-            // of Tools/make_desk_bag.py in one run.
-            "prop_bag_uniform", "prop_bag_desk_uniform",
-            "kunin_reach_1_uniform", "kunin_reach_2_uniform",
-            "kunin_grip_uniform", "kunin_lift_uniform",
-            "kunin_carry_1_uniform", "kunin_carry_2_uniform",
-            "kunin_settle_uniform",
-            "kunin_strap_1_uniform", "kunin_strap_2_uniform",
-            "kunin_stand_uniform",
-            "paalam_lift_1_uniform", "paalam_lift_2_uniform",
-            "paalam_lift_3_uniform",
-            "paalam_wave_in_uniform", "paalam_wave_mid_uniform",
-            "paalam_wave_out_uniform", "paalam_down_uniform",
-            "alis_turn_uniform",
-            "alis_walk_1_uniform", "alis_walk_2_uniform",
-            "alis_walk_3_uniform", "alis_walk_4_uniform",
+            // "Kunin", "Paalam" and "Alis": Canva drawings, cut and
+            // registered by Tools/make_uwian_canva_frames.py. The bag on the
+            // desk is Tools/make_desk_bag.py's, the one Ligpit packs.
+            "prop_bag_desk_uniform",
+            "kunin_look_canva", "kunin_reach_canva", "kunin_lift_canva",
+            "kunin_shoulder_canva", "kunin_straps_canva", "kunin_wear_canva",
+            "paalam_raise_canva", "paalam_up_canva",
+            "paalam_out_canva", "paalam_in_canva",
+            "alis_turn_canva", "alis_side_canva", "alis_step_canva",
+            "alis_walk_1_canva", "alis_walk_2_canva",
+            "alis_walk_3_canva", "alis_walk_4_canva",
             "ui_arrow", "ui_word_badge", "badge_paaralan",
         }, "Paaralan Scene 5");
 
@@ -738,40 +654,20 @@ public class BuildPaaralanScene5
 
         // ================= "Kunin": he takes his bag and puts it on =========
         //
-        //   tayo_stand        where Tayo left him, so the join is silent
-        //   kunin_reach_1     his arm starts out from his side
-        //   kunin_reach_2     out over the desk, the hand turning down
-        //   kunin_grip        his fist closes on the handle
-        //   kunin_lift        and lifts it clear of the wood
-        //   kunin_carry_1     coming back in with it
-        //   kunin_carry_2     at his hip, elbow well bent
-        //   kunin_settle      and it is on his back
-        //   kunin_strap_1     his hand up at the strap
-        //   kunin_strap_2     pulling it down to sit
-        //   kunin_stand       his idle again, wearing it
+        //   tayo_stand        where Tayo left him
+        //   kunin_look  x2    he looks down at the bag beside him
+        //   kunin_reach x2    leans out and his hand is on it - held, so the
+        //                     child sees him take hold before it moves
+        //   kunin_lift        up off the desk by its handle, at his side
+        //   kunin_shoulder    swung up over his left shoulder
+        //   kunin_straps x2   both straps on, pulled to fit
+        //   kunin_wear        standing in it, arms at his sides
         //
-        // THIS USED TO BE A PROP AND A GLEAM. The bag was switched on upon
-        // the desk and nothing about the boy changed, and the note at the top
-        // of this file said why: he is standing, and every reaching pose in
-        // the project is either seated or a wide-shot figure for a scene with
-        // a floor in it. It also said what the undrawn words were waiting
-        // for - a standing pose at this desk to start and end on - and
-        // "Tayo" delivered one.
-        //
-        // SO THE ARM IS DRAWN. Tools/make_kunin_frames.py has the whole of
-        // how, and it is make_tayo_frames' own trick carried one step: that
-        // file had to INVENT his forearms to get him out of the chair,
-        // because the seated drawing stops flat at the desk's far edge, and a
-        // limb this project draws for itself can be drawn going somewhere
-        // else. The bend starts inside the seated drawing's own arm and is
-        // eased in, so nothing is cut and nothing tears; the hand on the end
-        // is standing_uniform's, turned whole.
-        //
-        // AND THE BAG HE PUTS ON IS THE DIFFERENCE BETWEEN TWO DRAWINGS -
-        // talking_uniform and talking_uniform_with_bag, which are one pose
-        // with and without it. That is what makes him match the Kylo of
-        // Paaralan Scene 2, who wears that backpack for a whole level: it is
-        // the same drawn bag, not a new one.
+        // EVERY POSE IS A DRAWING. The bag in his hand, on his shoulder and
+        // on his back is drawn into the frames, so it cannot lag his hand,
+        // drift off his shoulder or stick up past it, which is everything
+        // the cut-and-turned version and its carried prop got wrong. There
+        // is no bag object in this beat but the one on the desk.
         //
         // PLAYED ONCE. Picking something up happens once, and
         // Docs/AnimationStandard.md lists it among the things that must not
@@ -779,123 +675,68 @@ public class BuildPaaralanScene5
         PoseSequence kuninFrames = AddPose(seatGO, seatSr, new[]
         {
             "tayo_stand_uniform",       // where Tayo left him
-            "kunin_reach_1_uniform",    // the arm comes off his side
-            "kunin_reach_2_uniform",    // out over the desk, hand turning down
-            "kunin_grip_uniform",       // and his fist closes on the handle
-            "kunin_lift_uniform",       // and lifts it clear of the desk
-            "kunin_carry_1_uniform",    // back in with it
-            "kunin_carry_2_uniform",    // at his hip, elbow well bent
-            "kunin_settle_uniform",     // on his back - the straps are drawn
-            "kunin_strap_1_uniform",    // his hand up at the strap
-            "kunin_strap_2_uniform",    // and pulling it down to sit
-        }, "kunin_stand_uniform", KuninFps);
-        kuninFrames.tailFrames = Sprites("kunin_stand_uniform");
+            "kunin_look_canva",         // he looks at his bag
+            "kunin_look_canva",
+            "kunin_reach_canva",        // leans out, hand on it
+            "kunin_reach_canva",
+            "kunin_lift_canva",         // and up off the desk
+            "kunin_shoulder_canva",     // over his shoulder
+            "kunin_straps_canva",       // both straps, pulled to fit
+            "kunin_straps_canva",
+        }, "kunin_wear_canva", KuninFps);
+        kuninFrames.tailFrames = Sprites("kunin_wear_canva");
 
-        // --- The bag, from the desk to his hand ---
-        // The same component the pencil rides in "Ligpit", for the same
-        // reason: one waypoint per drawn frame and no clock of its own, so
-        // the bag is where the hand is however the scene's Pace changes. The
-        // first waypoint is exactly where the bag has been sitting, which is
-        // what makes the hand-over invisible.
-        Vector3[] bagPath = new Vector3[KuninFist.Length];
-        for (int i = 0; i < KuninFist.Length; i++)
-            bagPath[i] = new Vector3(KuninFist[i].x + BagGripDX,
-                                     KuninFist[i].y + BagGripDY * KuninFist[i].z,
-                                     0f);
-        PropCarry bagCarry = CreateCarry("Carry_Bag", "prop_bag_uniform", BagHeight,
-                                          bagPath, 0f);
-        bagCarry.framesPerSecond = KuninFps;
-        // AND IT TURNS AS IT COMES ROUND. A bag lifted straight up off a desk
-        // hangs level under the hand; a bag swung in across a body tips,
-        // because the hand leading it is going sideways faster than the
-        // weight below it is. Fourteen degrees is the most it can take
-        // before it reads as a bag being spun rather than carried, and
-        // PropCarry turns it steadily over the whole path, so the tip
-        // arrives with the swing.
-        bagCarry.endAngle = -14f;
-        // IT GOES ON HIS BACK, IT DOES NOT GO INTO ANYTHING. PropCarry's
-        // let-go is written for a thing dropped into a bag - down, away and
-        // into shadow - and a backpack being swung on goes ROUND rather than
-        // down. So the drop is a twentieth of what the pencil's is and the
-        // shrink is slight: what the beat needs from it is the fade, and it
-        // is timed to land on kunin_settle, which is the frame where the
-        // straps are drawn on his shoulders. The bag in his hand goes as the
-        // bag on his back arrives, and for one frame they overlap - which is
-        // what swinging a bag round onto your own back looks like.
-        bagCarry.insertDuration = 1.2f / KuninFps;
-        bagCarry.insertDrop = 0.05f;
-        bagCarry.insertScale = 0.80f;
-        // IN FRONT, where CreateCarry leaves it, and that is deliberate. The
-        // first version put it behind Kylo and behind the desk, on the
-        // reasoning that a bag being swung on goes round his side - and the
-        // desk ate it: the whole middle of the beat was a bag you could not
-        // see, in the one scene whose job is to teach the word for taking
-        // it. The desk's own bag is drawn in front of the desk with the rest
-        // of his things, so the bag he is holding is too, and the two are
-        // the same object to look at across the hand-over.
-
-        // The hand-over: the drawn bag on the desk goes out and the carried
-        // one comes in, both on the frame where his fist closes on it.
-        kuninFrames.fireOnFrame = 4;                       // kunin_lift
-        UnityEventTools.AddPersistentListener(kuninFrames.onFrameReached, bagCarry.Play);
+        // THE HAND-OVER IS ON THE LIFT. The bag on the desk has a shadow and
+        // the one in his hand must not, so the frame they swap on is the
+        // frame it leaves the wood - a frame earlier and the shadow blinks
+        // out from under a bag that has not moved.
+        kuninFrames.fireOnFrame = 5;                       // kunin_lift
         if (propBag != null)
             UnityEventTools.AddBoolPersistentListener(kuninFrames.onFrameReached,
                                                        propBag.SetActive, false);
 
         // ================= "Paalam": he waves goodbye ======================
         //
-        //   kunin_stand       where Kunin left him, wearing the bag
-        //   paalam_lift_1..2  the hand on its way up, so it goes up rather
-        //                     than appears up
-        //   wave_in/mid/out   THE SWEEP, looped - the part that is the wave
-        //   paalam_down       and the hand comes back down
+        //   kunin_wear        where Kunin left him, wearing the bag
+        //   paalam_raise      the arm coming up, elbow bent, hand at his
+        //                     shoulder - so it goes up rather than appears up
+        //   paalam_up         the open palm beside his head
+        //   out/up/in/up      THE WAVE, looped three times
+        //   paalam_raise      and the hand comes back down
         //
         // IT IS A LOOP AND THAT IS THE POINT. A hand raised and held is not a
         // goodbye; what makes one read is the hand going BACK, and back
-        // again. PoseSequence has a looping body for exactly this - the
-        // project's rules list waving among the things that repeat - so the
-        // three drawn positions of the sweep are its loopFrames and it runs
-        // round three times, which is about two seconds of waving.
+        // again. PoseSequence has a looping body for exactly this, so the
+        // drawn positions of the sweep are its loopFrames. paalam_up appears
+        // twice in the loop, on the way out and on the way back, so the hand
+        // passes through the middle rather than jumping across it.
         //
-        // The middle frame appears TWICE in the loop, once on the way out and
-        // once on the way back, so the hand passes through the middle rather
-        // than jumping across it. Four frames a cycle at eleven a second is a
-        // sweep and a return in three-quarters of a second.
-        //
-        // HE IS WEARING THE BAG THROUGHOUT. Every frame here is built on the
-        // figure with the backpack on, so the straps are drawn on his
-        // shoulders in all of them and the bag cannot drift, vanish or lag
-        // behind the boy: there is no bag object in this beat at all. The one
-        // in his hand went when Kunin's PropCarry faded it.
+        // HIS OTHER ARM HANGS STILL and the bag is drawn on his back in every
+        // frame, so nothing but the waving arm moves.
         PoseSequence paalamFrames = AddPose(seatGO, seatSr, new[]
         {
-            "kunin_stand_uniform",      // where Kunin left him
-            "paalam_lift_1_uniform",    // the arm comes up, elbow bent
-            "paalam_lift_2_uniform",
-            "paalam_lift_3_uniform",    // hand level with his shoulder
-        }, "kunin_stand_uniform", PaalamFps);
-        paalamFrames.loopFrames = Sprites("paalam_wave_in_uniform",
-                                           "paalam_wave_mid_uniform",
-                                           "paalam_wave_out_uniform",
-                                           "paalam_wave_mid_uniform");
+            "kunin_wear_canva",         // where Kunin left him
+            "paalam_raise_canva",       // the arm comes up, elbow bent
+            "paalam_up_canva",          // palm beside his head
+        }, "kunin_wear_canva", PaalamFps);
+        paalamFrames.loopFrames = Sprites("paalam_out_canva",
+                                           "paalam_up_canva",
+                                           "paalam_in_canva",
+                                           "paalam_up_canva");
         paalamFrames.loopCycles = PaalamWaves;
         paalamFrames.loopFramesPerSecond = PaalamWaveFps;
-        // DOWN IN ORDER. The tail runs back through the lift in reverse and
-        // then past it - lift_3, lift_2, lift_1, down - before it hands back
-        // to kunin_stand, which is the hanging arm the other mechanism
-        // draws. The first version of this put lift_1 before down, so his
-        // hand fell to his hip, came back up to his waist and then dropped
-        // again, which is a flinch rather than an arm being lowered.
-        paalamFrames.tailFrames = Sprites("paalam_lift_3_uniform",
-                                           "paalam_lift_2_uniform",
-                                           "paalam_lift_1_uniform",
-                                           "paalam_down_uniform",
-                                           "kunin_stand_uniform");
+        // DOWN IN ORDER: back through the raise to the hanging arm.
+        paalamFrames.tailFrames = Sprites("paalam_up_canva",
+                                           "paalam_raise_canva",
+                                           "kunin_wear_canva");
 
         // ================= "Alis": he goes ==================================
         //
-        //   kunin_stand   standing at his desk, wearing it
-        //   alis_turn     he turns to go - one frame, narrowed
+        //   kunin_wear    standing at his desk, wearing it
+        //   alis_turn     turned three-quarters toward the left - head,
+        //                 shoulders, body and feet together
+        //   alis_side     in profile, facing the way out
+        //   alis_step     his first step, and the moment he starts moving
         //   walk_1..4     the walk, looped, while WalkOffAndFade carries him
         //                 across the room and off the side of it
         //
@@ -904,24 +745,24 @@ public class BuildPaaralanScene5
         // WalkOffAndFade, which moves the transform and nothing else. They
         // are started by the same word and tuned to the same length, which is
         // the whole of why it reads as walking rather than as sliding: the
-        // feet change while the boy moves. Give the loop too few cycles and
-        // he glides the last stretch with his legs together; too many and
-        // they go on after he has gone.
+        // feet change while the boy moves.
         //
         // SO THE CYCLES ARE COUNTED RATHER THAN CHOSEN. The walk lasts
-        // AlisWalk seconds after AlisTurn seconds of turning, the loop runs
-        // at AlisFps, and four frames make a cycle - so retuning the pace or
-        // the distance keeps them in step without anyone remembering to.
+        // AlisWalk seconds, the loop runs at AlisFps, and four frames make a
+        // cycle - so retuning the pace or the distance keeps them in step
+        // without anyone remembering to.
         int alisCycles = Mathf.Max(1, Mathf.RoundToInt(AlisWalk * AlisFps / 4f));
         PoseSequence alisFrames = AddPose(seatGO, seatSr, new[]
         {
-            "kunin_stand_uniform",
-            "alis_turn_uniform",        // he turns toward the left
+            "kunin_wear_canva",
+            "alis_turn_canva",          // he turns toward the left
+            "alis_side_canva",          // and faces the way out
+            "alis_step_canva",          // and steps
         }, null, AlisFps);
-        alisFrames.loopFrames = Sprites("alis_walk_1_uniform",
-                                         "alis_walk_2_uniform",
-                                         "alis_walk_3_uniform",
-                                         "alis_walk_4_uniform");
+        alisFrames.loopFrames = Sprites("alis_walk_1_canva",
+                                         "alis_walk_2_canva",
+                                         "alis_walk_3_canva",
+                                         "alis_walk_4_canva");
         alisFrames.loopCycles = alisCycles;
         // NO TAIL AND NO DESTINATION. He does not arrive anywhere and he does
         // not settle: he is off the side of the picture by the time the loop
@@ -966,7 +807,7 @@ public class BuildPaaralanScene5
         WalkOffAndFade alisWalk = seatGO.AddComponent<WalkOffAndFade>();
         alisWalk.figure = seatGO.transform;
         alisWalk.endX = AlisEndX;
-        alisWalk.startDelay = AlisTurn;
+        alisWalk.startDelay = 0f;
         alisWalk.duration = AlisWalk;
         alisWalk.fadeImage = fadeImage;
 
@@ -974,10 +815,10 @@ public class BuildPaaralanScene5
         // difference only shows in the one case that matters. `interrupts`
         // above can hold the pose back while the wave lowers his hand; a
         // Begin() wired straight to the objective would not wait with it, and
-        // he would set off across the room still waving. Hung on the turn
-        // frame instead, the two cannot come apart however long the wave
-        // takes to land - he turns, and on that frame he starts moving.
-        alisFrames.fireOnFrame = 1;                        // alis_turn
+        // he would set off across the room still waving. Hung on his first
+        // step instead, the two cannot come apart however long the wave
+        // takes to land - he turns, steps, and on that frame he starts moving.
+        alisFrames.fireOnFrame = 3;                        // alis_step
         UnityEventTools.AddPersistentListener(alisFrames.onFrameReached, alisWalk.Begin);
 
         // He is never completely still between words.
@@ -1107,11 +948,7 @@ public class BuildPaaralanScene5
         UnityEventTools.AddPersistentListener(kunin.onCorrect, gleamKunin.Play);
 
         // DRAWN, and it is a wave rather than a raised hand: three sweeps of
-        // the loop above. It used to be a gleam and nothing else, on the
-        // reasoning that the only drawn wave in the project is a wide-shot
-        // figure that does not belong in this shot - which was true of the
-        // DRAWINGS and stopped being the answer once Tools/make_uwian_frames
-        // could turn this figure's own arm about its own elbow.
+        // the loop above, on four Canva poses drawn for this shot.
         var paalam = MakeObjective("Paalam", pPaalam);
         UnityEventTools.AddPersistentListener(paalam.onCorrect, paalamFrames.Play);
         UnityEventTools.AddPersistentListener(paalam.onCorrect, gleamPaalam.Play);
@@ -1187,11 +1024,10 @@ public class BuildPaaralanScene5
                    "reaches out for the bag on the cleared desk, lifts it clear and puts " +
                    "it on his back; Paalam waves goodbye with it on; Alis turns him, walks " +
                    "him off the left of the picture and fades the room to black, ending " +
-                   "Level 2. ALL FIVE WORDS ARE DRAWN and none of them cost new art - " +
-                   "Scene 4's pack-away chain, a rise built by Tools/make_tayo_frames.py, " +
-                   "and a reach, a wave and a walk built by Tools/make_uwian_frames.py, " +
-                   "which cuts that rise's own figure at the elbow and at the hem of his " +
-                   "shorts and turns each piece whole. " +
+                   "Level 2. ALL FIVE WORDS ARE DRAWN: Scene 4's pack-away chain, a rise " +
+                   "built by Tools/make_tayo_frames.py, and Kunin, Paalam and Alis on Canva " +
+                   "drawings cut by Tools/make_uwian_canva_frames.py - he picks the bag up " +
+                   "and wears it, waves, turns to the left and walks out. " +
                    "NOTE: the narration ids follow the words, so run Tools > SALINLAHI > " +
                    "Refresh Narrator Voice Bank after this - Docs/VoiceOverScript.csv has " +
                    "the renamed and rewritten l2_s5 lines.");
