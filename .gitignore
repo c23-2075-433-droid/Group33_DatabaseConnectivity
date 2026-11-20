@@ -84,3 +84,7 @@ Tools/perf_probe/obj/
 # so it is tracked despite the *.csproj rule above.
 !Tools/perf_probe/perf_probe.csproj
 Art/sfx_source/*.wav
+
+# Rhubarb Lip Sync, for Tools/bake_lipsync.py. 87 MB, downloaded, not ours.
+#   github.com/DanielSWolf/rhubarb-lip-sync/releases (v1.14.0, Windows)
+Tools/rhubarb/

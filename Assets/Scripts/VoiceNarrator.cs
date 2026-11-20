@@ -134,6 +134,33 @@ public class VoiceNarrator : MonoBehaviour
         get { return audioSource != null ? audioSource.time : 0f; }
     }
 
+    /// <summary>
+    /// How far into CurrentClip playback has reached, in sample frames. Exact
+    /// where PlaybackTime is rounded, so the lip sync reads the very samples
+    /// that are coming out of the speaker.
+    /// </summary>
+    public int PlaybackSamples
+    {
+        get { return audioSource != null ? audioSource.timeSamples : 0; }
+    }
+
+    /// <summary>
+    /// What the narrator is actually sounding right now, after volume. A
+    /// fallback for the lip sync when a clip's own samples cannot be read.
+    /// </summary>
+    public bool ReadOutput(float[] into)
+    {
+        if (audioSource == null || !audioSource.isPlaying) return false;
+        audioSource.GetOutputData(into, 0);
+        return true;
+    }
+
+    /// <summary>The narrator's volume, so output read back can be un-scaled.</summary>
+    public float Volume
+    {
+        get { return audioSource != null ? audioSource.volume : 1f; }
+    }
+
     /// <summary>Raised when the queue empties - the moment the player is expected to answer.</summary>
     public event System.Action OnFinishedSpeaking;
 

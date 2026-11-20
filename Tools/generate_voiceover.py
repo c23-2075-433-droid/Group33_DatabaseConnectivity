@@ -252,9 +252,12 @@ def main():
 
     for name, tmp, _ in done:
         os.replace(tmp, os.path.join(OUT, name + ".wav"))
-    save_tracks({name: track for name, _, track in done})
+    # Mouth keyframes are no longer taken from the TTS text timings, which
+    # drift from the audio once a clip is re-cut or spliced. They are baked
+    # from the finished WAVs by Tools/bake_lipsync.py instead.
     print("\n%d clip(s) -> %s" % (len(done), os.path.relpath(OUT, ROOT)))
-    print("Now run Tools > SALINLAHI > Refresh Narrator Voice Bank in Unity.")
+    print("Now run:  python Tools/bake_lipsync.py   (Rachel's mouth keyframes)")
+    print("Then Tools > SALINLAHI > Refresh Narrator Voice Bank in Unity.")
     return 0
 
 

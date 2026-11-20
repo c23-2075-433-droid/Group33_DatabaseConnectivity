@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// When Teacher Rachel's mouth should change shape, for every line that has
-/// been generated with timings.
+/// When Teacher Rachel's mouth should change shape: the lip-sync keyframes
+/// for every recording.
 ///
-/// Assets/Resources/VisemeTracks.json is written by
-/// Tools/generate_voiceover.py, which asks ElevenLabs for the audio and its
-/// per-character alignment in one request - the timestamped endpoint costs
-/// the same characters as the plain one, so there was never a reason not to.
+/// Assets/Resources/VisemeTracks.json is written by Tools/bake_lipsync.py,
+/// which runs Rhubarb Lip Sync over each WAV in Assets/Audio/VO - the
+/// phonemes are found in the recording itself, the way Adobe Animate's Auto
+/// Lip-Sync does it, so the keyframes match the audio as it is on disk.
 /// Each entry is a line id and a list of [time, mouth] changes:
 ///
 ///     "rachel_l1_s1_bangon_done": [[0.0,"E"],[0.34,"Idle"],[0.5,"E"], ...]
@@ -17,10 +17,9 @@ using UnityEngine;
 /// where 434 tiny assets would each carry a .meta and each land in the build
 /// separately.
 ///
-/// A line with no track is NOT an error. The Filipino word clips are recorded
-/// by a person, not generated, so they have no alignment at all - and most of
-/// the script is still unvoiced. RachelPortraitAnimator falls back to its own
-/// cycle for those, which is what the whole game used before this existed.
+/// A line with no track is NOT an error: it is a recording added since the
+/// last bake, and RachelPortraitAnimator listens to it live instead. Re-run
+/// the bake to give it keyframes.
 /// </summary>
 public static class VisemeTracks
 {
@@ -50,6 +49,9 @@ public static class VisemeTracks
     }
 
     /// <summary>Forgets the loaded tracks, so a regenerated file is picked up.</summary>
+    // Also on every entry to Play mode: with domain reload turned off, a
+    // static survives between runs and a fresh bake would not be seen.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     public static void Invalidate()
     {
         tracks = null;
