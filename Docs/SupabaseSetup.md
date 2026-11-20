@@ -231,6 +231,86 @@ told, and `LeaderboardClient.PushIfNeeded()` tries again the next time the main
 menu opens with a connection. Opening the board with no connection says so in a
 line a child can read.
 
+## 2c. Nicknames, and why they are claimed rather than looked up
+
+The main menu refuses a nickname somebody else already has. Two things make
+that work, and only one of them is in the database.
+
+**On the device.** `PlayerProfileStore.NicknamesInUse()` lists the names the
+profiles on this tablet are already using, and the check reads it first, before
+anything is sent anywhere. This is the case that matters most in a classroom —
+two children taking turns on one copy of the game are the likeliest pair to
+want the same name — and it is the case no server check can help with: until
+that child finishes a scene, their name exists nowhere but in one JSON file.
+It also means the refusal works in flight mode.
+
+**In the database.** Run `supabase/migrations/20261120_nickname_claims.sql` in
+the **SQL Editor**. It is safe to run twice. It creates:
+
+* `nickname_claims` — one row per name that has been taken, with a unique index
+  on `lower(nickname)`.
+* A **select** and an **insert** policy for `anon`, and deliberately no update
+  and no delete. A claimed name cannot be released or moved, however the
+  public key is used.
+* The names already in `player_scores` and `leaderboard`, inserted as claims
+  so that the fix cannot hand out a name somebody has already played under.
+
+The game does not ask whether a name is free. It inserts the name and lets
+Postgres answer: the unique index means exactly one insert wins, and the loser
+is told so by a `409`. That is the difference the version before this one got
+wrong. A lookup answers a question about the past — *has anyone saved a score
+under this name* — and its answer is already stale when it arrives, so two
+tablets could both be told a name was free and both be right.
+
+A claim is filed under a **device id**, not a player id: a random UUID in the
+save file (`PlayerProfileStore.DeviceId`) that means nothing to any other app.
+It has to be the device rather than the profile, because the name is settled
+before the profile that will carry it exists, and because a child who renames
+their profile from Kylo to Rachel and back must not be refused by the row their
+own tablet put there.
+
+### If the migration has not been run
+
+Nothing breaks. The claim comes back `404`, the check falls back to the old
+`player_scores` lookup, and the game is exactly as good at this as v0.1.1 was —
+which is to say it still catches a name somebody has finished a level under,
+and still lets two children who have not finished one share a name. The device
+check above runs either way. `Could not check that name right now` in the log
+with a `404` beside it means this, and means the SQL above is still waiting.
+
+### Starting the board and the names over
+
+`supabase/maintenance/reset_board_and_nicknames.sql`, run in the **SQL Editor**.
+It deletes rows and nothing else — no table, policy, index or grant is touched,
+so no migration has to be re-run afterwards and the next child to finish a
+scene registers as if the project were new.
+
+It clears `leaderboard_owner` first and says why: a token is the secret the
+function issued when a player registered, and the device still holds its copy.
+Removing the hash does not lock that device out — with no owner row the next
+submission takes the registration branch, which issues a fresh token. Then the
+board, then the claims. A fourth step clears `player_scores` and is optional
+and marked as such: those rows are the recent-scores panel, and they are the
+evidence Activity 5's field reference and Activity 10's timings were taken
+from.
+
+**It cannot reach the tablets.** Profiles, names, stars and words live in a
+JSON file in each app's private storage, and nothing in Postgres can clear it.
+A phone that already has a profile called Kylo still has it afterwards, and
+will claim the name again the next time it is asked for one. To start a device
+from nothing, delete its profiles in CHANGE PROFILE, or reinstall the app.
+
+Nothing refills the board on its own, either. A device pushes when its totals
+are ahead of what the server was told, and after a reset they are level, so the
+board stays empty until somebody plays a scene.
+
+### What it still will not do
+
+A name is refused, never reserved while a child thinks about it: the claim is
+filed the moment OKAY is pressed and kept forever. And a child whose profile
+already carries a name keeps it — the check runs when a name is chosen, not
+when the game starts — so running the migration never renames anybody.
+
 ## 3. Add your local credentials (each member, once)
 
 Credentials are **not** in the repository — `Assets/Resources/SupabaseConfig.asset`

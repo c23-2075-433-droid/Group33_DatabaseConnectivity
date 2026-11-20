@@ -57,6 +57,7 @@ def read_config():
         "board": field("leaderboardTable", "leaderboard"),
         "submit": field("submitScoreFunction", "submit-score"),
         "rank": field("rankFunction", "leaderboard_rank"),
+        "claims": field("claimsTable", "nickname_claims"),
     }
 
 

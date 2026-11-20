@@ -238,15 +238,19 @@ they are meant to be re run rather than read. Each writes evidence into
 `Docs/perf/`.
 
 ```
-python Tools/check_backend.py                 nine functional checks on the leaderboard path
+python Tools/check_backend.py                 thirteen functional checks on the leaderboard and nickname paths
 python Tools/measure_backend.py 20            times every backend call, split into DNS, TCP, TLS and server
 dotnet run -c Release --project Tools/perf_probe    per attempt cost of the pronunciation judgement
 ```
 
 `check_backend.py` and `measure_backend.py` read the gitignored
 `Assets/Resources/SupabaseConfig.asset` for the project URL and key, and never
-print the key. Neither writes a row: the two write attempts in the functional
-checks are there because Row Level Security must refuse them. The probe needs a
+print the key. `measure_backend.py` writes nothing. `check_backend.py` makes
+two write attempts that Row Level Security must refuse, and one that must
+succeed: it claims a throwaway nickname of the form `ztest<6 hex>`, because the
+only honest way to check that the second child is refused is to be the second
+child. That one row stays - the claims table has no delete policy, which is
+itself one of the checks. The probe needs a
 .NET SDK, and the one inside the Unity install will do:
 `"D:\Unity\6000.6.2f1\Editor\Data\DotNetSdk\dotnet.exe"`.
 

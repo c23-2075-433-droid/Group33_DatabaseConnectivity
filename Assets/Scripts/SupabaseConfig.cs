@@ -44,6 +44,11 @@ public class SupabaseConfig : ScriptableObject
               "so a rank can be shown to someone outside the top of the board.")]
     public string rankFunction = "leaderboard_rank";
 
+    [Tooltip("Table that holds one row per nickname that has been claimed, which is " +
+              "what makes a name taken the moment it is chosen rather than once a " +
+              "level has been finished. See supabase/migrations/20261120_nickname_claims.sql.")]
+    public string claimsTable = "nickname_claims";
+
     public bool IsConfigured =>
         !string.IsNullOrWhiteSpace(projectUrl) && !string.IsNullOrWhiteSpace(anonKey);
 
@@ -63,4 +68,9 @@ public class SupabaseConfig : ScriptableObject
     /// <summary>Where a player's own rank is asked for.</summary>
     public string RankEndpoint =>
         projectUrl.TrimEnd('/') + "/rest/v1/rpc/" + rankFunction;
+
+    /// <summary>REST endpoint for the nickname claims table. The game may insert
+    /// a claim and read claims back; the unique index on the name is what
+    /// actually decides who got there first.</summary>
+    public string ClaimsEndpoint => projectUrl.TrimEnd('/') + "/rest/v1/" + claimsTable;
 }

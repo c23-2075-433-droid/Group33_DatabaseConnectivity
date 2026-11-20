@@ -185,7 +185,7 @@ Added after Activity 10, where the baseline these compare against was measured.
 All three are re runnable and write their evidence into `Docs/perf/`.
 
 ```
-python Tools/check_backend.py                nine functional checks on the leaderboard path
+python Tools/check_backend.py                thirteen checks on the leaderboard and nickname paths
 python Tools/measure_backend.py 20           times every backend call, phase by phase
 dotnet run -c Release --project Tools/perf_probe   per attempt cost of the pronunciation judgement
 ```
