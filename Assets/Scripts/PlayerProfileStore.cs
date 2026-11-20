@@ -65,6 +65,10 @@ public static class PlayerProfileStore
     {
         public int version = CurrentVersion;
         public string activePlayerId = "";
+
+        /// <summary>This copy of the game, named once. See DeviceId.</summary>
+        public string deviceId = "";
+
         public List<PlayerProfile> players = new List<PlayerProfile>();
     }
 
@@ -120,6 +124,58 @@ public static class PlayerProfileStore
     public static bool CanCreate
     {
         get { Load(); return book.players.Count < MaxProfiles; }
+    }
+
+    /// <summary>
+    /// Every nickname already spoken for on this device, in no order and with
+    /// the unnamed profiles left out.
+    ///
+    /// This is what makes the nickname check work with the tablet in flight
+    /// mode, which is the case that matters most: two children taking turns on
+    /// one copy of the game are the likeliest pair to pick the same name, and
+    /// they are also the pair a server check cannot help - the first child's
+    /// name does not exist anywhere outside this file until they finish a
+    /// scene. NicknameAvailability asks this before it asks Supabase anything.
+    /// </summary>
+    public static List<string> NicknamesInUse()
+    {
+        Load();
+        List<string> names = new List<string>();
+        foreach (PlayerProfile p in book.players)
+        {
+            if (!string.IsNullOrWhiteSpace(p.nickname)) names.Add(p.nickname);
+        }
+        return names;
+    }
+
+    /// <summary>
+    /// A UUID for this installation, made the first time it is asked for.
+    ///
+    /// It is what a nickname claim is filed under, so that the device which
+    /// claimed a name is allowed to go on using it - a child renaming their
+    /// profile from Kylo to Rachel and back again must not be told that Kylo
+    /// is taken by the row they put there themselves. A profile's own id would
+    /// be the obvious thing to use and cannot be: the name is settled before
+    /// the profile it belongs to exists, and a rename happens on whichever
+    /// profile the board has chosen rather than on the playing one.
+    ///
+    /// Deliberately random rather than anything the device already knows about
+    /// itself. SystemInfo.deviceUniqueIdentifier would also be stable, and
+    /// would also follow the child to every other app that asks for it; this
+    /// one means nothing anywhere else and goes away with the save file.
+    /// </summary>
+    public static string DeviceId
+    {
+        get
+        {
+            Load();
+            if (!NicknameRules.IsValidPlayerId(book.deviceId))
+            {
+                book.deviceId = Guid.NewGuid().ToString();
+                Save();
+            }
+            return book.deviceId;
+        }
     }
 
     private static PlayerProfile Find(string playerId)

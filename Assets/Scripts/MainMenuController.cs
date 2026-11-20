@@ -211,8 +211,11 @@ public class MainMenuController : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (aboutPanel != null) aboutPanel.SetActive(false);
         // Otherwise a reopened dialog still shows the last "already taken"
-        // line, about a name the child may since have changed.
-        if (nicknameAvailability != null) nicknameAvailability.ResetStatus();
+        // line, about a name the child may since have changed. The name it is
+        // starting from goes with it: a rename that keeps the same name is not
+        // a collision, and only the caller knows which profile is being
+        // renamed - this one is asked by the board as often as by a first run.
+        if (nicknameAvailability != null) nicknameAvailability.ResetStatus(initial);
 
         if (nicknameInput != null)
         {

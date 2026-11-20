@@ -6,7 +6,9 @@ for the reason this project keeps running into: a table existing and a screen
 existing are not evidence that the feature works. These checks exercise the
 same requests the game makes and assert on what comes back.
 
-Nine checks, all read only except two that are MEANT to be refused:
+Thirteen checks. All read only except two that are MEANT to be refused, and
+the four nickname-claim ones, which insert a throwaway name on purpose - see
+check 10.
 
     1. the board can be read with the key the game ships
     2. the board returns only the five columns the panel draws
@@ -17,6 +19,16 @@ Nine checks, all read only except two that are MEANT to be refused:
     7. the game's key cannot INSERT into the leaderboard table
     8. the game's key cannot UPDATE it either
     9. the token table cannot be read at all
+   10. a free nickname can be claimed
+   11. claiming the same nickname twice is refused
+   12. the refusal ignores case, so "Kylo" and "kylo" are one name
+   13. the game's key cannot delete a claim and free the name again
+
+Checks 10 to 13 are the only ones here that write. They claim one name of the
+form ztest<6 hex> per run, and that row stays: the claims table deliberately
+has no delete policy, which is check 13. One junk row per run is the price of
+testing the thing that matters - that the second child really is refused -
+against the live database rather than against a description of it.
 
 Checks 7 and 8 try a write that Row Level Security must refuse. The row count
 is taken before and after, so a pass is proved by the table being unchanged
@@ -26,6 +38,7 @@ Usage
     python Tools/check_backend.py
 """
 import json
+import secrets
 import sys
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -173,8 +186,54 @@ def main():
            status in (401, 403, 404) or not leaked,
            "HTTP %s, %d row(s) returned" % (status, len(leaked)))
 
+    # 10 to 13. the nickname claim, which is what stops two children sharing a
+    # name. The insert IS the check: the game never asks whether a name is
+    # free, it asks the database to decide, and these four assert that the
+    # database does.
+    claims = "/rest/v1/%s" % cfg["claims"]
+    name = "ztest" + secrets.token_hex(3)
+    device = "22222222-2222-2222-2222-222222222222"
+    body = '{"nickname":"%s","device_id":"%s"}' % (name, device)
+
+    status, _, payload = request(host, cfg["key"], "POST", claims, body,
+                                 ["Prefer: return=minimal"])
+    first_ok = status in (200, 201, 204)
+    report("a free nickname can be claimed",
+           first_ok,
+           "HTTP %s for %s" % (status, name))
+
+    status, _, payload = request(host, cfg["key"], "POST", claims, body,
+                                 ["Prefer: return=minimal"])
+    report("claiming the same nickname twice is refused",
+           status == 409,
+           "HTTP %s on the second claim (409 is the unique index saying no)" % status)
+
+    shouting = '{"nickname":"%s","device_id":"%s"}' % (name.upper(), device)
+    status, _, payload = request(host, cfg["key"], "POST", claims, shouting,
+                                 ["Prefer: return=minimal"])
+    report("the refusal ignores case",
+           status == 409,
+           "HTTP %s for %s" % (status, name.upper()))
+
+    status, _, _ = request(host, cfg["key"], "DELETE",
+                           "%s?nickname=eq.%s" % (claims, name))
+    _, _, payload = request(host, cfg["key"], "GET",
+                            "%s?select=nickname&nickname=eq.%s" % (claims, name))
+    still_there = []
+    try:
+        still_there = json.loads(payload.decode("utf-8"))
+    except ValueError:
+        pass
+    # As with the leaderboard UPDATE above, the status is not the evidence: with
+    # no delete policy the statement matches zero rows and succeeds at deleting
+    # nothing. The row still being there is.
+    report("the game's key cannot free a claimed nickname",
+           bool(still_there),
+           "HTTP %s, and the claim is %s" % (
+               status, "still there" if still_there else "gone - or was never made"))
+
     print()
-    print("%d of 9 checks failed" % failures if failures else "all 9 checks passed")
+    print("%d of 13 checks failed" % failures if failures else "all 13 checks passed")
     return 1 if failures else 0
 
 

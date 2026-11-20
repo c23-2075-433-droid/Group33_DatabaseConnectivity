@@ -59,6 +59,44 @@ public class SupabaseClient : MonoBehaviour
         StartCoroutine(FetchNamesRoutine(stem, limit, onDone));
     }
 
+    /// <summary>
+    /// Tries to put <paramref name="nickname"/> beyond anyone else's reach, by
+    /// inserting it into the claims table.
+    ///
+    /// This, and not a lookup, is what settles whether a name is free. A
+    /// lookup answers a question about the past - "has anyone saved a score
+    /// under this name" - and the answer is already stale by the time it
+    /// arrives; two children on two tablets can both be told a name is free
+    /// within the same second and both be right. The insert asks the database
+    /// to decide instead, and the unique index on the name means exactly one
+    /// of them gets the row. The loser is told so by a 409, which is a
+    /// successful check rather than a failure.
+    ///
+    /// onDone(result, error) - error carries a line fit for a child to read,
+    /// and only when the result is Failed.
+    /// </summary>
+    public void ClaimNickname(string nickname, string deviceId,
+                               Action<NicknameClaimResult, string> onDone)
+    {
+        if (!HasValidConfig((ok, err) => onDone?.Invoke(NicknameClaimResult.Failed, err))) return;
+        StartCoroutine(ClaimRoutine(nickname, deviceId, onDone));
+    }
+
+    /// <summary>
+    /// GETs the claims whose name begins with <paramref name="stem"/>, each
+    /// with the device that filed it.
+    ///
+    /// Only asked for once a claim has come back 409, and for two reasons at
+    /// once: the names in it are what a suggestion has to avoid, and the
+    /// device beside each one is how "that name is already yours" is told
+    /// apart from "that name is someone else's".
+    /// </summary>
+    public void FetchClaimsLike(string stem, int limit, Action<List<NicknameClaim>, string> onDone)
+    {
+        if (!HasValidConfig((ok, err) => onDone?.Invoke(null, err))) return;
+        StartCoroutine(FetchClaimsRoutine(stem, limit, onDone));
+    }
+
     private bool HasValidConfig(Action<bool, string> onDone)
     {
         if (config == null)
@@ -185,6 +223,76 @@ public class SupabaseClient : MonoBehaviour
         }
     }
 
+    private IEnumerator ClaimRoutine(string nickname, string deviceId,
+                                      Action<NicknameClaimResult, string> onDone)
+    {
+        ClaimInsert claim = new ClaimInsert
+        {
+            nickname = nickname == null ? "" : nickname.Trim(),
+            device_id = deviceId,
+        };
+
+        using (UnityWebRequest request =
+                new UnityWebRequest(config.ClaimsEndpoint, UnityWebRequest.kHttpVerbPOST))
+        {
+            byte[] body = System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(claim));
+            request.uploadHandler = new UploadHandlerRaw(body);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            ApplyHeaders(request);
+            request.SetRequestHeader("Content-Type", "application/json");
+            // The row back is the row just sent. Nothing reads it, so asking
+            // for it would only put a child's name in one more response body.
+            request.SetRequestHeader("Prefer", "return=minimal");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                onDone?.Invoke(NicknameClaimResult.Claimed, null);
+                yield break;
+            }
+
+            // 409 is Postgres refusing to break the unique index, which is the
+            // whole point of sending this: somebody already has the name.
+            if (request.responseCode == 409)
+            {
+                onDone?.Invoke(NicknameClaimResult.Taken, null);
+                yield break;
+            }
+
+            // Anything else is this feature not working rather than the name
+            // being taken - most likely a project where the claims migration
+            // has not been run, which answers 404. The caller lets the child
+            // through; the log is where the reason belongs.
+            Log("Nickname claim failed", request);
+            onDone?.Invoke(NicknameClaimResult.Failed, "Could not check that name right now.");
+        }
+    }
+
+    private IEnumerator FetchClaimsRoutine(string stem, int limit,
+                                            Action<List<NicknameClaim>, string> onDone)
+    {
+        string pattern = Uri.EscapeDataString(stem == null ? "" : stem.Trim()) + "*";
+        string url = config.ClaimsEndpoint + "?select=nickname,device_id&nickname=ilike." +
+                      pattern + "&limit=" + Mathf.Max(1, limit);
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            ApplyHeaders(request);
+
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Log("Claim lookup failed", request);
+                onDone?.Invoke(null, "Could not check that name right now.");
+                yield break;
+            }
+
+            onDone?.Invoke(ParseClaims(request.downloadHandler.text), null);
+        }
+    }
+
     private void ApplyHeaders(UnityWebRequest request)
     {
         ApplyHeaders(request, config);
@@ -244,9 +352,32 @@ public class SupabaseClient : MonoBehaviour
         return parsed?.items != null ? new List<ScoreRecord>(parsed.items) : new List<ScoreRecord>();
     }
 
+    private static List<NicknameClaim> ParseClaims(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json.Trim() == "[]")
+            return new List<NicknameClaim>();
+
+        ClaimList parsed = JsonUtility.FromJson<ClaimList>("{\"items\":" + json + "}");
+        return parsed?.items != null ? new List<NicknameClaim>(parsed.items) : new List<NicknameClaim>();
+    }
+
     [Serializable]
     private class RecordList
     {
         public ScoreRecord[] items;
+    }
+
+    [Serializable]
+    private class ClaimList
+    {
+        public NicknameClaim[] items;
+    }
+
+    /// <summary>The body of a claim. Field names are the column names.</summary>
+    [Serializable]
+    private class ClaimInsert
+    {
+        public string nickname;
+        public string device_id;
     }
 }
