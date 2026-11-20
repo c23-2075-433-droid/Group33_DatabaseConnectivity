@@ -278,6 +278,32 @@ and still lets two children who have not finished one share a name. The device
 check above runs either way. `Could not check that name right now` in the log
 with a `404` beside it means this, and means the SQL above is still waiting.
 
+### Starting the board and the names over
+
+`supabase/maintenance/reset_board_and_nicknames.sql`, run in the **SQL Editor**.
+It deletes rows and nothing else — no table, policy, index or grant is touched,
+so no migration has to be re-run afterwards and the next child to finish a
+scene registers as if the project were new.
+
+It clears `leaderboard_owner` first and says why: a token is the secret the
+function issued when a player registered, and the device still holds its copy.
+Removing the hash does not lock that device out — with no owner row the next
+submission takes the registration branch, which issues a fresh token. Then the
+board, then the claims. A fourth step clears `player_scores` and is optional
+and marked as such: those rows are the recent-scores panel, and they are the
+evidence Activity 5's field reference and Activity 10's timings were taken
+from.
+
+**It cannot reach the tablets.** Profiles, names, stars and words live in a
+JSON file in each app's private storage, and nothing in Postgres can clear it.
+A phone that already has a profile called Kylo still has it afterwards, and
+will claim the name again the next time it is asked for one. To start a device
+from nothing, delete its profiles in CHANGE PROFILE, or reinstall the app.
+
+Nothing refills the board on its own, either. A device pushes when its totals
+are ahead of what the server was told, and after a reset they are level, so the
+board stays empty until somebody plays a scene.
+
 ### What it still will not do
 
 A name is refused, never reserved while a child thinks about it: the claim is
