@@ -266,14 +266,20 @@ public static class StressReferenceBuilder
     public static List<float> MeasureAllRaw(float[] x, int sampleRate, StressPattern pattern)
     {
         List<float> values = new List<float>();
+        foreach (RawStressAnalyzer.Measurement m in MeasurementsUnderAllConditions(x, sampleRate, pattern))
+            values.Add(m.ok ? m.ScoreFor(pattern.StressedSyllable) : float.NaN);
+        return values;
+    }
+
+    /// <summary>The raw measurement of one recording under every condition.</summary>
+    public static List<RawStressAnalyzer.Measurement> MeasurementsUnderAllConditions(
+        float[] x, int sampleRate, StressPattern pattern)
+    {
+        List<RawStressAnalyzer.Measurement> all = new List<RawStressAnalyzer.Measurement>();
         foreach (float noise in RawNoiseDb)
             foreach (float raise in RawVoiceRaise)
-            {
-                RawStressAnalyzer.Measurement m = RawStressAnalyzer.Measure(
-                    RawCondition(x, sampleRate, noise, raise), sampleRate, pattern.SyllableCount);
-                values.Add(m.ok ? m.ScoreFor(pattern.StressedSyllable) : float.NaN);
-            }
-        return values;
+                all.Add(RawStressAnalyzer.Measure(RawCondition(x, sampleRate, noise, raise), sampleRate, pattern.SyllableCount));
+        return all;
     }
 
     /// <summary>
@@ -350,8 +356,11 @@ public static class StressReferenceBuilder
 
             int sr;
             float[] audio = WavLevelStream.ReadMono(path, out sr);
-            List<float> own = MeasureAllRaw(audio, sr, pattern);
-            List<float> moved = MeasureAllRaw(MoveStressRaw(audio, sr, pattern, 1f), sr, pattern);
+            List<RawStressAnalyzer.Measurement> ownM = MeasurementsUnderAllConditions(audio, sr, pattern);
+            List<RawStressAnalyzer.Measurement> movedM =
+                MeasurementsUnderAllConditions(MoveStressRaw(audio, sr, pattern, 1f), sr, pattern);
+            List<float> own = ownM.Select(m => m.ok ? m.ScoreFor(pattern.StressedSyllable) : float.NaN).ToList();
+            List<float> moved = movedM.Select(m => m.ok ? m.ScoreFor(pattern.StressedSyllable) : float.NaN).ToList();
 
             WordResult w = new WordResult();
             w.reference = Median(own);
@@ -359,13 +368,15 @@ public static class StressReferenceBuilder
             w.settings = own.Count;
             if (float.IsNaN(w.reference) || float.IsNaN(w.moved)) { result.missing.Add(word); continue; }
 
-            float cut = RawStressAnalyzer.Cutoff(w.reference, w.moved);
-            bool movedIsLower = w.moved < w.reference;
-            foreach (float c in own)
-                if (!float.IsNaN(c) && (movedIsLower ? c >= cut : c <= cut)) w.ownCorrect++;
-            foreach (float c in moved)
+            // The very rule a child's answer meets (cut-off AND cues), so a
+            // word is only enforced when that rule passes Rachel herself.
+            float sc, cut;
+            string why;
+            foreach (RawStressAnalyzer.Measurement m in ownM)
+                if (m.ok && RawStressAnalyzer.IsRight(m, pattern, w.reference, w.moved, 1f, out sc, out cut, out why)) w.ownCorrect++;
+            foreach (RawStressAnalyzer.Measurement m in movedM)
                 // Unmeasurable counts too: it is asked again, never accepted.
-                if (float.IsNaN(c) || (movedIsLower ? c < cut : c > cut)) w.movedRejected++;
+                if (!m.ok || !RawStressAnalyzer.IsRight(m, pattern, w.reference, w.moved, 1f, out sc, out cut, out why)) w.movedRejected++;
 
             // The raw score is how far the stressed syllable stands out, so
             // moving the stress away MUST lower it, and by a clear margin. If

@@ -412,8 +412,88 @@ public static class RawStressAnalyzer
     public static float Cutoff(float reference, float moved, float tolerance = 1f)
     {
         bool straddles = (reference > 0f && moved < 0f) || (reference < 0f && moved > 0f);
-        float line = straddles ? 0f : 0.5f * (reference + moved);
+        // Not 0 itself: an answer where neither syllable really stands out
+        // (score 0.4 against Rachel's 3.4) is not said the way she says it.
+        // It has to come MarginTowardRachel of the way from 0 to her.
+        float line = straddles ? MarginTowardRachel * reference : 0.5f * (reference + moved);
         return reference + Math.Max(0f, tolerance) * (line - reference);
+    }
+
+    /// <summary>
+    /// How far from "neither syllable stands out" toward Rachel's own score an
+    /// answer must come before its stress counts as hers.
+    /// </summary>
+    public const float MarginTowardRachel = 0.3f;
+
+    /// <summary>Rachel's own score from which the cue rule (see IsRight) applies.</summary>
+    public const float CueRuleMinReference = 1.0f;
+
+    // A cue counts for or against the stressed syllable only past these:
+    // smaller differences are within what one voice does by chance.
+    private const double CueLengthLn = 0.1;      // ~10 % longer or shorter
+    private const double CueLoudnessDb = 1.5;
+    private const double CuePitchSemitones = 1.0;
+
+    /// <summary>
+    /// How many of the three cues (length, loudness, pitch) put the stressed
+    /// syllable above its strongest rival, and how many put it below.
+    /// </summary>
+    public static void CountCues(Measurement m, int stressed, out int forIt, out int against)
+    {
+        forIt = 0; against = 0;
+        if (m.syllables == null || stressed < 0 || stressed >= m.syllables.Length) return;
+
+        // The rival is the syllable the stressed one stands out least over -
+        // the same one the score is taken against.
+        int rival = -1;
+        float least = float.MaxValue;
+        for (int k = 0; k < m.syllables.Length; k++)
+        {
+            if (k == stressed) continue;
+            float p = Prominence(m.syllables[stressed], m.syllables[k]);
+            if (p < least) { least = p; rival = k; }
+        }
+        if (rival < 0) return;
+
+        Syllable a = m.syllables[stressed], b = m.syllables[rival];
+        double length = Math.Log(a.lengthMs / b.lengthMs);
+        double loud = a.peakDb - b.peakDb;
+        if (length > CueLengthLn) forIt++; else if (length < -CueLengthLn) against++;
+        if (loud > CueLoudnessDb) forIt++; else if (loud < -CueLoudnessDb) against++;
+        if (a.pitchHz > 0 && b.pitchHz > 0)
+        {
+            double pitch = 12 * Math.Log(a.pitchHz / b.pitchHz, 2);
+            if (pitch > CuePitchSemitones) forIt++; else if (pitch < -CuePitchSemitones) against++;
+        }
+    }
+
+    /// <summary>
+    /// The decision itself, shared by Judge and by the reference builder (so
+    /// a word is only enforced when the rule a child faces passes Rachel).
+    /// Right when the score is past the cut-off on Rachel's side AND more of
+    /// the cues speak for the stressed syllable than against it: a score
+    /// carried by one cue alone - typically a question's rising pitch over a
+    /// first syllable held longer - is not the word said her way.
+    /// </summary>
+    public static bool IsRight(Measurement m, StressPattern pattern, float reference, float moved, float tolerance,
+                               out float score, out float threshold, out string why)
+    {
+        threshold = Cutoff(reference, moved, tolerance);
+        score = m.ScoreFor(pattern.StressedSyllable);
+        bool movedIsLower = moved < reference;
+        bool pastLine = movedIsLower ? score >= threshold : score <= threshold;
+
+        int forIt, against;
+        CountCues(m, pattern.StressedSyllable, out forIt, out against);
+        // Only where Rachel herself makes the syllable clearly stand out: in
+        // her Bangon, Ngiti or Ligpit the two syllables are nearly level, so
+        // demanding cues there would refuse her own way of saying them.
+        bool cuesAgree = reference < CueRuleMinReference || !movedIsLower || forIt > against;
+
+        why = !pastLine ? "not past the line" : !cuesAgree
+            ? "only " + forIt + " of length/loudness/pitch for the stressed syllable, " + against + " against"
+            : "past the line, " + forIt + " cue(s) for, " + against + " against";
+        return pastLine && cuesAgree;
     }
 
     /// <summary>The verdict for one measurement against a word's references.</summary>
@@ -443,14 +523,16 @@ public static class RawStressAnalyzer
             return j;
         }
 
-        float score = m.ScoreFor(pattern.StressedSyllable);
+        float score, threshold;
+        string why;
+        bool right = IsRight(m, pattern, e.reference, e.moved, tolerance, out score, out threshold, out why);
         j.measured = score;
-        bool movedIsLower = e.moved < e.reference;
-        bool right = movedIsLower ? score >= j.threshold : score <= j.threshold;
+        j.threshold = threshold;
         j.verdict = right ? StressAnalyzer.Verdict.Matches : StressAnalyzer.Verdict.WrongStress;
         j.reason = (right ? "stress heard where " + pattern.Spoken + " needs it"
-                          : "stress heard on the wrong syllable - the word asked for is " + pattern.Spoken) +
-                   " (score " + score.ToString("0.00") + " vs line " + j.threshold.ToString("0.00") + "; " + Describe(m) + ")";
+                          : "stress not where " + pattern.Spoken + " needs it") +
+                   " (score " + score.ToString("0.00") + " vs line " + threshold.ToString("0.00") + ", " + why +
+                   "; " + Describe(m) + ")";
         return j;
     }
 }

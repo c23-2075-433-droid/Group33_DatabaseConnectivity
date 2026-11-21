@@ -13,7 +13,7 @@ public static partial class RawStressReferences
         new Row("Akyat", 2.6854f, -2.7241f, true),   // 9/9, 9/9
         new Row("Alis", 0.7323f, -3.5021f, false),   // 9/9, 7/9
         new Row("Bangon", 0.2271f, -3.2082f, true),   // 9/9, 9/9
-        new Row("Basa", 4.2147f, -2.2699f, false),   // 9/9, 7/9
+        new Row("Basa", 4.2147f, -2.2699f, true),   // 9/9, 9/9
         new Row("Bati", 1.0239f, -1.4036f, true),   // 9/9, 9/9
         new Row("Bukas", 1.3504f, -4.5254f, true),   // 9/9, 9/9
         new Row("Damit", 1.8911f, 1.6829f, false),   // 6/9, 7/9
@@ -21,8 +21,8 @@ public static partial class RawStressReferences
         new Row("Ibahagi", -0.7619f, -5.5475f, true),   // 9/9, 9/9
         new Row("Ilaw", 6.8207f, 2.0797f, false),   // 6/9, 9/9
         new Row("Inom", 1.2454f, -6.5505f, true),   // 9/9, 9/9
-        new Row("Kain", 1.5618f, -3.1922f, false),   // 9/9, 6/9
-        new Row("Kaliwa", 1.5241f, -2.6608f, true),   // 9/9, 9/9
+        new Row("Kain", 1.5618f, -3.1922f, false),   // 9/9, 7/9
+        new Row("Kaliwa", 1.5241f, -2.6608f, false),   // 6/9, 9/9
         new Row("Kanan", 2.6207f, 5.2717f, false),   // 9/9, 9/9
         new Row("Kuha", 4.4069f, -1.4221f, true),   // 9/9, 9/9
         new Row("Kumusta", -5.8144f, 1.9781f, false),   // 5/9, 6/9
@@ -38,13 +38,13 @@ public static partial class RawStressReferences
         new Row("Paalam", -1.9681f, -3.3797f, true),   // 9/9, 9/9
         new Row("Pagod", -3.5932f, -7.4312f, true),   // 9/9, 9/9
         new Row("Pasok", -1.7629f, 5.0498f, false),   // 6/9, 9/9
-        new Row("Sabon", 2.1821f, 0.3178f, false),   // 9/9, 6/9
+        new Row("Sabon", 2.1821f, 0.3178f, true),   // 9/9, 8/9
         new Row("Sagot", 1.2759f, -3.1302f, true),   // 9/9, 9/9
-        new Row("Sakay", 4.5219f, -0.4241f, false),   // 6/9, 8/9
+        new Row("Sakay", 4.5219f, -0.4241f, false),   // 6/9, 9/9
         new Row("Salamat", -0.9383f, 0.5342f, false),   // 9/9, 7/9
-        new Row("Sapatos", 3.8326f, -0.9579f, false),   // 9/9, 5/9
+        new Row("Sapatos", 3.8326f, -0.9579f, true),   // 9/9, 9/9
         new Row("Sipilyo", 2.3020f, -2.2336f, true),   // 9/9, 9/9
-        new Row("Suklay", 2.5157f, -1.8815f, false),   // 9/9, 5/9
+        new Row("Suklay", 2.5157f, -1.8815f, false),   // 6/9, 8/9
         new Row("Sulat", -3.0337f, 1.3940f, false),   // 7/9, 6/9
         new Row("Takbo", 4.8862f, 2.8619f, true),   // 9/9, 9/9
         new Row("Talon", 3.1505f, -2.0316f, true),   // 9/9, 9/9
