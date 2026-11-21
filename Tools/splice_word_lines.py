@@ -55,6 +55,11 @@ FADE = 0.015
 # English on either side the way two tracks butted together do.
 GAP = 0.04
 
+# afconvert decodes the MP3 on a Mac. Anywhere else there is no decoder to
+# lean on, so ask for raw PCM instead and resample it here.
+AFCONVERT = "/usr/bin/afconvert"
+OUTPUT_FORMAT = "mp3_44100_128" if os.path.exists(AFCONVERT) else "pcm_24000"
+
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
@@ -205,7 +210,7 @@ def speak(key, voice, text):
                            "style": 0.0, "use_speaker_boost": True},
     }).encode()
     req = urllib.request.Request(
-        vo.TTS + voice + "/with-timestamps?output_format=mp3_44100_128",
+        vo.TTS + voice + "/with-timestamps?output_format=" + OUTPUT_FORMAT,
         data=body, headers={"xi-api-key": key, "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=300) as r:
         payload = json.load(r)
@@ -300,6 +305,12 @@ def retime(track, span, word_track, shift):
 
 
 def decode(audio, tmp):
+    if OUTPUT_FORMAT.startswith("pcm_"):
+        # Raw 16-bit mono at 24 kHz (44.1 kHz PCM needs a Pro plan), brought
+        # up to the 44.1 kHz every other clip and her word recordings use.
+        from scipy.signal import resample_poly
+        x = np.frombuffer(audio, dtype="<i2").astype(np.float32) / 32768.0
+        return resample_poly(x, 147, 80).astype(np.float32)
     mp3 = tmp + ".mp3"
     open(mp3, "wb").write(audio)
     subprocess.run(["/usr/bin/afconvert", "-f", "WAVE", "-d", "LEI16@44100", "-c", "1",
