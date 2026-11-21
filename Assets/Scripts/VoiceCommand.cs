@@ -65,9 +65,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "judged from the recognizer's own loudness readings, which never touch the microphone.")]
     public bool recordOwnVoice = false;
 
-    [Tooltip("Where the stress cut-off sits: 1 = halfway between Rachel's stress and the stress moved " +
-             "to the other syllable. Lower is stricter, higher more forgiving. Tune it from the stress " +
-             "columns of the attempt log.")]
+    [Tooltip("LENIENT MODE ONLY (Accept Only Rachels Pronunciation off): where the old single stress " +
+             "cut-off sits, 1 = halfway between Rachel's stress and the moved one. Strict mode does not use " +
+             "it: its Correct and WrongStress lines are calibrated per word (PronunciationReferences).")]
     [Range(0.25f, 1.75f)]
     public float stressTolerance = 1f;
 
@@ -76,13 +76,25 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "recording or level stream that exists but is unclear is never waved through.")]
     public bool acceptOnLettersWhenNoStressEvidence = true;
 
-    [Tooltip("ON: a word is only correct when its stress was measured and matches Teacher Rachel's " +
-             "recording. A correct spelling alone never passes - the word said in a sentence, with " +
-             "'po' around it, with no voice readings from the device, or one whose reference is less " +
-             "certain is asked again (or marked wrong-stress) instead of waved through. OFF: the older, " +
-             "lenient rules, where the letters decide whenever the stress cannot be judged with full " +
-             "certainty. Overrides acceptOnLettersWhenNoStressEvidence while on.")]
-    public bool acceptOnlyRachelsPronunciation = true;
+    /// <summary>How the answer's stress counts. See AnswerJudge.</summary>
+    public enum StressCheck
+    {
+        /// <summary>The word first: stress only matters for same-spelling pairs, and only when clearly the other word.</summary>
+        Balanced,
+        /// <summary>Stress must be verified as Rachel's on the trusted words; other words reject only a clear wrong stress.</summary>
+        StrictOnTrustedWords,
+        /// <summary>Stress must be verified as Rachel's on every word with a known stress.</summary>
+        StrictOnEveryWord,
+        /// <summary>The rules before strict mode existed.</summary>
+        Lenient,
+    }
+
+    [Tooltip("BALANCED (default): the right WORD is what counts. Different stress, speed, pitch, intonation or " +
+             "accent never fail an ordinary word like Bangon; only on the same-spelling pairs (Tayo, Upo, Bukas, " +
+             "Basa, Talon, Bati, Lakad, Pasok, Kuha, Sulat, Linis) does a CLEARLY different stress fail, because " +
+             "there it is a different word. STRICT ON TRUSTED WORDS / STRICT ON EVERY WORD: the player must match " +
+             "Rachel's stress (much stricter). LENIENT: the older rules. See AnswerJudge.")]
+    public StressCheck stressCheck = StressCheck.Balanced;
 
     [Header("Vocabulary Answer Checking")]
     [Tooltip("When set, incoming speech is checked against this Tagalog word - this is how EVERY " +
@@ -319,7 +331,27 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
             SimulateSpeech(currentTargetWord, audio, rate);
             SaveEditorRecording(audio, rate, LastJudgement);
+            lastEditorAudio = audio;
+            lastEditorRate = rate;
+            lastEditorWord = currentTargetWord;
+            Debug.Log("VoiceCommand (Editor): to keep this recording for calibration, press F5 if you said it the way " +
+                      "Rachel does, F6 if the stress was on the wrong syllable, F7 if a sound was wrong.");
             return;
+        }
+
+        // Label the last hold-R recording with what was REALLY said, for
+        // Tools/test_stress_rules.sh labelled - the check against real
+        // voices that the synthetic tests cannot replace.
+        if (lastEditorAudio != null)
+        {
+            string label = Input.GetKeyDown(KeyCode.F5) ? "correct"
+                         : Input.GetKeyDown(KeyCode.F6) ? "wrong_stress"
+                         : Input.GetKeyDown(KeyCode.F7) ? "wrong_sound" : null;
+            if (label != null)
+            {
+                SaveLabelledRecording(lastEditorAudio, lastEditorRate, lastEditorWord, label);
+                lastEditorAudio = null;
+            }
         }
 
         // These go through SimulateSpeech, NOT straight to PlayerMovement, so
@@ -381,6 +413,45 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
 #if UNITY_EDITOR
     private static int editorRecordingCount;
+    private float[] lastEditorAudio;
+    private int lastEditorRate;
+    private string lastEditorWord;
+
+    /// <summary>
+    /// Editor only: keeps a hold-R recording under Recordings/Labelled/WORD/LABEL
+    /// (ignored by git: voices never leave this computer), for
+    /// Tools/test_stress_rules.sh labelled to judge.
+    /// </summary>
+    private static void SaveLabelledRecording(float[] audio, int rate, string word, string label)
+    {
+        try
+        {
+            string dir = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, "..", "Recordings", "Labelled",
+                                                                           word.Trim(), label));
+            System.IO.Directory.CreateDirectory(dir);
+            string path = System.IO.Path.Combine(dir, System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".wav");
+            WriteWav(path, audio, rate);
+            Debug.Log("VoiceCommand (Editor): kept as " + label + " -> " + path);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("VoiceCommand (Editor): could not keep the labelled recording: " + e.Message);
+        }
+    }
+
+    private static void WriteWav(string path, float[] audio, int rate)
+    {
+        using (var w = new System.IO.BinaryWriter(System.IO.File.Create(path)))
+        {
+            int bytes = audio.Length * 2;
+            w.Write(System.Text.Encoding.ASCII.GetBytes("RIFF")); w.Write(36 + bytes);
+            w.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt ")); w.Write(16);
+            w.Write((short)1); w.Write((short)1); w.Write(rate); w.Write(rate * 2);
+            w.Write((short)2); w.Write((short)16);
+            w.Write(System.Text.Encoding.ASCII.GetBytes("data")); w.Write(bytes);
+            foreach (float v in audio) w.Write((short)Mathf.Clamp(Mathf.RoundToInt(v * 32767f), -32768, 32767));
+        }
+    }
 
     /// <summary>
     /// Editor only: keeps each hold-R recording as a WAV under
@@ -396,20 +467,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             System.IO.Directory.CreateDirectory(dir);
             string score = float.IsNaN(verdict.stress.measured) ? "na"
                 : verdict.stress.measured.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
-            string name = System.DateTime.Now.ToString("HHmmss") + "_" + (++editorRecordingCount) + "_" +
+            string word = verdict.pattern != null ? verdict.pattern.Word : "word";
+            string name = System.DateTime.Now.ToString("HHmmss") + "_" + (++editorRecordingCount) + "_" + word + "_" +
                           verdict.outcome + "_score" + score + ".wav";
             string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(dir, name));
 
-            using (var w = new System.IO.BinaryWriter(System.IO.File.Create(path)))
-            {
-                int bytes = audio.Length * 2;
-                w.Write(System.Text.Encoding.ASCII.GetBytes("RIFF")); w.Write(36 + bytes);
-                w.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt ")); w.Write(16);
-                w.Write((short)1); w.Write((short)1); w.Write(rate); w.Write(rate * 2);
-                w.Write((short)2); w.Write((short)16);
-                w.Write(System.Text.Encoding.ASCII.GetBytes("data")); w.Write(bytes);
-                foreach (float v in audio) w.Write((short)Mathf.Clamp(Mathf.RoundToInt(v * 32767f), -32768, 32767));
-            }
+            WriteWav(path, audio, rate);
             Debug.Log("VoiceCommand (Editor): recording saved to " + path);
         }
         catch (System.Exception e)
@@ -831,7 +894,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             AnswerJudge.Settings settings = AnswerJudge.Settings.Default;
             settings.stressTolerance = stressTolerance;
             settings.acceptOnLettersWhenNoEvidence = acceptOnLettersWhenNoStressEvidence;
-            settings.requireRachelsStress = acceptOnlyRachelsPronunciation;
+            settings.balanced = stressCheck == StressCheck.Balanced;
+            settings.requireRachelsStress = stressCheck == StressCheck.StrictOnTrustedWords || stressCheck == StressCheck.StrictOnEveryWord;
+            settings.verifyOnlyTrustedWords = stressCheck == StressCheck.StrictOnTrustedWords;
 
             AnswerJudge.Result verdict = AnswerJudge.Judge(
                 spokenText, currentTargetWord, currentTargetWordVariants, evidence, settings);

@@ -35,6 +35,12 @@ public static partial class StressReferences
         public float moved;
         public bool enforced;
         public bool measured;
+        /// <summary>
+        /// The lowest and highest centroid her own recording, and the moved
+        /// one, gave over every simulated phone. JudgeBanded's bands start
+        /// beyond these.
+        /// </summary>
+        public float ownMin, ownMax, movedMin, movedMax;
     }
 
     private static Dictionary<string, Entry> table;
@@ -55,6 +61,9 @@ public static partial class StressReferences
         e = new Entry();
         if (pattern.IsFinal) { e.reference = AverageFinal; e.moved = AverageInitial; }
         else { e.reference = AverageInitial; e.moved = AverageFinal; }
+        // No measurements: the bands sit at the references themselves.
+        e.ownMin = e.ownMax = e.reference;
+        e.movedMin = e.movedMax = e.moved;
         e.enforced = false;
         e.measured = false;
         return e;
@@ -67,18 +76,29 @@ public static partial class StressReferences
         public float reference;
         public float moved;
         public bool enforced;
+        public float ownMin, ownMax, movedMin, movedMax;
 
-        public Row(string word, float reference, float moved, bool enforced)
+        public Row(string word, float reference, float moved, bool enforced,
+                   float ownMin = float.NaN, float ownMax = float.NaN, float movedMin = float.NaN, float movedMax = float.NaN)
         {
             this.word = word;
             this.reference = reference;
             this.moved = moved;
             this.enforced = enforced;
+            // Without measured ranges the bands sit at the references themselves.
+            this.ownMin = float.IsNaN(ownMin) ? reference : ownMin;
+            this.ownMax = float.IsNaN(ownMax) ? reference : ownMax;
+            this.movedMin = float.IsNaN(movedMin) ? moved : movedMin;
+            this.movedMax = float.IsNaN(movedMax) ? moved : movedMax;
         }
 
         public Entry ToEntry()
         {
-            return new Entry { reference = reference, moved = moved, enforced = enforced, measured = true };
+            return new Entry
+            {
+                reference = reference, moved = moved, enforced = enforced, measured = true,
+                ownMin = ownMin, ownMax = ownMax, movedMin = movedMin, movedMax = movedMax,
+            };
         }
     }
 }

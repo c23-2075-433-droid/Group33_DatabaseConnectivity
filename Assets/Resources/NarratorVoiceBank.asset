@@ -1665,7 +1665,7 @@ MonoBehaviour:
   - id: word_pagkain
     text: Pagkain
     gloss: Food
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: 30d95792eb7b59e4b8813d267bf0b03c, type: 3}
   - id: word_kain
     text: Kain
     gloss: Eat

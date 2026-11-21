@@ -191,7 +191,8 @@ public static class VoiceAttemptLog
         if (r.pattern == null || r.source == AnswerJudge.StressSource.None) return "";
         string source = r.source == AnswerJudge.StressSource.RawAudio ? "raw_audio" : "voice_levels";
         string verdict = r.stress.verdict == StressAnalyzer.Verdict.Matches ? "matches"
-                       : r.stress.verdict == StressAnalyzer.Verdict.WrongStress ? "wrong_stress" : "unmeasurable";
+                       : r.stress.verdict == StressAnalyzer.Verdict.WrongStress ? "wrong_stress"
+                       : r.stress.verdict == StressAnalyzer.Verdict.Borderline ? "borderline" : "unmeasurable";
         return source + "," + verdict + "," + (r.stressEnforced ? "1" : "0") + "," +
                Number(r.stress.measured) + "," + Number(r.stress.threshold) + "," + Number(r.stress.reference);
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 /// <summary>
 /// How a taught word is SPELLED ON SCREEN and STRESSED when said: every word
 /// with a known stress is shown with its stress marks, as the Level script
-/// writes it (LÁKAD, BANGÓN, TAYÔ).
+/// writes it (LÁKAD, BÁNGON, TAYÔ).
 ///
 /// WHY THIS EXISTS
 ///
@@ -79,7 +79,7 @@ public static class WordStress
     /// <summary>
     /// Every taught word's stress, keyed by the taught word. From the group's
     /// Vocabulary Validation Form and the Level 1-2 script (the script wins
-    /// where they differed: Bangón, Lákad, Malígo, Sulát), except the words marked "not on the form",
+    /// where they differed: Lákad, Malígo, Sulát), except the words marked "not on the form",
     /// which the form does not list and are the group's own reading - those
     /// especially want the validating teacher's eye. A word missing here
     /// (Bag has one syllable; Kinig and Tapon are not yet decided) has no
@@ -89,12 +89,12 @@ public static class WordStress
         new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
     {
         // Bahay
-        { "Bangon",  "Bangón"  }, { "Tayo",    "Tayô"    }, { "Lakad",   "Lákad"   },
+        { "Bangon",  "Bángon"  }, { "Tayo",    "Tayô"    }, { "Lakad",   "Lákad"   },
         { "Kaliwa",  "Kaliwâ"  }, { "Kanan",   "Kánan"   }, { "Bukas",   "Bukás"   },
         { "Ilaw",    "Ílaw"    }, { "Tuwalya", "Tuwálya" }, { "Sabon",   "Sabón"   },
         { "Maligo",  "Malígo"  }, { "Sipilyo", "Sipílyo" }, { "Suklay",  "Sukláy"  },
         { "Damit",   "Damít"   }, { "Medyas",  "Médyas"  }, { "Sapatos", "Sapátos" },
-        { "Kunin",   "Kunín"   },   // not on the form
+        { "Kunin",   "Kúnin"   },   // not on the form; Bángon and Kúnin corrected by the group, 2026-11-21
         { "Upo",     "Upô"     },
         { "Pagkain", "Pagkáin" },   // not on the form
         { "Kain",    "Káin"    }, { "Inom",    "Inóm"    }, { "Linis",   "Línis"   },
@@ -116,7 +116,7 @@ public static class WordStress
     };
 
     /// <summary>
-    /// The word written with its stress marks ("Bangón", "Tayô"), or null when
+    /// The word written with its stress marks ("Bángon", "Tayô"), or null when
     /// its stress has not been decided. Used for checking; Display shows it.
     /// </summary>
     public static string PronunciationOf(string word)
@@ -131,7 +131,7 @@ public static class WordStress
 
     /// <summary>
     /// The spelling to put on screen: the word with its stress marks, as the
-    /// Level script writes it ("Lákad", "Bangón"), for every word whose stress
+    /// Level script writes it ("Lákad", "Bángon"), for every word whose stress
     /// is known; otherwise the word exactly as it was given (Bag, Kinig,
     /// Tapon). Never null for a non-null argument, so a caller can use it
     /// straight.
