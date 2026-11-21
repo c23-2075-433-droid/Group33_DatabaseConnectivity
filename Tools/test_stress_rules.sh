@@ -5,7 +5,10 @@
 #
 #   Tools/test_stress_rules.sh            run the tests (exit 0 = all passed)
 #   Tools/test_stress_rules.sh generate   re-measure the recordings and rewrite
-#                                         both stress reference files
+#                                         all three stress reference files
+#   Tools/test_stress_rules.sh labelled [DIR]
+#                                         judge real labelled recordings (default
+#                                         Recordings/Labelled) and report accuracy
 #   Tools/test_stress_rules.sh file WORD a.wav [b.wav ...]
 #                                         measure WAVs (e.g. the Editor's
 #                                         Library/StressRecordings) as answers to WORD
@@ -51,8 +54,14 @@ cat > "$OUT/tests.csproj" <<'PROJ'
     <Compile Include="$(GameRoot)/Assets/Scripts/RawStressAnalyzer.cs" />
     <Compile Include="$(GameRoot)/Assets/Scripts/RawStressReferences.cs" />
     <Compile Include="$(GameRoot)/Assets/Scripts/RawStressReferenceData.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/SpeechFeatures.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/SyllableAligner.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationAssessor.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationReferences.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationReferenceData.cs" />
     <Compile Include="$(GameRoot)/Assets/Editor/WavLevelStream.cs" />
     <Compile Include="$(GameRoot)/Assets/Editor/StressReferenceBuilder.cs" />
+    <Compile Include="$(GameRoot)/Assets/Editor/PronunciationReferenceBuilder.cs" />
     <Compile Include="$(GameRoot)/Tools/stresstests/StressTests.cs" />
   </ItemGroup>
 </Project>
@@ -64,5 +73,5 @@ command -v cygpath >/dev/null 2>&1 && WIN_ROOT=$(cygpath -m "$ROOT")
 MODE=${1:-test}
 [ $# -gt 0 ] && shift
 DOTNET_CLI_TELEMETRY_OPTOUT=1 DOTNET_NOLOGO=1 \
-  "$DOTNET" run --project "$OUT/tests.csproj" -p:GameRoot="$WIN_ROOT" -v quiet -- "$MODE" "$WIN_ROOT" "$@" 2>&1
+  "$DOTNET" run -c Release --project "$OUT/tests.csproj" -p:GameRoot="$WIN_ROOT" -v quiet -- "$MODE" "$WIN_ROOT" "$@" 2>&1
 exit $?

@@ -26,13 +26,13 @@ public static class StressReferenceBuilder
     public static readonly string[] CalibrationInitial =
     {
         "lakad", "kanan", "ilaw", "tabo", "suklay", "medyas", "basa", "bati",
-        "lapis", "inom", "labas", "tulak", "pagod", "pasok", "laro", "kain", "tawa", "kuha",
+        "lapis", "inom", "labas", "tulak", "pagod", "pasok", "laro", "kain", "tawa", "kuha", "bangon",
     };
 
     public static readonly string[] CalibrationFinal =
     {
         "tayo", "upo", "bukas", "talon", "sabon", "damit", "kanin", "alis", "akyat",
-        "sakay", "itlog", "sagot", "tingin", "takbo", "ligpit", "linis", "aklat", "tulong", "bangon", "sulat",
+        "sakay", "itlog", "sagot", "tingin", "takbo", "ligpit", "linis", "aklat", "tulong", "sulat",
     };
 
     /// <summary>
@@ -51,6 +51,8 @@ public static class StressReferenceBuilder
         public int ownCorrect;     // settings where her own recording passed
         public int movedRejected;  // settings where the moved one was NOT accepted (wrong, or unmeasurable)
         public int settings;
+        /// <summary>Range of her own and of the moved measurements over every setting (levels only).</summary>
+        public float ownMin, ownMax, movedMin, movedMax;
     }
 
     public sealed class Result
@@ -116,6 +118,10 @@ public static class StressReferenceBuilder
             w.moved = Median(moved);
             w.settings = own.Count;
             if (float.IsNaN(w.reference) || float.IsNaN(w.moved)) { result.missing.Add(word); continue; }
+
+            List<float> ownOk = own.Where(v => !float.IsNaN(v)).ToList(), movedOk = moved.Where(v => !float.IsNaN(v)).ToList();
+            w.ownMin = ownOk.Min(); w.ownMax = ownOk.Max();
+            w.movedMin = movedOk.Min(); w.movedMax = movedOk.Max();
 
             float cut = 0.5f * (w.reference + w.moved);
             bool movedIsEarlier = w.moved < w.reference;
@@ -285,7 +291,7 @@ public static class StressReferenceBuilder
     /// <summary>
     /// The syllable a mis-stressed word most likely puts the stress on: the
     /// one before, for a word stressed on its last syllable (tayô -> táyo),
-    /// otherwise the one after (bángon -> bangón, sapátos -> sapatós).
+    /// otherwise the one after (lákad -> lakád, sapátos -> sapatós).
     /// </summary>
     public static int MovedSyllable(StressPattern pattern)
     {
@@ -494,14 +500,15 @@ public static class StressReferenceBuilder
         sb.AppendLine();
         sb.AppendLine("public static partial class StressReferences");
         sb.AppendLine("{");
-        sb.AppendLine("    //            word, Rachel's stress, stress moved, enforced   (own ok / moved rejected, of settings)");
+        sb.AppendLine("    //            word, Rachel's stress, stress moved, enforced, own min/max, moved min/max   (own ok / moved rejected, of settings)");
         sb.AppendLine("    private static readonly Row[] Rows =");
         sb.AppendLine("    {");
         foreach (KeyValuePair<string, WordResult> row in r.rows)
         {
             WordResult w = row.Value;
             sb.AppendLine("        new Row(\"" + row.Key + "\", " + F(w.reference, inv) + ", " + F(w.moved, inv) + ", " +
-                          (w.enforced ? "true" : "false") + "),   // " + w.ownCorrect + "/" + w.settings + ", " +
+                          (w.enforced ? "true" : "false") + ", " + F(w.ownMin, inv) + ", " + F(w.ownMax, inv) + ", " +
+                          F(w.movedMin, inv) + ", " + F(w.movedMax, inv) + "),   // " + w.ownCorrect + "/" + w.settings + ", " +
                           w.movedRejected + "/" + w.settings);
         }
         sb.AppendLine("    };");

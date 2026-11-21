@@ -5,51 +5,51 @@
 
 public static partial class StressReferences
 {
-    //            word, Rachel's stress, stress moved, enforced   (own ok / moved rejected, of settings)
+    //            word, Rachel's stress, stress moved, enforced, own min/max, moved min/max   (own ok / moved rejected, of settings)
     private static readonly Row[] Rows =
     {
-        new Row("Aklat", 0.6458f, 0.4259f, true),   // 9/9, 9/9
-        new Row("Akyat", 0.6946f, 0.5247f, false),   // 7/9, 9/9
-        new Row("Alis", 0.3865f, 0.3942f, false),   // 5/9, 5/9
-        new Row("Bangon", 0.4604f, 0.3413f, false),   // 8/9, 5/9
-        new Row("Basa", 0.4711f, 0.4862f, false),   // 7/9, 5/9
-        new Row("Bati", 0.3447f, 0.5477f, true),   // 9/9, 9/9
-        new Row("Bukas", 0.4521f, 0.4955f, false),   // 9/9, 7/9
-        new Row("Damit", 0.4537f, 0.4403f, false),   // 7/9, 5/9
-        new Row("Ilaw", 0.6124f, 0.4789f, false),   // 6/9, 9/9
-        new Row("Inom", 0.5098f, 0.5178f, false),   // 7/9, 6/9
-        new Row("Kain", 0.4629f, 0.6770f, true),   // 9/9, 8/9
-        new Row("Kanan", 0.3992f, 0.6092f, true),   // 9/9, 8/9
-        new Row("Kuha", 0.4752f, 0.6921f, false),   // 9/9, 7/9
-        new Row("Kunin", 0.4705f, 0.4838f, false),   // 5/9, 5/9
-        new Row("Lakad", 0.4159f, 0.6821f, true),   // 9/9, 8/9
-        new Row("Lapis", 0.5544f, 0.6339f, true),   // 9/9, 9/9
-        new Row("Laro", 0.4304f, 0.5742f, true),   // 9/9, 8/9
-        new Row("Ligpit", 0.5254f, 0.6278f, false),   // 6/9, 8/9
-        new Row("Linis", 0.3750f, 0.5803f, true),   // 9/9, 9/9
-        new Row("Medyas", 0.3866f, 0.6126f, true),   // 9/9, 9/9
-        new Row("Ngiti", 0.4900f, 0.4828f, false),   // 6/9, 6/9
-        new Row("Pagod", 0.3201f, 0.4867f, true),   // 9/9, 9/9
-        new Row("Pasok", 0.5050f, 0.6401f, true),   // 9/9, 8/9
-        new Row("Sabon", 0.5352f, 0.5118f, false),   // 6/9, 5/9
-        new Row("Sagot", 0.4772f, 0.5442f, false),   // 6/9, 6/9
-        new Row("Sakay", 0.6503f, 0.4533f, false),   // 9/9, 7/9
-        new Row("Suklay", 0.6557f, 0.4951f, false),   // 9/9, 6/9
-        new Row("Sulat", 0.5775f, 0.3874f, false),   // 6/9, 5/9
-        new Row("Takbo", 0.6980f, 0.4936f, true),   // 9/9, 8/9
-        new Row("Talon", 0.4995f, 0.5018f, false),   // 5/9, 5/9
-        new Row("Tanong", 0.5423f, 0.5878f, false),   // 6/9, 6/9
-        new Row("Tayo", 0.5799f, 0.3782f, true),   // 9/9, 9/9
-        new Row("Tingin", 0.5583f, 0.4692f, false),   // 7/9, 7/9
-        new Row("Tulak", 0.4738f, 0.4887f, false),   // 6/9, 7/9
-        new Row("Tuwa", 0.5904f, 0.4500f, false),   // 6/9, 9/9
-        new Row("Upo", 0.6476f, 0.5064f, true),   // 9/9, 9/9
-        new Row("Uwi", 0.4753f, 0.4561f, false),   // 9/9, 7/9
+        new Row("Aklat", 0.7107f, 0.4804f, true, 0.6684f, 0.7274f, 0.4594f, 0.5486f),   // 9/9, 9/9
+        new Row("Akyat", 0.5171f, 0.4997f, false, 0.4742f, 0.5827f, 0.4766f, 0.5823f),   // 5/9, 7/9
+        new Row("Alis", 0.5008f, 0.5497f, false, 0.4852f, 0.5137f, 0.4865f, 0.5881f),   // 9/9, 5/9
+        new Row("Bangon", 0.4604f, 0.6453f, true, 0.3969f, 0.4790f, 0.3585f, 0.7120f),   // 9/9, 8/9
+        new Row("Basa", 0.3581f, 0.5797f, true, 0.2864f, 0.3926f, 0.5408f, 0.6301f),   // 9/9, 9/9
+        new Row("Bati", 0.3447f, 0.5477f, true, 0.3039f, 0.4175f, 0.5126f, 0.5814f),   // 9/9, 9/9
+        new Row("Bukas", 0.4521f, 0.4955f, false, 0.4035f, 0.4675f, 0.4616f, 0.5373f),   // 9/9, 7/9
+        new Row("Damit", 0.5741f, 0.4370f, false, 0.5046f, 0.6423f, 0.3209f, 0.4698f),   // 6/9, 9/9
+        new Row("Ilaw", 0.4389f, 0.4559f, false, 0.4092f, 0.4921f, 0.2789f, 0.4870f),   // 5/9, 5/9
+        new Row("Inom", 0.6388f, 0.3898f, true, 0.5621f, 0.7087f, 0.3717f, 0.4163f),   // 9/9, 9/9
+        new Row("Kain", 0.4879f, 0.3994f, false, 0.4829f, 0.5840f, 0.3810f, 0.4483f),   // 8/9, 8/9
+        new Row("Kanan", 0.3375f, 0.5301f, false, 0.2952f, 0.3956f, 0.2967f, 0.5537f),   // 9/9, 6/9
+        new Row("Kuha", 0.4752f, 0.6921f, false, 0.4301f, 0.5195f, 0.4958f, 0.7632f),   // 9/9, 7/9
+        new Row("Kunin", 0.5231f, 0.4987f, false, 0.4498f, 0.5669f, 0.4849f, 0.6947f),   // 5/9, 7/9
+        new Row("Lakad", 0.4159f, 0.6821f, true, 0.3973f, 0.4727f, 0.4866f, 0.6962f),   // 9/9, 8/9
+        new Row("Lapis", 0.5201f, 0.4508f, false, 0.3348f, 0.6497f, 0.4213f, 0.5132f),   // 7/9, 7/9
+        new Row("Laro", 0.5613f, 0.3470f, true, 0.5079f, 0.6279f, 0.2898f, 0.3991f),   // 9/9, 9/9
+        new Row("Ligpit", 0.4925f, 0.5264f, false, 0.3240f, 0.6204f, 0.5004f, 0.5636f),   // 6/9, 8/9
+        new Row("Linis", 0.3605f, 0.6156f, true, 0.3327f, 0.4203f, 0.5931f, 0.6292f),   // 9/9, 9/9
+        new Row("Medyas", 0.3866f, 0.6126f, true, 0.3149f, 0.4790f, 0.5836f, 0.6955f),   // 9/9, 9/9
+        new Row("Ngiti", 0.5902f, 0.5054f, false, 0.5556f, 0.6237f, 0.3916f, 0.5798f),   // 9/9, 7/9
+        new Row("Pagod", 0.6029f, 0.3561f, true, 0.5720f, 0.6851f, 0.3034f, 0.4550f),   // 9/9, 9/9
+        new Row("Pasok", 0.4139f, 0.5850f, true, 0.3681f, 0.4520f, 0.5473f, 0.6204f),   // 9/9, 9/9
+        new Row("Sabon", 0.5352f, 0.5118f, false, 0.5158f, 0.6212f, 0.3043f, 0.6260f),   // 6/9, 5/9
+        new Row("Sagot", 0.4772f, 0.5442f, false, 0.4526f, 0.5464f, 0.2875f, 0.5785f),   // 6/9, 6/9
+        new Row("Sakay", 0.6503f, 0.4533f, false, 0.5599f, 0.6933f, 0.3869f, 0.5810f),   // 9/9, 7/9
+        new Row("Suklay", 0.5993f, 0.5507f, false, 0.4912f, 0.7151f, 0.4738f, 0.7288f),   // 6/9, 5/9
+        new Row("Sulat", 0.6382f, 0.4412f, false, 0.4100f, 0.6930f, 0.3707f, 0.4772f),   // 7/9, 9/9
+        new Row("Takbo", 0.4942f, 0.4823f, false, 0.3636f, 0.5017f, 0.4660f, 0.4867f),   // 5/9, 9/9
+        new Row("Talon", 0.6042f, 0.4726f, true, 0.5606f, 0.6389f, 0.3041f, 0.5053f),   // 9/9, 9/9
+        new Row("Tanong", 0.5528f, 0.4761f, false, 0.5039f, 0.6141f, 0.2650f, 0.4854f),   // 7/9, 9/9
+        new Row("Tayo", 0.5799f, 0.3782f, true, 0.5305f, 0.6169f, 0.3257f, 0.4342f),   // 9/9, 9/9
+        new Row("Tingin", 0.5837f, 0.6131f, false, 0.4759f, 0.6231f, 0.5971f, 0.6236f),   // 6/9, 8/9
+        new Row("Tulak", 0.3863f, 0.5860f, true, 0.2554f, 0.4499f, 0.5615f, 0.6254f),   // 9/9, 9/9
+        new Row("Tuwa", 0.5805f, 0.4496f, true, 0.5656f, 0.6063f, 0.2549f, 0.4792f),   // 9/9, 9/9
+        new Row("Upo", 0.6476f, 0.5064f, true, 0.5991f, 0.6903f, 0.3907f, 0.5253f),   // 9/9, 9/9
+        new Row("Uwi", 0.4753f, 0.4561f, false, 0.4674f, 0.4890f, 0.3238f, 0.4713f),   // 9/9, 7/9
     };
 
     /// <summary>Average centroid of Rachel's two-syllable words stressed on the first syllable.</summary>
-    public const float AverageInitial = 0.4617f;
+    public const float AverageInitial = 0.4590f;
 
     /// <summary>Average centroid of Rachel's two-syllable words stressed on the last syllable.</summary>
-    public const float AverageFinal = 0.5379f;
+    public const float AverageFinal = 0.5452f;
 }

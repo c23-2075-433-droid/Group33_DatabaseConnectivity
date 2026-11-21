@@ -68,6 +68,11 @@ public static class StressAnalyzer
         WrongStress,
         /// <summary>There was not enough of a voice in the readings to judge.</summary>
         Unmeasurable,
+        /// <summary>
+        /// Measured, but neither clearly Rachel's stress nor clearly the moved
+        /// one: between the two bands (see JudgeBanded). Asked again.
+        /// </summary>
+        Borderline,
     }
 
     /// <summary>How the plugin scaled the level readings it reported.</summary>
@@ -161,6 +166,60 @@ public static class StressAnalyzer
         j.reason = ok
             ? "stress heard where " + pattern.Spoken + " needs it"
             : "stress heard on the wrong syllable - the word asked for is " + pattern.Spoken;
+        return j;
+    }
+
+    /// <summary>Clear space kept between each band and the other stress's measurements.</summary>
+    public const float BandMargin = 0.02f;
+
+    /// <summary>
+    /// The judgement strict mode acts on. Rather than one cut-off with
+    /// nothing around it - where an answer near the line falls either side
+    /// by chance - there are two bands, both taken from Rachel's recording as
+    /// every simulated phone hears it (StressReferences):
+    ///
+    ///   Matches      past EVERY reading the moved stress gave, and past the
+    ///                halfway mark: nothing that sounds like the other word
+    ///                was ever measured there.
+    ///   WrongStress  past every reading her own stress gave, the other way.
+    ///   Borderline   in between: asked again, never scored.
+    ///
+    /// Where the two stresses overlap on some phone, the Matches band starts
+    /// beyond the overlap - so a word whose loudness readings barely tell its
+    /// stresses apart can still be passed, but only by a stress at least as
+    /// clear as Rachel's, and never by one that sounds like the moved stress.
+    /// </summary>
+    public static Judgement JudgeBanded(IList<float> levels, float sampleIntervalMs, LevelScale scale, StressPattern pattern)
+    {
+        Judgement j = Judge(levels, sampleIntervalMs, scale, pattern, 1f);
+        if (j.verdict == Verdict.Unmeasurable) return j;
+
+        StressReferences.Entry e = StressReferences.For(pattern);
+        bool movedIsEarlier = e.moved < e.reference;
+        float mid = 0.5f * (e.reference + e.moved);
+        float c = j.measured;
+        bool right, wrong;
+        if (movedIsEarlier)
+        {
+            float accept = Math.Max(e.movedMax + BandMargin, mid);
+            float reject = Math.Min(e.ownMin - BandMargin, mid);
+            j.threshold = accept;
+            right = c >= accept;
+            wrong = c <= reject;
+        }
+        else
+        {
+            float accept = Math.Min(e.movedMin - BandMargin, mid);
+            float reject = Math.Max(e.ownMax + BandMargin, mid);
+            j.threshold = accept;
+            right = c <= accept;
+            wrong = c >= reject;
+        }
+        j.verdict = right ? Verdict.Matches : wrong ? Verdict.WrongStress : Verdict.Borderline;
+        j.reason = (right ? "stress heard where " + pattern.Spoken + " needs it"
+                   : wrong ? "stress heard on the wrong syllable - the word asked for is " + pattern.Spoken
+                   : "not clearly either stress in the loudness readings") +
+                   " (centroid " + c.ToString("0.000") + ", passes from " + j.threshold.ToString("0.000") + ")";
         return j;
     }
 

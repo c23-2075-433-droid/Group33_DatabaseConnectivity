@@ -86,20 +86,20 @@ public static class StressCheckTool
             ((ISpeechToTextListener)vc).OnBeginningOfSpeech();
             ((ISpeechToTextListener)vc).OnResultReceived("", 7);   // ERROR_NO_MATCH
             failures += Expect(sb, "   ...the recognizer's no-match error -> nothing-heard", ev, "nothing-heard");
-            failures += Case(sb, ev, "4b. Words heard but the recording has no voice -> unclear, not scored",
-                () => vc.SimulateSpeech("tayo", silence, rate), "unclear");
+            failures += Case(sb, ev, "4b. Words heard but the recording has no voice -> balanced: the word decides",
+                () => vc.SimulateSpeech("tayo", silence, rate), "correct");
             failures += Case(sb, ev, "5a. Wrong stress first...",
                 () => vc.SimulateSpeech("tayo", we, rate), "wrong, wrong-stress");
             failures += Case(sb, ev, "5b. ...then correct on the second attempt -> Correct",
                 () => vc.SimulateSpeech("tayo", standUp, rate), "correct");
 
             vc.currentTargetWord = "Bangon";
-            failures += Case(sb, ev, "Strict: Bangon typed with no audio -> asked again, never passed on letters",
-                () => vc.SimulateSpeech("bangon"), "unclear");
-            vc.acceptOnlyRachelsPronunciation = false;
-            failures += Case(sb, ev, "Lenient (strict off): Bangon with no audio -> letters decide",
+            failures += Case(sb, ev, "Balanced (default): Bangon with no audio -> the word decides",
                 () => vc.SimulateSpeech("bangon"), "correct");
-            vc.acceptOnlyRachelsPronunciation = true;
+            vc.stressCheck = VoiceCommand.StressCheck.StrictOnEveryWord;
+            failures += Case(sb, ev, "Strict on every word: Bangon typed with no audio -> asked again",
+                () => vc.SimulateSpeech("bangon"), "unclear");
+            vc.stressCheck = VoiceCommand.StressCheck.Balanced;
             failures += Case(sb, ev, "Unpaired word, wrong word -> Wrong",
                 () => vc.SimulateSpeech("tayo"), "wrong");
         }
