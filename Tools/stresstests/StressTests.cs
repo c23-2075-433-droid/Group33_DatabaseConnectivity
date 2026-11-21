@@ -388,12 +388,46 @@ internal static class StressTests
         Check("Phone kept the mic for the recognizer (silent recording) -> readings decide: tayô Correct",
               sl.outcome == AnswerJudge.Outcome.Correct && sl.source == AnswerJudge.StressSource.VoiceLevels, sl.outcome + " / " + sl.source);
 
-        var none = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), s);
-        Check("No evidence at all -> letters decide, flagged unverified", none.outcome == AnswerJudge.Outcome.Correct && none.stressUnverified);
-        var strict = AnswerJudge.Settings.Default;
-        strict.acceptOnLettersWhenNoEvidence = false;
-        var noneStrict = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), strict);
+        // The older, lenient rules (strict mode off), still selectable in the Inspector.
+        var lenient = AnswerJudge.Settings.Default;
+        lenient.requireRachelsStress = false;
+
+        var noneStrictDefault = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), s);
+        Check("Strict (default): no evidence at all -> Unclear, never passed on its letters",
+              noneStrictDefault.outcome == AnswerJudge.Outcome.Unclear, noneStrictDefault.outcome + ": " + noneStrictDefault.reason);
+        var none = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), lenient);
+        Check("Lenient: no evidence at all -> letters decide, flagged unverified", none.outcome == AnswerJudge.Outcome.Correct && none.stressUnverified);
+        var lenientNoFallback = lenient;
+        lenientNoFallback.acceptOnLettersWhenNoEvidence = false;
+        var noneStrict = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), lenientNoFallback);
         Check("...and Unclear when that fallback is switched off", noneStrict.outcome == AnswerJudge.Outcome.Unclear);
+
+        Console.WriteLine("Strict mode: never Correct unless the stress was measured and matched Rachel");
+        int strictWords = 0, ownPassed = 0, movedRejected = 0, unchecked_ = 0;
+        foreach (string word in WordStress.WordsWithStress.OrderBy(w => w))
+        {
+            StressPattern p = StressPattern.For(word);
+            if (p == null || !File.Exists(StressReferenceBuilder.WavPath(vo, word))) continue;
+            float[] a = Load(word, out int r);
+            var own = AnswerJudge.Judge(word.ToLowerInvariant(), word, null, Audio(a, r), s);
+            var moved = AnswerJudge.Judge(word.ToLowerInvariant(), word, null,
+                                          Audio(StressReferenceBuilder.MoveStressRaw(a, r, p, 1f), r), s);
+            var nothing = AnswerJudge.Judge(word.ToLowerInvariant(), word, null, new AnswerJudge.Evidence(), s);
+            strictWords++;
+            if (own.outcome == AnswerJudge.Outcome.Correct) ownPassed++;
+            if (moved.outcome != AnswerJudge.Outcome.Correct) movedRejected++;
+            foreach (var res in new[] { own, moved, nothing })
+                if (res.outcome == AnswerJudge.Outcome.Correct && !(res.stressChecked && res.stressEnforced)) unchecked_++;
+        }
+        Check("Strict: no word with a known stress is ever Correct without a measured, acted-on stress",
+              unchecked_ == 0, unchecked_ + " unchecked pass(es)");
+        Console.WriteLine("  (for information: of " + strictWords + " recorded words, Rachel's own recording passes " +
+                          ownPassed + ", the stress-moved one is refused " + movedRejected + ")");
+
+        var lfill = AnswerJudge.Judge("bangon po", "Bangon", null, Audio(Load("bangon", out int bsr), bsr), s);
+        Check("Strict: \"bangon po\" -> Unclear (say it on its own)", lfill.outcome == AnswerJudge.Outcome.Unclear, lfill.outcome.ToString());
+        var lsent = AnswerJudge.Judge("bangon na ako", "Bangon", null, Audio(Load("bangon", out bsr), bsr), s);
+        Check("Strict: \"bangon na ako\" -> Unclear (say it on its own)", lsent.outcome == AnswerJudge.Outcome.Unclear, lsent.outcome.ToString());
 
         foreach (string word in WordStress.WordsWithStress.OrderBy(w => w))
         {
@@ -402,8 +436,8 @@ internal static class StressTests
             if (!File.Exists(StressReferenceBuilder.WavPath(vo, word))) continue;
             float[] a = Load(word, out int r);
             var res = AnswerJudge.Judge(word.ToLowerInvariant(), word, null,
-                                        Audio(StressReferenceBuilder.MoveStressRaw(a, r, p, 1f), r), s);
-            Check(p.Spoken + " (not enforced): letters decide, stress still measured",
+                                        Audio(StressReferenceBuilder.MoveStressRaw(a, r, p, 1f), r), lenient);
+            Check(p.Spoken + " (not enforced, lenient): letters decide, stress still measured",
                   res.outcome == AnswerJudge.Outcome.Correct && res.stressChecked && !res.stressEnforced, res.outcome + ": " + res.reason);
         }
 
@@ -416,10 +450,10 @@ internal static class StressTests
         var lk = AnswerJudge.Judge("lakad tayo", "Lakad", null, walk, s);
         Check("\"lakad tayo\" for Lakad (a pair, inside a sentence) -> Wrong", lk.outcome == AnswerJudge.Outcome.Wrong, lk.outcome.ToString());
         float[] bangon = Load("bangon", out int br);
-        var bp = AnswerJudge.Judge("bangon po", "Bangon", null, Audio(bangon, br), s);
-        Check("\"bangon po\" (not a pair, filler) -> Correct, as before", bp.outcome == AnswerJudge.Outcome.Correct, bp.outcome.ToString());
-        var bs = AnswerJudge.Judge("bangon na ako", "Bangon", null, Audio(bangon, br), s);
-        Check("\"bangon na ako\" (not a pair, in a sentence) -> Correct, as before", bs.outcome == AnswerJudge.Outcome.Correct, bs.outcome.ToString());
+        var bp = AnswerJudge.Judge("bangon po", "Bangon", null, Audio(bangon, br), lenient);
+        Check("Lenient: \"bangon po\" (not a pair, filler) -> Correct, as before", bp.outcome == AnswerJudge.Outcome.Correct, bp.outcome.ToString());
+        var bs = AnswerJudge.Judge("bangon na ako", "Bangon", null, Audio(bangon, br), lenient);
+        Check("Lenient: \"bangon na ako\" (not a pair, in a sentence) -> Correct, as before", bs.outcome == AnswerJudge.Outcome.Correct, bs.outcome.ToString());
         if (RawStressReferences.For(StressPattern.For("Bangon")).enforced)
         {
             var bWrong = AnswerJudge.Judge("bangon", "Bangon", null,

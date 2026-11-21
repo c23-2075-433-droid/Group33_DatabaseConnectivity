@@ -76,6 +76,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "recording or level stream that exists but is unclear is never waved through.")]
     public bool acceptOnLettersWhenNoStressEvidence = true;
 
+    [Tooltip("ON: a word is only correct when its stress was measured and matches Teacher Rachel's " +
+             "recording. A correct spelling alone never passes - the word said in a sentence, with " +
+             "'po' around it, with no voice readings from the device, or one whose reference is less " +
+             "certain is asked again (or marked wrong-stress) instead of waved through. OFF: the older, " +
+             "lenient rules, where the letters decide whenever the stress cannot be judged with full " +
+             "certainty. Overrides acceptOnLettersWhenNoStressEvidence while on.")]
+    public bool acceptOnlyRachelsPronunciation = true;
+
     [Header("Vocabulary Answer Checking")]
     [Tooltip("When set, incoming speech is checked against this Tagalog word - this is how EVERY " +
              "taught word (Bangon, Tayo, Lakad, and every future vocabulary word) is recognized. " +
@@ -823,6 +831,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             AnswerJudge.Settings settings = AnswerJudge.Settings.Default;
             settings.stressTolerance = stressTolerance;
             settings.acceptOnLettersWhenNoEvidence = acceptOnLettersWhenNoStressEvidence;
+            settings.requireRachelsStress = acceptOnlyRachelsPronunciation;
 
             AnswerJudge.Result verdict = AnswerJudge.Judge(
                 spokenText, currentTargetWord, currentTargetWordVariants, evidence, settings);

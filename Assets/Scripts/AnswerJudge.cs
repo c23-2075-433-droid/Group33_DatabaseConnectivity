@@ -38,6 +38,14 @@ using System.Collections.Generic;
 ///      every answer would leave the child stuck for good, so the letters
 ///      decide and the attempt is flagged stress-unverified in the log.
 ///      Unclear evidence that DOES exist is never waved through.
+///
+/// STRICT MODE (Settings.requireRachelsStress, on by default) removes every
+/// "the letters decide" above for a word with a known stress: the answer is
+/// Correct only when its stress was measured and sits on Rachel's side. A word
+/// in a sentence or with filler, an unenforced reference, or no evidence at
+/// all is Unclear (say it again, on its own); an unenforced measurement that
+/// lands on the other syllable is WrongStress. Words with one syllable or no
+/// decided stress have nothing but letters to judge, so rules 1-2 still hold.
 /// </summary>
 public static class AnswerJudge
 {
@@ -90,12 +98,32 @@ public static class AnswerJudge
     {
         /// <summary>Moves the stress cut-off; 1 = halfway between Rachel and the moved stress.</summary>
         public float stressTolerance;
-        /// <summary>See rule 6. Only ever applies when there is NO evidence at all.</summary>
+        /// <summary>See rule 6. Only ever applies when there is NO evidence at all, and never in strict mode.</summary>
         public bool acceptOnLettersWhenNoEvidence;
+        /// <summary>
+        /// STRICT MODE (the default): a word with a known stress is only ever
+        /// Correct when its stress was MEASURED and matched Teacher Rachel's
+        /// recording. Every place the rules above let the letters decide
+        /// instead - a word whose reference is not enforced, filler or a
+        /// sentence around the word, no evidence at all - becomes Unclear
+        /// (asked again, not scored), or WrongStress when the measurement
+        /// put the stress on the other syllable. The price: on the words
+        /// whose references are not enforced, the measurement is less sure,
+        /// so a right answer is sometimes asked for again.
+        /// </summary>
+        public bool requireRachelsStress;
 
         public static Settings Default
         {
-            get { return new Settings { stressTolerance = 1f, acceptOnLettersWhenNoEvidence = true }; }
+            get
+            {
+                return new Settings
+                {
+                    stressTolerance = 1f,
+                    acceptOnLettersWhenNoEvidence = true,
+                    requireRachelsStress = true,
+                };
+            }
         }
     }
 
@@ -122,12 +150,20 @@ public static class AnswerJudge
             return r;
         }
 
+        bool strict = settings.requireRachelsStress;
+
         if (context == PronunciationChecker.WordContext.InSentence)
         {
             if (r.pattern.IsMinimalPair)
             {
                 r.outcome = Outcome.Wrong;
                 r.reason = "said inside a sentence, where it means something else";
+            }
+            else if (strict)
+            {
+                r.outcome = Outcome.Unclear;
+                r.reason = "said inside a sentence, where its stress cannot be checked - say " +
+                           r.pattern.Spoken + " on its own";
             }
             else
             {
@@ -136,6 +172,15 @@ public static class AnswerJudge
                 r.outcome = Outcome.Correct;
                 r.reason = "word matched inside a sentence; stress not measurable there";
             }
+            return r;
+        }
+
+        if (context == PronunciationChecker.WordContext.WithFiller && strict)
+        {
+            // The recording holds more than the word, so its stress cannot be
+            // measured against Rachel's: ask for the word on its own.
+            r.outcome = Outcome.Unclear;
+            r.reason = "said with other words around it - say " + r.pattern.Spoken + " on its own";
             return r;
         }
 
@@ -159,6 +204,19 @@ public static class AnswerJudge
             j = RawStressAnalyzer.Judge(evidence.audio, evidence.audioSampleRate, r.pattern, settings.stressTolerance);
             r.source = StressSource.RawAudio;
         }
+        if (strict && hasAudio && hasLevels && j.verdict != StressAnalyzer.Verdict.Unmeasurable && !j.enforced)
+        {
+            // Strict mode acts on every measurement, so when the recording
+            // cannot be trusted for this word but the readings can, the
+            // readings decide.
+            StressAnalyzer.Judgement fromLevels = StressAnalyzer.Judge(
+                evidence.levels, evidence.levelIntervalMs, evidence.levelScale, r.pattern, settings.stressTolerance);
+            if (fromLevels.verdict != StressAnalyzer.Verdict.Unmeasurable && fromLevels.enforced)
+            {
+                j = fromLevels;
+                r.source = StressSource.VoiceLevels;
+            }
+        }
         if (j.verdict == StressAnalyzer.Verdict.Unmeasurable && hasLevels)
         {
             // The recording can come back silent when the phone gives the
@@ -178,7 +236,7 @@ public static class AnswerJudge
         if (!hasAudio && !hasLevels)
         {
             bool anyEnforced = RawStressReferences.For(r.pattern).enforced || StressReferences.For(r.pattern).enforced;
-            if (settings.acceptOnLettersWhenNoEvidence || !anyEnforced)
+            if (!strict && (settings.acceptOnLettersWhenNoEvidence || !anyEnforced))
             {
                 r.outcome = Outcome.Correct;
                 r.stressUnverified = true;
@@ -193,7 +251,7 @@ public static class AnswerJudge
             return r;
         }
 
-        if (!j.enforced)
+        if (!j.enforced && !strict)
         {
             r.stressChecked = j.verdict != StressAnalyzer.Verdict.Unmeasurable;
             r.outcome = Outcome.Correct;
@@ -210,7 +268,8 @@ public static class AnswerJudge
         }
 
         r.stressChecked = j.verdict != StressAnalyzer.Verdict.Unmeasurable;
-        r.reason = j.reason;
+        r.stressEnforced = true;   // acted on: either enforced for this word, or strict mode
+        r.reason = j.reason + (j.enforced ? "" : " (strict mode; this word's reference is less certain)");
         switch (j.verdict)
         {
             case StressAnalyzer.Verdict.Matches: r.outcome = Outcome.Correct; break;

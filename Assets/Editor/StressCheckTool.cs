@@ -94,8 +94,12 @@ public static class StressCheckTool
                 () => vc.SimulateSpeech("tayo", standUp, rate), "correct");
 
             vc.currentTargetWord = "Bangon";
-            failures += Case(sb, ev, "Unpaired word (Bangon) unchanged: letters decide",
+            failures += Case(sb, ev, "Strict: Bangon typed with no audio -> asked again, never passed on letters",
+                () => vc.SimulateSpeech("bangon"), "unclear");
+            vc.acceptOnlyRachelsPronunciation = false;
+            failures += Case(sb, ev, "Lenient (strict off): Bangon with no audio -> letters decide",
                 () => vc.SimulateSpeech("bangon"), "correct");
+            vc.acceptOnlyRachelsPronunciation = true;
             failures += Case(sb, ev, "Unpaired word, wrong word -> Wrong",
                 () => vc.SimulateSpeech("tayo"), "wrong");
         }
