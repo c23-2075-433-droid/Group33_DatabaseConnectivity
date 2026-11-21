@@ -59,6 +59,12 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "up) from táyo (we). See AnswerJudge and StressAudioCapture.")]
     public bool checkStressFromAudio = true;
 
+    [Tooltip("Also record the player's voice with Unity's own microphone for the stress check. OFF by " +
+             "default: on some phones the speech recognizer cannot get the microphone while this " +
+             "recording holds it, and then nothing the child says is heard. With it off, stress is " +
+             "judged from the recognizer's own loudness readings, which never touch the microphone.")]
+    public bool recordOwnVoice = false;
+
     [Tooltip("Where the stress cut-off sits: 1 = halfway between Rachel's stress and the stress moved " +
              "to the other syllable. Lower is stricter, higher more forgiving. Tune it from the stress " +
              "columns of the attempt log.")]
@@ -218,6 +224,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         CancelInvoke(nameof(StartListening));   // drop any queued restart
         SetListening(false);
+        if (stressCapture != null) stressCapture.Stop();
 
         try
         {
@@ -531,6 +538,9 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         speechStartedThisSession = false;
         ResetLatency();
         ResetLevels();
+        // The recognizer must open the microphone first every time: a
+        // recording still running from the last round can leave it with none.
+        if (stressCapture != null) stressCapture.Stop();
         SpeechToText.Start(this, useFreeFormLanguageModel, preferOfflineRecognition: false);
 #endif
     }
@@ -547,7 +557,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         // Only now, with the recognizer holding the microphone: see
         // StressAudioCapture for why the order matters.
-        if (StressWordLive && !Capture.IsDisabled && Capture.Begin()) Capture.MarkStart();
+        if (recordOwnVoice && StressWordLive && !Capture.IsDisabled && Capture.Begin()) Capture.MarkStart();
     }
 
     // Someone started talking. Remembered so a failed recognition can tell
@@ -703,13 +713,16 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             // internet, etc.) — handle gracefully, never crash.
             SetStatusText("Recognition error (code " + errorCode.Value + "). Try again.");
 
+            // Counted whether or not speech began: a recognizer that could not
+            // get the microphone never hears speech begin at all.
+            if (stressCapture != null && stressCapture.IsRecording &&
+                ++failuresWhileCapturing >= FailuresBeforeCaptureOff)
+                stressCapture.DisableForSession(failuresWhileCapturing +
+                    " recognizer failures in a row while recording - it may not be sharing the microphone");
+
             // Only when the player actually spoke - see OnNothingHeard.
             if (speechStartedThisSession)
             {
-                if (stressCapture != null && stressCapture.IsRecording &&
-                    ++failuresWhileCapturing >= FailuresBeforeCaptureOff)
-                    stressCapture.DisableForSession(failuresWhileCapturing +
-                        " recognizer failures in a row while recording - it may not be sharing the microphone");
 
                 // Worth recording: a word the recognizer never manages to
                 // transcribe needs a clearer prompt, not a new variant.
