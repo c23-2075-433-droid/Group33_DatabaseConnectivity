@@ -164,6 +164,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         {
             voice.OnAnswerChecked += HandleAnswerChecked;
             voice.OnSpeechBegan += HandleSpeechBegan;
+            voice.OnStressUnclear += HandleStressUnclear;
             voice.OnMicrophoneUnavailable += HandleMicrophoneUnavailable;
         }
 
@@ -183,6 +184,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         {
             voice.OnAnswerChecked -= HandleAnswerChecked;
             voice.OnSpeechBegan -= HandleSpeechBegan;
+            voice.OnStressUnclear -= HandleStressUnclear;
             voice.OnMicrophoneUnavailable -= HandleMicrophoneUnavailable;
         }
         if (ui != null)
@@ -254,7 +256,7 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
 
         // The spelling on the signpost is the word's own, uppercased only for
         // reading - the same way the badge over the object shows it. WordStress
-        // puts the marks back on the six words whose bare spelling is two
+        // puts the marks back on the words whose bare spelling is two
         // different words, so the signpost says which one is being asked for.
         ui.wordText.text = objective.word != null
             ? WordStress.Display(objective.word).ToUpperInvariant()
@@ -327,6 +329,15 @@ public class GameplayHUD : MonoBehaviour, ICaptionPresenter
         // match a word against. If restartDelay is ever shortened, check that
         // again rather than assuming it still holds.
         SoundEffects.Play(wasCorrect ? "SALINLAHI_Correct" : "SALINLAHI_Incorrect");
+    }
+
+    /// <summary>
+    /// The word's stress could not be judged: the plank says TRY AGAIN, but
+    /// without the wrong-answer horn - nothing was wrong, and nothing is scored.
+    /// </summary>
+    private void HandleStressUnclear(string word, string reason)
+    {
+        status.NoteTryAgain();
     }
 
     private void HandleSpeechBegan()

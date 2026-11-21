@@ -113,6 +113,7 @@ public class VoicePromptDirector : MonoBehaviour
         {
             voiceCommand.OnAnswerChecked += HandleAnswerChecked;
             voiceCommand.OnNothingHeard += HandleNothingHeard;
+            voiceCommand.OnStressUnclear += HandleStressUnclear;
             voiceCommand.OnMicrophoneUnavailable += HandleMicrophoneUnavailable;
         }
 
@@ -134,6 +135,7 @@ public class VoicePromptDirector : MonoBehaviour
         {
             voiceCommand.OnAnswerChecked -= HandleAnswerChecked;
             voiceCommand.OnNothingHeard -= HandleNothingHeard;
+            voiceCommand.OnStressUnclear -= HandleStressUnclear;
             voiceCommand.OnMicrophoneUnavailable -= HandleMicrophoneUnavailable;
         }
         if (narrator != null) narrator.StopSpeaking();
@@ -240,6 +242,20 @@ public class VoicePromptDirector : MonoBehaviour
         missCount++;
         notHeardCount = 0;
 
+        // The right letters with the stress on the wrong syllable: the child
+        // said the OTHER word (táyo, "we", for tayô, "stand up"). "Malapit
+        // na! You are very close" is exactly true, and the most useful thing
+        // after it is the word itself, at normal speed, so the child hears
+        // where the stress goes. Every time, not only on later misses - this
+        // is the one mistake a retry alone cannot fix.
+        if (voiceCommand != null &&
+            voiceCommand.LastJudgement.outcome == AnswerJudge.Outcome.WrongStress)
+        {
+            narrator.SpeakLine(NarratorScript.Retry2);
+            controller.PlayCurrentInstruction();
+            return;
+        }
+
         if (missCount == missesBeforeHint)
         {
             // Say it again, slowly, without being asked.
@@ -272,6 +288,18 @@ public class VoicePromptDirector : MonoBehaviour
         narrator.SpeakLine(notHeardCount >= 2
             ? NarratorScript.NotHeard2
             : NarratorScript.NotHeard1);
+    }
+
+    /// <summary>
+    /// The right word, but its stress could not be judged ("tayo po", or too
+    /// faint). Not a miss: Rachel just says the word again - "Pakinggan mo
+    /// ulit: TAYÔ" - which shows the child to say it on its own.
+    /// </summary>
+    private void HandleStressUnclear(string word, string reason)
+    {
+        ResetSilence();
+        if (narrator == null || currentObjective == null) return;
+        controller.PlayCurrentInstruction();
     }
 
     private void HandleMicrophoneUnavailable()

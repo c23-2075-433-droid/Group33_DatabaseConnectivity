@@ -57,6 +57,26 @@ using UnityEngine.SceneManagement;
 /// wait is long, it is the device's recognizer and its network call, not this
 /// project's code, and the plan's 1.5 second threshold is about the first.
 ///
+/// THE STRESS COLUMNS
+///
+/// For the words whose meaning depends on their stress (see AnswerJudge):
+///
+///   stressSource     raw_audio (the game's own recording), voice_levels (the
+///                    recognizer's loudness readings) or empty (not checked).
+///   stressVerdict    matches / wrong_stress / unmeasurable, as measured -
+///                    even for a word whose stress is not enforced.
+///   stressEnforced   1 if that verdict decided the answer.
+///   stressMeasured   the player's score, and stressCutoff the line it was
+///                    held against; Rachel's own is stressReference. These
+///                    three are how the tolerance gets tuned: rows of a child
+///                    saying tayô correctly that land on the wrong side of the
+///                    cut-off mean it is too strict.
+///
+/// The verdict column gains "mali_diin" (right letters, wrong stress - scored
+/// as wrong) and "hindi_malinaw" (stress could not be judged; asked again and
+/// never scored). A file started before these columns existed keeps its old
+/// header; delete it to get the new one.
+///
 /// WHERE THE FILE GOES
 ///
 ///   Editor:  ~/Library/Application Support/&lt;company&gt;/&lt;product&gt;/
@@ -79,12 +99,15 @@ public static class VoiceAttemptLog
 
     private const string Header =
         "timestamp,scene,targetWord,canonicalTarget,rawSpokenText,canonicalSpoken,verdict," +
-        "listenToResultMs,speechToResultMs,lastPartialToResultMs,partialCount,verdictMs";
+        "listenToResultMs,speechToResultMs,lastPartialToResultMs,partialCount,verdictMs," +
+        "stressSource,stressVerdict,stressEnforced,stressMeasured,stressCutoff,stressReference";
 
     /// <summary>Verdict column values. "nothing_heard" is not an answer and is never scored.</summary>
     public const string VerdictCorrect = "tama";
     public const string VerdictWrong = "mali";
     public const string VerdictNothingHeard = "nothing_heard";
+    public const string VerdictWrongStress = "mali_diin";
+    public const string VerdictUnclear = "hindi_malinaw";
 
     /// <summary>
     /// The elapsed times for one recognition attempt, measured by VoiceCommand
@@ -146,7 +169,36 @@ public static class VoiceAttemptLog
     /// </summary>
     public static void Record(string targetWord, string spokenText, bool wasCorrect, Latency latency)
     {
-        Write(targetWord, spokenText, wasCorrect ? VerdictCorrect : VerdictWrong, latency);
+        Write(targetWord, spokenText, wasCorrect ? VerdictCorrect : VerdictWrong, latency, "");
+    }
+
+    /// <summary>Records one judged attempt, with its stress check if there was one.</summary>
+    public static void Record(string targetWord, string spokenText, AnswerJudge.Result verdict, Latency latency)
+    {
+        string v;
+        switch (verdict.outcome)
+        {
+            case AnswerJudge.Outcome.Correct: v = VerdictCorrect; break;
+            case AnswerJudge.Outcome.WrongStress: v = VerdictWrongStress; break;
+            case AnswerJudge.Outcome.Unclear: v = VerdictUnclear; break;
+            default: v = VerdictWrong; break;
+        }
+        Write(targetWord, spokenText, v, latency, StressColumns(verdict));
+    }
+
+    private static string StressColumns(AnswerJudge.Result r)
+    {
+        if (r.pattern == null || r.source == AnswerJudge.StressSource.None) return "";
+        string source = r.source == AnswerJudge.StressSource.RawAudio ? "raw_audio" : "voice_levels";
+        string verdict = r.stress.verdict == StressAnalyzer.Verdict.Matches ? "matches"
+                       : r.stress.verdict == StressAnalyzer.Verdict.WrongStress ? "wrong_stress" : "unmeasurable";
+        return source + "," + verdict + "," + (r.stressEnforced ? "1" : "0") + "," +
+               Number(r.stress.measured) + "," + Number(r.stress.threshold) + "," + Number(r.stress.reference);
+    }
+
+    private static string Number(float v)
+    {
+        return float.IsNaN(v) ? "" : v.ToString("0.000", CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -166,10 +218,10 @@ public static class VoiceAttemptLog
     /// </summary>
     public static void RecordNothingHeard(string targetWord, Latency latency)
     {
-        Write(targetWord, "", VerdictNothingHeard, latency);
+        Write(targetWord, "", VerdictNothingHeard, latency, "");
     }
 
-    private static void Write(string targetWord, string spokenText, string verdict, Latency latency)
+    private static void Write(string targetWord, string spokenText, string verdict, Latency latency, string stress)
     {
         // Logging must never be able to break a lesson, so every failure here
         // is swallowed after being reported once.
@@ -194,7 +246,8 @@ public static class VoiceAttemptLog
                .Append(Millis(latency.speechToResultMs)).Append(',')
                .Append(Millis(latency.lastPartialToResultMs)).Append(',')
                .Append(latency.partialCount < 0 ? "" : latency.partialCount.ToString(CultureInfo.InvariantCulture)).Append(',')
-               .Append(Millis(latency.verdictMs));
+               .Append(Millis(latency.verdictMs)).Append(',')
+               .Append(string.IsNullOrEmpty(stress) ? ",,,,," : stress);
             row.AppendLine();
 
             File.AppendAllText(path, row.ToString(), Encoding.UTF8);

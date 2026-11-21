@@ -51,6 +51,25 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "See VoiceAttemptLog for where the file lands and how to pull it off a phone.")]
     public bool logAttempts = true;
 
+    [Header("Stress Checking (tayô vs táyo)")]
+    [Tooltip("For the words whose meaning depends on their stress (the ones WordStress marks: Tayô, " +
+             "Upô, Bukás, Bása, Talón, Bátì), record the player's voice while the word is asked and " +
+             "check WHICH syllable they stressed - length, loudness and pitch - against Teacher " +
+             "Rachel's own recording. The recognizer returns letters only and cannot tell tayô (stand " +
+             "up) from táyo (we). See AnswerJudge and StressAudioCapture.")]
+    public bool checkStressFromAudio = true;
+
+    [Tooltip("Where the stress cut-off sits: 1 = halfway between Rachel's stress and the stress moved " +
+             "to the other syllable. Lower is stricter, higher more forgiving. Tune it from the stress " +
+             "columns of the attempt log.")]
+    [Range(0.25f, 1.75f)]
+    public float stressTolerance = 1f;
+
+    [Tooltip("Only when the device gives NO audio and NO voice levels at all, so the stress can never " +
+             "be measured: let the letters decide rather than leave the child stuck on the word. A " +
+             "recording or level stream that exists but is unclear is never waved through.")]
+    public bool acceptOnLettersWhenNoStressEvidence = true;
+
     [Header("Vocabulary Answer Checking")]
     [Tooltip("When set, incoming speech is checked against this Tagalog word - this is how EVERY " +
              "taught word (Bangon, Tayo, Lakad, and every future vocabulary word) is recognized. " +
@@ -98,6 +117,68 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     /// anything or is scored.
     /// </summary>
     public event Action OnSpeechBegan;
+
+    /// <summary>
+    /// Raised after OnAnswerChecked(.., false) when the letters were right but
+    /// the stress was on the wrong syllable - the child said táyo ("we") when
+    /// tayô ("stand up") was asked. The narrator answers this one by saying
+    /// the word again, so the child can hear where the stress goes.
+    /// (word, stress pattern)
+    /// </summary>
+    public event Action<string, StressPattern> OnWrongStress;
+
+    /// <summary>
+    /// Raised INSTEAD of OnAnswerChecked when the right word was said but its
+    /// stress could not be judged ("tayo po", or too faint to hear the
+    /// syllables). Not scored and not a miss: the child is just asked to say
+    /// the word again, on its own. (word, reason)
+    /// </summary>
+    public event Action<string, string> OnStressUnclear;
+
+    /// <summary>The full verdict on the most recent answer, for listeners that need more than right/wrong.</summary>
+    public AnswerJudge.Result LastJudgement { get; private set; }
+
+    private StressAudioCapture stressCapture;
+
+    // The recognizer's voice-level readings for the current listening
+    // session, and when the first and last arrived (to know their rate).
+    private readonly System.Collections.Generic.List<float> levelReadings = new System.Collections.Generic.List<float>();
+    private double firstLevelAtMs = -1, lastLevelAtMs = -1;
+
+    // Recognizer failures in a row while our own recording was running; see
+    // StressAudioCapture for why this switches the recording off.
+    private int failuresWhileCapturing;
+    private const int FailuresBeforeCaptureOff = 3;
+
+    private bool StressWordLive
+    {
+        get { return checkStressFromAudio && !string.IsNullOrEmpty(currentTargetWord) && StressPattern.For(currentTargetWord) != null; }
+    }
+
+    private StressAudioCapture Capture
+    {
+        get
+        {
+            if (stressCapture == null)
+            {
+                stressCapture = GetComponent<StressAudioCapture>();
+                if (stressCapture == null) stressCapture = gameObject.AddComponent<StressAudioCapture>();
+            }
+            return stressCapture;
+        }
+    }
+
+    private static StressAnalyzer.LevelScale DeviceLevelScale
+    {
+        get
+        {
+#if UNITY_IOS
+            return StressAnalyzer.LevelScale.LinearDecibels;
+#else
+            return StressAnalyzer.LevelScale.AndroidPower;
+#endif
+        }
+    }
 
     // --- Microphone button listening indicator (see VoiceInteractionUI) ---
     // True while the device's speech recognizer is actively listening for the
@@ -159,6 +240,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     void OnDestroy()
     {
         isShuttingDown = true;
+        if (stressCapture != null) stressCapture.Stop();
         CancelInvoke();                      // drop any queued StartListening()
         SetListening(false);
 
@@ -187,6 +269,43 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // which matters now that the keyboard is the ONLY way to answer in
         // the Editor.
         if (!enableKeyboardFallback) return;
+        if (!Input.GetKey(KeyCode.R)) StopCaptureIfNoStressWord();
+
+        // R, held: say the current word into the computer's microphone, and
+        // let go. The letters are taken as the word itself (there is no
+        // recognizer here), and the recording goes through the real stress
+        // check - so tayô and táyo can be tried out by ear in the Editor.
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (string.IsNullOrEmpty(currentTargetWord))
+                Debug.Log("VoiceCommand (Editor): no objective is active right now.");
+            else if (Capture.Begin())
+            {
+                Capture.MarkStart();
+                Debug.Log("VoiceCommand (Editor): recording - say \"" + WordStress.Display(currentTargetWord) +
+                          "\" and let go of R.");
+            }
+            else
+                Debug.LogWarning("VoiceCommand (Editor): R pressed but the microphone could not start - " +
+                                 (Capture.DisabledReason ?? "no reason given"));
+        }
+        else if (Input.GetKeyUp(KeyCode.R) && Capture.IsRecording)
+        {
+            int rate;
+            float[] audio = Capture.TakeAnswer(out rate);
+            Capture.Stop();
+            if (audio == null) { Debug.Log("VoiceCommand (Editor): the recording was silent."); return; }
+
+            // The R key's own click, on release, lands at the very end of the
+            // recording on a desk microphone; drop it so it cannot read as a
+            // (short, quiet) last syllable.
+            int trim = Mathf.Min(audio.Length / 4, rate * 120 / 1000);
+            if (trim > 0) System.Array.Resize(ref audio, audio.Length - trim);
+
+            SimulateSpeech(currentTargetWord, audio, rate);
+            SaveEditorRecording(audio, rate, LastJudgement);
+            return;
+        }
 
         // These go through SimulateSpeech, NOT straight to PlayerMovement, so
         // the Editor exercises the real pipeline: objective matching,
@@ -237,6 +356,59 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         else if (Input.GetKeyDown(KeyCode.X)) SimulateSpeech("mali");
     }
 #endif
+
+#if !UNITY_EDITOR
+    void Update()
+    {
+        StopCaptureIfNoStressWord();
+    }
+#endif
+
+#if UNITY_EDITOR
+    private static int editorRecordingCount;
+
+    /// <summary>
+    /// Editor only: keeps each hold-R recording as a WAV under
+    /// Library/StressRecordings (never in a build, ignored by git), named with
+    /// its verdict and score, so a disputed verdict can be listened to and
+    /// re-measured instead of guessed at.
+    /// </summary>
+    private static void SaveEditorRecording(float[] audio, int rate, AnswerJudge.Result verdict)
+    {
+        try
+        {
+            string dir = System.IO.Path.Combine(Application.dataPath, "..", "Library", "StressRecordings");
+            System.IO.Directory.CreateDirectory(dir);
+            string score = float.IsNaN(verdict.stress.measured) ? "na"
+                : verdict.stress.measured.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+            string name = System.DateTime.Now.ToString("HHmmss") + "_" + (++editorRecordingCount) + "_" +
+                          verdict.outcome + "_score" + score + ".wav";
+            string path = System.IO.Path.GetFullPath(System.IO.Path.Combine(dir, name));
+
+            using (var w = new System.IO.BinaryWriter(System.IO.File.Create(path)))
+            {
+                int bytes = audio.Length * 2;
+                w.Write(System.Text.Encoding.ASCII.GetBytes("RIFF")); w.Write(36 + bytes);
+                w.Write(System.Text.Encoding.ASCII.GetBytes("WAVEfmt ")); w.Write(16);
+                w.Write((short)1); w.Write((short)1); w.Write(rate); w.Write(rate * 2);
+                w.Write((short)2); w.Write((short)16);
+                w.Write(System.Text.Encoding.ASCII.GetBytes("data")); w.Write(bytes);
+                foreach (float v in audio) w.Write((short)Mathf.Clamp(Mathf.RoundToInt(v * 32767f), -32768, 32767));
+            }
+            Debug.Log("VoiceCommand (Editor): recording saved to " + path);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("VoiceCommand (Editor): could not save the recording: " + e.Message);
+        }
+    }
+#endif
+
+    /// <summary>The microphone is only ours while a stress-pair word is live.</summary>
+    private void StopCaptureIfNoStressWord()
+    {
+        if (stressCapture != null && stressCapture.IsRecording && !StressWordLive) stressCapture.Stop();
+    }
 
     void Awake()
     {
@@ -358,6 +530,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         SetStatusText("Listening...");
         speechStartedThisSession = false;
         ResetLatency();
+        ResetLevels();
         SpeechToText.Start(this, useFreeFormLanguageModel, preferOfflineRecognition: false);
 #endif
     }
@@ -371,6 +544,10 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         if (isShuttingDown || this == null) return;
         readyAtMs = NowMs;
         SetListening(true);
+
+        // Only now, with the recognizer holding the microphone: see
+        // StressAudioCapture for why the order matters.
+        if (StressWordLive && !Capture.IsDisabled && Capture.Begin()) Capture.MarkStart();
     }
 
     // Someone started talking. Remembered so a failed recognition can tell
@@ -453,7 +630,31 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         OnSpeechBegan?.Invoke();
     }
 
-    void ISpeechToTextListener.OnVoiceLevelChanged(float normalizedVoiceLevel) { }
+    void ISpeechToTextListener.OnVoiceLevelChanged(float normalizedVoiceLevel)
+    {
+        if (isShuttingDown || this == null || isSuspended) return;
+        double now = NowMs;
+        if (firstLevelAtMs < 0) firstLevelAtMs = now;
+        lastLevelAtMs = now;
+        // A listening session is a few seconds; the cap only guards against a
+        // recognizer that never stops.
+        if (levelReadings.Count < 2000) levelReadings.Add(normalizedVoiceLevel);
+    }
+
+    private void ResetLevels()
+    {
+        levelReadings.Clear();
+        firstLevelAtMs = -1;
+        lastLevelAtMs = -1;
+    }
+
+    /// <summary>Average time between level readings this session; they arrive at a steady rate at source.</summary>
+    private float LevelIntervalMs()
+    {
+        if (levelReadings.Count < 2 || firstLevelAtMs < 0) return 50f;
+        double ms = (lastLevelAtMs - firstLevelAtMs) / (levelReadings.Count - 1);
+        return ms > 1 ? (float)ms : 50f;
+    }
 
     void ISpeechToTextListener.OnPartialResultReceived(string spokenText)
     {
@@ -505,6 +706,11 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             // Only when the player actually spoke - see OnNothingHeard.
             if (speechStartedThisSession)
             {
+                if (stressCapture != null && stressCapture.IsRecording &&
+                    ++failuresWhileCapturing >= FailuresBeforeCaptureOff)
+                    stressCapture.DisableForSession(failuresWhileCapturing +
+                        " recognizer failures in a row while recording - it may not be sharing the microphone");
+
                 // Worth recording: a word the recognizer never manages to
                 // transcribe needs a clearer prompt, not a new variant.
                 if (logAttempts && !string.IsNullOrEmpty(currentTargetWord))
@@ -515,7 +721,8 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         }
         else
         {
-            ProcessRecognizedText(spokenText);
+            failuresWhileCapturing = 0;
+            ProcessRecognizedText(spokenText, CollectEvidence());
         }
 
         if (listenContinuously && !isSuspended)
@@ -537,10 +744,44 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // No recognizer was involved, so there is nothing to time and the
         // latency columns stay empty rather than reporting a flattering zero.
         ResetLatency();
-        ProcessRecognizedText(spokenText);
+        ProcessRecognizedText(spokenText, new AnswerJudge.Evidence());
     }
 
-    private void ProcessRecognizedText(string spokenText)
+    /// <summary>
+    /// Like SimulateSpeech, with a recording of the answer for the stress
+    /// check - what the Editor's hold-R shortcut uses, and what a test can
+    /// feed a known tayô or táyo through.
+    /// </summary>
+    public void SimulateSpeech(string spokenText, float[] audio, int sampleRate)
+    {
+        Debug.Log("VoiceCommand: simulating recognized speech \"" + spokenText + "\" with " +
+                  (audio != null ? (audio.Length / (float)Mathf.Max(1, sampleRate)).ToString("0.0") + " s of audio" : "no audio"));
+        ResetLatency();
+        ProcessRecognizedText(spokenText, new AnswerJudge.Evidence { audio = audio, audioSampleRate = sampleRate });
+    }
+
+    /// <summary>The recording and level readings of the session that just ended.</summary>
+    private AnswerJudge.Evidence CollectEvidence()
+    {
+        AnswerJudge.Evidence e = new AnswerJudge.Evidence();
+        if (!StressWordLive) return e;
+
+        if (stressCapture != null && stressCapture.IsRecording)
+        {
+            int rate;
+            e.audio = stressCapture.TakeAnswer(out rate);
+            e.audioSampleRate = rate;
+        }
+        if (levelReadings.Count > 0)
+        {
+            e.levels = levelReadings.ToArray();
+            e.levelIntervalMs = LevelIntervalMs();
+            e.levelScale = DeviceLevelScale;
+        }
+        return e;
+    }
+
+    private void ProcessRecognizedText(string spokenText, AnswerJudge.Evidence evidence)
     {
         SetStatusText("Recognized:\n\"" + spokenText + "\"");
 
@@ -564,19 +805,47 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // correct-answer feedback hook into.
         if (!string.IsNullOrEmpty(currentTargetWord))
         {
-            bool isCorrect = PronunciationChecker.IsCorrect(
-                spokenText, currentTargetWord, currentTargetWordVariants);
+            // The letters, and - for the words whose meaning depends on it -
+            // where the stress fell. See AnswerJudge for the rules.
+            AnswerJudge.Settings settings = AnswerJudge.Settings.Default;
+            settings.stressTolerance = stressTolerance;
+            settings.acceptOnLettersWhenNoEvidence = acceptOnLettersWhenNoStressEvidence;
 
-            SetStatusText((isCorrect ? "Correct! " : "Try again. ") +
-                           "Heard: \"" + spokenText + "\" (target: \"" + currentTargetWord + "\")");
+            AnswerJudge.Result verdict = AnswerJudge.Judge(
+                spokenText, currentTargetWord, currentTargetWordVariants, evidence, settings);
+            LastJudgement = verdict;
+            bool isCorrect = verdict.IsCorrect;
+
+            string heard = "Heard: \"" + spokenText + "\" (target: \"" + WordStress.Display(currentTargetWord) + "\")";
+            switch (verdict.outcome)
+            {
+                case AnswerJudge.Outcome.Correct: SetStatusText("Correct! " + heard); break;
+                case AnswerJudge.Outcome.WrongStress:
+                    SetStatusText("Almost - say " + verdict.pattern.Spoken + ". " + heard + " - " + verdict.reason); break;
+                case AnswerJudge.Outcome.Unclear:
+                    SetStatusText("Say just " + verdict.pattern.Spoken + ", clearly. " + heard + " - " + verdict.reason); break;
+                default: SetStatusText("Try again. " + heard); break;
+            }
+            if (verdict.pattern != null) Debug.Log("VoiceCommand: stress check - " + verdict.outcome + ", " + verdict.reason);
 
             // Only while an objective is live. Listening restarts every few
             // seconds whether or not anyone is talking, so logging outside a
             // lesson would bury the real attempts in idle noise.
             if (logAttempts)
-                VoiceAttemptLog.Record(currentTargetWord, spokenText, isCorrect, CurrentLatency());
+                VoiceAttemptLog.Record(currentTargetWord, spokenText, verdict, CurrentLatency());
+
+            // An unclear stress is neither right nor wrong: the child is asked
+            // again and nothing is scored.
+            if (verdict.outcome == AnswerJudge.Outcome.Unclear)
+            {
+                OnStressUnclear?.Invoke(currentTargetWord, verdict.reason);
+                return;
+            }
 
             OnAnswerChecked?.Invoke(spokenText, isCorrect);
+
+            if (verdict.outcome == AnswerJudge.Outcome.WrongStress)
+                OnWrongStress?.Invoke(currentTargetWord, verdict.pattern);
         }
     }
 

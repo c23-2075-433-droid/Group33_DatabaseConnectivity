@@ -133,6 +133,57 @@ public static class PronunciationChecker
         return false;
     }
 
+    /// <summary>How the taught word sat in what the player said.</summary>
+    public enum WordContext
+    {
+        /// <summary>The word was not said at all (IsCorrect is false).</summary>
+        NotSaid,
+        /// <summary>The whole utterance is the word (or one of its accepted variants).</summary>
+        Alone,
+        /// <summary>The word, with only filler words around it: "tayo po", "ang tayo".</summary>
+        WithFiller,
+        /// <summary>The word as one word of a longer sentence: "kain tayo".</summary>
+        InSentence,
+    }
+
+    /// <summary>
+    /// Like IsCorrect, but says HOW the word was found. Needed for the words
+    /// whose meaning depends on their stress (see StressPattern): their stress
+    /// is checked from the loudness of the whole utterance, so it can only be
+    /// judged when the child said the word on its own. And a sentence around
+    /// such a word usually means the other word - "kain tayo" is "let's eat",
+    /// táyo the pronoun, not tayô "stand up".
+    /// </summary>
+    public static WordContext ContextOf(
+        string spokenText,
+        string targetWord,
+        string[] acceptedVariants = null)
+    {
+        if (!IsCorrect(spokenText, targetWord, acceptedVariants)) return WordContext.NotSaid;
+
+        Utterance said = Utterance.Of(spokenText);
+        List<string> forms = new List<string>();
+        forms.Add(Canonicalize(targetWord));
+        AddCanonical(forms, acceptedVariants);
+        AddCanonical(forms, WordVariants.For(targetWord));
+
+        if (said.IsWhole(forms)) return WordContext.Alone;
+
+        // IsCorrect matched, but not on the whole utterance. If some reading
+        // with only filler trimmed off the ends matches, the rest was filler.
+        foreach (string form in forms)
+            if (said.MatchesTrimmedWhole(form)) return WordContext.WithFiller;
+
+        return WordContext.InSentence;
+    }
+
+    private static void AddCanonical(List<string> into, string[] variants)
+    {
+        if (variants == null) return;
+        foreach (string v in variants)
+            if (!string.IsNullOrWhiteSpace(v)) into.Add(Canonicalize(v));
+    }
+
     /// <summary>
     /// Like IsCorrect, but judged on the taught word ALONE - the curated
     /// mistranscriptions are not consulted.
@@ -240,6 +291,35 @@ public static class PronunciationChecker
         public bool MatchesVariant(string canonicalForm)
         {
             return Matches(canonicalForm, false);
+        }
+
+        /// <summary>
+        /// True when the WHOLE utterance, nothing trimmed, is one of these
+        /// canonical forms - spaced or run together, or a one-consonant slip of
+        /// a long word.
+        /// </summary>
+        public bool IsWhole(List<string> canonicalForms)
+        {
+            if (allTokens.Length == 0) return false;
+            string spaced = string.Join(" ", allTokens);
+            string joined = string.Concat(allTokens);
+            foreach (string form in canonicalForms)
+            {
+                if (string.IsNullOrEmpty(form)) continue;
+                if (form == spaced || form == joined || form.Replace(" ", "") == joined) return true;
+                if (form.Length >= ConsonantSlipMinLength && form.IndexOf(' ') < 0 &&
+                    IsConsonantSlip(joined, form)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>True when a reading with only filler trimmed off its ends is this form.</summary>
+        public bool MatchesTrimmedWhole(string canonicalForm)
+        {
+            if (string.IsNullOrEmpty(canonicalForm)) return false;
+            foreach (string form in wholeForms)
+                if (form == canonicalForm || form == canonicalForm.Replace(" ", "")) return true;
+            return false;
         }
 
         private bool Matches(string canonicalForm, bool mayBeOneWordOfASentence)
