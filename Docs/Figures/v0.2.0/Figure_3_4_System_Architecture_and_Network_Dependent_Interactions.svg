@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1460" viewBox="0 0 1000 1460"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="1000" height="1460" fill="#ffffff"/><rect x="10" y="10" width="980" height="905" rx="12" fill="#ffffff" stroke="#1f2937" stroke-width="3"/>
+<rect x="10" y="10" width="980" height="40" rx="12" fill="#1f2937"/><rect x="10" y="36" width="980" height="14" fill="#1f2937"/>
+<text x="26" y="31" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" letter-spacing="1.2" fill="#ffffff" dominant-baseline="central">PLAYER DEVICE — ANDROID 8.0+ (API 26), ARM64 — SALINLAHI v0.2.0</text>
+<rect x="30" y="62" width="940" height="108" rx="8" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="46" y="86" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#4a6a8a" dominant-baseline="central">PRESENTATION LAYER</text>
+<text x="46" y="114.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">17 Unity scenes: 15 gameplay scenes, MainMenu, LevelSelect</text>
+<text x="46" y="134.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">GameplayHUD + VoiceStatusMachine (listening panel) · SceneResultPanel · WordsLearnedPanel · RachelPortraitAnimator</text>
+<text x="46" y="154.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">MainMenuController · ProfilePickerPanel · LevelSelectController · WordStress (stress marks on screen)</text>
+<rect x="30" y="190" width="940" height="128" rx="8" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="46" y="214" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#4a6a8a" dominant-baseline="central">GAME LOGIC LAYER</text>
+<text x="46" y="242.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">SceneObjectiveController</tspan> — the ordered objectives of a scene</text>
+<text x="46" y="262.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">AnswerJudge</tspan> — the word first (PronunciationChecker + WordVariants); stress only for Tayo, Upo, Bukas, Basa, Bati, Pasok</text>
+<text x="46" y="282.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">VoicePromptDirector + VoiceNarrator</tspan> — what Teacher Rachel says, and when (hints, retries, nudges)</text>
+<text x="46" y="302.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">RunScore · SessionScoreTracker · LevelProgress · JourneyMap · PlayerMovement · NicknameAvailability</text>
+<path d="M 500.0 190.0 L 500.0 172.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="30" y="338" width="940" height="372" rx="8" fill="#fbf7f1" stroke="#b7791f" stroke-width="2"/>
+<text x="46.0" y="358.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#b7791f" text-anchor="start" dominant-baseline="central">SPEECH INPUT AND PRONUNCIATION LAYER — VoiceCommand chooses the listening path</text>
+<path d="M 500.0 338.0 L 500.0 320.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="45" y="378" width="455" height="155" rx="8" fill="#ffffff" stroke="#4a6a8a" stroke-width="2"/>
+<text x="61" y="402" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#4a6a8a" dominant-baseline="central">ORDINARY LISTENING</text>
+<text x="61" y="430.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">All words except the six on phones where</text>
+<text x="61" y="450.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">the audio bridge works</text>
+<text x="61" y="470.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">UnitySpeechToText</tspan> (yasirkula) → Android</text>
+<text x="61" y="490.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">SpeechRecognizer, fil-PH: text + loudness</text>
+<rect x="515" y="378" width="440" height="155" rx="8" fill="#ffffff" stroke="#4a6a8a" stroke-width="2"/>
+<text x="531" y="402" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#4a6a8a" dominant-baseline="central">AUDIO BRIDGE — SIX WORDS, ANDROID 13+</text>
+<text x="531" y="430.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">SalinlahiAudioRecognizer.java</tspan> records into</text>
+<text x="531" y="450.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">memory (max. 12 s) and pipes the same audio</text>
+<text x="531" y="470.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">to SpeechRecognizer (EXTRA_AUDIO_SOURCE);</text>
+<text x="531" y="490.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">gives up for the session after failures</text>
+<rect x="45" y="545" width="455" height="150" rx="8" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="61" y="569" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#b7791f" dominant-baseline="central">FALLBACK STRESS CHECK (SIX WORDS)</text>
+<text x="61" y="597.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">Used when no audio was recorded</text>
+<text x="61" y="617.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">StressAnalyzer.JudgeBanded</tspan> on loudness</text>
+<text x="61" y="637.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">readings; no readings → uncertain</text>
+<rect x="515" y="545" width="440" height="150" rx="8" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="531" y="569" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#2f7d4a" dominant-baseline="central">ON-DEVICE CLASSIFIER (SIX WORDS)</text>
+<text x="531" y="597.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">PronunciationModel</tspan>: logistic regression per</text>
+<text x="531" y="617.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">word, weights embedded in the app; checked</text>
+<text x="531" y="637.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">by safety-net judges; no network; audio is</text>
+<text x="531" y="657.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">discarded after judging</text>
+<rect x="30" y="728" width="940" height="92" rx="8" fill="#f4f8f4" stroke="#2f7d4a" stroke-width="2"/>
+<text x="46" y="752" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#2f7d4a" dominant-baseline="central">LOCAL DATA LAYER</text>
+<text x="46" y="780.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">players.json</tspan> (PlayerProfileStore): up to 10 profiles · UUID · progress · stars · points · words learned</text>
+<text x="46" y="800.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">salinlahi_voice_attempts.csv</tspan> (VoiceAttemptLog): 18 columns of text and numbers; no audio; never uploaded</text>
+<rect x="30" y="832" width="940" height="70" rx="8" fill="#f4f8f4" stroke="#2f7d4a" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="46" y="856" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#2f7d4a" dominant-baseline="central">STAYS ON THE DEVICE</text>
+<text x="46" y="884.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">The game's copy of the audio (memory only) · the attempt log · profiles and progress · the trained model</text>
+<rect x="10" y="1000" width="300" height="330" rx="8" fill="#fff7ea" stroke="#b7791f" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="26" y="1024" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#b7791f" dominant-baseline="central">SPEECH SERVICE</text>
+<text x="26" y="1052.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">Android speech-recognition</text>
+<text x="26" y="1072.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">service (device provider,</text>
+<text x="26" y="1092.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">e.g. Google)</text>
+<text x="26" y="1112.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"></text>
+<text x="26" y="1133.2" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">The standard recognizer</text>
+<text x="26" y="1153.5" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">is requested; it may</text>
+<text x="26" y="1173.8" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">process audio on the</text>
+<text x="26" y="1194.1" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">provider's servers. The</text>
+<text x="26" y="1214.4" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">on-device recognizer is</text>
+<text x="26" y="1234.7" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">tried only after failures.</text>
+<rect x="330" y="1000" width="660" height="330" rx="12" fill="#ffffff" stroke="#3b5b8c" stroke-width="3"/>
+<rect x="330" y="1000" width="660" height="40" rx="12" fill="#3b5b8c"/><rect x="330" y="1026" width="660" height="14" fill="#3b5b8c"/>
+<text x="346" y="1021" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" letter-spacing="1.2" fill="#ffffff" dominant-baseline="central">SUPABASE BACKEND (HTTPS, UnityWebRequest)</text>
+<rect x="345" y="1052" width="315" height="140" rx="8" fill="#eef3fb" stroke="#3b5b8c" stroke-width="2"/>
+<text x="361" y="1076" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#3b5b8c" dominant-baseline="central">POSTGREST</text>
+<text x="361" y="1104.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">player_scores: INSERT</text>
+<text x="361" y="1124.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">nickname_claims: INSERT, SELECT</text>
+<text x="361" y="1144.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">leaderboard: SELECT (read only)</text>
+<text x="361" y="1164.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">rpc leaderboard_rank</text>
+<rect x="345" y="1202" width="315" height="118" rx="8" fill="#fff7ea" stroke="#b7791f" stroke-width="2"/>
+<text x="361" y="1226" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#b7791f" dominant-baseline="central">EDGE FUNCTION submit-score</text>
+<text x="361" y="1254.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">The only leaderboard writer;</text>
+<text x="361" y="1274.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">issues and checks an</text>
+<text x="361" y="1294.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">ownership token</text>
+<rect x="670" y="1052" width="305" height="268" rx="8" fill="#ffffff" stroke="#4a6a8a" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="686" y="1076" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1.2" fill="#4a6a8a" dominant-baseline="central">LEAVES THE DEVICE</text>
+<text x="686" y="1104.0" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">Level record</tspan> (5th scene):</text>
+<text x="686" y="1124.3" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">nickname · score · attempts</text>
+<text x="686" y="1144.6" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">· level · remarks</text>
+<text x="686" y="1164.9" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">Leaderboard</tspan> (main menu):</text>
+<text x="686" y="1185.2" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">player ID · nickname · points</text>
+<text x="686" y="1205.5" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">· stars · ownership token</text>
+<text x="686" y="1225.8" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central"><tspan font-weight="bold">Nickname claim</tspan> (dialog):</text>
+<text x="686" y="1246.1" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">nickname · installation ID</text>
+<text x="686" y="1266.4" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#1f2937" dominant-baseline="central">No audio, no attempt log</text>
+<path d="M 120.0 915.0 L 120.0 998.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="121.0" y="943.5" width="46.4" height="22.9" fill="#ffffff" opacity="0.95"/>
+<text x="126.0" y="955.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">audio</text>
+<path d="M 200.0 998.0 L 200.0 917.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="201.0" y="943.5" width="39.1" height="22.9" fill="#ffffff" opacity="0.95"/>
+<text x="206.0" y="955.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">text</text>
+<path d="M 430.0 915.0 L 430.0 998.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="315.1" y="937.1" width="111.9" height="39.8" fill="#ffffff" opacity="0.95"/>
+<text x="422.0" y="948.5" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="end" dominant-baseline="central">level record ·</text>
+<text x="422.0" y="965.4" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="end" dominant-baseline="central">nickname claim</text>
+<path d="M 600.0 998.0 L 600.0 917.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="8 6" stroke-linejoin="round"/>
+<rect x="603.0" y="937.1" width="141.0" height="39.8" fill="#ffffff" opacity="0.95"/>
+<text x="608.0" y="948.5" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">leaderboard rows ·</text>
+<text x="608.0" y="965.4" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">rank · names</text>
+<path d="M 880.0 915.0 L 880.0 998.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="786.9" y="937.1" width="90.1" height="39.8" fill="#ffffff" opacity="0.95"/>
+<text x="872.0" y="948.5" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="end" dominant-baseline="central">totals</text>
+<text x="872.0" y="965.4" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="end" dominant-baseline="central">(main menu)</text>
+<rect x="10" y="1348" width="980" height="104" rx="8" fill="#f7f7f5" stroke="#9ca3af" stroke-width="1.5"/>
+<rect x="30" y="1360" width="30" height="20" rx="4" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="70.0" y="1370.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#1f2937" text-anchor="start" dominant-baseline="central">On the device; no network</text>
+<rect x="300" y="1360" width="30" height="20" rx="4" fill="#fff7ea" stroke="#b7791f" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="340.0" y="1370.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#1f2937" text-anchor="start" dominant-baseline="central">May use the network (speech service)</text>
+<rect x="640" y="1360" width="30" height="20" rx="4" fill="#eef3fb" stroke="#3b5b8c" stroke-width="2"/>
+<text x="680.0" y="1370.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#1f2937" text-anchor="start" dominant-baseline="central">Network: Supabase</text>
+<text x="30.0" y="1404.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#1f2937" text-anchor="start" dominant-baseline="central">Answer checking, the classifier and local saving need no network. Recognition may; the level record, nickname</text>
+<text x="30.0" y="1424.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#1f2937" text-anchor="start" dominant-baseline="central">claim and leaderboard do. The game itself never saves or uploads audio.</text></svg>

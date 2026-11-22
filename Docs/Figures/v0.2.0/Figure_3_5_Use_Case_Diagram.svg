@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1010" viewBox="0 0 1000 1010"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="1000" height="1010" fill="#ffffff"/><rect x="150" y="40" width="735" height="950" rx="14" fill="#f8fafc" stroke="#4a6a8a" stroke-width="2"/>
+<text x="517.0" y="66.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" fill="#4a6a8a" text-anchor="middle" dominant-baseline="central">SALINLAHI (Unity application on the phone)</text>
+<circle cx="62" cy="442" r="14" fill="#fff" stroke="#374151" stroke-width="2"/>
+<path d="M 62 456 L 62 496 M 38 470 L 86 470 M 62 496 L 42 528 M 62 496 L 82 528" stroke="#374151" stroke-width="2" fill="none"/>
+<text x="62.0" y="552.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Bata</text>
+<text x="62.0" y="570.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(child)</text>
+<path d="M 86.0 470.0 L 172.0 130.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 220.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 310.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 400.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 490.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 580.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 670.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 760.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 86.0 470.0 L 172.0 850.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<ellipse cx="330" cy="130" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="130.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Set or change a nickname</text>
+<ellipse cx="330" cy="220" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="210.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Manage profiles</text>
+<text x="330.0" y="229.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(switch, create, rename, delete)</text>
+<ellipse cx="330" cy="310" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="310.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">View the shared leaderboard</text>
+<ellipse cx="330" cy="400" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="400.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Browse the journey map</text>
+<ellipse cx="330" cy="490" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="490.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Play a scene</text>
+<ellipse cx="330" cy="580" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="570.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">View the scene summary</text>
+<text x="330.0" y="589.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">and words learned</text>
+<ellipse cx="330" cy="670" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="670.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Replay a scene</text>
+<ellipse cx="330" cy="760" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="760.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Adjust the settings</text>
+<ellipse cx="330" cy="850" rx="160" ry="36" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="330.0" y="850.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">View the About panel</text>
+<path d="M 490 130 L 528 130" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="473.8" y="101.2" width="70.5" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="509.0" y="112.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="middle" dominant-baseline="central">«include»</text>
+<path d="M 470 208 L 548 152" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="547.0" y="179.2" width="184.7" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="552.0" y="190.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">«include» (create, rename)</text>
+<path d="M 478 300 L 532 262" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="515.0" y="285.2" width="70.5" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="520.0" y="296.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">«include»</text>
+<path d="M 560 386 L 452 470" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="555.0" y="421.2" width="144.4" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="560.0" y="432.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">«extend» [5th scene]</text>
+<path d="M 490 490 L 528 490" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="473.8" y="461.2" width="70.5" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="509.0" y="472.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="middle" dominant-baseline="central">«include»</text>
+<path d="M 645 525 L 602 604" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="546.5" y="549.2" width="70.5" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="612.0" y="560.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="end" dominant-baseline="central">«include»</text>
+<path d="M 715 525 L 760 604" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="740.0" y="549.2" width="70.5" height="21.6" fill="#ffffff" opacity="0.95"/>
+<text x="745.0" y="560.0" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">«include»</text>
+<path d="M 632 776 L 592 678" fill="none" stroke="#374151" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#open)"/>
+<rect x="617.0" y="697.4" width="157.8" height="37.2" fill="#ffffff" opacity="0.95"/>
+<text x="622.0" y="708.2" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">«extend»</text>
+<text x="622.0" y="723.8" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#374151" text-anchor="start" dominant-baseline="central">[one of the six words]</text>
+<ellipse cx="690" cy="130" rx="160" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="690.0" y="120.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Check nickname</text>
+<text x="690.0" y="139.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">availability</text>
+<ellipse cx="690" cy="240" rx="160" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="690.0" y="230.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Submit totals and</text>
+<text x="690.0" y="249.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">load the leaderboard</text>
+<ellipse cx="690" cy="360" rx="160" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="690.0" y="350.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Save the level record</text>
+<text x="690.0" y="369.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">[after the fifth scene]</text>
+<ellipse cx="690" cy="490" rx="160" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="690.0" y="490.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Say the Filipino word</text>
+<ellipse cx="575" cy="640" rx="100" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="575.0" y="630.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Match the word</text>
+<text x="575.0" y="649.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(recognized text)</text>
+<ellipse cx="785" cy="640" rx="95" ry="36" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="785.0" y="630.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Recognise</text>
+<text x="785.0" y="649.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the speech</text>
+<ellipse cx="650" cy="820" rx="115" ry="46" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="650.0" y="801.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Verify the stress</text>
+<text x="650.0" y="820.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(Tayo, Upo, Bukas,</text>
+<text x="650.0" y="838.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Basa, Bati, Pasok)</text>
+<circle cx="950" cy="202" r="14" fill="#fff" stroke="#374151" stroke-width="2"/>
+<path d="M 950 216 L 950 256 M 926 230 L 974 230 M 950 256 L 930 288 M 950 256 L 970 288" stroke="#374151" stroke-width="2" fill="none"/>
+<text x="950.0" y="312.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Supabase</text>
+<text x="950.0" y="330.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">backend</text>
+<circle cx="950" cy="592" r="14" fill="#fff" stroke="#374151" stroke-width="2"/>
+<path d="M 950 606 L 950 646 M 926 620 L 974 620 M 950 646 L 930 678 M 950 646 L 970 678" stroke="#374151" stroke-width="2" fill="none"/>
+<text x="950.0" y="702.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Speech</text>
+<text x="950.0" y="720.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">service</text>
+<text x="950.0" y="738.4" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(may be</text>
+<text x="950.0" y="756.6" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">online)</text>
+<path d="M 850.0 130.0 L 926.0 236.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 850.0 240.0 L 926.0 236.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 850.0 360.0 L 926.0 236.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 880.0 640.0 L 926.0 628.0" fill="none" stroke="#4b5563" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="517.0" y="918.1" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#4b5563" text-anchor="middle" dominant-baseline="central">Unshaded use cases are started by the child; shaded ones are pulled in by another use case.</text>
+<text x="517.0" y="935.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#4b5563" text-anchor="middle" dominant-baseline="central">The stress check runs on the device and extends word matching only for the six words.</text>
+<text x="517.0" y="951.9" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" fill="#4b5563" text-anchor="middle" dominant-baseline="central">MINI GAME is an unwired placeholder and is not a use case.</text></svg>

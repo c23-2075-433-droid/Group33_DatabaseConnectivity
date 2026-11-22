@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1400" viewBox="0 0 1000 1400"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="1000" height="1400" fill="#ffffff"/><rect x="350.0" y="10.0" width="300" height="44" rx="22.0" ry="22.0" fill="#e3edf9" stroke="#4a6a8a" stroke-width="2"/>
+<text x="500.0" y="32.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Objective becomes live</text>
+<circle cx="690" cy="32" r="17" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="690.0" y="32.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">B</text>
+<path d="M 673.0 32.0 L 652.0 32.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="280.0" y="70.0" width="440" height="44" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="500.0" y="92.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Teacher Rachel introduces the word</text>
+<path d="M 500.0 54.0 L 500.0 68.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="280.0" y="129.0" width="440" height="42" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="500.0" y="150.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Speaking turn opens (SPEAK NOW)</text>
+<path d="M 500.0 114.0 L 500.0 127.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<polygon points="500,188.0 690.0,240 500,292.0 310.0,240" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="220.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Six-word target, and the</text>
+<text x="500.0" y="240.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">audio bridge works on</text>
+<text x="500.0" y="259.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">this phone (Android 13+)?</text>
+<path d="M 500.0 171.0 L 500.0 186.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="25.0" y="300.0" width="280" height="80" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="165.0" y="321.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Audio bridge records the</text>
+<text x="165.0" y="340.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">answer in memory and sends</text>
+<text x="165.0" y="358.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the same audio to the recognizer</text>
+<rect x="695.0" y="300.0" width="280" height="80" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="835.0" y="321.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">UnitySpeechToText: the</text>
+<text x="835.0" y="340.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">recognizer returns text and</text>
+<text x="835.0" y="358.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">loudness readings, no audio</text>
+<path d="M 310.0 240.0 L 165.0 240.0 L 165.0 298.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="218.2" y="211.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="235.0" y="224.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Yes</text>
+<path d="M 690.0 240.0 L 835.0 240.0 L 835.0 298.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="752.2" y="211.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="765.0" y="224.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">No</text>
+<path d="M 165.0 380.0 L 165.0 400.0 L 500.0 400.0 L 500.0 418.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<path d="M 835.0 380.0 L 835.0 400.0 L 500.0 400.0" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="500,420.0 650.0,465 500,510.0 350.0,465" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="455.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Recognizer</text>
+<text x="500.0" y="474.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">returned a word?</text>
+<rect x="695.0" y="428.0" width="280" height="74" rx="10" ry="10" fill="#f7f7f5" stroke="#9ca3af" stroke-width="2"/>
+<text x="835.0" y="446.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Nothing recognised: not</text>
+<text x="835.0" y="465.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">scored; Rachel prompts again</text>
+<text x="835.0" y="483.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">or nudges after 10 s</text>
+<path d="M 650.0 465.0 L 693.0 465.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="657.2" y="435.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="670.0" y="448.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">No</text>
+<path d="M 975.0 465.0 L 990.0 465.0" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"/>
+<path d="M 500.0 510.0 L 500.0 538.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="511.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="524.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Yes</text>
+<polygon points="500,540.0 650.0,585 500,630.0 350.0,585" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="575.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Text matches</text>
+<text x="500.0" y="594.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the target word?</text>
+<rect x="25.0" y="535.0" width="280" height="100" rx="10" ry="10" fill="#fde8e8" stroke="#b42318" stroke-width="2"/>
+<text x="165.0" y="557.7" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Wrong word: a miss</text>
+<text x="165.0" y="575.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">TRY AGAIN + incorrect sound;</text>
+<text x="165.0" y="594.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">hint after 2 misses,</text>
+<text x="165.0" y="612.3" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">replay after 4</text>
+<path d="M 350.0 585.0 L 307.0 585.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="317.2" y="555.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="330.0" y="568.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">No</text>
+<path d="M 25.0 585.0 L 10.0 585.0" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"/>
+<path d="M 500.0 630.0 L 500.0 658.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="631.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="644.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Yes</text>
+<polygon points="500,660.0 650.0,705 500,750.0 350.0,705" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="695.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">One of the six</text>
+<text x="500.0" y="714.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">stress words?</text>
+<path d="M 650.0 705.0 L 723.0 705.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<circle cx="742" cy="705" r="17" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="742.0" y="705.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">A</text>
+<rect x="763.0" y="692.9" width="213.8" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="768.0" y="705.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">No: the text match decides</text>
+<path d="M 500.0 750.0 L 500.0 778.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="751.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="764.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Yes</text>
+<polygon points="500,780.0 650.0,825 500,870.0 350.0,825" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="815.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Said on</text>
+<text x="500.0" y="834.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">its own?</text>
+<path d="M 350.0 825.0 L 165.0 825.0 L 165.0 637.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="202.0" y="795.9" width="111.9" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="258.0" y="808.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">In a sentence</text>
+<path d="M 650.0 825.0 L 723.0 825.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<circle cx="742" cy="825" r="17" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="742.0" y="825.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">U</text>
+<rect x="763.0" y="812.9" width="190.3" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="768.0" y="825.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">With filler (e.g. “po”)</text>
+<path d="M 500.0 870.0 L 500.0 898.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="871.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="884.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Yes</text>
+<polygon points="500,900.0 650.0,945 500,990.0 350.0,945" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="935.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Learner's audio</text>
+<text x="500.0" y="954.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">recorded?</text>
+<rect x="30.0" y="1000.0" width="340" height="80" rx="10" ry="10" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="200.0" y="1021.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">On-device classifier</text>
+<text x="200.0" y="1040.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(PronunciationModel) checked</text>
+<text x="200.0" y="1058.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">by the safety-net judges</text>
+<rect x="630.0" y="1000.0" width="340" height="80" rx="10" ry="10" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="800.0" y="1021.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Fallback check on the</text>
+<text x="800.0" y="1040.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">recognizer's loudness readings;</text>
+<text x="800.0" y="1058.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">no readings → uncertain</text>
+<path d="M 350.0 945.0 L 200.0 945.0 L 200.0 998.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="258.2" y="915.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="275.0" y="928.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Yes</text>
+<path d="M 650.0 945.0 L 800.0 945.0 L 800.0 998.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="712.2" y="915.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="725.0" y="928.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">No</text>
+<path d="M 200.0 1080.0 L 200.0 1098.0 L 500.0 1098.0 L 500.0 1113.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<path d="M 800.0 1080.0 L 800.0 1098.0 L 500.0 1098.0" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="500,1115.0 650.0,1160 500,1205.0 350.0,1160" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="1150.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Pronunciation</text>
+<text x="500.0" y="1169.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">decision</text>
+<rect x="20.0" y="1255.0" width="260" height="110" rx="10" ry="10" fill="#fde8e8" stroke="#b42318" stroke-width="2"/>
+<text x="150.0" y="1282.7" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Wrong stress: a miss</text>
+<text x="150.0" y="1300.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">TRY AGAIN + incorrect</text>
+<text x="150.0" y="1319.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">sound; Rachel: “Malapit</text>
+<text x="150.0" y="1337.3" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">na!” and the word again</text>
+<rect x="360.0" y="1255.0" width="280" height="110" rx="10" ry="10" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="500.0" y="1282.7" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Correct</text>
+<text x="500.0" y="1300.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">CORRECT! + Kylo's action;</text>
+<text x="500.0" y="1319.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">next objective (B), or the</text>
+<text x="500.0" y="1337.3" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">scene summary (Fig. 3.2b)</text>
+<rect x="720.0" y="1255.0" width="260" height="110" rx="10" ry="10" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="850.0" y="1282.7" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Uncertain: not scored</text>
+<text x="850.0" y="1300.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">TRY AGAIN, no incorrect</text>
+<text x="850.0" y="1319.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">sound; Rachel repeats</text>
+<text x="850.0" y="1337.3" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the instruction</text>
+<path d="M 350.0 1160.0 L 150.0 1160.0 L 150.0 1253.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="175.5" y="1130.9" width="159.0" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="255.0" y="1143.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Other pronunciation</text>
+<path d="M 650.0 1160.0 L 850.0 1160.0 L 850.0 1253.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="709.7" y="1130.9" width="80.6" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="750.0" y="1143.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Uncertain</text>
+<path d="M 500.0 1205.0 L 500.0 1253.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="1215.9" width="57.0" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="1228.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Taught</text>
+<circle cx="395" cy="1222" r="15" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="395.0" y="1222.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">A</text>
+<path d="M 395.0 1237.0 L 395.0 1253.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<circle cx="935" cy="1222" r="15" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="935.0" y="1222.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1f2937" text-anchor="middle" dominant-baseline="central">U</text>
+<path d="M 935.0 1237.0 L 935.0 1253.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<path d="M 20.0 1310.0 L 10.0 1310.0 L 10.0 150.0 L 278.0 150.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="115.4" y="123.9" width="49.2" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="140.0" y="136.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Retry</text>
+<path d="M 850.0 1365.0 L 850.0 1385.0 L 990.0 1385.0 L 990.0 150.0 L 722.0 150.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="835.4" y="123.9" width="49.2" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="860.0" y="136.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Retry</text></svg>

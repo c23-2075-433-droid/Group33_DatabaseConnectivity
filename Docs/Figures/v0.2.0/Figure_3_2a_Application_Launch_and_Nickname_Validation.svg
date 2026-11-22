@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="960" viewBox="0 0 1000 960"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="1000" height="960" fill="#ffffff"/><rect x="360.0" y="16.0" width="280" height="48" rx="24.0" ry="24.0" fill="#e3edf9" stroke="#4a6a8a" stroke-width="2"/>
+<text x="500.0" y="40.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Application opens</text>
+<polygon points="500,90.0 690.0,150 500,210.0 310.0,150" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="140.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Does the playing profile</text>
+<text x="500.0" y="159.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">already have a nickname?</text>
+<path d="M 500.0 64.0 L 500.0 88.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="750.0" y="120.0" width="200" height="60" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="850.0" y="150.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Main menu</text>
+<path d="M 690.0 150.0 L 748.0 150.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="702.2" y="120.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="719.0" y="133.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Yes</text>
+<rect x="730.0" y="16.0" width="240" height="48" rx="24.0" ry="24.0" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="850.0" y="40.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Journey map opens</text>
+<path d="M 850.0 120.0 L 850.0 66.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="857.0" y="80.9" width="80.6" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="862.0" y="93.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">ADVENTURE</text>
+<rect x="320.0" y="260.0" width="360" height="80" rx="10" ry="10" fill="#eef3fa" stroke="#4a6a8a" stroke-width="2"/>
+<text x="500.0" y="280.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Nickname dialog</text>
+<text x="500.0" y="300.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(first launch; also used to</text>
+<text x="500.0" y="319.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">create or rename a profile)</text>
+<path d="M 500.0 210.0 L 500.0 258.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="221.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="234.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">No</text>
+<path d="M 680.0 300.0 L 800.0 300.0 L 800.0 182.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="711.5" y="270.9" width="57.0" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="740.0" y="283.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">CANCEL</text>
+<polygon points="500,395.0 680.0,450 500,505.0 320.0,450" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="430.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Is the name used by</text>
+<text x="500.0" y="450.0" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">another profile on</text>
+<text x="500.0" y="469.5" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">this device?</text>
+<path d="M 500.0 340.0 L 500.0 393.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="354.9" width="41.4" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="367.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">OKAY</text>
+<polygon points="500,550.0 670.0,610 500,670.0 330.0,610" fill="#fdf6e3" stroke="#8a6d2b" stroke-width="2"/>
+<text x="500.0" y="600.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Online claim of the name</text>
+<text x="500.0" y="619.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(Supabase nickname_claims)</text>
+<path d="M 500.0 505.0 L 500.0 548.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="514.9" width="25.7" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="527.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">No</text>
+<rect x="40.0" y="550.0" width="230" height="120" rx="10" ry="10" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="155.0" y="582.7" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Name is taken (on this</text>
+<text x="155.0" y="600.9" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">or another device): a free</text>
+<text x="155.0" y="619.1" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">alternative is filled in;</text>
+<text x="155.0" y="637.3" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the dialog stays open</text>
+<path d="M 320.0 450.0 L 155.0 450.0 L 155.0 548.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="223.2" y="420.9" width="33.5" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="240.0" y="433.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Yes</text>
+<path d="M 330.0 610.0 L 272.0 610.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="277.8" y="580.5" width="46.4" height="22.9" fill="#ffffff" opacity="0.95"/>
+<text x="301.0" y="592.0" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#374151" text-anchor="middle" dominant-baseline="central">Taken</text>
+<path d="M 40.0 610.0 L 15.0 610.0 L 15.0 300.0 L 318.0 300.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="330.0" y="738.0" width="340" height="64" rx="10" ry="10" fill="#e6f4ea" stroke="#2f7d4a" stroke-width="2"/>
+<text x="500.0" y="760.2" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Nickname saved on the local</text>
+<text x="500.0" y="779.8" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">profile (players.json)</text>
+<path d="M 500.0 670.0 L 500.0 736.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="507.0" y="690.9" width="307.9" height="24.2" fill="#ffffff" opacity="0.95"/>
+<text x="512.0" y="703.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151" text-anchor="start" dominant-baseline="central">Claimed, or the check failed: accepted</text>
+<path d="M 670.0 770.0 L 900.0 770.0 L 900.0 182.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<rect x="20.0" y="848.0" width="960" height="84" rx="8" ry="8" fill="#f7f7f5" stroke="#9ca3af" stroke-width="2"/>
+<text x="500.0" y="871.8" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">CANCEL leaves the profile unnamed (shown as “Bata”); the dialog opens again at the next launch.</text>
+<text x="500.0" y="890.0" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">The device check runs first, then the online claim, which sends the nickname and a random installation ID.</text>
+<text x="500.0" y="908.2" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">If Supabase cannot be reached, the name is accepted, so a child is never blocked from starting the game.</text></svg>
