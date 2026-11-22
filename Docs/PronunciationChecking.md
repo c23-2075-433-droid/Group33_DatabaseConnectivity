@@ -54,10 +54,12 @@ Balanced`, `AnswerJudge.JudgeBalanced`) ranks the evidence like this:
    except the 11 pairs. Stress, speed, pitch, intonation and accent never fail
    it. The stress is still measured and written to the attempt log for the
    teacher.
-3. **Stress only matters where it changes the word.** The 11 same-spelling
-   pairs are tayô/táyo, upô/úpo, bukás/búkas, bása/basâ, talón/tálon,
-   bátì/batî, lákad/lakád, pások/pasók, kúha/kuhà, sulát/súlat and línis/linís.
-   - A pair is refused only when **both** audio checks agree the stress is on the
+3. **Stress only matters for six words** (since 2026-11-22): tayô/táyo,
+   upô/úpo, bukás/búkas, bása/basâ, báti/batî and pások/pasók. These get the
+   strict hybrid check in section 2a. Talón, lákad, kúha, sulát and línis also
+   have a second pronunciation, but the group chose to judge them as ordinary
+   words, so the right word passes whatever its stress.
+   - (Superseded by section 2a for the six:) a pair is refused only when **both** audio checks agree the stress is on the
      other syllable. With no recording, it is refused only when the loudness
      readings fall beyond anything Rachel's own delivery produced.
    - A borderline or unmeasurable stress passes.
@@ -92,6 +94,423 @@ Balanced`, `AnswerJudge.JudgeBalanced`) ranks the evidence like this:
 
 The strict modes described below stay selectable on `VoiceCommand`:
 `StrictOnTrustedWords`, `StrictOnEveryWord` and `Lenient`.
+
+## 2a. Strict hybrid check for ambiguous words (2026-11-22)
+
+**Why balanced mode was inconsistent on the pairs.** In
+`AnswerJudge.JudgeBalanced`, a pair word was accepted whenever the stress check
+was *not decisive*. That covered an unclear measurement, the two judges
+disagreeing, "po" around the word, and no recording at all. On the phone there
+is never a recording (`recordOwnVoice` is off), so a borderline loudness reading
+passed. The same wrong *táyo* could therefore pass on one try and fail on the
+next: 61 of 374 wrong stresses were accepted, with 2 flips. Nothing asynchronous
+was involved; the verdict is computed synchronously when the recognizer's result
+arrives.
+
+**What decides which words are strict.** `AmbiguousWords.cs` lists the six words
+the group chose: Tayo, Upo, Bukas, Basa, Bati and Pasok. Each entry holds the
+meaning and stress mark the game teaches (Rachel's) and the other meaning and
+mark, e.g. tayô "stand up" / táyo "we". These six go to
+`AnswerJudge.JudgeAmbiguous`; every other word, including Talon, Lakad, Kuha,
+Sulat and Linis, stays balanced. Adding or removing a strict word means editing
+this list and the matching row in `WordStress.Table`, then running
+`Tools/test_stress_rules.sh generate`.
+
+**How the hybrid check decides** (`JudgeAmbiguous`):
+
+- **The letters must be right first.** Audio never turns another word (*kayo*)
+  into the target.
+- **Judge T, the whole-word template comparison** (`PronunciationTemplate`):
+  - It lines the answer up with Rachel's actual recording using dynamic time
+    warping on MFCC features, so speed differences don't matter.
+  - Along that line-up it compares pitch movement (relative to the speaker's
+    own median), loudness movement (relative to the speaker's own peak) and
+    timing (relative to the speaker's own pace). Voice height, loudness and
+    overall speed cancel out.
+  - It does the same against the other pronunciation; the score says which one
+    the answer is nearer.
+  - References are stored at three voice heights (adult, ×1.25, ×1.45, i.e.
+    child-like) and precomputed into `PronunciationTemplateData.cs`.
+  - Real recordings of the other pronunciation can be added in
+    `Assets/Audio/VO/alt/word_WORD_alt*.wav` and are used automatically.
+- **Judges A, the syllable-based stress check** (`PronunciationAssessor`), with
+  `RawStressAnalyzer` as its second opinion.
+- **The verdict:**
+  - **Correct** when T says Rachel's and A doesn't disagree, or when A, on a
+    trusted word, and its second opinion both say Rachel's and T doesn't
+    disagree.
+  - **WrongStress** only when **two** judges say it's the other word.
+  - **Ask again** in every other case: disagreement, an unclear recording,
+    "po" around the word, or no audio. An ambiguous word is **never accepted
+    on its letters alone**.
+
+**Results on held-out material** (`Tools/test_stress_rules.sh hybrid`; none of
+these voices, noise levels or stress strengths were used to set the lines):
+
+| Check | Result |
+|---|---|
+| Other pronunciation accepted | 0 of 110 |
+| Rachel's pronunciation refused | 0 of 55 |
+| Same answer flipping between accepted and refused | 0 |
+| Same recording getting a different verdict | 0 |
+| Rachel's pronunciation accepted | 44 of 55 (the rest asked again) |
+| Other pronunciation refused | 91 of 110 (the rest asked again) |
+
+The table above is from the eleven-word version. Talon (always asked again)
+and Linis (2 of 5) were the weakest, and both are now ordinary words.
+
+**Six-word version (2026-11-22), held-out material:**
+
+| Check | Result |
+|---|---|
+| Other pronunciation accepted | 0 of 60 |
+| Rachel's pronunciation refused | 0 of 30 |
+| Flips between accepted and refused | 0 |
+| Same recording getting a different verdict | 0 |
+| Rachel's pronunciation accepted | 27 of 30 |
+| Other pronunciation refused | 53 of 60 |
+
+Per word:
+
+| Word | Rachel's accepted | Other refused |
+|---|---|---|
+| Tayo (trusted template) | 5/5 | 10/10 |
+| Upo | 5/5 | 9/10 |
+| Bukas | 5/5 | 7/10 |
+| Basa | 5/5 | 8/10 |
+| Bati | 4/5 | 10/10 |
+| Pasok | 3/5 | 9/10 |
+
+Ordinary words: none of Rachel's 714 own deliveries refused, and no word refused
+for its stress (0 of 1,564). Full suite: 222 checks pass; the one failure is in
+the optional old strict mode, which the game does not use.
+
+**Results on real recordings. This method is not yet validated on real voices.**
+
+| Real recordings | Result |
+|---|---|
+| Developer's 8 correct *Bángon* takes (Bangon set up as if ambiguous, as an experiment) | Template alone: "other word" 3, unclear 5, Rachel's 0 |
+| Developer's 25 unlabelled Tayo takes (one of them is actually Lakad) | Hybrid: 4 accepted, 11 refused, 14 asked again; accuracy unknown without labels |
+
+The held-out tests are all made from Rachel's own recording, so they only test
+her voice against her voice with the stress moved. On a real speaker the
+template cannot yet tell "a different speaker" from "a different stress". That
+is why a refusal needs two judges. Before the strict hybrid check can be trusted
+with children, it needs **real labelled recordings** of both pronunciations of
+each word from several speakers, children included, to recalibrate. Record in
+the Editor with hold-R plus F5 or F6, and put real alternative pronunciations in
+`Assets/Audio/VO/alt/`.
+
+## 2c. The classifier trained on our own speakers (2026-11-22)
+
+Section 2a's judges were built from Rachel's voice alone, with the "other"
+pronunciation made by moving her stress, and they were never checked on real
+voices. The group then recorded a dataset: **three speakers (la, gar, olyk).
+Each said every word the taught way three times, then the other way three
+times.** That is 108 takes. The six words now have a classifier trained on
+these recordings (`PronunciationModel`), and the older judges stay on only as
+a safety net.
+
+**What the recordings showed.** All six contrasts are stress contrasts.
+Tagalog stress is mostly vowel **length**, plus pitch.
+
+| Word | Taught | Other | What separates them in the recordings |
+|---|---|---|---|
+| Tayo | tayô | táyo | 1st vowel ~110 ms vs ~220 ms; pitch higher on the 1st syllable in táyo |
+| Upo | upô | úpo | 1st syllable +6 to +11 semitones in úpo |
+| Bukas | bukás | búkas | length, and pitch up to +12 semitones on bú- |
+| Basa | bása | basâ | long 1st vowel in bása |
+| Bati | báti | batî | **weakest**: both end in a glottal stop and both fall in pitch; only the length differs, not always clearly |
+| Pasok | pások | pasók | length, loudness and pitch, consistently |
+
+**How it works.**
+
+- **Dataset.** `Tools/pronunciation_dataset/segment.py` finds the takes by
+  silence and labels them by their order. It writes an editable manifest
+  (`manifests/SPEAKER.csv`), 16 kHz clips in `Recordings/Dataset/` (git-ignored)
+  and a page to listen to every take. It refuses to label a file that doesn't
+  give exactly 36 takes. You then fix the manifest by hand and re-run with
+  `--from-manifest`. gar's file had one 0.15 s noise before Bukas, which it
+  drops and shows as a dropped row.
+- **Features.** All five are measured within the child's own word, so
+  absolute pitch, loudness and speed never count:
+  - vowel-length ratio;
+  - pitch difference in semitones;
+  - loudness difference in dB;
+  - pitch fall inside the last vowel;
+  - the whole-word DTW template score against every recorded speaker's taught
+    and other takes (stored at three voice heights).
+- **Model.** One logistic regression per word, on standardised features, with
+  a strong weight penalty. Every training take is also heard under the 12
+  simulated phones and voices (noise; voice ×1.25 and ×1.45; slower and faster
+  speech). A training take's template score is measured only against *other*
+  speakers.
+- **Verdict.** p is the probability of the taught pronunciation, measured six
+  ways per answer:
+  - **Correct** when every p ≥ 0.7;
+  - **Incorrect** (WrongStress) when every p ≤ 0.3;
+  - **Uncertain** (asked again, not scored) otherwise, or when the syllables
+    can't be found.
+- **Safety net** (`AnswerJudge.DecideWithModel`):
+  - an acceptance turns into "ask again" only when the template *and* a
+    syllable judge both say the other word;
+  - a refusal turns into "ask again" when either the template or a trusted
+    syllable judge says Rachel's;
+  - when the classifier is unsure, all three older judges agreeing still
+    decides. This keeps Rachel's synthetic táyo refused, as the test suite
+    requires.
+- **Switch.** `VoiceCommand.useLearnedPronunciationModel` (on by default)
+  turns it off. A word with no trained model falls back to section 2a.
+
+**Results, leave one speaker out** (`Tools/test_stress_rules.sh dataset-eval`).
+Every take is judged by a model trained without its speaker.
+
+| Whole game check (AnswerJudge), held-out takes | As recorded (108) | Under 12 simulated phones/voices (1,296) |
+|---|---|---|
+| Correct pronunciation accepted | 47 / 54 | 475 / 648 |
+| Alternate pronunciation rejected | 39 / 54 | 460 / 648 |
+| **Alternate mistakenly accepted** | **0** | 8 |
+| **Correct mistakenly rejected** | **0** | 6 |
+| Uncertain (asked again) | 22 | 347 |
+| Accuracy (all takes) | 80 % | 72 % |
+| *Old Rachel-only check, same takes: wrong accepts / wrong rejects* | *1 / 2* | *23 / 39* |
+
+On the same real voices the new check makes no errors on the recorded takes,
+where the old check made 3. Under simulated conditions it makes 14 errors,
+against 62 for the old check. It asks again about as often (22 against 19 of
+108). The classifier alone, without the safety net, gets 81 %
+of the recorded takes right with no errors, and asks again on 20.
+
+Per word, classifier alone, as recorded:
+
+| Word | Correct accepted | Alternate rejected | Asked again |
+|---|---|---|---|
+| Tayo | 7/9 | 8/9 | 3 |
+| Upo | 9/9 | 7/9 | 2 |
+| Bukas | 9/9 | 7/9 | 2 |
+| Basa | 6/9 | 6/9 | 6 |
+| Bati | 5/9 | 9/9 | 4 |
+| Pasok | 9/9 | 6/9 | 3 |
+
+**Limits. Read these before quoting the numbers.**
+
+- **Three adult speakers** is enough to fit five weights per word. It is not
+  enough to give a reliable accuracy figure: each test is one voice, 18 takes
+  per word. **No child has been recorded.** The ×1.25 and ×1.45 voice raises
+  only approximate a child's voice.
+- The speakers exaggerate the other pronunciation (pitch jumps of up to 12
+  semitones). A child who says it naturally may land in "ask again" more often.
+- To aim for: **at least 10 speakers, 5 or more of them children of the
+  players' age, mixed gender**, plus a separate group of children used only
+  for the final test.
+- **Phones: not yet.** The game records no audio on a phone (`recordOwnVoice`
+  is off), so there the six words are still judged from the recognizer's
+  loudness readings (`StressAnalyzer.JudgeBanded`). The classifier runs in the
+  Editor, on desktop, and on a phone only with Record Own Voice turned on. Fixing
+  this needs one of:
+  - a native plugin that records the audio and feeds it to the recognizer
+    (Android 13 and later);
+  - recording first with Unity's microphone for these six words.
+- `PronunciationModelData.cs` is about 500 KB of source, because it stores the
+  reference frames of every take.
+
+**Testing inside Unity.**
+
+1. Open a scene that asks one of the six words (for example Bahay scene 1 for
+   Tayo).
+2. Hold **R**, say the word, and let go. The Console shows the verdict with
+   `model: Correct/Incorrect/Uncertain`, p, the features, and what the other
+   judges said.
+3. Press **F5** (said the taught way), **F6** (said the other way) or **F7** (a
+   sound wrong). The take is kept under `Recordings/Labelled/WORD/LABEL/`.
+4. Run `Tools/test_stress_rules.sh labelled` to judge every labelled take with
+   the current model. It exits 1 if anything labelled wrong was accepted.
+5. To compare with the older check, untick **Use Learned Pronunciation Model** on
+   the scene's VoiceCommand.
+
+### 2d. Calibrated to natural speech (2026-11-22, later the same day)
+
+**What went wrong in testing.** A developer tried the six words in the Editor,
+saying them naturally. Correct answers were mostly asked again, and a word was
+accepted only when it was exaggerated. Bati was accepted 2 times in about 19
+tries. There were two causes:
+
+- **Exaggerated training data.** The three speakers had exaggerated the
+  contrast, so natural speech scored in the middle (p 0.3–0.6).
+- **An all-six rule.** A verdict needed all six measurements to succeed and
+  all six to clear the line, so one stray measurement meant "ask again".
+
+**What changed.**
+
+- **Your session as training data.** The developer's 38 session takes became a
+  fourth speaker, `kl`: 32 taught takes and 6 marked as the other way with F6.
+- **Median rule.** At least 4 of the 6 measurements must find the word. The
+  verdict uses their median p, and no single measurement may sit past the
+  opposite line.
+- **New lines.** Correct from p ≥ 0.60 (was 0.70); Incorrect at p ≤ 0.30 (unchanged).
+- **Protection against voice bias.**
+  - A speaker trains a word only if they recorded *both* pronunciations of it.
+  - Each speaker's correct takes and alternate takes carry equal total weight.
+
+  Without this, kl's 22 correct and one alternate Bati takes taught the model
+  "this voice means correct", and kl's batî crept from p 0.06 to 0.43.
+- **Spelling.** Bati is now written **Báti** (BÁ-ti). The group chose the mark
+  on the a only.
+
+**Results.**
+
+| | Accepted / refused, as recorded |
+|---|---|
+| Whole game check, leave one speaker out (4 speakers, 146 takes) | correct accepted 63/86, alternate refused 43/60, **0 wrong accepts, 0 wrong refusals**, asked again 40 |
+| Old Rachel-only check, same takes | correct accepted 55/86, alternate refused 48/60, 1 wrong accept, 4 wrong refusals |
+| kl held out entirely (the model never heard kl) | correct accepted 11/32 (classifier alone) |
+| kl split in half (trained on the other half of kl's takes) | correct accepted 18/32, alternate refused 5/6, 0 wrong accepts |
+
+So a speaker's own natural takes help with their other takes. A new voice that
+nobody has recorded still meets the older, more cautious behaviour, and it is
+asked again rather than refused. kl recorded only one alternate per word, which
+limits how much of kl's style the model can learn. A full 3 + 3 per word from kl,
+and from children, is the next step. `PronunciationModelData.cs` is now about
+780 KB.
+
+### 2e. The developer's labelled takes, and two more safeguards (2026-11-22)
+
+**Data.** The developer recorded 88 labelled takes in the Editor (F5 / F6).
+`Tools/pronunciation_dataset/import_labelled.py` copied them into the dataset
+as speaker `kl`, replacing the unlabelled session takes:
+
+| | Tayo | Upo | Bukas | Basa | Bati | Pasok |
+|---|---|---|---|---|---|---|
+| Taught way | 6 | 7 | 11 | 4 | 20 | 6 |
+| Other way | 5 | 4 | 8 | 4 | 8 | 5 |
+
+Two takes the model disagreed with were checked by ear:
+
+- One Tayo take had been pressed F6 by mistake. It was moved to `correct`.
+- One Basa F6 take and two Pasok F5 takes were labelled right. They are real
+  near-misses: a basâ that sounds close to bása, and two pások the model had
+  never heard from this speaker.
+
+**Safeguards added after the simulated-voice tests.** The test suite plays
+Rachel's moved-stress recordings as a slower, child-like voice in noise. With
+the 0.60 line, it accepted 4 of 60 of those. The fixes:
+
+- **Both syllable judges** agreeing it is the other word now block an
+  acceptance (`AnswerJudge.DecideWithModel`). Before, the template also had to
+  agree.
+- **No measurement below 0.40** may be part of a Correct verdict
+  (`PronunciationModel.MinLowForCorrect`).
+
+With both, the test accepts **0 of 60**. On real takes the floor cost 2 of 108
+acceptances when the model had never heard the speaker, and none when it had.
+
+**Results.** These are the game check's numbers, before the 0.40 floor; the
+floor lowers "correct accepted" by about 2.
+
+| | Correct accepted | Other way refused | Wrong accepts | Wrong refusals |
+|---|---|---|---|---|
+| Leave one speaker out, whole game check (4 speakers, 196 takes) | 82/108 | 65/88 | 1 | 2 |
+| Old Rachel-only check, same takes | 68/108 | 66/88 | 2 | 5 |
+| kl split in half (the model knows half of kl's takes) | 46/54 | 26/34 | 0 | 0 |
+
+The three remaining errors are the three near-miss takes above. They only
+occur when the model has never heard the speaker.
+
+Full suite: everything passes except the old optional strict mode's 5 of 800,
+which predates this work and is not used by the game.
+`PronunciationModelData.cs` is now about 1.2 MB, because it stores reference
+frames for every take. Keeping fewer references per speaker would shrink it.
+
+### 2f. First test on a voice the model had never heard (2026-11-22, 13:13–13:21)
+
+A second person (`sp5`), who had not recorded anything for the model, played
+the six words in the Editor. They said each word naturally, both ways, and
+labelled every take with F5 or F6. The model in use was trained on la, gar,
+olyk and kl, and had the 0.60 / 0.30 lines and both safeguards from section 2e.
+These are the live verdicts from the Console:
+
+| Word | Taught way (F5) | Other way (F6) |
+|---|---|---|
+| Tayo | 1/1 accepted | 1 asked again |
+| Upo | 1/1 accepted | 3/3 refused |
+| Bukas | 2/2 accepted | 3 refused, 3 asked again |
+| Basa | 1/1 accepted | 2 refused, 1 asked again |
+| Bati | 2/3 accepted, 1 asked again | 5 refused, 1 asked again |
+| Pasok | 1/1 accepted | 3/3 refused |
+| **All** | **8/9 accepted, 0 refused** | **16 refused, 6 asked again, 0 accepted** |
+
+There was no wrong verdict in either direction. This is still one adult voice,
+and few correct takes per word. The takes were then added to the dataset as
+speaker `sp5`, so this exact test can't be repeated on them. The next unheard
+voice, ideally a child's, is the next test.
+
+### 2g. Getting the child's audio on a phone (2026-11-22)
+
+**The problem.** On a phone, Android's speech recognizer holds the
+microphone, and it gives the game text only. Text can't show the stress, so the
+pronunciation model had nothing to judge there. Two approaches were tried
+first and failed:
+
+- **The game records while the recognizer listens** (a switch tried and then
+  removed). On a Galaxy A03s (Android 13) the recognizer then heard nothing.
+  The give-up counter it relied on was fixed and kept, for the original
+  `recordOwnVoice` option: it had missed failures after the phone stopped the
+  game's recording, and empty results. It now always switches recording off
+  after 3 failed listens.
+- **The game listens itself and checks the word by sound.** A sound-matching
+  check couldn't tell words apart across voices. To pass every real take of a
+  word, it also passed about two-thirds of 1,469 wrong-word recordings (Rachel's
+  other words and the other strict words). It was removed.
+
+**The approach now: an audio bridge (Android 13+).**
+`Assets/Plugins/Android/SalinlahiAudioRecognizer.java`, with
+`AndroidAudioRecognizer.cs` as its Unity side:
+
+- **One recorder.** For the six words, the game records the child with
+  Android's AudioRecord. Each block of audio is kept for the model **and**
+  written into a pipe. Android's speech recognizer is told to read its audio
+  from that pipe (`RecognizerIntent.EXTRA_AUDIO_SOURCE`, API 33). So the
+  recognizer checks **which** word and the model checks **how**, on the same
+  sound, and only the game ever opens the microphone.
+- **Fallback.** Whether a phone's recognizer accepts audio this way is up to
+  the phone. VoiceCommand tries the standard recognizer, then the on-device one.
+  A failure only counts when the child actually spoke, so silence never counts.
+  After two counted failures in each mode, the bridge is given up for the
+  session and the six words use the normal recognizer with loudness readings.
+- **Switches.** `VoiceCommand.listenWithAudioBridge` turns it on (the default).
+  `showAudioBridgeMessages` shows the test box and short on-screen messages
+  ("works on this phone" / "trying the on-device recognizer" / "not supported",
+  each round, error codes). It is **off by default**, and works only in a
+  **Development Build**. A normal (release) APK never shows them, even with the
+  switch ticked. To test again, tick both the switch and *Development Build*.
+- **Privacy.** The audio stays in memory only until it is judged. It is never
+  written to storage or sent anywhere.
+
+**Tried on a Galaxy A03s (Android 13), four rounds of fixes:**
+
+1. **Deaf, never falling back.** Timeouts and instant refusals were not
+   counted as failures. Now they are.
+2. **"Speech began", but never an answer.** A recognizer reading from a pipe
+   answers only when the stream ends. The plugin now detects the end of the
+   word itself and closes the stream.
+3. **`partial: tayo`, but an empty final result.** The last partial is used
+   when the final result is empty, or ends in "no match" after a partial.
+4. **It worked, but slowly.**
+   - The word only "ended" after about 5 s, because the game's music kept the
+     room from sounding quiet. Now the recognizer's own end of speech ends
+     the round, as soon as it has named a word.
+   - The check itself measured the whole 8 s recording, six times over, in
+     each judge: about 0.7 s on a PC, several seconds on the phone.
+     `AnswerJudge.CropToWord` now cuts the recording to the word ± 0.5 s
+     first, which takes about 0.2 s on a PC.
+   - Judged as recorded and inside 8 s of quiet, 225 of 229 real takes got the
+     same verdict. The other 4 moved between decided and "ask again". None
+     moved between accepted and refused.
+
+After fix 3, on the A03s, Tayo and Bukas were recognized and judged by the
+model. The wrong pronunciation was refused, and the right one accepted. The
+on-device recognizer is not available on this phone
+(`UnsupportedOperationException`), so only the standard recognizer is used.
 
 ## 2b. Strict mode (no longer the default)
 

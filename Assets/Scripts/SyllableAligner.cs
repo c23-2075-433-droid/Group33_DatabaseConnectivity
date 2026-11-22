@@ -157,6 +157,41 @@ public static class SyllableAligner
         return energy * notHiss * Math.Max(voiced, 0.6f);
     }
 
+    /// <summary>
+    /// Where the spoken word is in a recording: the run of speech-like frames
+    /// around the loudest one, gaps of up to 250 ms (a stop, a glottal stop)
+    /// included. False, with a reason, when there is no clear voice.
+    /// </summary>
+    public static bool FindWord(SpeechFeatures s, out int start, out int end, out string whyNot)
+    {
+        start = end = 0;
+        whyNot = null;
+        if (s == null || s.Count < MinWordFrames) { whyNot = "the recording was too short"; return false; }
+        List<float> all = new List<float>(s.db);
+        int loudest = -1;
+        for (int f = 0; f < s.Count; f++)
+            if (IsSpeechLike(s, f) && (loudest < 0 || s.db[f] > s.db[loudest])) loudest = f;
+        if (loudest < 0) { whyNot = "no clear voice in the recording"; return false; }
+        float peak = s.db[loudest];
+        // A tightly trimmed clip has no silence to measure the floor on, so the
+        // floor is never taken as closer than 45 dB under the voice.
+        float floor = Math.Min(SpeechFeatures.Percentile(all, 0.1f), peak - 45f);
+        if (peak < -62f || peak - floor < 15f) { whyNot = "no clear voice in the recording"; return false; }
+
+        float level = Math.Max(peak - WordWindowDb, floor + WordAboveFloorDb);
+        start = loudest; end = loudest;
+        for (int f = loudest - 1, gap = 0; f >= 0; f--)
+        {
+            if (s.db[f] > level && IsSpeechLike(s, f)) { start = f; gap = 0; } else if (++gap > MaxGapInsideWordFrames) break;
+        }
+        for (int f = loudest + 1, gap = 0; f < s.Count; f++)
+        {
+            if (s.db[f] > level && IsSpeechLike(s, f)) { end = f; gap = 0; } else if (++gap > MaxGapInsideWordFrames) break;
+        }
+        if (end - start + 1 < MinWordFrames) { whyNot = "the word was too short to hear its syllables"; return false; }
+        return true;
+    }
+
     /// <summary>Aligns a recording of the given word (syllables from its spelling).</summary>
     public static Alignment Align(SpeechFeatures s, string word)
     {
@@ -167,29 +202,10 @@ public static class SyllableAligner
         if (s == null || s.Count < MinWordFrames) { a.whyNot = "the recording was too short"; return a; }
 
         // ---- 1. Where the word is ------------------------------------------
-        List<float> all = new List<float>(s.db);
-        int loudest = -1;
-        for (int f = 0; f < s.Count; f++)
-            if (IsSpeechLike(s, f) && (loudest < 0 || s.db[f] > s.db[loudest])) loudest = f;
-        if (loudest < 0) { a.whyNot = "no clear voice in the recording"; return a; }
-        float peak = s.db[loudest];
-        // A tightly trimmed clip has no silence to measure the floor on, so the
-        // floor is never taken as closer than 45 dB under the voice.
-        float floor = Math.Min(SpeechFeatures.Percentile(all, 0.1f), peak - 45f);
-        if (peak < -62f || peak - floor < 15f) { a.whyNot = "no clear voice in the recording"; return a; }
-
-        float level = Math.Max(peak - WordWindowDb, floor + WordAboveFloorDb);
-        int start = loudest, end = loudest;
-        for (int f = loudest - 1, gap = 0; f >= 0; f--)
-        {
-            if (s.db[f] > level && IsSpeechLike(s, f)) { start = f; gap = 0; } else if (++gap > MaxGapInsideWordFrames) break;
-        }
-        for (int f = loudest + 1, gap = 0; f < s.Count; f++)
-        {
-            if (s.db[f] > level && IsSpeechLike(s, f)) { end = f; gap = 0; } else if (++gap > MaxGapInsideWordFrames) break;
-        }
+        int start, end;
+        string why;
+        if (!FindWord(s, out start, out end, out why)) { a.whyNot = why; return a; }
         int T = end - start + 1;
-        if (T < MinWordFrames) { a.whyNot = "the word was too short to hear its syllables"; return a; }
         a.wordFrom = start;
         a.wordTo = end;
 

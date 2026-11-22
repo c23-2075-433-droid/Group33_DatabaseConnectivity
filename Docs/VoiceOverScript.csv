@@ -366,8 +366,8 @@ rachel_word_talon_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teach
 rachel_word_talon_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Talon' means to jump.",Jump,"B - short reminder, played every time after the first.",Talon,Recall,0
 rachel_word_ngiti_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Ngiti' means to smile.",Smile,"B - full English meaning, played the first time this word comes up in a session.",Ngiti,Teach,0
 rachel_word_ngiti_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Ngiti' means to smile.",Smile,"B - short reminder, played every time after the first.",Ngiti,Recall,0
-rachel_word_bati_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Bátì' means to greet someone kindly.",Greet,"B - full English meaning, played the first time this word comes up in a session.",Bati,Teach,0
-rachel_word_bati_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Bátì' means to greet.",Greet,"B - short reminder, played every time after the first.",Bati,Recall,0
+rachel_word_bati_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Báti' means to greet someone kindly.",Greet,"B - full English meaning, played the first time this word comes up in a session.",Bati,Teach,0
+rachel_word_bati_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Báti' means to greet.",Greet,"B - short reminder, played every time after the first.",Bati,Recall,0
 rachel_word_ibahagi_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,"In Filipino, 'Ibahagi' means to share what you have.",Share,"B - full English meaning, played the first time this word comes up in a session.",Ibahagi,Teach,0
 rachel_word_ibahagi_recall.wav,Rachel Line (Teach),All Levels,Later encounters,Teacher Rachel,"Remember, 'Ibahagi' means to share.",Share,"B - short reminder, played every time after the first.",Ibahagi,Recall,0
 rachel_word_salamat_teach.wav,Rachel Line (Teach),All Levels,First encounter,Teacher Rachel,'Salamat' is the Filipino word for thank you.,Thank you,"B - full English meaning, played the first time this word comes up in a session.",Salamat,Teach,0
@@ -439,7 +439,7 @@ word_sakay.wav,Word,All Levels,Level 3 Scene 2,-,Sakay,Ride,First taught in Leve
 word_tulak.wav,Word,All Levels,Level 3 Scene 2,-,Tulak,Push,First taught in Level 3 Scene 2.,Tulak,Word,0
 word_talon.wav,Word,All Levels,Level 3 Scene 2,-,Talon,Jump,First taught in Level 3 Scene 2.,Talon,Word,0
 word_ngiti.wav,Word,All Levels,Level 3 Scene 3,-,Ngiti,Smile,First taught in Level 3 Scene 3.,Ngiti,Word,0
-word_bati.wav,Word,All Levels,Level 2 Scene 1,-,Bátì,Greet,First taught in Level 2 Scene 1.,Bati,Word,0
+word_bati.wav,Word,All Levels,Level 2 Scene 1,-,Báti,Greet,First taught in Level 2 Scene 1.,Bati,Word,0
 word_ibahagi.wav,Word,All Levels,Level 3 Scene 4,-,Ibahagi,Share,First taught in Level 3 Scene 4.,Ibahagi,Word,0
 word_salamat.wav,Word,All Levels,Level 3 Scene 4,-,Salamat,Thank you,First taught in Level 3 Scene 4.,Salamat,Word,0
 word_pagod.wav,Word,All Levels,Level 3 Scene 5,-,Pagod,Tired,First taught in Level 3 Scene 5.,Pagod,Word,0

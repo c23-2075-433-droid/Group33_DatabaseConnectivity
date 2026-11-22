@@ -1483,11 +1483,11 @@ MonoBehaviour:
     gloss: Smile
     clip: {fileID: 8300000, guid: 214fb80a663cf4b6b99baf3d73ecb257, type: 3}
   - id: rachel_word_bati_teach
-    text: "In Filipino, 'B\xE1t\xEC' means to greet someone kindly."
+    text: "In Filipino, 'B\xE1ti' means to greet someone kindly."
     gloss: Greet
     clip: {fileID: 8300000, guid: baba912f13bc640c5b6816aaaf9c69a3, type: 3}
   - id: rachel_word_bati_recall
-    text: "Remember, 'B\xE1t\xEC' means to greet."
+    text: "Remember, 'B\xE1ti' means to greet."
     gloss: Greet
     clip: {fileID: 8300000, guid: 12e001c94914c42a38023e5c085bae6f, type: 3}
   - id: rachel_word_ibahagi_teach
@@ -1775,7 +1775,7 @@ MonoBehaviour:
     gloss: Smile
     clip: {fileID: 8300000, guid: 0511a5cb88be5402aa753d0634ca6493, type: 3}
   - id: word_bati
-    text: "B\xE1t\xEC"
+    text: "B\xE1ti"
     gloss: Greet
     clip: {fileID: 8300000, guid: 0f3e4e63489054b39810e3b8fa504272, type: 3}
   - id: word_ibahagi

@@ -16,6 +16,7 @@ public static class StressReferenceTool
     private const string DataFile = "Assets/Scripts/StressReferenceData.cs";
     private const string RawDataFile = "Assets/Scripts/RawStressReferenceData.cs";
     private const string PronunciationDataFile = "Assets/Scripts/PronunciationReferenceData.cs";
+    private const string TemplateDataFile = "Assets/Scripts/PronunciationTemplateData.cs";
 
     [MenuItem("Tools/SALINLAHI/Rebuild Stress References")]
     public static void Rebuild()
@@ -28,7 +29,10 @@ public static class StressReferenceTool
         File.WriteAllText(PronunciationDataFile, PronunciationReferenceBuilder.Generate(pron));
         AssetDatabase.ImportAsset(DataFile);
         AssetDatabase.ImportAsset(RawDataFile);
+        PronunciationTemplateBuilder.Result templates = PronunciationTemplateBuilder.Build(VoFolder);
+        File.WriteAllText(TemplateDataFile, PronunciationTemplateBuilder.Generate(templates));
         AssetDatabase.ImportAsset(PronunciationDataFile);
+        AssetDatabase.ImportAsset(TemplateDataFile);
 
         List<string> trusted = new List<string>();
         foreach (KeyValuePair<string, PronunciationReferenceBuilder.WordResult> row in pron.rows)

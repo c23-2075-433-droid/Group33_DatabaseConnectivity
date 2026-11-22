@@ -53,8 +53,11 @@ internal static class StressTests
         if (mode == "generate") return Generate(root);
         if (mode == "debug") return Debug();
         if (mode == "file") return Files(args.Skip(2).ToArray());
+        if (mode == "hybrid") { HybridTests(); Console.WriteLine(passed + " passed, " + failed + " failed"); return failed == 0 ? 0 : 1; }
         if (mode == "balanced") { BalancedTests(); Console.WriteLine(passed + " passed, " + failed + " failed"); return failed == 0 ? 0 : 1; }
         if (mode == "strict") { StrictEveryWord(); Console.WriteLine(passed + " passed, " + failed + " failed"); return failed == 0 ? 0 : 1; }
+        if (mode == "dataset-eval") return DatasetTool.Run(root, false, args.Skip(2).ToArray());
+        if (mode == "dataset-train") return DatasetTool.Run(root, true, args.Skip(2).ToArray());
         if (mode == "labelled") return Labelled(args.Length > 2 ? args[2] : Path.Combine(root, "Recordings", "Labelled"));
 
         PatternTests();
@@ -66,6 +69,7 @@ internal static class StressTests
         StrictEveryWord();
         BandedLevels();
         BalancedTests();
+        HybridTests();
         Informational();
 
         Console.WriteLine();
@@ -99,6 +103,17 @@ internal static class StressTests
                               "  half accepted " + row.Value.halfAccepted + (row.Value.entry.trusted ? "  TRUSTED" : ""));
         if (pr.missing.Count > 0) Console.WriteLine("  no recording: " + string.Join(", ", pr.missing));
         if (pr.unmeasurable.Count > 0) Console.WriteLine("  syllables not found in Rachel's recording: " + string.Join(", ", pr.unmeasurable));
+
+        PronunciationTemplateBuilder.Result tr = PronunciationTemplateBuilder.Build(vo);
+        string trFile = Path.Combine(root, "Assets", "Scripts", "PronunciationTemplateData.cs");
+        File.WriteAllText(trFile, PronunciationTemplateBuilder.Generate(tr));
+        Console.WriteLine("wrote " + trFile);
+        foreach (var row in tr.rows)
+            Console.WriteLine("  " + row.Key.PadRight(8) + " template: Rachel matched " + row.Value.ownMatched + "/" + row.Value.conditions +
+                              "  other pronunciation caught " + row.Value.wrongOther + "/" + row.Value.wrongTotal +
+                              "  accepted " + row.Value.wrongAccepted + "  half accepted " + row.Value.halfAccepted +
+                              "  real alternative recordings " + row.Value.reference.realAlternatives + (row.Value.reference.trusted ? "  TRUSTED" : ""));
+        foreach (string pb in tr.problems) Console.WriteLine("  " + pb);
         return 0;
     }
 
@@ -176,15 +191,19 @@ internal static class StressTests
         Expect("Bukas", 2, 1, "bu-KÁS");
         Expect("Talon", 2, 1, "ta-LÓN");
         Expect("Basa", 2, 0, "BÁ-sa");
-        Expect("Bati", 2, 0, "BÁ-tì");
+        Expect("Bati", 2, 0, "BÁ-ti");
         Expect("Bangon", 2, 0, "BÁ-ngon");
         Expect("Sapatos", 3, 1, "sa-PÁ-tos");
         Expect("Ibahagi", 4, 2, "i-ba-HÁ-gì");
         Expect("Paalam", 3, 1, "pa-Á-lam");
         Check("one-syllable Bag has no stress check", StressPattern.For("Bag") == null);
         Check("Kinig (stress not decided) has no stress check", StressPattern.For("Kinig") == null);
-        Check("Tayo and Lakad are pairs, Bangon is not",
-              StressPattern.For("Tayo").IsMinimalPair && StressPattern.For("Lakad").IsMinimalPair && !StressPattern.For("Bangon").IsMinimalPair);
+        Check("Tayo and Pasok are strict pairs; Lakad and Bangon are not",
+              StressPattern.For("Tayo").IsMinimalPair && StressPattern.For("Pasok").IsMinimalPair &&
+              !StressPattern.For("Lakad").IsMinimalPair && !StressPattern.For("Bangon").IsMinimalPair);
+        Check("exactly six words are judged strictly: Tayo, Upo, Bukas, Basa, Bati, Pasok",
+              AmbiguousWords.All.Select(e => e.word).OrderBy(w => w).SequenceEqual(new[] { "Basa", "Bati", "Bukas", "Pasok", "Tayo", "Upo" }),
+              string.Join(", ", AmbiguousWords.All.Select(e => e.word)));
         foreach (string w in WordStress.WordsWithStress)
             if (StressPattern.For(w) == null) Check(w + " has a readable stress", false);
         Check("lookup ignores case and spaces", StressPattern.For("  tAyO ") != null);
@@ -241,6 +260,13 @@ internal static class StressTests
         Check("PronunciationReferenceData.cs matches the recordings (else run: generate)",
               Normalize(pron) == Normalize(File.ReadAllText(Path.Combine(root, "Assets", "Scripts", "PronunciationReferenceData.cs"))));
         Check("Tayo's pronunciation reference is trusted", PronunciationReferences.For("Tayo").trusted);
+        string tmpl = PronunciationTemplateBuilder.Generate(PronunciationTemplateBuilder.Build(vo));
+        Check("PronunciationTemplateData.cs matches the recordings (else run: generate)",
+              Normalize(tmpl) == Normalize(File.ReadAllText(Path.Combine(root, "Assets", "Scripts", "PronunciationTemplateData.cs"))));
+        Check("every ambiguous word is a same-spelling pair in WordStress, and the other way round",
+              AmbiguousWords.All.Select(e => e.word.ToLowerInvariant()).OrderBy(w => w).SequenceEqual(WordStress.Words.Select(w => w.ToLowerInvariant()).OrderBy(w => w)));
+        Check("every ambiguous word has template references", AmbiguousWords.All.All(e => PronunciationTemplate.For(e.word) != null),
+              string.Join(", ", AmbiguousWords.All.Where(e => PronunciationTemplate.For(e.word) == null).Select(e => e.word)));
         Console.WriteLine("  pronunciation references trusted: " + string.Join(", ", WordStress.WordsWithStress.Where(w => PronunciationReferences.For(w).trusted)));
         Console.WriteLine("  raw audio enforced: " + string.Join(", ", WordStress.WordsWithStress.Where(w => RawStressReferences.For(StressPattern.For(w)).enforced)) +
                           "; loudness readings enforced: " + string.Join(", ", WordStress.WordsWithStress.Where(w => StressReferences.For(StressPattern.For(w)).enforced)));
@@ -512,8 +538,8 @@ internal static class StressTests
         Console.WriteLine("Pairs and other words");
         float[] lakad = Load("lakad", out int lr);
         var walk = Audio(lakad, lr);
-        var lk = AnswerJudge.Judge("lakad tayo", "Lakad", null, walk, s);
-        Check("\"lakad tayo\" for Lakad (a pair, inside a sentence) -> Wrong", lk.outcome == AnswerJudge.Outcome.Wrong, lk.outcome.ToString());
+        var lk = AnswerJudge.Judge("pasok tayo", "Pasok", null, walk, s);
+        Check("\"pasok tayo\" for Pasok (a strict pair, inside a sentence) -> Wrong", lk.outcome == AnswerJudge.Outcome.Wrong, lk.outcome.ToString());
         float[] bangon = Load("bangon", out int br);
         var bp = AnswerJudge.Judge("bangon po", "Bangon", null, Audio(bangon, br), lenient);
         Check("Lenient: \"bangon po\" (not a pair, filler) -> Correct, as before", bp.outcome == AnswerJudge.Outcome.Correct, bp.outcome.ToString());
@@ -751,7 +777,7 @@ internal static class StressTests
         Check("no taught word is ever accepted for another (" + confused + " confusions)", confused == 0);
 
         // ---- Every recorded word: Rachel's own always passes; ordinary words never fail on stress ----
-        int ownFail = 0, ownTotal = 0, ordinaryStressFail = 0, ordinaryTotal = 0, pairCaught = 0, pairWrongTotal = 0, pairFlips = 0;
+        int pairOwnRefused = 0, ownFail = 0, ownTotal = 0, ordinaryStressFail = 0, ordinaryTotal = 0, pairCaught = 0, pairWrongTotal = 0, pairFlips = 0;
         List<string> pairReport = new List<string>();
         foreach (string word in WordStress.WordsWithStress.OrderBy(w => w))
         {
@@ -769,8 +795,9 @@ internal static class StressTests
             for (int ci = 0; ci < allConds.Length; ci++)
             {
                 var c = allConds[ci];
-                ownTotal++;
-                if (AnswerJudge.Judge(said, word, null, Raw(PronunciationReferenceBuilder.Apply(a, sr, c), sr), b).outcome != AnswerJudge.Outcome.Correct) ownFail++;
+                var ownR = AnswerJudge.Judge(said, word, null, Raw(PronunciationReferenceBuilder.Apply(a, sr, c), sr), b);
+                if (p.IsMinimalPair) { if (ownR.outcome == AnswerJudge.Outcome.WrongStress || ownR.outcome == AnswerJudge.Outcome.Wrong) pairOwnRefused++; }
+                else { ownTotal++; if (ownR.outcome != AnswerJudge.Outcome.Correct) ownFail++; }
                 foreach (float[] m in wrongs)
                 {
                     var r = AnswerJudge.Judge(said, word, null, Raw(PronunciationReferenceBuilder.Apply(m, sr, c), sr), b);
@@ -791,7 +818,8 @@ internal static class StressTests
             }
             if (p.IsMinimalPair) pairReport.Add(p.Spoken + " " + caught + "/" + total);
         }
-        Check("Rachel's own delivery of every word is accepted on every phone and voice (" + ownFail + " of " + ownTotal + " refused)", ownFail == 0);
+        Check("Rachel's own delivery of every ORDINARY word is accepted on every phone and voice (" + ownFail + " of " + ownTotal + " refused)", ownFail == 0);
+        Check("Rachel's own delivery of an ambiguous word is never refused (" + pairOwnRefused + " refused; asked again at worst)", pairOwnRefused == 0);
         Check("an ordinary word is never refused for its stress (" + ordinaryStressFail + " of " + ordinaryTotal + " refused)", ordinaryStressFail == 0);
 
         // ---- The pairs, where stress changes the word ----
@@ -803,9 +831,104 @@ internal static class StressTests
         Check("pair: tayô (stand up) -> accepted", standUp.outcome == AnswerJudge.Outcome.Correct, standUp.outcome + ": " + standUp.reason);
         Check("pair: táyo (we), clearly the other word -> refused as wrong stress", we.outcome == AnswerJudge.Outcome.WrongStress, we.outcome + ": " + we.reason);
         Check("pair: \"kain tayo\" (let's eat) -> refused", kainTayo.outcome == AnswerJudge.Outcome.Wrong);
-        Console.WriteLine("  (for information: on the same-spelling pairs a clearly moved stress was refused on " + pairCaught + "/" + pairWrongTotal +
-                          " - the rest passed, as the stress was not clear enough to call it the other word: " + string.Join(", ", pairReport) + ")");
-        Console.WriteLine("  (for information: a moved stress on a pair was refused on one try and accepted on another " + pairFlips + " time(s))");
+        Console.WriteLine("  (ambiguous words are covered by HybridTests below)");
+    }
+
+    // ---- Ambiguous words: the strict hybrid check ------------------------------
+
+    /// <summary>
+    /// The eleven words whose meaning depends on pronunciation, through
+    /// AnswerJudge exactly as the game calls it, on material the references
+    /// were NOT calibrated on: the held-out phones and voices, the other
+    /// pronunciation at 90% and 130% strength, and four repeats of each in
+    /// different room noise.
+    /// </summary>
+    private static void HybridTests()
+    {
+        Console.WriteLine("Ambiguous words (strict hybrid check), held-out phones, voices and pronunciations");
+        var b = AnswerJudge.Settings.Default;
+        int ownTotal = 0, ownAccepted = 0, ownRefused = 0, otherTotal = 0, otherRefused = 0, otherAccepted = 0;
+        int nondeterministic = 0, flips = 0, unclearRepeats = 0;
+        List<string> report = new List<string>(), falseAccepts = new List<string>();
+        foreach (AmbiguousWords.Entry e in AmbiguousWords.All)
+        {
+            StressPattern p = StressPattern.For(e.word);
+            float[] a = Load(e.word, out int sr);
+            string said = e.word.ToLowerInvariant();
+            List<float[]> others = new List<float[]>();
+            foreach (float k in new[] { 0.9f, 1.3f })
+                foreach (int nb in PronunciationAssessor.Neighbours(p))
+                {
+                    float[] m = PronunciationReferenceBuilder.MoveStress(a, sr, p, nb, k);
+                    if (m != null) others.Add(m);
+                }
+            int wOwnOk = 0, wOwnBad = 0, wOther = 0, wOtherBad = 0, wOtherN = 0;
+            for (int ci = 0; ci < HeldOut.Length; ci++)
+            {
+                var c = HeldOut[ci];
+                float[] x = PronunciationReferenceBuilder.Apply(a, sr, c, 71 + ci);
+                var own = AnswerJudge.Judge(said, e.word, null, Raw(x, sr), b);
+                ownTotal++;
+                if (own.outcome == AnswerJudge.Outcome.Correct) { ownAccepted++; wOwnOk++; }
+                if (own.outcome == AnswerJudge.Outcome.WrongStress || own.outcome == AnswerJudge.Outcome.Wrong) { ownRefused++; wOwnBad++; }
+                var again = AnswerJudge.Judge(said, e.word, null, Raw(x, sr), b);
+                if (again.outcome != own.outcome) nondeterministic++;
+
+                foreach (float[] m in others)
+                {
+                    var r = AnswerJudge.Judge(said, e.word, null, Raw(PronunciationReferenceBuilder.Apply(m, sr, c, 71 + ci), sr), b);
+                    otherTotal++; wOtherN++;
+                    if (r.outcome == AnswerJudge.Outcome.WrongStress) { otherRefused++; wOther++; }
+                    if (r.outcome == AnswerJudge.Outcome.Correct)
+                    {
+                        otherAccepted++; wOtherBad++;
+                        falseAccepts.Add(e.word + " (" + c.name + "): " + r.reason);
+                    }
+                }
+
+                // The same delivery, four tries in different room noise.
+                foreach (float[] src in new[] { a, others[others.Count - 1] })
+                {
+                    bool anyCorrect = false, anyWrong = false, anyUnclear = false;
+                    for (int seed = 81; seed < 85; seed++)
+                    {
+                        var rr = AnswerJudge.Judge(said, e.word, null, Raw(PronunciationReferenceBuilder.Apply(src, sr, c, seed), sr), b);
+                        anyCorrect |= rr.outcome == AnswerJudge.Outcome.Correct;
+                        anyWrong |= rr.outcome == AnswerJudge.Outcome.WrongStress;
+                        anyUnclear |= rr.outcome == AnswerJudge.Outcome.Unclear;
+                    }
+                    if (anyCorrect && anyWrong) flips++;
+                    if (anyUnclear && (anyCorrect || anyWrong)) unclearRepeats++;
+                }
+            }
+            report.Add(p.Spoken + (PronunciationTemplate.For(e.word) != null && PronunciationTemplate.For(e.word).trusted ? "*" : "") +
+                       " right " + wOwnOk + "/" + HeldOut.Length + ", other refused " + wOther + "/" + wOtherN +
+                       (wOtherBad > 0 ? " OTHER ACCEPTED " + wOtherBad : "") + (wOwnBad > 0 ? " RIGHT REFUSED " + wOwnBad : ""));
+        }
+        foreach (string f in falseAccepts) Console.WriteLine("    false accept: " + f);
+        Check("the other pronunciation of an ambiguous word is never accepted (" + otherAccepted + " of " + otherTotal + ")", otherAccepted == 0);
+        Check("Rachel's pronunciation of an ambiguous word is never refused (" + ownRefused + " of " + ownTotal + ")", ownRefused == 0);
+        Check("the same recording always gets the same verdict (" + nondeterministic + " differed)", nondeterministic == 0);
+        Check("the same delivery is never accepted on one try and refused on another (" + flips + " flips)", flips == 0);
+        Console.WriteLine("  (for information: Rachel's pronunciation accepted " + ownAccepted + "/" + ownTotal + ", the other refused " +
+                          otherRefused + "/" + otherTotal + "; the rest asked again. Same delivery asked again on some tries but decided on others: " +
+                          unclearRepeats + ". * = trusted template)");
+        foreach (string line in report) Console.WriteLine("    " + line);
+
+        // Rules that hold whatever the audio says.
+        float[] t = Load("tayo", out int tsr);
+        var noAudio = AnswerJudge.Judge("tayo", "Tayo", null, new AnswerJudge.Evidence(), b);
+        Check("ambiguous word, letters right but no audio -> asked again, never accepted on its letters", noAudio.outcome == AnswerJudge.Outcome.Unclear, noAudio.outcome.ToString());
+        var filler = AnswerJudge.Judge("tayo po", "Tayo", null, Raw(t, tsr), b);
+        Check("ambiguous word with \"po\" -> asked again (say it on its own)", filler.outcome == AnswerJudge.Outcome.Unclear, filler.outcome.ToString());
+        var silent = AnswerJudge.Judge("tayo", "Tayo", null, Raw(StressReferenceBuilder.RawCondition(new float[tsr], tsr, -60f, 1f), tsr), b);
+        Check("ambiguous word, recording with no voice -> asked again", silent.outcome == AnswerJudge.Outcome.Unclear, silent.outcome.ToString());
+        var sentence = AnswerJudge.Judge("kain tayo", "Tayo", null, Raw(t, tsr), b);
+        Check("\"kain tayo\" (let's eat) -> refused", sentence.outcome == AnswerJudge.Outcome.Wrong);
+        var otherWord = AnswerJudge.Judge("kayo", "Tayo", null, Raw(t, tsr), b);
+        Check("a different word (\"kayo\") with Rachel's own audio -> refused: audio never overrides the letters", otherWord.outcome == AnswerJudge.Outcome.Wrong);
+        var ordinary = AnswerJudge.Judge("bangon", "Bangon", null, new AnswerJudge.Evidence(), b);
+        Check("an ordinary word (Bangon) is still balanced: no audio -> accepted on the word", ordinary.outcome == AnswerJudge.Outcome.Correct);
     }
 
     // ---- Real recordings, sorted by what was said -----------------------------
