@@ -1,0 +1,163 @@
+SALINLAHI - RELEASE NOTES
+=========================
+
+Project      : SALINLAHI - A Voice-Interactive Filipino Language Learning Game
+Version      : 0.2.0
+Release Date : [CONFIRM: build date]
+Release Type : Development milestone (testing build, not a stable release)
+Platform     : Android 8.0+ (minSdk 26), ARM64. The stress check for six
+               words needs Android 13+ (API 33).
+Artifact     : SALINLAHI-v0.2.0.apk  (versionCode 4)
+Artifact size: [CONFIRM: bytes, from the built APK]
+Package size : [CONFIRM: SALINLAHI-v0.2.0.zip bytes]
+Package id   : ph.edu.uphsl.group33.salinlahi
+Built with   : Unity 6000.6.2f1
+
+Source version / branch / changeset
+  Branch : main
+  Commit : recorded in BUILD_INFO.txt beside this file, written by the build
+           itself rather than typed in by hand
+  Tag    : v0.2.0
+
+Why 0.2.0. A new working feature - the stress check for six words - is a
+MINOR change under the Numbering table in Docs/RELEASE_PROCESS.md. It also
+ends a naming problem: test builds made from the source after v0.1.1 showed
+"0.1.1" on the About screen although they were not v0.1.1.
+
+
+WHAT CHANGED SINCE v0.1.1
+-------------------------
+
+Stress check for six words (the main change).
+  Tayo, Upo, Bukas, Basa, Bati and Pasok are each two different words
+    depending on stress (ta-YO "stand up" / TA-yo "we", and so on). The
+    speech recognizer returns letters only, so it cannot tell them apart.
+  For these six words the game now also judges HOW the word was said:
+    - PronunciationModel, an on-device classifier (one logistic regression
+      per word) on five measurements taken inside the child's own word:
+      vowel-length ratio, pitch difference, loudness difference, pitch fall
+      in the last vowel, and a whole-word comparison (dynamic time warping)
+      with recorded speakers. Absolute pitch, loudness and speed never count.
+    - Trained on 229 recordings from five adult speakers, each heard under
+      12 simulated conditions (room noise, raised child-like voices, slower
+      and faster speech).
+    - The older Rachel-based judges are kept as a safety net.
+  Three answers: Correct, Other word (counted as a miss), or Say it again
+    (not counted). Every other word is judged by the recognized text alone,
+    exactly as in v0.1.1.
+  Audio bridge (Android 13+): a small Android plugin
+    (Assets/Plugins/Android/SalinlahiAudioRecognizer.java) records the child,
+    keeps the audio in memory for the classifier, and hands the same audio to
+    Android's speech recognizer. Nothing is written to storage or uploaded by
+    the game. Phones that refuse it fall back, for the session, to normal
+    listening and a rougher loudness-based check.
+  Results, leave one speaker out, whole game check (Docs/PronunciationChecking.md
+    section 2h): correct pronunciation accepted 95/117, other pronunciation
+    refused 81/112, 2 wrongly accepted, 2 wrongly refused, 49 asked again;
+    77% of all takes decided correctly (98% of decided takes). The earlier
+    Rachel-only check on the same takes: 75/117, 87/112, 2, 5, 60; 71%.
+    The decision lines were tuned on the same recordings, so these figures
+    are optimistic. No Grade 2-3 learner has been recorded or tested.
+  Bati is now written Bati with one mark (BA-ti); v0.1.1 wrote it with two.
+    The group's validation form uses the two-mark spelling; this is pending
+    the validator's confirmation.
+
+Nicknames.
+  A name is now checked against the other profiles on the device, then
+    claimed online (Supabase nickname_claims), so two children cannot share
+    one. The claim sends the nickname and a random installation ID. If the
+    check cannot be completed, the name is accepted, as before.
+
+Voice and narration.
+  34 of Rachel's word clips were replaced with clearer takes, and Pagkain now
+    has its recording. 471 voice clips (v0.1.1: 468); 13 voice-bank entries
+    are empty (v0.1.1: 14).
+  Rachel's lip sync is baked from the recordings (Rhubarb) instead of the TTS
+    timings; clips not yet baked are lip-synced live.
+
+Scenes.
+  Paaralan 5: Tayo, Kunin, Paalam and Alis are drawn at the desk's scale; Alis
+    walks off and the room fades before the summary appears. Rachel says
+    Ligpit there, not Linis.
+
+Measurement.
+  The voice-attempt log gains 11 columns: 5 for recognition latency and 6 for
+    the stress check. It still holds text and numbers only, never audio, and
+    is never uploaded.
+  PerfSampler measures frames per second, memory and startup on the device.
+
+Tools (not in the APK).
+  Tools/pronunciation_dataset: cut, label and import new speakers'
+    recordings. Tools/test_stress_rules.sh: the tests and the
+    leave-one-speaker-out evaluation, without Unity.
+
+
+KNOWN ISSUES
+------------
+
+  THE STRESS CHECK IS NOT VALIDATED FOR CHILDREN. Trained and tested on five
+    adult speakers; children's voices were only simulated. Its accuracy for
+    Grade 2-3 learners is unknown. Do not present it as a pronunciation
+    assessment.
+
+  "Say it again" is common on the six words (about one answer in five in the
+    evaluation), and there is no limit on how often it can repeat for one
+    word. Nothing is counted against the child, but a child could be asked
+    again and again.
+
+  The audio bridge has been tried on one phone (Galaxy A03s, Android 13).
+    Its on-device recognizer was not available, so the standard one was used.
+    [CONFIRM: result of the release test on this APK, below.]
+
+  On Android 8-12 the six words use the loudness-based fallback, which is
+    less precise and may ask again more often.
+
+  Speech recognition goes through the device's standard recognizer, which may
+    process the audio online. The game's own classifier is on the device.
+
+  Kinig and Tapon have no recording of the word itself. Eight more empty
+    word entries (Suot, Padyak, Alok, Apir, Hugas, Sali, Tara, Salamin) are not
+    asked in any scene. 13 empty voice-bank entries in all.
+
+  The scene badges show plain spellings (Tayo, Bati) except in Klasrum, while
+    the word sign above shows stress marks (TAYO with its mark). Two
+    spellings of the same word can be on screen together.
+
+  Unchanged from v0.1.1: the long silent pause before the first word of a
+    scene; MINI GAME does nothing; a word badge sits low in Paaralan 5;
+    suspend and resume not tested at full volume; no desktop voice input; the
+    leaderboard cannot be filtered to one child.
+
+
+RELEASE TEST (Docs/RELEASE_PROCESS.md step 7) - fill in on the device
+--------------------------------------------------------------------
+
+  Device / Android version: [CONFIRM]        Tester: [CONFIRM]
+  About screen reads v0.2.0 ........................ [CONFIRM]
+  A spoken ordinary word is accepted and acts ........ [CONFIRM]
+  A wrong vowel is not accepted ...................... [CONFIRM]
+  Each of the six words said the taught way .......... [CONFIRM: accepted / asked again]
+  Each of the six words said the other way ........... [CONFIRM: refused / asked again]
+  Assets load, save/load, leaderboard, clean exit .... [CONFIRM]
+  Keep a screen recording with sound of the six-word checks.
+
+
+INSTALLATION / RUNNING INSTRUCTIONS
+-----------------------------------
+
+See README.txt in this folder. In short:
+
+  1. v0.1.0 or v0.1.1 can be upgraded in place.
+  2. Copy SALINLAHI-v0.2.0.apk to an Android 8.0+ device and open it.
+  3. Allow installation from this source, then allow the microphone.
+  4. Stay online, turn the volume up, and say the Filipino word on screen.
+
+Confirm the build by opening SETTINGS > ABOUT; it should read v0.2.0.
+
+
+NEXT VERSION
+------------
+
+  A bug fix on top of this release becomes 0.2.1.
+  Testing the stress check with Grade 2-3 learners, with their recordings
+    added to the dataset, decides what Chapter 4 may claim about it.
