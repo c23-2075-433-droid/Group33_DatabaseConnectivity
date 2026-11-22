@@ -294,9 +294,9 @@ Per word, classifier alone, as recorded:
 
 **Limits. Read these before quoting the numbers.**
 
-- **Three adult speakers** is enough to fit five weights per word. It is not
+- **Three speakers** is enough to fit five weights per word. It is not
   enough to give a reliable accuracy figure: each test is one voice, 18 takes
-  per word. **No child has been recorded.** The ×1.25 and ×1.45 voice raises
+  per word. The speakers' ages were not recorded. **No child has been recorded.** The ×1.25 and ×1.45 voice raises
   only approximate a child's voice.
 - The speakers exaggerate the other pronunciation (pitch jumps of up to 12
   semitones). A child who says it naturally may land in "ask again" more often.
@@ -355,7 +355,7 @@ tries. There were two causes:
   Without this, kl's 22 correct and one alternate Bati takes taught the model
   "this voice means correct", and kl's batî crept from p 0.06 to 0.43.
 - **Spelling.** Bati is now written **Báti** (BÁ-ti). The group chose the mark
-  on the a only.
+  on the a only (to be validated: see section 2h).
 
 **Results.**
 
@@ -439,8 +439,8 @@ These are the live verdicts from the Console:
 | Pasok | 1/1 accepted | 3/3 refused |
 | **All** | **8/9 accepted, 0 refused** | **16 refused, 6 asked again, 0 accepted** |
 
-There was no wrong verdict in either direction. This is still one adult voice,
-and few correct takes per word. The takes were then added to the dataset as
+There was no wrong verdict in either direction. This is still one voice (age
+not recorded, and not a Grade 2–3 learner), and few correct takes per word. The takes were then added to the dataset as
 speaker `sp5`, so this exact test can't be repeated on them. The next unheard
 voice, ideally a child's, is the next test.
 
@@ -483,8 +483,16 @@ first and failed:
   each round, error codes). It is **off by default**, and works only in a
   **Development Build**. A normal (release) APK never shows them, even with the
   switch ticked. To test again, tick both the switch and *Development Build*.
-- **Privacy.** The audio stays in memory only until it is judged. It is never
-  written to storage or sent anywhere.
+- **Privacy.** The pronunciation classifier runs entirely on the phone, and
+  SALINLAHI never writes the audio to storage or uploads it: the game's copy
+  stays in memory only until it is judged. **But the same audio is given to
+  Android's speech-recognition service** to find out which word was said.
+  SALINLAHI asks for the standard recognizer, and the on-device one is not
+  available on the A03s, so that service may process the audio online (for
+  example on Google's servers), under the phone's own speech-service terms.
+  This is no change from before: every voice answer in the game already went
+  through the same service. The manuscript's privacy statement should say
+  exactly this, and not "audio never leaves the phone".
 
 **Tried on a Galaxy A03s (Android 13), four rounds of fixes:**
 
@@ -511,6 +519,95 @@ After fix 3, on the A03s, Tayo and Bukas were recognized and judged by the
 model. The wrong pronunciation was refused, and the right one accepted. The
 on-device recognizer is not available on this phone
 (`UnsupportedOperationException`), so only the standard recognizer is used.
+
+### 2h. Verified results, five speakers (re-run on the merged code, 2026-11-22)
+
+These figures were re-run on `origin/main` after pull request #24 was merged
+(commit `f5e9ebb`), from a clean copy of the repository and the git-ignored
+`Recordings/Dataset`. They are the figures to quote, with the caveats below.
+Earlier tables in sections 2c–2e are from earlier rounds with fewer speakers.
+
+Reproduce them with:
+
+```
+PM_QUICK=1 sh Tools/test_stress_rules.sh dataset-eval
+sh Tools/test_stress_rules.sh
+```
+
+**Data.** 229 takes from five speakers. Each speaker is judged by a model
+trained without them (leave one speaker out).
+
+| Speaker | Source | Taught takes | Other-way takes |
+|---|---|---|---|
+| la, gar, olyk | one recording each, 3 + 3 per word | 18 each | 18 each |
+| kl | labelled takes in the Editor (F5 / F6) | 54 | 34 |
+| sp5 | labelled takes in the Editor (F5 / F6) | 9 | 24 |
+
+The speakers' ages were not recorded. None of them is a Grade 2–3 learner.
+
+**Two different results, which measure different things:**
+
+| 229 takes | Classifier alone | **Whole game check** (what a player gets) | Earlier Rachel-only check |
+|---|---|---|---|
+| Correct pronunciation accepted | 96 / 117 | **95 / 117** | 75 / 117 |
+| Other pronunciation refused | 88 / 112 | **81 / 112** | 87 / 112 |
+| Other pronunciation wrongly accepted | 3 | **2** | 2 |
+| Correct pronunciation wrongly refused | 3 | **2** | 5 |
+| Asked to repeat | 39 | **49** | 60 |
+| Accuracy, all takes | 80 % | **77 %** | 71 % |
+| Accuracy, decided takes only | 97 % | 98 % | 96 % |
+
+- The **classifier alone** is `PronunciationModel` by itself.
+- The **whole game check** is `AnswerJudge`: the classifier plus the older
+  judges as a safety net, which turn some verdicts into "ask again". It is the
+  result to quote for the system.
+- "Accuracy, all takes" counts "asked to repeat" as not decided correctly.
+- Under the 12 simulated phones and voices (2,748 versions of the same takes),
+  the whole game check decided 66 % correctly, against 57 % for the earlier
+  check. It wrongly accepted 39 and wrongly refused 83.
+
+Classifier alone, per held-out speaker (the tool prints these per speaker;
+the whole-game totals are only printed overall):
+
+| Speaker | Correct accepted | Other refused | Wrong accepts | Wrong refusals |
+|---|---|---|---|---|
+| la | 18/18 | 18/18 | 0 | 0 |
+| olyk | 17/18 | 15/18 | 0 | 0 |
+| gar | 15/18 | 13/18 | 0 | 1 |
+| sp5 | 9/9 | 19/24 | 0 | 0 |
+| kl | 37/54 | 23/34 | 3 | 2 |
+
+**Caveats. State these with the figures.**
+
+- **Thresholds tuned on the same recordings.** The decision lines (Correct
+  from p ≥ 0.60 with no measurement below 0.40; Incorrect at p ≤ 0.30) were
+  chosen while looking at these same 229 takes. The figures are therefore
+  likely somewhat optimistic. A fresh group of speakers, ideally children, is
+  needed for an unbiased figure.
+- **Not independently verified.** The figures come from the project's own test
+  tool, run by the developers. They have not been reproduced by anyone outside
+  the group.
+- **No Grade 2–3 learners** were recorded or tested. Accuracy for children has
+  not been established.
+- **Five speakers** is a small sample, and kl contributed more takes than
+  everyone else together.
+
+**Automated test suite** (same commit): **222 checks passed, 1 failed.** The
+failure is in the optional "strict on every word" mode, which the game does not
+use: it accepted 5 of 800 simulated wrong stresses. It failed the same way
+before this work.
+
+**Vocabulary still to validate.**
+
+- **Báti.** The group chose to write the greeting **Báti**, with the stress
+  mark on the *a* only. In standard Filipino marking, the greeting is **bátì**:
+  the grave accent marks its final glottal stop, and the group's own
+  Vocabulary Validation Form lists "bátì – to greet". Written without it, the
+  word would normally be read without the glottal stop. A Filipino language
+  expert should confirm which form the game shows.
+- **Pasok.** "pások – to enter" matches the validation form. The meaning given
+  for the other pronunciation, "pasók, inserted / included", was never
+  validated, because the form lists only the taught words.
 
 ## 2b. Strict mode (no longer the default)
 
