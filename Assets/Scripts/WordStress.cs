@@ -18,17 +18,21 @@ using System.Collections.Generic;
 ///     bukás  to open            búkas  tomorrow
 ///     bása   to read            basâ   wet
 ///     talón  to jump            tálon  a waterfall
-///     bátì   a greeting         batî   beaten, as an egg is
+///     báti   a greeting         batî   beaten, as an egg is
 ///     lákad  to walk            lakád  on foot
 ///     pások  to enter           pasók  inserted, included
 ///     kúha   to get, to take    kuhà   a shot, something taken
 ///     sulát  to write           súlat  a letter, writing
 ///     línis  to clean           linís  cleaned
 ///
+/// Only the first six (tayô, upô, bukás, bása, báti, pások) are judged
+/// strictly - the group's decision of 2026-11-22; the other five are judged as
+/// ordinary words, and are listed here for their marks only.
+///
 /// This game asks the child to SAY the word, so an unmarked spelling on those
 /// eleven is not a small imprecision - it is the game failing to specify what it
 /// is asking for. An adult reading over the child's shoulder would be none the
-/// wiser either. Those eleven are also judged more strictly (see below).
+/// wiser either. The six strict ones are also judged more strictly (see below).
 ///
 /// The last five (lákad, pások, kúha, sulát, línis) were added when stress
 /// checking was extended to every word; kúha and súlat had been held back
@@ -37,7 +41,7 @@ using System.Collections.Generic;
 ///
 /// TWO TABLES
 ///
-///   Pairs           the words above. They are judged strictly: said inside a sentence they are
+///   Pairs           the six strict words above. They are judged strictly: said inside a sentence they are
 ///                   taken as the other word (AnswerJudge).
 ///   Pronunciations  EVERY taught word's stress, written with Filipino stress
 ///                   marks, as the group's Vocabulary Validation Form gives
@@ -67,13 +71,12 @@ public static class WordStress
         { "Upo",   "Upô"   },   // against úpo, the gourd
         { "Bukas", "Bukás" },   // against búkas, tomorrow
         { "Basa",  "Bása"  },   // against basâ, wet
-        { "Talon", "Talón" },   // against tálon, a waterfall
-        { "Bati",  "Bátì"  },   // against batî, beaten
-        { "Lakad", "Lákad" },   // against lakád, on foot
+        { "Bati",  "Báti"  },   // against batî, beaten
         { "Pasok", "Pások" },   // against pasók, inserted
-        { "Kuha",  "Kúha"  },   // against kuhà, a shot / something taken
-        { "Sulat", "Sulát" },   // against súlat, a letter
-        { "Linis", "Línis" },   // against linís, cleaned
+        // Talón, Lákad, Kúha, Sulát and Línis also have a same-spelling
+        // partner, but the group decided (2026-11-22) to judge them as ordinary
+        // words: the right word passes whatever its stress. Their marks stay in
+        // Pronunciations below, so the screen still shows them.
     };
 
     /// <summary>
@@ -99,7 +102,7 @@ public static class WordStress
         { "Pagkain", "Pagkáin" },   // not on the form
         { "Kain",    "Káin"    }, { "Inom",    "Inóm"    }, { "Linis",   "Línis"   },
         // Paaralan
-        { "Pasok",   "Pások"   }, { "Takbo",   "Takbó"   }, { "Bati",    "Bátì"    },
+        { "Pasok",   "Pások"   }, { "Takbo",   "Takbó"   }, { "Bati",    "Báti"    },
         { "Kuha",    "Kúha"    }, { "Lapis",   "Lápis"   }, { "Aklat",   "Aklát"   },
         { "Basa",    "Bása"    }, { "Sulat",   "Sulát"   }, { "Sagot",   "Sagót"   },
         { "Ligpit",  "Ligpít"  },   // not on the form

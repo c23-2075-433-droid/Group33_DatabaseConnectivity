@@ -132,13 +132,27 @@ public static class AnswerJudge
         public StressAnalyzer.Judgement stress;
         /// <summary>Strict mode, recorded audio: PronunciationAssessor's verdict.</summary>
         public PronunciationAssessor.Assessment assessment;
+        /// <summary>Ambiguous words: the whole-word comparison with Rachel's recording (PronunciationTemplate).</summary>
+        public PronunciationTemplate.Result template;
         /// <summary>Strict mode, recorded audio: the second judge (RawStressAnalyzer).</summary>
         public StressAnalyzer.Judgement secondOpinion;
+        /// <summary>Ambiguous words: the classifier trained on the group's recorded speakers (PronunciationModel).</summary>
+        public PronunciationModel.Result model;
+        /// <summary>True when the trained classifier made the decision.</summary>
+        public bool decidedByModel;
         /// <summary>A short reason, for the console and the attempt log.</summary>
         public string reason;
 
         public bool IsCorrect { get { return outcome == Outcome.Correct; } }
     }
+
+    /// <summary>
+    /// ON (the default): the six ambiguous words are decided by the classifier
+    /// trained on the group's recorded speakers (PronunciationModel), with the
+    /// older Rachel-based judges kept only as a safety net - see JudgeAmbiguous.
+    /// OFF, or for a word with no trained model: the older hybrid check alone.
+    /// </summary>
+    public static bool useLearnedModel = true;
 
     public struct Settings
     {
@@ -248,9 +262,11 @@ public static class AnswerJudge
     ///      stress, like Bangon - that is the whole decision. A different
     ///      stress, speed, pitch, intonation or accent never fails it. The
     ///      stress is still measured and logged, for the teacher.
-    ///   3. For the eleven same-spelling pairs (tayo stand-up / tayo we, upo,
-    ///      bukas, basa, talon, bati, lakad, pasok, kuha, sulat, linis -
-    ///      WordStress), a different stress IS a different word, so stress is
+    ///   3. For the six same-spelling pairs judged strictly (tayo stand-up /
+    ///      tayo we, upo, bukas, basa, bati, pasok - AmbiguousWords), the
+    ///      strict hybrid check below decides instead (JudgeAmbiguous). The
+    ///      text that follows describes this branch's own fallback, which those
+    ///      six no longer reach: a different stress IS a different word, so stress is
     ///      consulted - but only to REJECT, and only when the evidence is
     ///      clear: both audio judges agree the stress is on the other syllable
     ///      (or, with no recording, the loudness readings are past every
@@ -260,6 +276,221 @@ public static class AnswerJudge
     ///
     /// Never compares the player's voice with Rachel's.
     /// </summary>
+    /// <summary>
+    /// STRICT HYBRID CHECK for a word whose meaning depends on how it is
+    /// pronounced (AmbiguousWords: tayô "stand up" / táyo "we", ...). The
+    /// recognizer's letters have already matched; they say WHICH letters, not
+    /// which word, so they never decide here on their own.
+    ///
+    /// Two independent audio judges, both measured six ways per answer:
+    ///   T  PronunciationTemplate - the whole answer lined up with Teacher
+    ///      Rachel's own recording and with the other pronunciation, compared
+    ///      on speaker-normalised pitch, loudness and timing. The primary judge.
+    ///   A  PronunciationAssessor (with RawStressAnalyzer as its second opinion)
+    ///      - the answer cut into syllables, the stressed one compared with
+    ///      its neighbours.
+    ///
+    ///   Correct      T says Rachel's pronunciation and A does not say the
+    ///                other; or A says Rachel's on a word where A is trusted,
+    ///                its second opinion agrees, and T does not say the other.
+    ///   WrongStress  two judges say the other pronunciation and none says
+    ///                Rachel's: T and A (or A's second opinion), or A and its
+    ///                second opinion with T not saying Rachel's.
+    ///   Unclear      anything else - the judges disagree, the recording is
+    ///                unclear, the word came with other words around it, or
+    ///                there is no recording. Asked again, never scored, NEVER
+    ///                accepted on its letters.
+    ///
+    /// With only the recognizer's loudness readings (a phone that does not
+    /// share its microphone), StressAnalyzer.JudgeBanded decides the same three
+    /// ways from them.
+    /// </summary>
+    /// <summary>
+    /// Cuts a long recording down to the word and CropMarginSeconds either
+    /// side, before the judges measure it. A phone records the whole listening
+    /// round (8 s and more on the audio bridge) while the word is under a
+    /// second, and every judge measures its audio six times over: on a budget
+    /// phone that was seconds of waiting. The judges find the word the same
+    /// way (SyllableAligner.FindWord), so they still measure the same word.
+    /// </summary>
+    public static Evidence CropToWord(Evidence evidence)
+    {
+        if (evidence.audio == null || evidence.audioSampleRate <= 0) return evidence;
+        float seconds = evidence.audio.Length / (float)evidence.audioSampleRate;
+        if (seconds <= CropAboveSeconds) return evidence;
+        float[] x16 = SpeechFeatures.Resample(evidence.audio, evidence.audioSampleRate, SpeechFeatures.SampleRate);
+        int from, to;
+        string why;
+        if (!SyllableAligner.FindWord(SpeechFeatures.Of(x16, SpeechFeatures.SampleRate), out from, out to, out why)) return evidence;
+        int margin = (int)(CropMarginSeconds * SpeechFeatures.SampleRate);
+        int a = System.Math.Max(0, from * SpeechFeatures.Hop - margin);
+        int b = System.Math.Min(x16.Length, (to + 1) * SpeechFeatures.Hop + margin);
+        float[] cut = new float[b - a];
+        System.Array.Copy(x16, a, cut, 0, cut.Length);
+        evidence.audio = cut;
+        evidence.audioSampleRate = SpeechFeatures.SampleRate;
+        return evidence;
+    }
+
+    public const float CropAboveSeconds = 2.5f, CropMarginSeconds = 0.5f;
+
+    private static Result JudgeAmbiguous(Result r, PronunciationChecker.WordContext context, Evidence evidence)
+    {
+        r.stressEnforced = true;
+        if (context != PronunciationChecker.WordContext.Alone)
+        {
+            r.outcome = Outcome.Unclear;
+            r.reason = "said with other words around it - say " + r.pattern.Spoken + " on its own";
+            return r;
+        }
+
+        evidence = CropToWord(evidence);
+        bool hasAudio = evidence.audio != null && evidence.audio.Length > 0 && evidence.audioSampleRate > 0;
+        bool hasLevels = evidence.levels != null && evidence.levels.Count > 0;
+
+        if (hasAudio)
+        {
+            PronunciationTemplate.Result t = PronunciationTemplate.Assess(evidence.audio, evidence.audioSampleRate, r.pattern.Word);
+            PronunciationAssessor.Assessment a = PronunciationAssessor.Assess(evidence.audio, evidence.audioSampleRate, r.pattern);
+            StressAnalyzer.Judgement second = RawStressAnalyzer.Judge(evidence.audio, evidence.audioSampleRate, r.pattern, 1f);
+            r.template = t;
+            r.assessment = a;
+            r.secondOpinion = second;
+
+            PronunciationModel.Model learned = useLearnedModel ? PronunciationModel.For(r.pattern.Word) : null;
+            PronunciationModel.Result m = learned != null
+                ? PronunciationModel.Assess(evidence.audio, evidence.audioSampleRate, r.pattern, learned)
+                : new PronunciationModel.Result { verdict = PronunciationModel.Verdict.Uncertain, pLow = float.NaN, pHigh = float.NaN, reason = "no trained model" };
+            r.model = m;
+
+            if (learned != null && (m.measured > 0 || t.measured > 0 || a.measured > 0 || !hasLevels))
+                return DecideWithModel(r, t, a, second, m);
+
+            if (t.measured > 0 || a.measured > 0 || !hasLevels)
+            {
+                r.source = StressSource.RawAudio;
+                r.stressChecked = t.measured > 0 || a.measured > 0;
+
+                bool tRight = t.verdict == PronunciationTemplate.Verdict.Matches;
+                bool tOther = t.verdict == PronunciationTemplate.Verdict.Other;
+                bool aRight = a.verdict == PronunciationAssessor.Verdict.Matches;
+                bool aOther = a.verdict == PronunciationAssessor.Verdict.WrongStress;
+                bool secondRight = second.verdict == StressAnalyzer.Verdict.Matches;
+                bool secondOther = second.verdict == StressAnalyzer.Verdict.WrongStress;
+
+                bool right = (tRight && !aOther) || (aRight && a.referenceTrusted && secondRight && !tOther);
+                // A refusal needs two judges. Tried on the group's real labelled
+                // voices, the template alone called 3 of 8 correct answers the
+                // other word; with only Rachel-derived references it cannot
+                // yet tell "another speaker" from "another stress" by itself.
+                bool other = (tOther && (aOther || secondOther) && !aRight) || (aOther && secondOther && !tRight);
+
+                r.stress = new StressAnalyzer.Judgement
+                {
+                    verdict = right && !other ? StressAnalyzer.Verdict.Matches
+                            : other && !right ? StressAnalyzer.Verdict.WrongStress
+                            : r.stressChecked ? StressAnalyzer.Verdict.Borderline : StressAnalyzer.Verdict.Unmeasurable,
+                    measured = t.low,
+                    reference = float.NaN,
+                    moved = float.NaN,
+                    threshold = PronunciationTemplate.For(r.pattern.Word) != null ? PronunciationTemplate.For(r.pattern.Word).acceptFrom : float.NaN,
+                    enforced = true,
+                    reason = t.reason,
+                };
+                string both = "template: " + t.verdict + " - " + t.reason + "; syllables: " + a.verdict + " - " + a.reason +
+                              "; second: " + second.verdict;
+                if (right && !other) { r.outcome = Outcome.Correct; r.reason = "said like Rachel's " + r.pattern.Spoken + " - " + both; }
+                else if (other && !right) { r.outcome = Outcome.WrongStress; r.reason = "said like the other word - " + both; }
+                else { r.outcome = Outcome.Unclear; r.reason = "not clear enough which word was said - " + both; }
+                return r;
+            }
+        }
+
+        if (hasLevels)
+        {
+            StressAnalyzer.Judgement j = StressAnalyzer.JudgeBanded(evidence.levels, evidence.levelIntervalMs, evidence.levelScale, r.pattern);
+            r.source = StressSource.VoiceLevels;
+            r.stress = j;
+            r.stressChecked = j.verdict != StressAnalyzer.Verdict.Unmeasurable;
+            r.reason = j.reason + " [loudness readings]";
+            r.outcome = j.verdict == StressAnalyzer.Verdict.Matches ? Outcome.Correct
+                      : j.verdict == StressAnalyzer.Verdict.WrongStress ? Outcome.WrongStress
+                      : Outcome.Unclear;
+            return r;
+        }
+
+        r.outcome = Outcome.Unclear;
+        r.reason = "no audio to tell " + r.pattern.Spoken + " from the other word - say it again";
+        return r;
+    }
+
+    /// <summary>
+    /// The trained classifier decides; the older judges, built from Rachel's
+    /// voice alone, can only turn a decision into "ask again", never make one:
+    ///
+    ///   Correct      the classifier says the taught pronunciation, and no
+    ///                two older judges (template + a syllable judge, or both
+    ///                syllable judges) say the other.
+    ///   WrongStress  the classifier says the other pronunciation, and neither
+    ///                the template nor a trusted syllable judge says Rachel's.
+    ///   Unclear      everything else, including no clear classifier verdict -
+    ///                unless the classifier is unsure and all THREE older
+    ///                judges agree, which then decides.
+    ///
+    /// The veto is lopsided on purpose: tolerance for a child comes first, so
+    /// one older judge is enough to stop a refusal, but it takes two to stop
+    /// an acceptance.
+    /// </summary>
+    private static Result DecideWithModel(Result r, PronunciationTemplate.Result t, PronunciationAssessor.Assessment a,
+                                          StressAnalyzer.Judgement second, PronunciationModel.Result m)
+    {
+        r.source = StressSource.RawAudio;
+        r.stressChecked = m.measured > 0 || t.measured > 0 || a.measured > 0;
+        r.decidedByModel = true;
+
+        bool tRight = t.verdict == PronunciationTemplate.Verdict.Matches;
+        bool tOther = t.verdict == PronunciationTemplate.Verdict.Other;
+        bool aRight = a.verdict == PronunciationAssessor.Verdict.Matches;
+        bool aOther = a.verdict == PronunciationAssessor.Verdict.WrongStress;
+        bool secondOther = second.verdict == StressAnalyzer.Verdict.WrongStress;
+
+        bool secondRight = second.verdict == StressAnalyzer.Verdict.Matches;
+        bool unsure = m.verdict == PronunciationModel.Verdict.Uncertain;
+
+        // Two older judges saying "the other word" stop an acceptance: the
+        // template with either syllable judge, or both syllable judges.
+        bool right = m.verdict == PronunciationModel.Verdict.Correct && !(tOther && (aOther || secondOther)) && !(aOther && secondOther);
+        bool other = m.verdict == PronunciationModel.Verdict.Incorrect && !tRight && !(aRight && a.referenceTrusted);
+        // When the classifier cannot tell, all THREE older judges agreeing
+        // still decides (section 2a needed only two).
+        if (unsure && tRight && aRight && secondRight) right = true;
+        if (unsure && tOther && aOther && secondOther) other = true;
+
+        r.stress = new StressAnalyzer.Judgement
+        {
+            verdict = right ? StressAnalyzer.Verdict.Matches
+                    : other ? StressAnalyzer.Verdict.WrongStress
+                    : r.stressChecked ? StressAnalyzer.Verdict.Borderline : StressAnalyzer.Verdict.Unmeasurable,
+            measured = m.pLow,
+            reference = float.NaN,
+            moved = float.NaN,
+            threshold = PronunciationModel.For(r.pattern.Word).acceptFrom,
+            enforced = true,
+            reason = m.reason,
+        };
+        string all = "model: " + m.verdict + " - " + m.reason + " [" + PronunciationModel.Describe(m.features) + "]" +
+                     "; template: " + t.verdict + "; syllables: " + a.verdict + "; second: " + second.verdict;
+        if (right) { r.outcome = Outcome.Correct; r.reason = "said like " + r.pattern.Spoken + " - " + all; }
+        else if (other) { r.outcome = Outcome.WrongStress; r.reason = "said like the other word - " + all; }
+        else
+        {
+            r.outcome = Outcome.Unclear;
+            r.reason = (m.verdict == PronunciationModel.Verdict.Uncertain ? "not clear enough which word was said"
+                        : "the model's verdict was not confirmed") + " - " + all;
+        }
+        return r;
+    }
+
     private static Result JudgeBalanced(string spokenText, string targetWord, string[] acceptedVariants, Evidence evidence)
     {
         Result r = new Result();
@@ -286,6 +517,9 @@ public static class AnswerJudge
             r.reason = "said inside a sentence, where it means something else";
             return r;
         }
+        // A word whose meaning depends on its pronunciation gets the strict
+        // hybrid check; every other word stays balanced.
+        if (AmbiguousWords.IsAmbiguous(targetWord)) return JudgeAmbiguous(r, context, evidence);
 
         // Measure the stress whenever the answer is the word on its own, for
         // the log - and, for a pair, to catch a clearly different word.

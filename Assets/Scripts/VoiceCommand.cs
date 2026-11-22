@@ -53,7 +53,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
     [Header("Stress Checking (tayô vs táyo)")]
     [Tooltip("For the words whose meaning depends on their stress (the ones WordStress marks: Tayô, " +
-             "Upô, Bukás, Bása, Talón, Bátì), record the player's voice while the word is asked and " +
+             "Upô, Bukás, Bása, Talón, Báti), record the player's voice while the word is asked and " +
              "check WHICH syllable they stressed - length, loudness and pitch - against Teacher " +
              "Rachel's own recording. The recognizer returns letters only and cannot tell tayô (stand " +
              "up) from táyo (we). See AnswerJudge and StressAudioCapture.")]
@@ -64,6 +64,20 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
              "recording holds it, and then nothing the child says is heard. With it off, stress is " +
              "judged from the recognizer's own loudness readings, which never touch the microphone.")]
     public bool recordOwnVoice = false;
+
+    [Tooltip("ANDROID 13+, the six strictly judged words: the game records the child itself and hands that " +
+             "same audio to Android's speech recognizer (Plugins/Android/SalinlahiAudioRecognizer.java), so the " +
+             "recognizer checks WHICH word and the pronunciation model checks HOW it was said. Phones that do not " +
+             "support it are detected and fall back to normal listening for the session.")]
+    public bool listenWithAudioBridge = true;
+
+    [Tooltip("TESTING ONLY: show the audio bridge's on-screen box and short messages (whether it works on this " +
+             "phone, each listening round, error codes). Shown only in a Development Build - a normal (release) " +
+             "build never shows them, even with this ticked.")]
+    public bool showAudioBridgeMessages = false;
+
+    /// <summary>The test box and messages: only when asked for AND in a development build (never in a release APK).</summary>
+    private bool BridgeMessagesOn { get { return showAudioBridgeMessages && Debug.isDebugBuild; } }
 
     [Tooltip("LENIENT MODE ONLY (Accept Only Rachels Pronunciation off): where the old single stress " +
              "cut-off sits, 1 = halfway between Rachel's stress and the moved one. Strict mode does not use " +
@@ -90,11 +104,17 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     }
 
     [Tooltip("BALANCED (default): the right WORD is what counts. Different stress, speed, pitch, intonation or " +
-             "accent never fail an ordinary word like Bangon; only on the same-spelling pairs (Tayo, Upo, Bukas, " +
-             "Basa, Talon, Bati, Lakad, Pasok, Kuha, Sulat, Linis) does a CLEARLY different stress fail, because " +
-             "there it is a different word. STRICT ON TRUSTED WORDS / STRICT ON EVERY WORD: the player must match " +
+             "accent never fail an ordinary word like Bangon. Only six words - Tayo, Upo, Bukas, Basa, Bati, " +
+             "Pasok (AmbiguousWords) - get the strict hybrid check, because there a different pronunciation is a " +
+             "different word. STRICT ON TRUSTED WORDS / STRICT ON EVERY WORD: the player must match " +
              "Rachel's stress (much stricter). LENIENT: the older rules. See AnswerJudge.")]
     public StressCheck stressCheck = StressCheck.Balanced;
+
+    [Tooltip("For the six strictly judged words (Tayo, Upo, Bukas, Basa, Bati, Pasok): decide with the " +
+             "classifier trained on the group's own recorded speakers (PronunciationModel, from " +
+             "Tools/pronunciation_dataset), keeping the older Rachel-based judges only as a safety net. " +
+             "Off: the older hybrid check alone. Needs the player's audio (Editor/desktop, or Record Own Voice).")]
+    public bool useLearnedPronunciationModel = true;
 
     [Header("Vocabulary Answer Checking")]
     [Tooltip("When set, incoming speech is checked against this Tagalog word - this is how EVERY " +
@@ -174,6 +194,177 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     // Recognizer failures in a row while our own recording was running; see
     // StressAudioCapture for why this switches the recording off.
     private int failuresWhileCapturing;
+    // True from the moment our own recording was started for this listening
+    // round until its result arrives. Failures are counted on this, not on
+    // whether the recording is STILL running when the failure arrives: a
+    // phone that hands the microphone to the recognizer may stop our
+    // recording first, and those failures must still count.
+    private bool capturedThisRound;
+
+    // ---- The audio bridge (Android 13+; see listenWithAudioBridge) ----------------
+    private AndroidAudioRecognizer bridge;
+    private bool bridgeRound;            // a bridge listening round is running
+    private float bridgeRoundStarted;
+    private bool bridgeDisabled;         // gave up for this session
+    private bool bridgeWorked;           // at least one answer came through it
+    private int bridgeMode;              // 0 = the standard recognizer, 1 = on-device
+    private int bridgeFailures;          // failed rounds in a row in which the child DID talk
+    private const int BridgeFailuresPerMode = 2;
+    private const float BridgeRoundTimeout = 15f;
+
+    private bool UseBridge
+    {
+        get
+        {
+            return listenWithAudioBridge && !bridgeDisabled && !string.IsNullOrEmpty(currentTargetWord) &&
+                   AmbiguousWords.IsAmbiguous(currentTargetWord) && AndroidAudioRecognizer.IsSupported;
+        }
+    }
+
+    private void BridgeMessage(string text)
+    {
+        if (BridgeMessagesOn) AndroidAudioRecognizer.Toast(text);
+        else Debug.Log("VoiceCommand: audio bridge - " + text);
+    }
+
+    void OnEnable() { AndroidAudioRecognizer.ShowDiagnostics = BridgeMessagesOn; }
+
+    private void StartBridgeRound()
+    {
+        if (bridge == null)
+        {
+            bridge = AndroidAudioRecognizer.Instance;
+            bridge.Ready += HandleBridgeReady;
+            bridge.SpeechBegan += HandleBridgeSpeechBegan;
+            bridge.Result += HandleBridgeResult;
+            bridge.Error += HandleBridgeError;
+        }
+        SetStatusText("Listening...");
+        speechStartedThisSession = false;
+        ResetLatency();
+        ResetLevels();
+        if (stressCapture != null) stressCapture.Stop();
+        bridgeRound = true;
+        bridgeRoundStarted = Time.realtimeSinceStartup;
+        Debug.Log("VoiceCommand: audio bridge listening for " + currentTargetWord + " (" +
+                  (bridgeMode == 0 ? "standard" : "on-device") + " recognizer)");
+        AndroidAudioRecognizer.Note("listening for " + currentTargetWord + " (" + (bridgeMode == 0 ? "standard" : "on-device") + ")");
+        bridge.StartListening(preferredLanguage, bridgeMode == 1);
+    }
+
+    private void StopBridgeRound()
+    {
+        if (!bridgeRound) return;
+        bridgeRound = false;
+        if (bridge != null) bridge.Cancel();
+        SetListening(false);
+    }
+
+    private void HandleBridgeReady()
+    {
+        if (isShuttingDown || this == null || !bridgeRound) return;
+        readyAtMs = NowMs;
+        SetListening(true);
+        AndroidAudioRecognizer.Note("recognizer ready");
+    }
+
+    private void HandleBridgeSpeechBegan()
+    {
+        if (isShuttingDown || this == null || !bridgeRound) return;
+        speechStartedThisSession = true;
+        if (speechBeganAtMs < 0) speechBeganAtMs = NowMs;
+        OnSpeechBegan?.Invoke();
+        AndroidAudioRecognizer.Note("speech began");
+    }
+
+    private void HandleBridgeResult(string text)
+    {
+        if (isShuttingDown || this == null || !bridgeRound) return;
+        bridgeRound = false;
+        SetListening(false);
+        resultAtMs = NowMs;
+        latencyIsReal = true;
+        int rate;
+        float[] audio = bridge.TakeAudio(out rate);
+
+        AndroidAudioRecognizer.Note("heard \"" + text + "\", audio " + Describe(audio, rate));
+        if (string.IsNullOrWhiteSpace(text)) { BridgeRoundFailed("empty result", audio, false); return; }
+
+        if (!bridgeWorked)
+            BridgeMessage("Audio listening works on this phone (" + (bridgeMode == 0 ? "standard" : "on-device") + " recognizer)");
+        bridgeWorked = true;
+        bridgeFailures = 0;
+        AnswerJudge.Evidence e = new AnswerJudge.Evidence();
+        if (StressWordLive && audio != null) { e.audio = audio; e.audioSampleRate = rate; }
+        ProcessRecognizedText(text, e);
+        RestartAfterRound();
+    }
+
+    private void HandleBridgeError(string code)
+    {
+        if (isShuttingDown || this == null || !bridgeRound) return;
+        bridgeRound = false;
+        SetListening(false);
+        int rate = 16000;
+        float[] audio = bridge != null ? bridge.TakeAudio(out rate) : null;
+        int c;
+        bool normalSilence = int.TryParse(code, out c) && (c == 6 || c == 7);   // speech timeout / no match
+        AndroidAudioRecognizer.Note("error " + AndroidAudioRecognizer.ErrorName(code) + ", audio " + Describe(audio, rate));
+        BridgeRoundFailed("error " + AndroidAudioRecognizer.ErrorName(code), audio, !normalSilence);
+    }
+
+    private static string Describe(float[] audio, int rate)
+    {
+        if (audio == null || audio.Length == 0) return "none";
+        float peak = 0;
+        foreach (float v in audio) peak = Math.Max(peak, Math.Abs(v));
+        return (audio.Length / (float)rate).ToString("0.0") + " s, peak " + peak.ToString("0.00");
+    }
+
+    /// <summary>
+    /// A round that ended without a word. Until the bridge has worked once on
+    /// this phone, the round counts against it when the child talked (the
+    /// game's own recording has a voice in it), or when the failure was not
+    /// the recognizer's ordinary "heard nothing" (a refusal, a timeout, an
+    /// audio error): a round of plain silence is just silence. Two counted
+    /// failures switch to the on-device recognizer; two more, and the bridge
+    /// is given up for this session and the game listens the normal way.
+    /// </summary>
+    private void BridgeRoundFailed(string why, float[] audio, bool hardFailure)
+    {
+        float peak = 0;
+        if (audio != null) foreach (float v in audio) peak = Math.Max(peak, Math.Abs(v));
+        bool talked = peak > 0.05f || speechStartedThisSession;
+        Debug.Log("VoiceCommand: audio bridge round failed (" + why + "), peak " + peak.ToString("0.000") +
+                  (talked ? " - the child talked" : " - silence") + (hardFailure ? ", hard failure" : ""));
+
+        if ((talked || hardFailure) && !bridgeWorked)
+        {
+            if (++bridgeFailures >= BridgeFailuresPerMode)
+            {
+                bridgeFailures = 0;
+                if (bridgeMode == 0)
+                {
+                    bridgeMode = 1;
+                    BridgeMessage("Audio listening: trying the on-device recognizer (" + why + ")");
+                    AndroidAudioRecognizer.Note("SWITCHED to the on-device recognizer");
+                }
+                else
+                {
+                    bridgeDisabled = true;
+                    BridgeMessage("Audio listening is not supported on this phone (" + why + ") - using normal listening");
+                    AndroidAudioRecognizer.Note("GAVE UP - normal listening from now on");
+                }
+            }
+        }
+        if (talked && speechStartedThisSession && OnNothingHeard != null) OnNothingHeard();
+        RestartAfterRound();
+    }
+
+    private void RestartAfterRound()
+    {
+        if (listenContinuously && !isSuspended) Invoke(nameof(StartListening), restartDelay);
+    }
     private const int FailuresBeforeCaptureOff = 3;
 
     private bool StressWordLive
@@ -245,6 +436,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         CancelInvoke(nameof(StartListening));   // drop any queued restart
         SetListening(false);
         if (stressCapture != null) stressCapture.Stop();
+        StopBridgeRound();
 
         try
         {
@@ -268,6 +460,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     {
         isShuttingDown = true;
         if (stressCapture != null) stressCapture.Stop();
+        StopBridgeRound();
+        if (bridge != null)
+        {
+            bridge.Ready -= HandleBridgeReady;
+            bridge.SpeechBegan -= HandleBridgeSpeechBegan;
+            bridge.Result -= HandleBridgeResult;
+            bridge.Error -= HandleBridgeError;
+        }
         CancelInvoke();                      // drop any queued StartListening()
         SetListening(false);
 
@@ -329,11 +529,15 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             int trim = Mathf.Min(audio.Length / 4, rate * 120 / 1000);
             if (trim > 0) System.Array.Resize(ref audio, audio.Length - trim);
 
-            SimulateSpeech(currentTargetWord, audio, rate);
+            // The word asked for, taken BEFORE the answer is judged: a correct
+            // answer moves the scene on to its next objective, and the label
+            // (F5/F6/F7) belongs to the word that was actually said.
+            string askedWord = currentTargetWord;
+            SimulateSpeech(askedWord, audio, rate);
             SaveEditorRecording(audio, rate, LastJudgement);
             lastEditorAudio = audio;
             lastEditorRate = rate;
-            lastEditorWord = currentTargetWord;
+            lastEditorWord = askedWord;
             Debug.Log("VoiceCommand (Editor): to keep this recording for calibration, press F5 if you said it the way " +
                       "Rachel does, F6 if the stress was on the wrong syllable, F7 if a sound was wrong.");
             return;
@@ -408,6 +612,30 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
     void Update()
     {
         StopCaptureIfNoStressWord();
+        if (isShuttingDown || isSuspended || !isInitialized) return;
+
+        // The scene changed its word: move between the bridge (the six words)
+        // and the normal recognizer (every other word) right away.
+        if (bridgeRound && !UseBridge)
+        {
+            StopBridgeRound();
+            StartListening();
+        }
+        else if (!bridgeRound && UseBridge && SpeechToText.IsBusy())
+        {
+            SpeechToText.Cancel();
+            CancelInvoke(nameof(StartListening));
+            Invoke(nameof(StartListening), 0.2f);
+        }
+        else if (bridgeRound && Time.realtimeSinceStartup - bridgeRoundStarted > BridgeRoundTimeout)
+        {
+            int rate = 16000;
+            float[] audio = null;
+            if (bridge != null) { bridge.KeepNow(); audio = bridge.TakeAudio(out rate); }
+            StopBridgeRound();
+            AndroidAudioRecognizer.Note("no answer in " + BridgeRoundTimeout + " s, audio " + Describe(audio, rate));
+            BridgeRoundFailed("no answer from the recognizer in " + BridgeRoundTimeout + " s", audio, true);
+        }
     }
 #endif
 
@@ -602,6 +830,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         if (!isInitialized) return;
         if (isSuspended) return;
 
+        if (bridgeRound) return;
+        if (UseBridge)
+        {
+            if (SpeechToText.IsBusy()) { SpeechToText.Cancel(); Invoke(nameof(StartListening), 0.2f); return; }
+            StartBridgeRound();
+            return;
+        }
+
         // Don't try to start a new session if one's already running.
         if (SpeechToText.IsBusy()) return;
 
@@ -628,7 +864,13 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
         // Only now, with the recognizer holding the microphone: see
         // StressAudioCapture for why the order matters.
-        if (recordOwnVoice && StressWordLive && !Capture.IsDisabled && Capture.Begin()) Capture.MarkStart();
+        bool record = recordOwnVoice;
+        capturedThisRound = false;
+        if (record && StressWordLive && !Capture.IsDisabled && Capture.Begin())
+        {
+            Capture.MarkStart();
+            capturedThisRound = true;
+        }
     }
 
     // Someone started talking. Remembered so a failed recognition can tell
@@ -761,6 +1003,10 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         // rather than touching a dead object.
         if (isShuttingDown || this == null) return;
 
+        // The normal recognizer was cancelled to hand over to the audio
+        // bridge; its farewell result is not an answer.
+        if (bridgeRound) return;
+
         // Cancel() delivers a result of its own, so a result arriving while
         // the narrator is talking is our own interruption, not the player.
         if (isSuspended)
@@ -786,10 +1032,14 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
 
             // Counted whether or not speech began: a recognizer that could not
             // get the microphone never hears speech begin at all.
-            if (stressCapture != null && stressCapture.IsRecording &&
-                ++failuresWhileCapturing >= FailuresBeforeCaptureOff)
-                stressCapture.DisableForSession(failuresWhileCapturing +
-                    " recognizer failures in a row while recording - it may not be sharing the microphone");
+            if (capturedThisRound && stressCapture != null)
+            {
+                Debug.Log("VoiceCommand: recognizer failed (code " + errorCode.Value + ") while our own recording was on - " +
+                          (failuresWhileCapturing + 1) + " of " + FailuresBeforeCaptureOff + " before recording is switched off");
+                if (++failuresWhileCapturing >= FailuresBeforeCaptureOff)
+                    stressCapture.DisableForSession(failuresWhileCapturing +
+                        " recognizer failures in a row while recording - it may not be sharing the microphone");
+            }
 
             // Only when the player actually spoke - see OnNothingHeard.
             if (speechStartedThisSession)
@@ -805,9 +1055,20 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
         }
         else
         {
-            failuresWhileCapturing = 0;
+            // An empty result is the recognizer hearing nothing, the same as
+            // an error for the purpose of "is our recording starving it".
+            if (string.IsNullOrWhiteSpace(spokenText) && capturedThisRound && stressCapture != null)
+            {
+                Debug.Log("VoiceCommand: recognizer heard nothing while our own recording was on - " +
+                          (failuresWhileCapturing + 1) + " of " + FailuresBeforeCaptureOff + " before recording is switched off");
+                if (++failuresWhileCapturing >= FailuresBeforeCaptureOff)
+                    stressCapture.DisableForSession(failuresWhileCapturing +
+                        " empty recognizer results in a row while recording - it may not be sharing the microphone");
+            }
+            else failuresWhileCapturing = 0;
             ProcessRecognizedText(spokenText, CollectEvidence());
         }
+        capturedThisRound = false;
 
         if (listenContinuously && !isSuspended)
         {
@@ -897,6 +1158,7 @@ public class VoiceCommand : MonoBehaviour, ISpeechToTextListener
             settings.balanced = stressCheck == StressCheck.Balanced;
             settings.requireRachelsStress = stressCheck == StressCheck.StrictOnTrustedWords || stressCheck == StressCheck.StrictOnEveryWord;
             settings.verifyOnlyTrustedWords = stressCheck == StressCheck.StrictOnTrustedWords;
+            AnswerJudge.useLearnedModel = useLearnedPronunciationModel;
 
             AnswerJudge.Result verdict = AnswerJudge.Judge(
                 spokenText, currentTargetWord, currentTargetWordVariants, evidence, settings);

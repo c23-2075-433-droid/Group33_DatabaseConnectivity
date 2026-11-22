@@ -5,10 +5,16 @@
 #
 #   Tools/test_stress_rules.sh            run the tests (exit 0 = all passed)
 #   Tools/test_stress_rules.sh generate   re-measure the recordings and rewrite
-#                                         all three stress reference files
+#                                         all four reference files
 #   Tools/test_stress_rules.sh labelled [DIR]
 #                                         judge real labelled recordings (default
 #                                         Recordings/Labelled) and report accuracy
+#   Tools/test_stress_rules.sh dataset-eval [DIR]
+#                                         leave-one-speaker-out report on the recorded
+#                                         pronunciation dataset (default Recordings/Dataset)
+#   Tools/test_stress_rules.sh dataset-train [DIR]
+#                                         the same report, then train on every speaker and
+#                                         rewrite Assets/Scripts/PronunciationModelData.cs
 #   Tools/test_stress_rules.sh file WORD a.wav [b.wav ...]
 #                                         measure WAVs (e.g. the Editor's
 #                                         Library/StressRecordings) as answers to WORD
@@ -59,10 +65,18 @@ cat > "$OUT/tests.csproj" <<'PROJ'
     <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationAssessor.cs" />
     <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationReferences.cs" />
     <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationReferenceData.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/AmbiguousWords.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationTemplate.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationTemplateData.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationModel.cs" />
+    <Compile Include="$(GameRoot)/Assets/Scripts/PronunciationModelData.cs" />
     <Compile Include="$(GameRoot)/Assets/Editor/WavLevelStream.cs" />
     <Compile Include="$(GameRoot)/Assets/Editor/StressReferenceBuilder.cs" />
     <Compile Include="$(GameRoot)/Assets/Editor/PronunciationReferenceBuilder.cs" />
+    <Compile Include="$(GameRoot)/Assets/Editor/PronunciationTemplateBuilder.cs" />
+    <Compile Include="$(GameRoot)/Assets/Editor/PronunciationModelBuilder.cs" />
     <Compile Include="$(GameRoot)/Tools/stresstests/StressTests.cs" />
+    <Compile Include="$(GameRoot)/Tools/stresstests/DatasetTool.cs" />
   </ItemGroup>
 </Project>
 PROJ

@@ -36,6 +36,13 @@ public sealed class SpeechFeatures
     /// an s sits near or above it.
     /// </summary>
     public float[] hiss;
+    /// <summary>
+    /// 12 mel-cepstral coefficients per frame (c1..c12): the shape of the
+    /// spectrum, i.e. WHICH sound is being made. PronunciationTemplate uses
+    /// them only to line an answer up in time with Rachel's recording; they
+    /// are never compared for voice.
+    /// </summary>
+    public float[][] mfcc;
 
     public int Count { get { return db.Length; } }
 
@@ -65,6 +72,7 @@ public sealed class SpeechFeatures
             f0 = new float[frames],
             periodicity = new float[frames],
             hiss = new float[frames],
+            mfcc = new float[frames][],
         };
 
         // Pitch is tracked at 8 kHz: a voice's fundamental is far below 4 kHz,
@@ -94,8 +102,106 @@ public sealed class SpeechFeatures
             float aperiodic;
             s.f0[f] = Yin(half, f * Hop / 2, Window / 2, PitchRate, out aperiodic);
             s.periodicity[f] = Clamp01(1f - aperiodic);
+            s.mfcc[f] = Mfcc(x, f * Hop + (Window - MfccWindow) / 2);
         }
         return s;
+    }
+
+    private const int MfccWindow = 400;   // 25 ms
+    private const int Fft = 512;
+    private const int MelBands = 24;
+    public const int Cepstra = 12;
+    private static float[][] melFilters;
+    private static float[] hamming;
+
+    /// <summary>c1..c12 of one 25 ms window.</summary>
+    private static float[] Mfcc(float[] x, int start)
+    {
+        if (melFilters == null) BuildMel();
+        double[] re = new double[Fft], im = new double[Fft];
+        for (int i = 0; i < MfccWindow; i++)
+        {
+            int k = start + i;
+            float v = k >= 0 && k < x.Length ? x[k] : 0f;
+            float prev = k - 1 >= 0 && k - 1 < x.Length ? x[k - 1] : 0f;
+            re[i] = (v - 0.97f * prev) * hamming[i];   // pre-emphasis
+        }
+        FftInPlace(re, im);
+        double[] power = new double[Fft / 2 + 1];
+        for (int i = 0; i <= Fft / 2; i++) power[i] = re[i] * re[i] + im[i] * im[i];
+
+        double[] logMel = new double[MelBands];
+        for (int b = 0; b < MelBands; b++)
+        {
+            double e = 0;
+            float[] w = melFilters[b];
+            for (int i = 0; i < w.Length; i++) e += w[i] * power[i];
+            logMel[b] = Math.Log(e + 1e-10);
+        }
+        float[] c = new float[Cepstra];
+        for (int n = 1; n <= Cepstra; n++)
+        {
+            double sum = 0;
+            for (int b = 0; b < MelBands; b++) sum += logMel[b] * Math.Cos(Math.PI * n * (b + 0.5) / MelBands);
+            c[n - 1] = (float)sum;
+        }
+        return c;
+    }
+
+    private static void BuildMel()
+    {
+        hamming = new float[MfccWindow];
+        for (int i = 0; i < MfccWindow; i++) hamming[i] = (float)(0.54 - 0.46 * Math.Cos(2 * Math.PI * i / (MfccWindow - 1)));
+        Func<double, double> mel = hz => 2595 * Math.Log10(1 + hz / 700);
+        Func<double, double> hz_ = m => 700 * (Math.Pow(10, m / 2595) - 1);
+        double lo = mel(100), hi = mel(7000);
+        double[] edges = new double[MelBands + 2];
+        for (int i = 0; i < edges.Length; i++) edges[i] = hz_(lo + (hi - lo) * i / (MelBands + 1)) * Fft / SampleRate;
+        float[][] f = new float[MelBands][];
+        for (int b = 0; b < MelBands; b++)
+        {
+            f[b] = new float[Fft / 2 + 1];
+            for (int i = 0; i <= Fft / 2; i++)
+            {
+                double w = 0;
+                if (i >= edges[b] && i <= edges[b + 1]) w = (i - edges[b]) / (edges[b + 1] - edges[b]);
+                else if (i > edges[b + 1] && i <= edges[b + 2]) w = (edges[b + 2] - i) / (edges[b + 2] - edges[b + 1]);
+                f[b][i] = (float)w;
+            }
+        }
+        melFilters = f;
+    }
+
+    /// <summary>Iterative radix-2 FFT.</summary>
+    private static void FftInPlace(double[] re, double[] im)
+    {
+        int n = re.Length;
+        for (int i = 1, j = 0; i < n; i++)
+        {
+            int bit = n >> 1;
+            for (; (j & bit) != 0; bit >>= 1) j ^= bit;
+            j ^= bit;
+            if (i < j) { double t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+        }
+        for (int len = 2; len <= n; len <<= 1)
+        {
+            double ang = -2 * Math.PI / len;
+            double wr = Math.Cos(ang), wi = Math.Sin(ang);
+            for (int i = 0; i < n; i += len)
+            {
+                double cr = 1, ci = 0;
+                for (int k = 0; k < len / 2; k++)
+                {
+                    int a = i + k, b = a + len / 2;
+                    double tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr;
+                    re[b] = re[a] - tr; im[b] = im[a] - ti;
+                    re[a] += tr; im[a] += ti;
+                    double ncr = cr * wr - ci * wi;
+                    ci = cr * wi + ci * wr;
+                    cr = ncr;
+                }
+            }
+        }
     }
 
     /// <summary>

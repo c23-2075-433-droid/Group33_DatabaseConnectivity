@@ -134,7 +134,7 @@ public static class NarratorScript
 
     /// <summary>
     /// How a vocabulary word is SPELLED for the child to read - "Bati" ->
-    /// "Bátì" - read from the Script / Word column of
+    /// "Báti" - read from the Script / Word column of
     /// Docs/VoiceOverScript.csv by way of the voice bank.
     ///
     /// The game keeps two spellings of every word on purpose, and they are
@@ -145,7 +145,7 @@ public static class NarratorScript
     ///   recogniser matches against it, WordVariants is keyed by it and the
     ///   database stores it. It is ASCII and it never changes.
     ///
-    ///   The MARKED one - "Bátì" - is what a reader sees. The accents are
+    ///   The MARKED one - "Báti" - is what a reader sees. The accents are
     ///   stress and glottal marks: they say where the voice lands, which is
     ///   the whole difference between báta and batá, so a child learning to
     ///   say the word needs them in front of them.

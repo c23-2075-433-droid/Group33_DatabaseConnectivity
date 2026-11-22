@@ -3,7 +3,7 @@
 // One-click scene builder for Paaralan Scene 2 ("Entering the Classroom").
 // Teaches five words, in this order:
 //
-//   Bátì    greet          he says hello and crosses to his desk
+//   Báti    greet          he says hello and crosses to his desk
 //   Upô     sit down       he sits, and the view goes in with him
 //   Kínig   listen         settled, before he unpacks
 //   Kúha    get something  he reaches into the bag for his notebook
@@ -1143,7 +1143,7 @@ public class BuildPaaralanScene2
 
     /// <summary>
     /// How the word is spelled on the badge: the marked spelling from the
-    /// voice bank - "Bati" -> "Bátì" - and the word itself if the bank has
+    /// voice bank - "Bati" -> "Báti" - and the word itself if the bank has
     /// no row for it yet. Only the badge uses this; the objective, the
     /// recogniser and the database all keep the plain key.
     /// </summary>
