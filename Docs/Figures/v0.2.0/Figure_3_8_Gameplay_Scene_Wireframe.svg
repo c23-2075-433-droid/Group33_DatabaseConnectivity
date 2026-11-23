@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="960" height="540" fill="#ffffff"/><rect x="2" y="2" width="956" height="536" rx="10" fill="#f3f4f6" stroke="#374151" stroke-width="2.5"/>
+<text x="946.0" y="522.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#6b7280" text-anchor="end" dominant-baseline="central" font-style="italic">Illustrated scene</text>
+<rect x="20.0" y="20.0" width="60.0" height="40.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="50.0" y="40.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">◀</text>
+<circle cx="912" cy="40" r="24" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="912.0" y="40.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">≡</text>
+<circle cx="330" cy="58" r="36" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="330.0" y="58.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Rachel</text>
+<rect x="370.0" y="30.0" width="300.0" height="56.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="520.0" y="48.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Narration plaque:</text>
+<text x="520.0" y="68.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Teacher Rachel's line</text>
+<rect x="135.0" y="220.0" width="90.0" height="220.0" rx="6" fill="#e5e7eb" stroke="#374151" stroke-width="2"/>
+<text x="180.0" y="310.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Kylo</text>
+<text x="180.0" y="330.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(player</text>
+<text x="180.0" y="350.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">character)</text>
+<rect x="485.0" y="282.0" width="150.0" height="96.0" rx="6" fill="#e5e7eb" stroke="#374151" stroke-width="2"/>
+<text x="560.0" y="310.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Picture of</text>
+<text x="560.0" y="330.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">the object</text>
+<text x="560.0" y="350.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">or action</text>
+<rect x="495.0" y="231.0" width="130.0" height="34.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="560.0" y="248.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Word label</text>
+<path d="M 560.0 266.0 L 560.0 280.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-linejoin="round"/>
+<path d="M 650 330 L 700 330" stroke="#374151" stroke-width="2.5" marker-start="url(#arr)"/>
+<text x="708.0" y="330.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start" dominant-baseline="central" font-style="italic">arrow</text>
+<rect x="765.0" y="397.0" width="170.0" height="86.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="850.0" y="420.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">WORD TO SAY:</text>
+<text x="850.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">LÁKAD</text>
+<text x="850.0" y="460.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Walk</text>
+<circle cx="470" cy="440" r="30" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="470.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Mic</text>
+<circle cx="540" cy="440" r="22" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="540.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">↻</text>
+<text x="570.0" y="440.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#4b5563" text-anchor="start" dominant-baseline="central" font-style="italic">replay</text>
+<rect x="345.0" y="482.0" width="250.0" height="36.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="470.0" y="500.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Listening panel: SPEAK NOW …</text>
+<rect x="20.0" y="482.0" width="180.0" height="36.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="110.0" y="500.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">BAHAY: LEVEL 1</text></svg>

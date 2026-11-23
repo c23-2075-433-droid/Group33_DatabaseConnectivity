@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540"><defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#374151"/></marker><marker id="open" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path d="M0,0 L11,6 L0,12" fill="none" stroke="#374151" stroke-width="1.6"/></marker></defs><rect width="960" height="540" fill="#ffffff"/><rect x="2" y="2" width="956" height="536" rx="10" fill="#f3f4f6" stroke="#374151" stroke-width="2.5"/>
+<text x="946.0" y="522.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#6b7280" text-anchor="end" dominant-baseline="central" font-style="italic">Classroom background</text>
+<rect x="71.6" y="53.6" width="455.0" height="200.0" rx="6" fill="#e5e7eb" stroke="#374151" stroke-width="2"/>
+<text x="299.1" y="143.6" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">SALINLAHI title</text>
+<text x="299.1" y="163.6" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(logo and subtitle)</text>
+<rect x="609.6" y="131.8" width="240.0" height="72.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="729.6" y="167.8" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">ADVENTURE</text>
+<rect x="609.6" y="228.9" width="240.0" height="72.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="729.6" y="254.9" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">MINI GAME</text>
+<text x="729.6" y="274.9" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(not wired)</text>
+<rect x="609.6" y="325.9" width="240.0" height="72.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="729.6" y="361.9" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">SETTINGS</text>
+<rect x="609.6" y="423.0" width="240.0" height="72.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="729.6" y="459.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">ABOUT</text>
+<rect x="706.5" y="25.0" width="230.0" height="58.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2"/>
+<text x="821.5" y="44.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Nickname plate</text>
+<text x="821.5" y="64.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(who is playing)</text>
+<rect x="44.7" y="407.1" width="116.0" height="74.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="102.7" y="434.1" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Books</text>
+<text x="102.7" y="454.1" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">(decoration)</text>
+<rect x="263.0" y="13.0" width="410.0" height="34.0" rx="6" fill="#ffffff" stroke="#374151" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="468.0" y="30.0" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="normal" fill="#1f2937" text-anchor="middle" dominant-baseline="central">Plate tap: CHANGE PROFILE, LEADERBOARDS</text>
+<path d="M 673.0 30.0 L 704.0 30.0" fill="none" stroke="#374151" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="8 6" stroke-linejoin="round"/></svg>
